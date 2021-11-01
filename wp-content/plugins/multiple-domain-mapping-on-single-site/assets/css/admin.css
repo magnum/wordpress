@@ -1,0 +1,148 @@
+/** mapping input accordion **/
+.falke_mdm_mapping_header {
+  display: flex;
+}
+
+.falke_mdm_mapping {
+  margin-bottom: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #e5e5e5;
+}
+
+/** mapping input accordion header **/
+.falke_mdm_mapping_header .ui-accordion-header-icon.ui-icon{
+  text-indent: 0;
+}
+.falke_mdm_mapping_header .ui-accordion-header-icon::before {
+  content: '\f345';
+  font-family: 'dashicons';
+  display: block;
+  font-size: 1.2em;
+  background-color: #ccc;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.4;
+  text-align: center;
+  border-radius: 3px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+
+.falke_mdm_new_mapping .falke_mdm_mapping_header {
+  padding-left: 1.7em;
+}
+
+.falke_mdm_mapping_header.ui-state-active .ui-accordion-header-icon::before {
+  transform: rotate(90deg);
+}
+
+.falke_mdm_mapping_header > div:not(.falke_mdm_mapping_arrow) {
+  flex-grow: 1;
+}
+
+.falke_mdm_mapping_header > .falke_mdm_mapping_arrow {
+  padding: 0.3em 0.8em;
+}
+
+.falke_mdm_input_wrap {
+  background-color: #fff;
+  border-radius: 3px;
+  display: flex;
+}
+
+.falke_mdm_input_prefix {
+  background-color: #e5e5e5;
+  padding: 4px 6px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 3px;
+}
+
+.falke_mdm_input_wrap input {
+  border: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  background-color: transparent;
+  padding: 3px 6px;
+  width: 100%;
+  border-top-left-radius: 0;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 0;
+}
+
+.falke_mdm_input_hint {
+  font-size: 0.9em;
+  margin: 0.5em;
+  text-align: right;
+  font-style: italic;
+}
+
+@media all and (max-width: 782px) {
+  .falke_mdm_mapping > .falke_mdm_mapping_arrow,
+  .falke_mdm_input_prefix {
+    padding: 7px 3px;
+    line-height: 1.5;
+    font-size: 16px;
+  }
+}
+
+@media all and (max-width: 699px) {
+  .falke_mdm_mapping_header {
+    flex-direction: column;
+  }
+
+  .falke_mdm_mapping_header > .falke_mdm_mapping_arrow {
+    padding: 0.5em;
+    text-align: center;
+    transform: rotate(90deg);
+  }
+
+  .falke_mdm_new_mapping .falke_mdm_mapping_header {
+    padding-left: 0;
+  }
+}
+
+/** mapping input accordion body **/
+
+.falke_mdm_mapping_body::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.falke_mdm_mapping_body_icon {
+  float: right;
+  margin: 0.5em 0 0.5em 0.5em;
+}
+
+.falke_mdm_mapping_body_icon a {
+  text-decoration: none;
+}
+
+.falke_mdm_mapping_body_icon i {
+  font-style: normal;
+  display: inline-block;
+  font-size: 1.2em;
+  background-color: #ccc;
+  color: #444;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5;
+  text-align: center;
+  border-radius: 3px;
+  transition: 0.5s;
+}
+
+.falke_mdm_mapping_body_icon a:hover i {
+  background-color: #fff;
+}
+
+/** premium notice **/
+
+.premium-survey-notice {
+  color: green;
+  padding:.5em 0;
+}
