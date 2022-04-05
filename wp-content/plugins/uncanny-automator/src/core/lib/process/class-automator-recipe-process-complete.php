@@ -5,6 +5,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Automator_Recipe_Process_Complete
+ *
  * @package Uncanny_Automator
  */
 class Automator_Recipe_Process_Complete {
@@ -139,11 +140,8 @@ class Automator_Recipe_Process_Complete {
 			$user_id = get_current_user_id();
 		}
 
-		$recipe_triggers = Automator()->get_recipe_data( 'uo-trigger', $recipe_id );
-
-		// By default the recipe will complete unless there is a trigger that is live(publish status) and its NOT completed
-		$triggers_completed = true;
-
+		$recipe_triggers  = Automator()->get_recipe_data( 'uo-trigger', $recipe_id );
+		$trigger_statuses = array();
 		foreach ( $recipe_triggers as $recipe_trigger ) {
 			if ( 'publish' === (string) $recipe_trigger['post_status'] ) {
 				$trigger_integration = $recipe_trigger['meta']['integration'];
@@ -153,14 +151,72 @@ class Automator_Recipe_Process_Complete {
 					Automator()->error->add_error( 'complete_trigger', 'ERROR: You are trying to complete ' . $recipe_trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. @recipe_id ' . $recipe_id, $this );
 				}
 
-				$trigger_completed = Automator()->db->trigger->is_completed( $user_id, $recipe_trigger['ID'], $recipe_id, $recipe_log_id, true, $args );
-				if ( ! $trigger_completed ) {
-					return false;
-				}
+				$trigger_completed                         = Automator()->db->trigger->is_completed( $user_id, $recipe_trigger['ID'], $recipe_id, $recipe_log_id, true, $args );
+				$trigger_statuses[ $recipe_trigger['ID'] ] = $trigger_completed;
+			}
+		}
+		if ( empty( $trigger_statuses ) ) {
+			return false;
+		}
+
+		// If "Any" trigger option is set
+		if ( true === $this->is_any_trigger_option_set( $recipe_id ) ) {
+			return $this->is_any_recipe_trigger_completed( $trigger_statuses );
+		}
+
+		// Default logic, All triggers
+		return $this->are_all_recipe_triggers_completed( $trigger_statuses );
+	}
+
+	/**
+	 * Check if "Any" option is selected for triggers
+	 *
+	 * @param $recipe_id
+	 *
+	 * @return bool
+	 */
+	public function is_any_trigger_option_set( $recipe_id ) {
+		$value = get_post_meta( $recipe_id, 'run_when_any_trigger_complete', true );
+		if ( empty( $value ) ) {
+			return apply_filters( 'automator_recipe_any_trigger_complete', false, $recipe_id );
+		}
+		if ( 'any' !== $value ) {
+			return apply_filters( 'automator_recipe_any_trigger_complete', false, $recipe_id );
+		}
+
+		return apply_filters( 'automator_recipe_any_trigger_complete', true, $recipe_id );
+	}
+
+	/**
+	 * @param $statuses
+	 *
+	 * @return bool
+	 */
+	public function are_all_recipe_triggers_completed( $statuses ) {
+		// if "All" option is set (default)
+		foreach ( $statuses as $_trigger_status ) {
+			if ( ! $_trigger_status ) {
+				return false;
 			}
 		}
 
-		return $triggers_completed;
+		return true;
+	}
+
+	/**
+	 * @param $statuses
+	 *
+	 * @return bool
+	 */
+	public function is_any_recipe_trigger_completed( $statuses ) {
+		// if "All" option is set (default)
+		foreach ( $statuses as $_trigger_status ) {
+			if ( $_trigger_status ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -221,9 +277,14 @@ class Automator_Recipe_Process_Complete {
 
 					$action = apply_filters( 'automator_before_action_executed', $action );
 
-					if ( isset( $action['process_further'] ) && false === $action['process_further'] ) {
-						Utilities::log( 'Action was skipped by uap_before_action_executed filter.' );
-						continue;
+					if ( isset( $action['process_further'] ) ){
+
+						if ( false === $action['process_further'] ) {
+							Utilities::log( 'Action was skipped by uap_before_action_executed filter.' );
+							continue;
+						}
+
+						unset( $action['process_further'] );
 					}
 
 					call_user_func_array( $action_execution_function, $action );
@@ -257,7 +318,7 @@ class Automator_Recipe_Process_Complete {
 	 * @param null $recipe_log_id
 	 * @param array $args
 	 *
-	 * @return null
+	 * @return null|void
 	 */
 	public function action( $user_id = null, $action_data = null, $recipe_id = null, $error_message = '', $recipe_log_id = null, $args = array() ) {
 
@@ -358,7 +419,6 @@ class Automator_Recipe_Process_Complete {
 		do_action( 'automator_action_created', $do_action_args );
 
 		$this->recipe( $recipe_id, $user_id, $recipe_log_id, $args );
-
 	}
 
 	/**
@@ -405,16 +465,17 @@ class Automator_Recipe_Process_Complete {
 		 * 1 = completed
 		 * 2 = completed with errors, error message provided
 		 * 5 = scheduled
+		 * 7 = cancelled
+		 * 8 = skipped
 		 * 9 = completed, do nothing
-		 *
 		 */
 		$completed = 0;
 
 		if ( is_array( $action_data ) && ! empty( $error_message ) && key_exists( 'complete_with_errors', $action_data ) ) {
 			$completed = 2;
-		} else if ( ( is_array( $action_data ) && key_exists( 'do-nothing', $action_data ) ) ) {
+		} elseif ( ( is_array( $action_data ) && key_exists( 'do-nothing', $action_data ) ) ) {
 			$completed = 9;
-		} else if ( empty( $error_message ) ) {
+		} elseif ( empty( $error_message ) ) {
 			$completed = 1;
 		}
 
@@ -538,7 +599,6 @@ class Automator_Recipe_Process_Complete {
 		 * 2 = completed with errors, error message provided
 		 * 5 = in progress (some actions are scheduled)
 		 * 9 = completed, do nothing
-		 *
 		 */
 
 		$run_number = Automator()->get->next_run_number( $recipe_id, $user_id, true );
@@ -570,7 +630,7 @@ class Automator_Recipe_Process_Complete {
 
 				return null;
 			}
-
+			
 			$recipe_log_id = Automator()->db->recipe->add( $user_id, $recipe_id, $completed, $run_number );
 		} else {
 			Automator()->db->recipe->mark_complete( $recipe_log_id, $completed );
@@ -589,6 +649,8 @@ class Automator_Recipe_Process_Complete {
 			} elseif ( strpos( $message, 'New user created' ) || strpos( $message, 'Create new user failed' ) ) {
 				$skip = true;
 			} elseif ( 9 === (int) $complete ) {
+				$skip = true;
+			} elseif ( 8 === (int) $complete ) {
 				$skip = true;
 			}
 
@@ -624,7 +686,6 @@ class Automator_Recipe_Process_Complete {
 	 * @param array $args
 	 *
 	 * @return bool
-	 *
 	 */
 	public function closures( $recipe_id = null, $user_id = null, $recipe_log_id = null, $args = array() ) {
 

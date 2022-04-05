@@ -68,7 +68,7 @@ class EventsCustom extends EventsFactory {
 
         switch ($event->getTriggerType()) {
             case 'page_visit': {
-                $singleEvent = new SingleEvent('custom_event',EventTypes::$STATIC);
+                $singleEvent = new SingleEvent('custom_event',EventTypes::$STATIC,'custom');
                 $singleEvent->args = $event;
                 return $singleEvent;
             }

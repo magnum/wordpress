@@ -41,6 +41,7 @@ class Utilities {
     }
 
     public static function createAuthnRequest($acsUrl, $issuer, $force_authn = 'false') {
+        $saml_nameid_format = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
         $requestXmlStr = '<?xml version="1.0" encoding="UTF-8"?>' .
                         '<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="' . self::generateID() .
                         '" Version="2.0" IssueInstant="' . self::generateTimestamp() . '"';
@@ -48,7 +49,8 @@ class Utilities {
             $requestXmlStr .= ' ForceAuthn="true"';
         }
         $requestXmlStr .= ' ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" AssertionConsumerServiceURL="' . $acsUrl .
-                        '" ><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">' . $issuer . '</saml:Issuer></samlp:AuthnRequest>';
+                        '" ><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">' . $issuer .
+            '</saml:Issuer><samlp:NameIDPolicy AllowCreate="true" Format="' . $saml_nameid_format . '"/></samlp:AuthnRequest>';
         $deflatedStr = gzdeflate($requestXmlStr);
         $base64EncodedStr = base64_encode($deflatedStr);
         $urlEncoded = urlencode($base64EncodedStr);
@@ -56,22 +58,6 @@ class Utilities {
 
         return $urlEncoded;
     }
-
-	public static function createSAMLRequest($acsUrl, $issuer, $destination, $force_authn = 'false') {
-
-		$requestXmlStr = '<?xml version="1.0" encoding="UTF-8"?>' .
-		                 '<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="' . self::generateID() .
-		                 '" Version="2.0" IssueInstant="' . self::generateTimestamp() . '"';
-		if( $force_authn == 'true') {
-			$requestXmlStr .= ' ForceAuthn="true"';
-		}
-		$requestXmlStr .= ' ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" AssertionConsumerServiceURL="' . $acsUrl .
-		                  '" Destination="' . htmlspecialchars($destination) . '"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">' . $issuer . '</saml:Issuer><samlp:NameIDPolicy AllowCreate="true" Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
-                        /></samlp:AuthnRequest>';
-        $samlRequest  = base64_encode($requestXmlStr);
-        update_option('MO_SAML_REQUEST',$samlRequest);
-		return $requestXmlStr;
-	}
 
     public static function generateTimestamp($instant = NULL) {
         if($instant === NULL) {
@@ -806,10 +792,11 @@ class Utilities {
 	public static function mo_saml_wp_remote_post($url, $args = array()){
 		$response = wp_remote_post($url, $args);
 		if(!is_wp_error($response)){
-			return $response;
+			return $response['body'];
 		} else {
 			update_option('mo_saml_message', __('Unable to connect to the Internet. Please try again.','miniorange-saml-20-single-sign-on'));
 			(new self)->mo_saml_show_error_message();
+			return null;
         }
     }
     

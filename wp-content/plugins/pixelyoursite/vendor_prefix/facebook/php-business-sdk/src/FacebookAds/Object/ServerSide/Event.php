@@ -131,8 +131,8 @@ class Event implements \ArrayAccess
         return \true;
     }
     /**
-     * Sets a Facebook pixel Standard Event or Custom Event name
-     * @param string $event_name A Facebook pixel Standard Event or Custom Event name.
+     * Sets a Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name
+     * @param string $event_name A Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name.
      * @return $this
      */
     public function setEventName($event_name)
@@ -175,9 +175,9 @@ class Event implements \ArrayAccess
     /**
      * Sets an ID used by Facebook to deduplicate the same event sent from both server and browser.
      * @param string $event_id This ID can be any unique string chosen by the advertiser.
-     * event_id is used to deduplicate events sent by both Facebook Pixel and Server-Side API.
+     * event_id is used to deduplicate events sent by both Meta Pixel (formerly Facebook Pixel) and Server-Side API.
      * event_name is also used in the deduplication process.
-     * For deduplication, the eventID from Facebook pixel must match the
+     * For deduplication, the eventID from Meta Pixel (formerly Facebook Pixel) must match the
      * event_id in the corresponding Server-Side API event.
      * @return $this
      */
@@ -330,7 +330,7 @@ class Event implements \ArrayAccess
         return $normalized_payload;
     }
     /**
-     * Gets Facebook pixel Standard Event or Custom Event name.
+     * Gets Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name.
      * @return string
      */
     public function getEventName()

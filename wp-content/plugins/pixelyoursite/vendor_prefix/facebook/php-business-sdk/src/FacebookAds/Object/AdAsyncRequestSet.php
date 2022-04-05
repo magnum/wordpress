@@ -30,7 +30,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAsyncRequestSetFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationModeValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationStatusValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestStatusesValues;
 /**
  * This class is auto-generated.
@@ -60,7 +59,6 @@ class AdAsyncRequestSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudO
     {
         $ref_enums = array();
         $ref_enums['NotificationMode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationModeValues::getInstance()->getValues();
-        $ref_enums['NotificationStatus'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationStatusValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function getRequests(array $fields = array(), array $params = array(), $pending = \false)

@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row">
             <div class="col">
                 <p>Define custom thank you pages (general or for a particular product) and fire the
-                    Facebook pixel on it.</p>
+                    Meta Pixel (formerly Facebook Pixel) on it.</p>
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable Custom Thank You Pages</h4>
             </div>

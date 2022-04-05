@@ -30,7 +30,7 @@ use PixelYourSite\GA\Helpers;
                 <h4 class="switcher-label">Enable Enhance Link Attribution</h4>
             </div>
         </div>
-        <?php if(Ga()->isUse4Version()) : ?>
+
             <div class="row">
                 <div class="col">
                     <?php GA()->render_switcher_input( 'disable_advertising_features' ); ?>
@@ -43,7 +43,7 @@ use PixelYourSite\GA\Helpers;
                     <h4 class="switcher-label">Disable advertising personalization</h4>
                 </div>
             </div>
-        <?php endif;?>
+
 
         <div class="row">
             <div class="col">

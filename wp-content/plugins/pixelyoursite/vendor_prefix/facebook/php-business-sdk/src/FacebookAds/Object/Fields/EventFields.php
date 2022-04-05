@@ -39,6 +39,7 @@ class EventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const CAN_GUESTS_INVITE = 'can_guests_invite';
     const CATEGORY = 'category';
     const COVER = 'cover';
+    const CREATED_TIME = 'created_time';
     const DECLINED_COUNT = 'declined_count';
     const DESCRIPTION = 'description';
     const DISCOUNT_CODE_ENABLED = 'discount_code_enabled';
@@ -61,6 +62,7 @@ class EventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const PLACE = 'place';
     const SCHEDULED_PUBLISH_TIME = 'scheduled_publish_time';
     const START_TIME = 'start_time';
+    const TICKET_SETTING = 'ticket_setting';
     const TICKET_URI = 'ticket_uri';
     const TICKET_URI_START_SALES_TIME = 'ticket_uri_start_sales_time';
     const TICKETING_PRIVACY_URI = 'ticketing_privacy_uri';
@@ -70,6 +72,6 @@ class EventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const UPDATED_TIME = 'updated_time';
     public function getFieldTypes()
     {
-        return array('attending_count' => 'int', 'can_guests_invite' => 'bool', 'category' => 'Category', 'cover' => 'CoverPhoto', 'declined_count' => 'int', 'description' => 'string', 'discount_code_enabled' => 'bool', 'end_time' => 'string', 'event_times' => 'list<ChildEvent>', 'guest_list_enabled' => 'bool', 'id' => 'string', 'interested_count' => 'int', 'is_canceled' => 'bool', 'is_draft' => 'bool', 'is_online' => 'bool', 'is_page_owned' => 'bool', 'maybe_count' => 'int', 'name' => 'string', 'noreply_count' => 'int', 'online_event_format' => 'OnlineEventFormat', 'online_event_third_party_url' => 'string', 'owner' => 'Object', 'parent_group' => 'Group', 'place' => 'Place', 'scheduled_publish_time' => 'string', 'start_time' => 'string', 'ticket_uri' => 'string', 'ticket_uri_start_sales_time' => 'string', 'ticketing_privacy_uri' => 'string', 'ticketing_terms_uri' => 'string', 'timezone' => 'string', 'type' => 'Type', 'updated_time' => 'datetime');
+        return array('attending_count' => 'int', 'can_guests_invite' => 'bool', 'category' => 'Category', 'cover' => 'CoverPhoto', 'created_time' => 'datetime', 'declined_count' => 'int', 'description' => 'string', 'discount_code_enabled' => 'bool', 'end_time' => 'string', 'event_times' => 'list<ChildEvent>', 'guest_list_enabled' => 'bool', 'id' => 'string', 'interested_count' => 'int', 'is_canceled' => 'bool', 'is_draft' => 'bool', 'is_online' => 'bool', 'is_page_owned' => 'bool', 'maybe_count' => 'int', 'name' => 'string', 'noreply_count' => 'int', 'online_event_format' => 'OnlineEventFormat', 'online_event_third_party_url' => 'string', 'owner' => 'Object', 'parent_group' => 'Group', 'place' => 'Place', 'scheduled_publish_time' => 'string', 'start_time' => 'string', 'ticket_setting' => 'Object', 'ticket_uri' => 'string', 'ticket_uri_start_sales_time' => 'string', 'ticketing_privacy_uri' => 'string', 'ticketing_terms_uri' => 'string', 'timezone' => 'string', 'type' => 'Type', 'updated_time' => 'datetime');
     }
 }

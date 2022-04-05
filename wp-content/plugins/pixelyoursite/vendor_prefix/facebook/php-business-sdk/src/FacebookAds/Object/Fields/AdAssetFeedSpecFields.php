@@ -45,16 +45,19 @@ class AdAssetFeedSpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnu
     const CAPTIONS = 'captions';
     const CAROUSELS = 'carousels';
     const DESCRIPTIONS = 'descriptions';
+    const EVENTS = 'events';
     const GROUPS = 'groups';
     const IMAGES = 'images';
     const LINK_URLS = 'link_urls';
+    const OFFER_IDS = 'offer_ids';
     const ONSITE_DESTINATIONS = 'onsite_destinations';
     const OPTIMIZATION_TYPE = 'optimization_type';
+    const PHONE_DATA_IDS = 'phone_data_ids';
     const POSTS = 'posts';
     const TITLES = 'titles';
     const VIDEOS = 'videos';
     public function getFieldTypes()
     {
-        return array('ad_formats' => 'list<string>', 'additional_data' => 'Object', 'asset_customization_rules' => 'list<Object>', 'autotranslate' => 'list<string>', 'bodies' => 'list<AdAssetFeedSpecBody>', 'call_to_action_types' => 'list<CallToActionTypes>', 'call_to_actions' => 'list<Object>', 'captions' => 'list<AdAssetFeedSpecCaption>', 'carousels' => 'list<Object>', 'descriptions' => 'list<AdAssetFeedSpecDescription>', 'groups' => 'list<AdAssetFeedSpecGroupRule>', 'images' => 'list<AdAssetFeedSpecImage>', 'link_urls' => 'list<AdAssetFeedSpecLinkURL>', 'onsite_destinations' => 'list<Object>', 'optimization_type' => 'string', 'posts' => 'list<Object>', 'titles' => 'list<AdAssetFeedSpecTitle>', 'videos' => 'list<AdAssetFeedSpecVideo>');
+        return array('ad_formats' => 'list<string>', 'additional_data' => 'Object', 'asset_customization_rules' => 'list<Object>', 'autotranslate' => 'list<string>', 'bodies' => 'list<AdAssetFeedSpecBody>', 'call_to_action_types' => 'list<CallToActionTypes>', 'call_to_actions' => 'list<Object>', 'captions' => 'list<AdAssetFeedSpecCaption>', 'carousels' => 'list<Object>', 'descriptions' => 'list<AdAssetFeedSpecDescription>', 'events' => 'list<Object>', 'groups' => 'list<AdAssetFeedSpecGroupRule>', 'images' => 'list<AdAssetFeedSpecImage>', 'link_urls' => 'list<AdAssetFeedSpecLinkURL>', 'offer_ids' => 'list<Object>', 'onsite_destinations' => 'list<Object>', 'optimization_type' => 'string', 'phone_data_ids' => 'list<Object>', 'posts' => 'list<Object>', 'titles' => 'list<AdAssetFeedSpecTitle>', 'videos' => 'list<AdAssetFeedSpecVideo>');
     }
 }

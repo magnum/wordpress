@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class AdCreativeLinkDataImageOverlaySpecTextTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
+    const AUTOMATED_PERSONALIZE = 'automated_personalize';
     const CUSTOM = 'custom';
     const DISCLAIMER = 'disclaimer';
     const FROM_PRICE = 'from_price';

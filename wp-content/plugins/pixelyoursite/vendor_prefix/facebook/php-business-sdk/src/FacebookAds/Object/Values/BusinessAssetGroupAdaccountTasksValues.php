@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class BusinessAssetGroupAdaccountTasksValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
+    const AA_ANALYZE = 'AA_ANALYZE';
     const ADVERTISE = 'ADVERTISE';
     const ANALYZE = 'ANALYZE';
     const DRAFT = 'DRAFT';

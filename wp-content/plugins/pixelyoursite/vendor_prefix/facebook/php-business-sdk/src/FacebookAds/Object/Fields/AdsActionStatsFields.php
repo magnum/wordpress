@@ -63,9 +63,11 @@ class AdsActionStatsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const INLINE = 'inline';
     const INTERACTIVE_COMPONENT_STICKER_ID = 'interactive_component_sticker_id';
     const INTERACTIVE_COMPONENT_STICKER_RESPONSE = 'interactive_component_sticker_response';
+    const SKAN_CLICK = 'skan_click';
+    const SKAN_VIEW = 'skan_view';
     const VALUE = 'value';
     public function getFieldTypes()
     {
-        return array('1d_click' => 'string', '1d_view' => 'string', '28d_click' => 'string', '28d_view' => 'string', '7d_click' => 'string', '7d_view' => 'string', 'action_brand' => 'string', 'action_canvas_component_id' => 'string', 'action_canvas_component_name' => 'string', 'action_carousel_card_id' => 'string', 'action_carousel_card_name' => 'string', 'action_category' => 'string', 'action_converted_product_id' => 'string', 'action_destination' => 'string', 'action_device' => 'string', 'action_event_channel' => 'string', 'action_link_click_destination' => 'string', 'action_location_code' => 'string', 'action_reaction' => 'string', 'action_target_id' => 'string', 'action_type' => 'string', 'action_video_asset_id' => 'string', 'action_video_sound' => 'string', 'action_video_type' => 'string', 'dda' => 'string', 'inline' => 'string', 'interactive_component_sticker_id' => 'string', 'interactive_component_sticker_response' => 'string', 'value' => 'string');
+        return array('1d_click' => 'string', '1d_view' => 'string', '28d_click' => 'string', '28d_view' => 'string', '7d_click' => 'string', '7d_view' => 'string', 'action_brand' => 'string', 'action_canvas_component_id' => 'string', 'action_canvas_component_name' => 'string', 'action_carousel_card_id' => 'string', 'action_carousel_card_name' => 'string', 'action_category' => 'string', 'action_converted_product_id' => 'string', 'action_destination' => 'string', 'action_device' => 'string', 'action_event_channel' => 'string', 'action_link_click_destination' => 'string', 'action_location_code' => 'string', 'action_reaction' => 'string', 'action_target_id' => 'string', 'action_type' => 'string', 'action_video_asset_id' => 'string', 'action_video_sound' => 'string', 'action_video_type' => 'string', 'dda' => 'string', 'inline' => 'string', 'interactive_component_sticker_id' => 'string', 'interactive_component_sticker_response' => 'string', 'skan_click' => 'string', 'skan_view' => 'string', 'value' => 'string');
     }
 }

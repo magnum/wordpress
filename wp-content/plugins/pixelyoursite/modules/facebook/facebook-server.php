@@ -15,9 +15,7 @@ require_once PYS_FREE_PATH . '/modules/facebook/PYSServerEventHelper.php';
 use PYS_PRO_GLOBAL\FacebookAds\Api;
 use PYS_PRO_GLOBAL\FacebookAds\Http\Exception\RequestException;
 use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\EventRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Event;
-use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\CustomData;
-use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Content;
+
 
 class FacebookServer {
 
@@ -50,20 +48,151 @@ class FacebookServer {
         if($this->isEnabled) {
             add_action( 'wp_ajax_pys_api_event',array($this,"catchAjaxEvent"));
             add_action( 'wp_ajax_nopriv_pys_api_event', array($this,"catchAjaxEvent"));
+            add_action( 'woocommerce_remove_cart_item', array($this, 'trackRemoveFromCartEvent'), 10, 2);
+            add_action( 'woocommerce_add_to_cart', array($this, 'trackAddToCartEvent'), 40, 4);
 
+            //add_action( 'woocommerce_order_status_completed', array( $this, 'completed_purchase' ) );
             // initialize the s2s event async task
             new FacebookAsyncTask();
         }
     }
 
+    /**
+     * Send event in shutdown hook (not work in ajax)
+     * @param SingleEvent[] $events
+     */
+    public function sendEventsAsync($events) {
+
+        $serverEvents = [];
+        foreach ($events as $event) {
+            $ids = $event->payload['pixelIds'];
+            $serverEvents[] = [
+                "pixelIds" => $ids,
+                "event" => ServerEventHelper::mapEventToServerEvent($event)
+            ];
+        }
+
+        if(count($serverEvents) > 0) {
+            do_action('pys_send_server_event', $serverEvents);
+        }
+    }
+
+    /**
+     * Send Event Now
+     *
+     * @param SingleEvent[] $events
+     */
+    public function sendEventsNow($events) {
+
+        foreach ($events as $event) {
+            $serverEvent = ServerEventHelper::mapEventToServerEvent($event);
+            $ids = $event->payload['pixelIds'];
+
+            $this->sendEvent($ids,$serverEvent);
+        }
+    }
 
 
     /**
-     * Send this events by FacebookAsyncTask
-     * @param array $event List of raw event data
+     * Tracks a completed purchase
+     *
+     * @param int $order_id the order ID
      */
-    public function addAsyncEvents($events) {
-        do_action('pys_send_server_event', $events);
+    function completed_purchase($order_id) {
+
+        if(get_post_meta( $order_id, '_pys_purchase_event_fired', true )
+            || !PYS()->getOption( 'woo_purchase_enabled' )) {
+            return;
+        }
+        add_filter("pys_woo_checkout_order_id",function () use ($order_id) {return $order_id;});
+        $event = EventsWoo()->getEvent('woo_purchase');
+        if ( $event == null ) {
+            return;
+        }
+        $events = Facebook()->generateEvents($event);
+
+        foreach ($events as $singleEvent) {
+            if(isset($_COOKIE['pys_landing_page']))
+                $singleEvent->addParams(['landing_page'=>$_COOKIE['pys_landing_page']]);
+        }
+
+        $this->sendEventsNow($events);
+    }
+
+    function trackAddToCartEvent($cart_item_key, $product_id, $quantity, $variation_id) {
+        if(EventsWoo()->isReadyForFire("woo_add_to_cart_on_button_click")
+            && PYS()->getOption('woo_add_to_cart_catch_method') == "add_cart_js")
+        {
+            PYS()->getLog()->debug('trackAddToCartEvent send fb server with out browser event');
+            if( !empty($variation_id)
+                && $variation_id > 0
+                && ( !Facebook()->getOption( 'woo_variable_as_simple' )
+                    || ( Facebook()->getSlug() == "facebook"
+                        && !Facebook\Helpers\isDefaultWooContentIdLogic()
+                    )
+                )
+            ) {
+                $_product_id = $variation_id;
+            } else {
+                $_product_id = $product_id;
+            }
+
+            $event =  new SingleEvent("woo_add_to_cart_on_button_click",EventTypes::$DYNAMIC,'woo');
+            $event->args = ['productId' => $_product_id,'quantity' => $quantity];
+            add_filter('pys_conditional_post_id', function($id) use ($product_id) { return $product_id; });
+            $events = Facebook()->generateEvents($event);
+            remove_all_filters('pys_conditional_post_id');
+
+            foreach ($events as $singleEvent) {
+
+                if(isset($_COOKIE['pys_landing_page']))
+                    $singleEvent->addParams(['landing_page'=>$_COOKIE['pys_landing_page']]);
+
+                if(isset($_COOKIE["pys_fb_event_id"])) {
+                    $singleEvent->payload['eventID'] = json_decode(stripslashes($_COOKIE["pys_fb_event_id"]))->AddToCart;
+                }
+            }
+
+            $this->sendEventsAsync($events);
+        }
+
+    }
+
+    /**
+     * @param String $cart_item_key
+     * @param \WC_Cart $cart
+     */
+
+    function trackRemoveFromCartEvent ($cart_item_key,$cart) {
+        $eventId = 'woo_remove_from_cart';
+
+        $url = $_SERVER['HTTP_HOST'].strtok($_SERVER["REQUEST_URI"], '?');
+        $postId = url_to_postid($url);
+        $cart_id = wc_get_page_id( 'cart' );
+        $item = $cart->get_cart_item($cart_item_key);
+
+
+
+        if(PYS()->getOption( 'woo_remove_from_cart_enabled') && $cart_id==$postId) {
+            PYS()->getLog()->debug('trackRemoveFromCartEvent send fb server with out browser event');
+            $event = new SingleEvent("woo_remove_from_cart",EventTypes::$STATIC,'woo');
+            $event->args=['item'=>$item];
+
+            $events = Facebook()->generateEvents($event);
+
+            foreach ($events as $singleEvent) {
+                $singleEvent->addParams(getStandardParams());
+                if(isset($_COOKIE['pys_landing_page'])){
+                    $singleEvent->addParams(['landing_page'=>$_COOKIE['pys_landing_page']]);
+                }
+                if(isset($_COOKIE["pys_fb_event_id"])) {
+                    $singleEvent->payload['eventID'] = json_decode(stripslashes($_COOKIE["pys_fb_event_id"]))->RemoveFromCart;
+                }
+
+            }
+
+            $this->sendEventsAsync($events);
+        }
     }
 
     /*
@@ -71,7 +200,7 @@ class FacebookServer {
      * we send data by ajax request from js and send the same data like browser event
      */
     function catchAjaxEvent() {
-
+        PYS()->getLog()->debug('catchAjaxEvent send fb server from ajax');
         $event = $_POST['event'];
         $data = isset($_POST['data']) ? $_POST['data'] : array();
         $ids = $_POST['ids'];
@@ -80,109 +209,51 @@ class FacebookServer {
         $eddOrder = isset($_POST['edd_order']) ? $_POST['edd_order'] : null;
 
 
+
         if($event == "hCR") $event="CompleteRegistration"; // de mask completer registration event if it was hidden
 
-        $event = $this->createEvent($eventID,$event,$data,$wooOrder,$eddOrder);
-        if($event) {
-            if(isset($_POST['url'])) {
-                if(PYS()->getOption('enable_remove_source_url_params')) {
-                    $list = explode("?",$_POST['url']);
-                    if(is_array($list) && count($list) > 0) {
-                        $url = $list[0];
-                    } else {
-                        $url = $_POST['url'];
-                    }
-                } else {
-                    $url = $_POST['url'];
-                }
-                $event->setEventSourceUrl($url);
-            }
+        $singleEvent = $this->dataToSingleEvent($event,$data,$eventID,$ids,$wooOrder,$eddOrder);
 
-            $this->sendEvent($ids,array($event));
-        }
+        $this->sendEventsNow([$singleEvent]);
+
         wp_die();
     }
 
-
     /**
-     * We prepare data from event for browser and create Facebook server event object
-     * @param String $name Event name
-     * @param $data Data for event
-     * @return bool|\FacebookAds\Object\ServerSide\Event
+     * @param $eventName
+     * @param $params
+     * @param $eventID
+     * @param $ids
+     * @param $wooOrder
+     * @param $eddOrder
+     * @return SingleEvent
      */
-    function createEvent($eventID,$name, $data,$wooOrder = null ,$eddOrder=null) {
+    private function dataToSingleEvent($eventName,$params,$eventID,$ids,$wooOrder,$eddOrder) {
+        $singleEvent = new SingleEvent("","");
 
-        if(!$eventID) return false;
+        $payload = [
+            'name' => $eventName,
+            'eventID'   => $eventID,
+            'woo_order' => $wooOrder,
+            'edd_order' => $eddOrder,
+            'pixelIds'  => $ids
+        ];
+        $singleEvent->addParams($params);
+        $singleEvent->addPayload($payload);
 
-        // create Server event
-        $event = ServerEventHelper::newEvent($name,$eventID,$wooOrder,$eddOrder);
-
-        $event->setEventTime(time());
-        $event->setActionSource("website");
-
-        // prepare data
-        if(isset($data['contents']) && is_array($data['contents'])) {
-            $contents = array();
-            foreach ($data['contents'] as $c) {
-                $content = array();
-                $content['product_id'] = $c['id'];
-                $content['quantity'] = $c['quantity'];
-              //  $content['item_price'] = $c->item_price;
-                $contents[] = new Content($content);
-            }
-            $data['contents'] = $contents;
-        } else {
-            $data['contents'] = array();
-        }
-
-        // prepare custom data
-        $customData = $this->getCustomData($data);
-
-
-        if(isset($data['category_name'])) {
-            $customData->setContentCategory($data['category_name']);
-        }
-
-
-        $event->setCustomData($customData);
-
-        return $event;
+        return $singleEvent;
     }
 
-    function getCustomData($data) {
-        $customData = new CustomData($data);
-        $customProperties = getCommonEventParams();
-        //$customProperties['event_day'] = date("l");
-       // $customProperties['event_month'] = date("F");
-       // $customProperties['event_hour'] = $this->hours[date("G")];
 
-        if(isset($data['category_name'])) {
-            $customData->setContentCategory($data['category_name']);
-        }
-
-
-        $custom_values = ['event_action','download_type','download_name','download_url','target_url','text','trigger','traffic_source','plugin','user_role','event_url','page_title',"post_type",'post_id','categories','tags','video_type',
-            'video_id','video_title','event_trigger','link_type','tag_text',"URL",
-            'form_id','form_class','form_submit_label','transactions_count','average_order',
-            'shipping_cost','tax','total','shipping','coupon_used'];
-
-
-        foreach ($custom_values as $val) {
-            if(isset($data[$val]))
-                $customProperties[$val] = $data[$val];
-        }
-        $customData->setCustomProperties($customProperties);
-        return $customData;
-    }
 
     /**
      * Send event for each pixel id
-     * @param array $pixel_Ids array of facebook ids
-     * @param array $events One Facebook event object
+     * @param array $pixel_Ids //array of facebook ids
+     * @param \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Event $event //One Facebook event object
      */
-    function sendEvent($pixel_Ids, $events) {
+    function sendEvent($pixel_Ids, $event) {
 
-        if (empty($events)) {
+        if (!$event || apply_filters('pys_disable_server_event_filter',false)) {
             return;
         }
 
@@ -195,15 +266,18 @@ class FacebookServer {
 
             if(empty($this->access_token[$pixel_Id])) continue;
 
+            $event->setEventId($event->getEventId());
+
             $api = Api::init(null, null, $this->access_token[$pixel_Id],false);
 
-            $request = (new EventRequest($pixel_Id))->setEvents($events);
+            $request = (new EventRequest($pixel_Id))->setEvents([$event]);
             $request->setPartnerAgent("dvpixelyoursite");
-            if(!empty($this->testCode[$pixel_Id]))
+            if(!empty($this->testCode[$pixel_Id])) {
                 $request->setTestEventCode($this->testCode[$pixel_Id]);
+            }
 
+            PYS()->getLog()->debug('Send FB server event',$request);
             try{
-                PYS()->getLog()->debug('Send FB server event',$request);
                 $response = $request->execute();
                 PYS()->getLog()->debug('Response from FB server',$response);
             } catch (\Exception   $e) {
@@ -213,42 +287,9 @@ class FacebookServer {
                     PYS()->getLog()->error('Error send FB server event',$e);
                 }
             }
-
         }
     }
 
-    function getTrafficSource () {
-        $referrer = "";
-        $source = "";
-        try {
-            if (isset($_SERVER['HTTP_REFERER'])) {
-                $referrer = $_SERVER['HTTP_REFERER'];
-            }
-
-            $direct = empty($referrer);
-            $internal = $direct ? false : strpos(site_url(), $referrer) == 0;
-            $external = !$direct && !$internal;
-            $cookie = !isset($_COOKIE['pysTrafficSource']) ? false : $_COOKIE['pysTrafficSource'];
-
-            if (!$external) {
-                $source = $cookie ? $cookie : 'direct';
-            } else {
-                $source = $cookie && $cookie === $referrer ? $cookie : $referrer;
-            }
-
-            if ($source !== 'direct') {
-                $parse = parse_url($source);
-
-                // leave only domain (Issue #70)
-                return $parse['host'];
-
-            } else {
-                return $source;
-            }
-        } catch (\Exception $e) {
-            return "direct";
-        }
-    }
 }
 
 /**

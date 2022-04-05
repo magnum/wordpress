@@ -8,49 +8,53 @@ use Uncanny_Automator_Pro\Mailchimp_Pro_Helpers;
 
 /**
  * Class Mailchimp_Helpers
+ *
  * @package Uncanny_Automator
  */
 class Mailchimp_Helpers {
 
 	/**
+	 * Maichimp Helpers.
+	 *
 	 * @var Mailchimp_Helpers
 	 */
 	public $options;
-	/**
-	 * @var Mailchimp_Helpers
-	 */
-	public $pro;
-	/**
-	 * @var Mailchimp_Helpers
-	 */
-	public $setting_tab;
 
 	/**
+	 * Pro Helpers.
+	 *
+	 * @var Pro_Helpers
+	 */
+	public $pro;
+
+
+	/**
+	 * Load Options.
+	 *
 	 * @var bool
 	 */
 	public $load_options;
 
 	/**
+	 * Mailchimp Endpoint.
+	 *
 	 * @var string
 	 */
 	private $mailchimp_endpoint;
 
 	/**
+	 * The Hash String.
+	 *
 	 * @var string
 	 */
 	public static $hash_string = 'Uncanny Automator Pro Mailchimp Sheet Integration';
 
-	/**
-	 * Mailchimp_Helpers constructor.
-	 */
 	public function __construct() {
 
-		$this->setting_tab   = 'mailchimp_api';
 		$this->automator_api = AUTOMATOR_API_URL . 'v2/mailchimp';
 
-		add_filter( 'automator_settings_tabs', array( $this, 'add_mailchimp_api_settings' ), 15 );
 		add_action( 'init', array( $this, 'validate_oauth_tokens' ), 100, 3 );
-		add_filter( 'automator_after_settings_extra_content', array( $this, 'mailchimp_connect_html' ), 10, 3 );
+
 		add_action( 'wp_ajax_select_mcgroupslist_from_mclist', array( $this, 'select_mcgroupslist_from_mclist' ) );
 		add_action( 'wp_ajax_select_mctagslist_from_mclist', array( $this, 'select_mctagslist_from_mclist' ) );
 
@@ -59,9 +63,16 @@ class Mailchimp_Helpers {
 		add_action( 'wp_ajax_get_mailchimp_audience_fields', array( $this, 'get_mailchimp_audience_fields' ) );
 		add_action( 'wp_ajax_uo_mailchimp_disconnect', array( $this, 'uo_mailchimp_disconnect' ) );
 
+		// Load the settings page.
+		require_once __DIR__ . '/../settings/settings-mailchimp.php';
+
+		new Mailchimp_Settings( $this );
+
 	}
 
 	/**
+	 * Set Options.
+	 *
 	 * @param Mailchimp_Helpers $options
 	 */
 	public function setOptions( Mailchimp_Helpers $options ) { // phpcs:ignore
@@ -69,6 +80,8 @@ class Mailchimp_Helpers {
 	}
 
 	/**
+	 * Set Pro.
+	 *
 	 * @param Mailchimp_Helpers $pro
 	 */
 	public function setPro( Mailchimp_Pro_Helpers $pro ) { // phpcs:ignore
@@ -76,6 +89,8 @@ class Mailchimp_Helpers {
 	}
 
 	/**
+	 * Get all list.
+	 *
 	 * @param null $label
 	 * @param $option_code
 	 * @param $args
@@ -148,6 +163,8 @@ class Mailchimp_Helpers {
 	}
 
 	/**
+	 * Get all list groups.
+	 *
 	 * @param $label
 	 * @param $option_code
 	 * @param $args
@@ -192,22 +209,13 @@ class Mailchimp_Helpers {
 		return apply_filters( 'uap_option_get_list_groups', $option );
 	}
 
-	/**
-	 *
-	 */
 	public function select_mcgroupslist_from_mclist() {
 
 		// Nonce and post object validation
-		Automator()->utilities->ajax_auth_check( $_POST ); // phpcs:ignore
+		Automator()->utilities->ajax_auth_check();
 
 		$fields = array();
-
-		$flags = array(
-			'filter' => 'FILTER_VALIDATE_STRING',
-			'flags'  => FILTER_REQUIRE_ARRAY,
-		);
-
-		$values = automator_filter_input_array( 'values', INPUT_POST, $flags );
+		$values = automator_filter_input_array( 'values', INPUT_POST );
 
 		if ( empty( $values['MCLIST'] ) ) {
 			echo wp_json_encode( $fields );
@@ -266,6 +274,8 @@ class Mailchimp_Helpers {
 
 
 	/**
+	 * Get list tags.
+	 *
 	 * @param $label
 	 * @param $option_code
 	 * @param $args
@@ -315,20 +325,16 @@ class Mailchimp_Helpers {
 
 	/**
 	 * Ajax callback for loading tags NAMES list.
+	 *
+	 * @return void.
 	 */
 	public function select_mctagslist_from_mclist() {
 
 		// Nonce and post object validation
-		Automator()->utilities->ajax_auth_check( $_POST ); // phpcs:ignore
+		Automator()->utilities->ajax_auth_check();
 
 		$fields = array();
-
-		$flags = array(
-			'filter' => 'FILTER_VALIDATE_STRING',
-			'flags'  => FILTER_REQUIRE_ARRAY,
-		);
-
-		$values = automator_filter_input_array( 'values', INPUT_POST, $flags );
+		$values = automator_filter_input_array( 'values', INPUT_POST );
 
 		if ( empty( $values['MCLIST'] ) ) {
 			echo wp_json_encode( $fields );
@@ -364,16 +370,20 @@ class Mailchimp_Helpers {
 		}
 
 		echo wp_json_encode( $fields );
+
 		die();
+
 	}
 
 	/**
 	 * Ajax callback for loading segment IDS list.
+	 *
+	 * @return void.
 	 */
 	public function select_segments_from_list() {
 
 		// Nonce and post object validation
-		Automator()->utilities->ajax_auth_check( $_POST ); // phpcs:ignore
+		Automator()->utilities->ajax_auth_check();
 
 		$fields = array();
 
@@ -382,12 +392,7 @@ class Mailchimp_Helpers {
 			'text'  => __( 'Select a Segment or Tag', 'uncanny-automator' ),
 		);
 
-		$flags = array(
-			'filter' => 'FILTER_VALIDATE_STRING',
-			'flags'  => FILTER_REQUIRE_ARRAY,
-		);
-
-		$values = automator_filter_input_array( 'values', INPUT_POST, $flags );
+		$values = automator_filter_input_array( 'values', INPUT_POST );
 
 		if ( empty( $values['MCLIST'] ) ) {
 			echo wp_json_encode( $fields );
@@ -427,6 +432,8 @@ class Mailchimp_Helpers {
 	}
 
 	/**
+	 * Get double opt in.
+	 *
 	 * @param $label
 	 * @param $option_code
 	 * @param $args
@@ -487,11 +494,13 @@ class Mailchimp_Helpers {
 
 	/**
 	 * Ajax callback for loading audience list related merge fields.
+	 *
+	 * @return void.
 	 */
 	public function get_mailchimp_audience_fields() {
 
 		// Nonce and post object validation
-		Automator()->utilities->ajax_auth_check( $_POST ); // phpcs:ignore
+		Automator()->utilities->ajax_auth_check();
 
 		$fields = array();
 
@@ -517,37 +526,37 @@ class Mailchimp_Helpers {
 					foreach ( $response->data->merge_fields as $field ) {
 						$merge_order = $field->display_order * 10;
 						if ( 'address' === $field->type ) {
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_addr1',
 								'type' => 'text',
 								'data' => $field->name,
 							);
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_addr2',
 								'type' => 'text',
 								'data' => $field->name,
 							);
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_city',
 								'type' => 'text',
 								'data' => $field->name,
 							);
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_state',
 								'type' => 'text',
 								'data' => $field->name,
 							);
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_zip',
 								'type' => 'text',
 								'data' => $field->name,
 							);
-							++$merge_order;
+							++ $merge_order;
 							$fields[ $merge_order ] = array(
 								'key'  => $field->tag . '_country',
 								'type' => 'text',
@@ -580,6 +589,8 @@ class Mailchimp_Helpers {
 	}
 
 	/**
+	 * Get all email templates.
+	 *
 	 * @param null $label
 	 * @param $option_code
 	 * @param $args
@@ -680,119 +691,6 @@ class Mailchimp_Helpers {
 		return ! empty( $this->get_mailchimp_client() );
 	}
 
-	/**
-	 * @param $tabs
-	 *
-	 * @return mixed
-	 */
-	public function add_mailchimp_api_settings( $tabs ) {
-
-		if ( $this->display_settings_tab() ) {
-
-			$is_uncannyowl_mailchimp_settings_expired = get_option( '_uncannyowl_mailchimp_settings_expired', false );
-			$tab_url                                  = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab;
-			$tabs[ $this->setting_tab ]               = array(
-				'name'           => __( 'Mailchimp', 'uncanny-automator' ),
-				'title'          => __( 'Mailchimp account settings', 'uncanny-automator' ),
-				'description'    => __( 'Connecting to Mailchimp requires signing into your account to link it to Automator. To get started, click the "Connect an account" button below or the "Change account" button if you need to connect a new account. Uncanny Automator can only connect to a single Mailchimp account at one time. (It is not possible to set some recipes up under one account and then switch accounts, all recipes are mapped to the account selected on this page and existing recipes may break if they were set up under another account).', 'uncanny-automator' ) . $this->get_user_info(),
-				'is_pro'         => false,
-				'is_expired'     => $is_uncannyowl_mailchimp_settings_expired,
-				'settings_field' => 'uap_automator_mailchimp_api_settings',
-				'wp_nonce_field' => 'uap_automator_mailchimp_api_nonce',
-				'save_btn_name'  => 'uap_automator_mailchimp_api_save',
-				'save_btn_title' => __( 'Connect mailchimp Sheets', 'uncanny-automator' ),
-				'fields'         => array(),
-			);
-
-		}
-
-		return $tabs;
-	}
-
-	/**
-	 * @param $content
-	 * @param $active
-	 * @param $tab
-	 *
-	 * @return mixed
-	 */
-	public function mailchimp_connect_html( $content, $active, $tab ) {
-
-		if ( 'mailchimp_api' === $active ) {
-			$action       = 'mailchimp_authorization_request';
-			$redirect_url = rawurlencode( admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab );
-			$nonce        = wp_create_nonce( 'automator_api_mailchimp_authorize' );
-			set_transient( 'automator_api_mailchimp_authorize_nonce', $nonce, 3600 );
-			$scope             = '';
-			$automator_version = InitializePlugin::PLUGIN_VERSION;
-			$auth_url          = $this->automator_api . "?action={$action}&scope={$scope}&redirect_url={$redirect_url}&nonce={$nonce}&plugin_ver={$automator_version}&api_ver=1.0";
-
-			$gs_client    = $this->get_mailchimp_client();
-			$button_text  = __( 'Connect an account', 'uncanny-automator' );
-			$button_class = '';
-
-			if ( $gs_client ) {
-				$button_text  = __( 'Change account', 'uncanny-automator' );
-				$button_class = 'uo-connected-button';
-			}
-			ob_start();
-			?>
-			<div class="uo-settings-content-form">
-
-				<a href="<?php echo esc_url( $auth_url ); ?>" class="uo-settings-btn uo-settings-btn--primary <?php echo esc_attr( $button_class ); ?>">
-					<?php echo esc_attr( $button_text ); ?>
-				</a>
-
-				<?php if ( $gs_client ) : ?>
-					<?php
-					$disconnect_uri = add_query_arg(
-						array(
-							'action' => 'uo_mailchimp_disconnect',
-							'nonce'  => wp_create_nonce( 'uo-mailchimp-disconnect' ),
-						),
-						admin_url( 'admin-ajax.php' )
-					);
-					?>
-					<a href="<?php echo esc_url( $disconnect_uri ); ?>" class="uo-settings-btn uo-settings-btn--error">
-						<?php esc_html_e( 'Disconnect', 'uncanny-automator' ); ?>
-					</a>
-				<?php endif; ?>
-
-			</div>
-			<style>
-				.uo-mailchimp-user-info {
-					display: flex;
-					align-items: center;
-					margin: 20px 0;
-				}
-
-				.uo-mailchimp-user-info__avatar {
-					display: inline-flex;
-					align-items: center;
-					overflow: hidden;
-					border-radius: 32px;
-					margin-right: 10px;
-				}
-
-				.uo-mailchimp-user-info__name {
-					margin-left: 5px;
-					opacity: 0.75;
-				}
-
-				.uo-connected-button {
-					color: #fff;
-					background-color: #0790e8;
-				}
-
-				.uo-settings-content-footer {
-					display: none !important;
-				}
-			</style>
-			<?php
-		}
-
-		return $content;
-	}
 
 	/**
 	 * Get Mailchimp Client object
@@ -816,10 +714,13 @@ class Mailchimp_Helpers {
 	public function validate_oauth_tokens() {
 
 		$api_message = automator_filter_input( 'automator_api_message' );
-		$tab         = automator_filter_input( 'tab' );
 
-		if ( ! empty( $api_message ) && ! empty( $tab ) && $tab === $this->setting_tab ) {
+		$integration = automator_filter_input( 'integration' );
+
+		if ( ! empty( $api_message ) && 'mailchimp_api' === $integration ) {
+
 			try {
+
 				$secret = get_transient( 'automator_api_mailchimp_authorize_nonce' );
 				$tokens = Automator_Helpers_Recipe::automator_api_decode_message( $api_message, $secret );
 
@@ -840,56 +741,35 @@ class Mailchimp_Helpers {
 					// Update user info settings.
 					update_option( '_uncannyowl_mailchimp_settings_user_info', $user_info );
 
-					// On success
+					// On success.
 					update_option( '_uncannyowl_mailchimp_settings', $tokens );
 					delete_option( '_uncannyowl_mailchimp_settings_expired' );
-					//set the transient
+
+					// Set the transient.
 					set_transient( '_uncannyowl_mailchimp_settings', $tokens['access_token'] . '|' . $tokens['dc'], 60 * 50 );
-					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab . '&connect=1' ) );
+
+					// Redirect back to settings page.
+					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=premium-integrations&integration=mailchimp_api&connect=1' ) );
+
 					die;
 
 				} else {
-					// On Error
-					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab . '&connect=2' ) );
+
+					// On Error.
+					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=premium-integrations&integration=mailchimp_api&connect=2' ) );
+
 					die;
+
 				}
 			} catch ( \Exception $e ) {
-				// On Error
-				wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab . '&connect=2' ) );
+
+				// On Error.
+				wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=premium-integrations&integration=mailchimp_api&connect=2' ) );
+
 				die;
+
 			}
 		}
-	}
-
-	/**
-	 * Get the user info of the user that is connected.
-	 *
-	 * @return string The html of the user info.
-	 */
-	public function get_user_info() {
-		$user_info = get_option( '_uncannyowl_mailchimp_settings_user_info' );
-		$mc_client = $this->get_mailchimp_client();
-
-		ob_start();
-		?>
-		<?php if ( false !== $user_info && ! empty( $mc_client ) ) : ?>
-			<div class="uo-mailchimp-user-info">
-				<?php if ( ! empty( $user_info['avatar'] ) ) : ?>
-					<div class="uo-mailchimp-user-info__avatar">
-						<img width="32" src="<?php echo esc_url( $user_info['avatar'] ); ?>" alt="<?php echo esc_html( $user_info['login_name'] ); ?>"/>
-					</div>
-				<?php endif; ?>
-				<div class="uo-mailchimp-user-info__email">
-					<?php echo esc_html( $user_info['email'] ); ?>
-				</div>
-				<div class="uo-mailchimp-user-info__name">
-					(<?php echo esc_html( $user_info['login_name'] ); ?>)
-				</div>
-			</div>
-		<?php endif; ?>
-		<?php
-		return ob_get_clean();
-
 	}
 
 	/**
@@ -910,9 +790,10 @@ class Mailchimp_Helpers {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'post_type' => 'uo-recipe',
-					'page'      => 'uncanny-automator-settings',
-					'tab'       => 'mailchimp_api',
+					'post_type'   => 'uo-recipe',
+					'page'        => 'uncanny-automator-config',
+					'tab'         => 'premium-integrations',
+					'integration' => 'mailchimp_api',
 				),
 				admin_url( 'edit.php' )
 			)
@@ -1004,4 +885,5 @@ class Mailchimp_Helpers {
 		$action_data['complete_with_errors'] = true;
 		Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
 	}
+
 }

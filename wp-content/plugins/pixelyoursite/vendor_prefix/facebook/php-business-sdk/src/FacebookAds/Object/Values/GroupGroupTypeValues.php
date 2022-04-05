@@ -46,6 +46,7 @@ class GroupGroupTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const EPHEMERAL = 'EPHEMERAL';
     const EVENT_PLANNING = 'EVENT_PLANNING';
     const FAMILY = 'FAMILY';
+    const FANTASY_LEAGUE = 'FANTASY_LEAGUE';
     const FITNESS = 'FITNESS';
     const FOR_SALE = 'FOR_SALE';
     const FOR_WORK = 'FOR_WORK';

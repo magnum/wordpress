@@ -109,7 +109,7 @@ function getAdvancedMatchingParams() {
 				$payment_key = urldecode( $_GET['payment_key'] );
 			} else if ( $session ) {
 				$payment_key = $session['purchase_key'];
-			} elseif ( $edd_receipt_args['payment_key'] ) {
+			} elseif ( $edd_receipt_args && $edd_receipt_args['payment_key'] ) {
 				$payment_key = $edd_receipt_args['payment_key'];
 			}
 

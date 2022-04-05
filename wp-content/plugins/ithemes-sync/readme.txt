@@ -3,8 +3,8 @@ Contributors: ithemes, layotte, oakesjosh
 Tags: manage multiple Sites, backup, security, migrate, SEO, manage updates, administration, update manager, reports, sync, google analytics, optimize, uptime, ithemes, customize dashboard, client sites, maintenance, management, google webmaster tools, reporting
 Requires at least: 4.5
 Requires PHP: 5.6
-Tested up to: 5.8
-Stable tag: 2.1.9
+Tested up to: 5.9.2
+Stable tag: 2.1.10
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/quick-guide-gplv3.html
 
@@ -86,6 +86,9 @@ Make steady, reliable income for WordPress maintenance with iThemes Sync Pro’s
 * WP101 Plugin - Easily add a complete series of WordPress onboarding tutorial videos to the WordPress dashboard of your client sites with Sync's WP101 plugin integration.
 
 == Changelog ==
+
+= 2.1.10 =
+* Bug Fix: Fix compatibility issue with fallback UTF-8 encoder on PHP 7.4+
 
 = 2.1.9 =
 * Enhancement: PHP 8 compatibility

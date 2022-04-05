@@ -173,8 +173,8 @@ include "html-popovers.php";
 
                         <div class="card card-static card-primary">
                             <div class="card-body">
-                                <h4 class="card-title">Facebook Pixel Essential Guide</h4>
-                                <p class="card-text">Learn how to use Facebook Pixel like a genuine expert. Download this Facebook
+                                <h4 class="card-title">Meta Pixel (formerly Facebook Pixel) Essential Guide</h4>
+                                <p class="card-text">Learn how to use Meta Pixel (formerly Facebook Pixel) like a genuine expert. Download this Facebook
                                     Pixel Essential Guide:</p>
                                 <a href="https://www.pixelyoursite.com/facebook-pixel-pdf-guide?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-facebook-guide" target="_blank" class="btn btn-sm btn-block btn-save">Click to get the free
                                     guide</a>

@@ -84,7 +84,9 @@ var external_wp_i18n_namespaceObject = window["wp"]["i18n"];
  * @return {boolean} True if MacOS; false otherwise.
  */
 
-function isAppleOS(_window = null) {
+function isAppleOS() {
+  let _window = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
   if (!_window) {
     if (typeof window === 'undefined') {
       return false;
@@ -98,7 +100,7 @@ function isAppleOS(_window = null) {
   } = _window.navigator;
   return platform.indexOf('Mac') !== -1 || (0,external_lodash_namespaceObject.includes)(['iPad', 'iPhone'], platform);
 }
-//# sourceMappingURL=platform.js.map
+
 ;// CONCATENATED MODULE: ./packages/keycodes/build-module/index.js
 /**
  * Note: The order of the modifier keys in many of the [foo]Shortcut()
@@ -285,7 +287,9 @@ const modifiers = {
 const rawShortcut = (0,external_lodash_namespaceObject.mapValues)(modifiers, modifier => {
   return (
     /** @type {WPKeyHandler<string>} */
-    (character, _isApple = isAppleOS) => {
+    function (character) {
+      let _isApple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isAppleOS;
+
       return [...modifier(_isApple), character.toLowerCase()].join('+');
     }
   );
@@ -307,7 +311,9 @@ const rawShortcut = (0,external_lodash_namespaceObject.mapValues)(modifiers, mod
 const displayShortcutList = (0,external_lodash_namespaceObject.mapValues)(modifiers, modifier => {
   return (
     /** @type {WPKeyHandler<string[]>} */
-    (character, _isApple = isAppleOS) => {
+    function (character) {
+      let _isApple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isAppleOS;
+
       const isApple = _isApple();
 
       const replacementKeyMap = {
@@ -350,7 +356,11 @@ const displayShortcutList = (0,external_lodash_namespaceObject.mapValues)(modifi
 const displayShortcut = (0,external_lodash_namespaceObject.mapValues)(displayShortcutList, shortcutList => {
   return (
     /** @type {WPKeyHandler<string>} */
-    (character, _isApple = isAppleOS) => shortcutList(character, _isApple).join('')
+    function (character) {
+      let _isApple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isAppleOS;
+
+      return shortcutList(character, _isApple).join('');
+    }
   );
 });
 /**
@@ -371,7 +381,9 @@ const displayShortcut = (0,external_lodash_namespaceObject.mapValues)(displaySho
 const shortcutAriaLabel = (0,external_lodash_namespaceObject.mapValues)(modifiers, modifier => {
   return (
     /** @type {WPKeyHandler<string>} */
-    (character, _isApple = isAppleOS) => {
+    function (character) {
+      let _isApple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isAppleOS;
+
       const isApple = _isApple();
 
       const replacementKeyMap = {
@@ -429,7 +441,9 @@ function getEventModifiers(event) {
 const isKeyboardEvent = (0,external_lodash_namespaceObject.mapValues)(modifiers, getModifiers => {
   return (
     /** @type {WPEventKeyHandler} */
-    (event, character, _isApple = isAppleOS) => {
+    function (event, character) {
+      let _isApple = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : isAppleOS;
+
       const mods = getModifiers(_isApple);
       const eventMods = getEventModifiers(event);
 
@@ -456,7 +470,7 @@ const isKeyboardEvent = (0,external_lodash_namespaceObject.mapValues)(modifiers,
     }
   );
 });
-//# sourceMappingURL=index.js.map
+
 (window.wp = window.wp || {}).keycodes = __webpack_exports__;
 /******/ })()
 ;

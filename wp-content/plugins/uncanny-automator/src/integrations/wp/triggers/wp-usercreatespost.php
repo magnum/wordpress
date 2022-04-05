@@ -9,6 +9,7 @@ class WP_USERCREATESPOST {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'WP';
@@ -82,15 +83,6 @@ class WP_USERCREATESPOST {
 		$options                   = array_merge( $options, $all_post_types['options'] );
 		$all_post_types['options'] = $options;
 
-		$relevant_tokens = array(
-			'POSTTITLE'    => __( 'Post title', 'uncanny-automator' ),
-			'POSTID'       => __( 'Post ID', 'uncanny-automator' ),
-			'POSTURL'      => __( 'Post URL', 'uncanny-automator' ),
-			'POSTCONTENT'  => __( 'Post content', 'uncanny-automator' ),
-			'POSTIMAGEURL' => __( 'Post featured image URL', 'uncanny-automator' ),
-			'POSTIMAGEID'  => __( 'Post featured image ID', 'uncanny-automator' ),
-		);
-
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/wordpress-core/' ),
@@ -125,8 +117,7 @@ class WP_USERCREATESPOST {
 						array(
 							'target_field' => 'WPTAXONOMYTERM',
 							'endpoint'     => 'select_terms_for_selected_taxonomy',
-						),
-						$relevant_tokens
+						)
 					),
 					Automator()->helpers->recipe->field->select_field( 'WPTAXONOMYTERM', esc_attr__( 'Taxonomy term', 'uncanny-automator' ) ),
 				),
@@ -362,6 +353,11 @@ class WP_USERCREATESPOST {
 				$trigger_meta['meta_value'] = maybe_serialize( $post->post_content );
 				Automator()->insert_trigger_meta( $trigger_meta );
 
+				// Post Excerpt Token
+				$trigger_meta['meta_key']   = $result['args']['trigger_id'] . ':' . $this->trigger_code . ':POSTEXCERPT';
+				$trigger_meta['meta_value'] = maybe_serialize( $post->post_excerpt );
+				Automator()->insert_trigger_meta( $trigger_meta );
+
 				// Post Type Token
 				$trigger_meta['meta_key']   = $result['args']['trigger_id'] . ':' . $this->trigger_code . ':WPPOSTTYPES';
 				$trigger_meta['meta_value'] = maybe_serialize( $post->post_type );
@@ -370,7 +366,7 @@ class WP_USERCREATESPOST {
 				$this->trigger_meta_log = $trigger_meta;
 				$this->result           = $result;
 
-				if ( REST_REQUEST ) {
+				if ( defined( 'REST_REQUEST' ) ) {
 					add_action(
 						"rest_after_insert_{$post->post_type}",
 						array(

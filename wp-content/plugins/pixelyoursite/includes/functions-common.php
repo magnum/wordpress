@@ -464,6 +464,12 @@ function isDisabledForCurrentRole() {
 	return false;
 
 }
+function pys_round( $val, $precision = 2, $mode = PHP_ROUND_HALF_UP )  {
+    if ( ! is_numeric( $val ) ) {
+        $val = floatval( $val );
+    }
+    return round( $val, $precision, $mode );
+}
 
 /**
  * Retrieves parameters values for for current queried object
@@ -548,9 +554,10 @@ function getTheContentParams( $allowedContentTypes = array() ) {
 			$term = get_term_by( 'slug', $slug, 'post_tag' );
 
 			$params['post_type']    = 'tag';
-			$params['post_id']      = $term->term_id;
-			$params['content_name'] = $term->name;
-
+			if($term) {
+                $params['post_id']      = $term->term_id;
+                $params['content_name'] = $term->name;
+            }
 		} else {
             
             $term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
@@ -1071,8 +1078,11 @@ function getStandardParams() {
         $slug = get_query_var( 'tag' );
         $term = get_term_by( 'slug', $slug, 'post_tag' );
         $params['post_type']    = 'tag';
-        $params['post_id']      = $term->term_id;
-        $params['page_title']   = $term->name;
+        if($term) {
+            $params['post_id']      = $term->term_id;
+            $params['page_title']   = $term->name;
+        }
+
 
     } elseif (is_tax()) {
         $term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );

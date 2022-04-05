@@ -7,6 +7,7 @@ use Uncanny_Automator_Pro\Presto_Pro_Helpers;
 
 /**
  * Class Presto_Helpers
+ *
  * @package Uncanny_Automator
  */
 class Presto_Helpers {
@@ -57,11 +58,8 @@ class Presto_Helpers {
 	public function list_presto_videos( $label = null, $option_code = 'PRESTOVIDEO', $args = array() ) {
 		if ( ! $this->load_options ) {
 
-
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
 		}
-
-
 
 		if ( ! $label ) {
 			$label = esc_attr__( 'Video', 'uncanny-automator' );

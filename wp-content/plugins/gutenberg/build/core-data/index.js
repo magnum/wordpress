@@ -1,10 +1,10 @@
 /******/ (function() { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3909:
+/***/ 2167:
 /***/ (function(module) {
 
+"use strict";
 
 
 function _typeof(obj) {
@@ -314,6 +314,174 @@ function () {
 module.exports = EquivalentKeyMap;
 
 
+/***/ }),
+
+/***/ 9756:
+/***/ (function(module) {
+
+/**
+ * Memize options object.
+ *
+ * @typedef MemizeOptions
+ *
+ * @property {number} [maxSize] Maximum size of the cache.
+ */
+
+/**
+ * Internal cache entry.
+ *
+ * @typedef MemizeCacheNode
+ *
+ * @property {?MemizeCacheNode|undefined} [prev] Previous node.
+ * @property {?MemizeCacheNode|undefined} [next] Next node.
+ * @property {Array<*>}                   args   Function arguments for cache
+ *                                               entry.
+ * @property {*}                          val    Function result.
+ */
+
+/**
+ * Properties of the enhanced function for controlling cache.
+ *
+ * @typedef MemizeMemoizedFunction
+ *
+ * @property {()=>void} clear Clear the cache.
+ */
+
+/**
+ * Accepts a function to be memoized, and returns a new memoized function, with
+ * optional options.
+ *
+ * @template {Function} F
+ *
+ * @param {F}             fn        Function to memoize.
+ * @param {MemizeOptions} [options] Options object.
+ *
+ * @return {F & MemizeMemoizedFunction} Memoized function.
+ */
+function memize( fn, options ) {
+	var size = 0;
+
+	/** @type {?MemizeCacheNode|undefined} */
+	var head;
+
+	/** @type {?MemizeCacheNode|undefined} */
+	var tail;
+
+	options = options || {};
+
+	function memoized( /* ...args */ ) {
+		var node = head,
+			len = arguments.length,
+			args, i;
+
+		searchCache: while ( node ) {
+			// Perform a shallow equality test to confirm that whether the node
+			// under test is a candidate for the arguments passed. Two arrays
+			// are shallowly equal if their length matches and each entry is
+			// strictly equal between the two sets. Avoid abstracting to a
+			// function which could incur an arguments leaking deoptimization.
+
+			// Check whether node arguments match arguments length
+			if ( node.args.length !== arguments.length ) {
+				node = node.next;
+				continue;
+			}
+
+			// Check whether node arguments match arguments values
+			for ( i = 0; i < len; i++ ) {
+				if ( node.args[ i ] !== arguments[ i ] ) {
+					node = node.next;
+					continue searchCache;
+				}
+			}
+
+			// At this point we can assume we've found a match
+
+			// Surface matched node to head if not already
+			if ( node !== head ) {
+				// As tail, shift to previous. Must only shift if not also
+				// head, since if both head and tail, there is no previous.
+				if ( node === tail ) {
+					tail = node.prev;
+				}
+
+				// Adjust siblings to point to each other. If node was tail,
+				// this also handles new tail's empty `next` assignment.
+				/** @type {MemizeCacheNode} */ ( node.prev ).next = node.next;
+				if ( node.next ) {
+					node.next.prev = node.prev;
+				}
+
+				node.next = head;
+				node.prev = null;
+				/** @type {MemizeCacheNode} */ ( head ).prev = node;
+				head = node;
+			}
+
+			// Return immediately
+			return node.val;
+		}
+
+		// No cached value found. Continue to insertion phase:
+
+		// Create a copy of arguments (avoid leaking deoptimization)
+		args = new Array( len );
+		for ( i = 0; i < len; i++ ) {
+			args[ i ] = arguments[ i ];
+		}
+
+		node = {
+			args: args,
+
+			// Generate the result from original function
+			val: fn.apply( null, args ),
+		};
+
+		// Don't need to check whether node is already head, since it would
+		// have been returned above already if it was
+
+		// Shift existing head down list
+		if ( head ) {
+			head.prev = node;
+			node.next = head;
+		} else {
+			// If no head, follows that there's no tail (at initial or reset)
+			tail = node;
+		}
+
+		// Trim tail if we're reached max size and are pending cache insertion
+		if ( size === /** @type {MemizeOptions} */ ( options ).maxSize ) {
+			tail = /** @type {MemizeCacheNode} */ ( tail ).prev;
+			/** @type {MemizeCacheNode} */ ( tail ).next = null;
+		} else {
+			size++;
+		}
+
+		head = node;
+
+		return node.val;
+	}
+
+	memoized.clear = function() {
+		head = null;
+		tail = null;
+		size = 0;
+	};
+
+	if ( false ) {}
+
+	// Ignore reason: There's not a clear solution to create an intersection of
+	// the function with additional properties, where the goal is to retain the
+	// function signature of the incoming argument and add control properties
+	// on the return value.
+
+	// @ts-ignore
+	return memoized;
+}
+
+module.exports = memize;
+
+
 /***/ })
 
 /******/ 	});
@@ -385,8 +553,9 @@ module.exports = EquivalentKeyMap;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 !function() {
+"use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
@@ -395,6 +564,8 @@ __webpack_require__.d(__webpack_exports__, {
   "EntityProvider": function() { return /* reexport */ EntityProvider; },
   "__experimentalFetchLinkSuggestions": function() { return /* reexport */ _experimental_fetch_link_suggestions; },
   "__experimentalFetchUrlData": function() { return /* reexport */ _experimental_fetch_url_data; },
+  "__experimentalUseEntityRecord": function() { return /* reexport */ __experimentalUseEntityRecord; },
+  "__experimentalUseEntityRecords": function() { return /* reexport */ __experimentalUseEntityRecords; },
   "store": function() { return /* binding */ store; },
   "useEntityBlockEditor": function() { return /* reexport */ useEntityBlockEditor; },
   "useEntityId": function() { return /* reexport */ useEntityId; },
@@ -406,6 +577,9 @@ var build_module_actions_namespaceObject = {};
 __webpack_require__.r(build_module_actions_namespaceObject);
 __webpack_require__.d(build_module_actions_namespaceObject, {
   "__experimentalBatch": function() { return __experimentalBatch; },
+  "__experimentalReceiveCurrentGlobalStylesId": function() { return __experimentalReceiveCurrentGlobalStylesId; },
+  "__experimentalReceiveThemeBaseGlobalStyles": function() { return __experimentalReceiveThemeBaseGlobalStyles; },
+  "__experimentalReceiveThemeGlobalStyleVariations": function() { return __experimentalReceiveThemeGlobalStyleVariations; },
   "__experimentalSaveSpecifiedEntityEdits": function() { return __experimentalSaveSpecifiedEntityEdits; },
   "__unstableCreateUndoLevel": function() { return __unstableCreateUndoLevel; },
   "addEntities": function() { return addEntities; },
@@ -430,6 +604,9 @@ __webpack_require__.d(build_module_actions_namespaceObject, {
 var build_module_selectors_namespaceObject = {};
 __webpack_require__.r(build_module_selectors_namespaceObject);
 __webpack_require__.d(build_module_selectors_namespaceObject, {
+  "__experimentalGetCurrentGlobalStylesId": function() { return __experimentalGetCurrentGlobalStylesId; },
+  "__experimentalGetCurrentThemeBaseGlobalStyles": function() { return __experimentalGetCurrentThemeBaseGlobalStyles; },
+  "__experimentalGetCurrentThemeGlobalStylesVariations": function() { return __experimentalGetCurrentThemeGlobalStylesVariations; },
   "__experimentalGetDirtyEntityRecords": function() { return __experimentalGetDirtyEntityRecords; },
   "__experimentalGetEntitiesBeingSaved": function() { return __experimentalGetEntitiesBeingSaved; },
   "__experimentalGetEntityRecordNoResolver": function() { return __experimentalGetEntityRecordNoResolver; },
@@ -444,7 +621,9 @@ __webpack_require__.d(build_module_selectors_namespaceObject, {
   "getEditedEntityRecord": function() { return getEditedEntityRecord; },
   "getEmbedPreview": function() { return getEmbedPreview; },
   "getEntitiesByKind": function() { return getEntitiesByKind; },
+  "getEntitiesConfig": function() { return getEntitiesConfig; },
   "getEntity": function() { return getEntity; },
+  "getEntityConfig": function() { return getEntityConfig; },
   "getEntityRecord": function() { return getEntityRecord; },
   "getEntityRecordEdits": function() { return getEntityRecordEdits; },
   "getEntityRecordNonTransientEdits": function() { return getEntityRecordNonTransientEdits; },
@@ -473,6 +652,9 @@ __webpack_require__.d(build_module_selectors_namespaceObject, {
 var resolvers_namespaceObject = {};
 __webpack_require__.r(resolvers_namespaceObject);
 __webpack_require__.d(resolvers_namespaceObject, {
+  "__experimentalGetCurrentGlobalStylesId": function() { return resolvers_experimentalGetCurrentGlobalStylesId; },
+  "__experimentalGetCurrentThemeBaseGlobalStyles": function() { return resolvers_experimentalGetCurrentThemeBaseGlobalStyles; },
+  "__experimentalGetCurrentThemeGlobalStylesVariations": function() { return resolvers_experimentalGetCurrentThemeGlobalStylesVariations; },
   "__experimentalGetTemplateForLink": function() { return resolvers_experimentalGetTemplateForLink; },
   "canUser": function() { return resolvers_canUser; },
   "canUserEditEntityRecord": function() { return resolvers_canUserEditEntityRecord; },
@@ -515,7 +697,7 @@ const ifMatchingAction = isMatch => reducer => (state, action) => {
 };
 
 /* harmony default export */ var if_matching_action = (ifMatchingAction);
-//# sourceMappingURL=if-matching-action.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/replace-action.js
 /**
  * Higher-order reducer creator which substitutes the action object before
@@ -530,14 +712,14 @@ const replaceAction = replacer => reducer => (state, action) => {
 };
 
 /* harmony default export */ var replace_action = (replaceAction);
-//# sourceMappingURL=replace-action.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/conservative-map-item.js
 /**
  * External dependencies
  */
 
 /**
- * Given the current and next item entity, returns the minimally "modified"
+ * Given the current and next item entity record, returns the minimally "modified"
  * result of the next item, preferring value references from the original item
  * if equal. If all values match, the original item is returned.
  *
@@ -580,7 +762,7 @@ function conservativeMapItem(item, nextItem) {
 
   return result;
 }
-//# sourceMappingURL=conservative-map-item.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/on-sub-key.js
 /**
  * Higher-order reducer creator which creates a combined reducer object, keyed
@@ -590,7 +772,9 @@ function conservativeMapItem(item, nextItem) {
  *
  * @return {Function} Higher-order reducer.
  */
-const onSubKey = actionProperty => reducer => (state = {}, action) => {
+const onSubKey = actionProperty => reducer => function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   // Retrieve subkey from action. Do not track if undefined; useful for cases
   // where reducer is scoped by action shape.
   const key = action[actionProperty];
@@ -612,7 +796,7 @@ const onSubKey = actionProperty => reducer => (state = {}, action) => {
   };
 };
 /* harmony default export */ var on_sub_key = (onSubKey);
-//# sourceMappingURL=on-sub-key.js.map
+
 ;// CONCATENATED MODULE: external ["wp","apiFetch"]
 var external_wp_apiFetch_namespaceObject = window["wp"]["apiFetch"];
 var external_wp_apiFetch_default = /*#__PURE__*/__webpack_require__.n(external_wp_apiFetch_namespaceObject);
@@ -701,6 +885,9 @@ function v4(options, buf, offset) {
 /* harmony default export */ var esm_browser_v4 = (v4);
 ;// CONCATENATED MODULE: external ["wp","url"]
 var external_wp_url_namespaceObject = window["wp"]["url"];
+;// CONCATENATED MODULE: external ["wp","deprecated"]
+var external_wp_deprecated_namespaceObject = window["wp"]["deprecated"];
+var external_wp_deprecated_default = /*#__PURE__*/__webpack_require__.n(external_wp_deprecated_namespaceObject);
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/queried-data/actions.js
 /**
  * External dependencies
@@ -726,14 +913,15 @@ function receiveItems(items, edits) {
  * Returns an action object used in signalling that entity records have been
  * deleted and they need to be removed from entities state.
  *
- * @param {string}       kind            Kind of the removed entities.
- * @param {string}       name            Name of the removed entities.
- * @param {Array|number} records         Record IDs of the removed entities.
- * @param {boolean}      invalidateCache Controls whether we want to invalidate the cache.
+ * @param {string}              kind            Kind of the removed entities.
+ * @param {string}              name            Name of the removed entities.
+ * @param {Array|number|string} records         Record IDs of the removed entities.
+ * @param {boolean}             invalidateCache Controls whether we want to invalidate the cache.
  * @return {Object} Action object.
  */
 
-function removeItems(kind, name, records, invalidateCache = false) {
+function removeItems(kind, name, records) {
+  let invalidateCache = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   return {
     type: 'REMOVE_ITEMS',
     itemIds: (0,external_lodash_namespaceObject.castArray)(records),
@@ -753,12 +941,14 @@ function removeItems(kind, name, records, invalidateCache = false) {
  * @return {Object} Action object.
  */
 
-function receiveQueriedItems(items, query = {}, edits) {
+function receiveQueriedItems(items) {
+  let query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  let edits = arguments.length > 2 ? arguments[2] : undefined;
   return { ...receiveItems(items, edits),
     query
   };
 }
-//# sourceMappingURL=actions.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/batch/default-processor.js
 /**
  * External dependencies
@@ -838,7 +1028,7 @@ async function defaultProcessor(requests) {
 
   return results;
 }
-//# sourceMappingURL=default-processor.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/batch/create-batch.js
 /**
  * External dependencies
@@ -883,8 +1073,11 @@ async function defaultProcessor(requests) {
  *                               either `output` or `error`.
  */
 
-function createBatch(processor = defaultProcessor) {
+function createBatch() {
+  let processor = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultProcessor;
   let lastId = 0;
+  /** @type {Array<{ input: any; resolve: ( value: any ) => void; reject: ( error: any ) => void }>} */
+
   let queue = [];
   const pending = new ObservableSet();
   return {
@@ -940,7 +1133,7 @@ function createBatch(processor = defaultProcessor) {
      * Runs the batch. This calls `batchProcessor` and resolves or rejects
      * all promises returned by `add()`.
      *
-     * @return {Promise} A promise that resolves to a boolean that is true
+     * @return {Promise<boolean>} A promise that resolves to a boolean that is true
      *                   if the processor returned no errors.
      */
     async run() {
@@ -949,7 +1142,7 @@ function createBatch(processor = defaultProcessor) {
           const unsubscribe = pending.subscribe(() => {
             if (!pending.size) {
               unsubscribe();
-              resolve();
+              resolve(undefined);
             }
           });
         });
@@ -958,9 +1151,12 @@ function createBatch(processor = defaultProcessor) {
       let results;
 
       try {
-        results = await processor(queue.map(({
-          input
-        }) => input));
+        results = await processor(queue.map(_ref => {
+          let {
+            input
+          } = _ref;
+          return input;
+        }));
 
         if (results.length !== queue.length) {
           throw new Error('run: Array returned by processor must be same size as input array.');
@@ -977,17 +1173,20 @@ function createBatch(processor = defaultProcessor) {
 
       let isSuccess = true;
 
-      for (const [result, {
-        resolve,
-        reject
-      }] of (0,external_lodash_namespaceObject.zip)(results, queue)) {
+      for (const pair of (0,external_lodash_namespaceObject.zip)(results, queue)) {
+        /** @type {{error?: unknown, output?: unknown}} */
+        const result = pair[0];
+        /** @type {{resolve: (value: any) => void; reject: (error: any) => void} | undefined} */
+
+        const queueItem = pair[1];
+
         if (result !== null && result !== void 0 && result.error) {
-          reject(result.error);
+          queueItem === null || queueItem === void 0 ? void 0 : queueItem.reject(result.error);
           isSuccess = false;
         } else {
           var _result$output;
 
-          resolve((_result$output = result === null || result === void 0 ? void 0 : result.output) !== null && _result$output !== void 0 ? _result$output : result);
+          queueItem === null || queueItem === void 0 ? void 0 : queueItem.resolve((_result$output = result === null || result === void 0 ? void 0 : result.output) !== null && _result$output !== void 0 ? _result$output : result);
         }
       }
 
@@ -999,7 +1198,11 @@ function createBatch(processor = defaultProcessor) {
 }
 
 class ObservableSet {
-  constructor(...args) {
+  constructor() {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
     this.set = new Set(...args);
     this.subscribers = new Set();
   }
@@ -1008,14 +1211,14 @@ class ObservableSet {
     return this.set.size;
   }
 
-  add(...args) {
-    this.set.add(...args);
+  add(value) {
+    this.set.add(value);
     this.subscribers.forEach(subscriber => subscriber());
     return this;
   }
 
-  delete(...args) {
-    const isSuccess = this.set.delete(...args);
+  delete(value) {
+    const isSuccess = this.set.delete(value);
     this.subscribers.forEach(subscriber => subscriber());
     return isSuccess;
   }
@@ -1028,7 +1231,7 @@ class ObservableSet {
   }
 
 }
-//# sourceMappingURL=create-batch.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/name.js
 /**
  * The reducer key used by core data in store registration.
@@ -1037,7 +1240,7 @@ class ObservableSet {
  * @type {string}
  */
 const STORE_NAME = 'core';
-//# sourceMappingURL=name.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/actions.js
 /**
  * External dependencies
@@ -1047,6 +1250,7 @@ const STORE_NAME = 'core';
 /**
  * WordPress dependencies
  */
+
 
 
 
@@ -1105,8 +1309,8 @@ function addEntities(entities) {
 /**
  * Returns an action object used in signalling that entity records have been received.
  *
- * @param {string}       kind            Kind of the received entity.
- * @param {string}       name            Name of the received entity.
+ * @param {string}       kind            Kind of the received entity record.
+ * @param {string}       name            Name of the received entity record.
  * @param {Array|Object} records         Records received.
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
@@ -1114,7 +1318,10 @@ function addEntities(entities) {
  * @return {Object} Action object.
  */
 
-function receiveEntityRecords(kind, name, records, query, invalidateCache = false, edits) {
+function receiveEntityRecords(kind, name, records, query) {
+  let invalidateCache = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let edits = arguments.length > 5 ? arguments[5] : undefined;
+
   // Auto drafts should not have titles, but some plugins rely on them so we can't filter this
   // on the server.
   if (kind === 'postType') {
@@ -1152,17 +1359,65 @@ function receiveCurrentTheme(currentTheme) {
   };
 }
 /**
- * Returns an action object used in signalling that the index has been received.
+ * Returns an action object used in signalling that the current global styles id has been received.
  *
- * @param {Object} themeSupports Theme support for the current theme.
+ * @param {string} currentGlobalStylesId The current global styles id.
  *
  * @return {Object} Action object.
  */
 
-function receiveThemeSupports(themeSupports) {
+function __experimentalReceiveCurrentGlobalStylesId(currentGlobalStylesId) {
   return {
-    type: 'RECEIVE_THEME_SUPPORTS',
-    themeSupports
+    type: 'RECEIVE_CURRENT_GLOBAL_STYLES_ID',
+    id: currentGlobalStylesId
+  };
+}
+/**
+ * Returns an action object used in signalling that the theme base global styles have been received
+ *
+ * @param {string} stylesheet   The theme's identifier
+ * @param {Object} globalStyles The global styles object.
+ *
+ * @return {Object} Action object.
+ */
+
+function __experimentalReceiveThemeBaseGlobalStyles(stylesheet, globalStyles) {
+  return {
+    type: 'RECEIVE_THEME_GLOBAL_STYLES',
+    stylesheet,
+    globalStyles
+  };
+}
+/**
+ * Returns an action object used in signalling that the theme global styles variations have been received.
+ *
+ * @param {string} stylesheet The theme's identifier
+ * @param {Array}  variations The global styles variations.
+ *
+ * @return {Object} Action object.
+ */
+
+function __experimentalReceiveThemeGlobalStyleVariations(stylesheet, variations) {
+  return {
+    type: 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS',
+    stylesheet,
+    variations
+  };
+}
+/**
+ * Returns an action object used in signalling that the index has been received.
+ *
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ *
+ * @return {Object} Action object.
+ */
+
+function receiveThemeSupports() {
+  external_wp_deprecated_default()("wp.data.dispatch( 'core' ).receiveThemeSupports", {
+    since: '5.9'
+  });
+  return {
+    type: 'DO_NOTHING'
   };
 }
 /**
@@ -1185,146 +1440,163 @@ function receiveEmbedPreview(url, preview) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                      Kind of the deleted entity.
- * @param {string}   name                      Name of the deleted entity.
- * @param {string}   recordId                  Record ID of the deleted entity.
- * @param {?Object}  query                     Special query parameters for the
- *                                             DELETE API call.
- * @param {Object}   [options]                 Delete options.
- * @param {Function} [options.__unstableFetch] Internal use only. Function to
- *                                             call instead of `apiFetch()`.
- *                                             Must return a promise.
+ * @param {string}   kind                         Kind of the deleted entity.
+ * @param {string}   name                         Name of the deleted entity.
+ * @param {string}   recordId                     Record ID of the deleted entity.
+ * @param {?Object}  query                        Special query parameters for the
+ *                                                DELETE API call.
+ * @param {Object}   [options]                    Delete options.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 
-const deleteEntityRecord = (kind, name, recordId, query, {
-  __unstableFetch = (external_wp_apiFetch_default())
-} = {}) => async ({
-  dispatch
-}) => {
-  const entities = await dispatch(getKindEntities(kind));
-  const entity = (0,external_lodash_namespaceObject.find)(entities, {
-    kind,
-    name
-  });
-  let error;
-  let deletedRecord = false;
-
-  if (!entity || entity !== null && entity !== void 0 && entity.__experimentalNoFetch) {
-    return;
-  }
-
-  const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'data', kind, name, recordId], {
-    exclusive: true
-  });
-
-  try {
-    dispatch({
-      type: 'DELETE_ENTITY_RECORD_START',
+const deleteEntityRecord = function (kind, name, recordId, query) {
+  let {
+    __unstableFetch = (external_wp_apiFetch_default()),
+    throwOnError = false
+  } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+  return async _ref => {
+    let {
+      dispatch
+    } = _ref;
+    const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+    const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
       kind,
-      name,
-      recordId
+      name
+    });
+    let error;
+    let deletedRecord = false;
+
+    if (!entityConfig || entityConfig !== null && entityConfig !== void 0 && entityConfig.__experimentalNoFetch) {
+      return;
+    }
+
+    const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'records', kind, name, recordId], {
+      exclusive: true
     });
 
     try {
-      let path = `${entity.baseURL}/${recordId}`;
+      dispatch({
+        type: 'DELETE_ENTITY_RECORD_START',
+        kind,
+        name,
+        recordId
+      });
+      let hasError = false;
 
-      if (query) {
-        path = (0,external_wp_url_namespaceObject.addQueryArgs)(path, query);
+      try {
+        let path = `${entityConfig.baseURL}/${recordId}`;
+
+        if (query) {
+          path = (0,external_wp_url_namespaceObject.addQueryArgs)(path, query);
+        }
+
+        deletedRecord = await __unstableFetch({
+          path,
+          method: 'DELETE'
+        });
+        await dispatch(removeItems(kind, name, recordId, true));
+      } catch (_error) {
+        hasError = true;
+        error = _error;
       }
 
-      deletedRecord = await __unstableFetch({
-        path,
-        method: 'DELETE'
+      dispatch({
+        type: 'DELETE_ENTITY_RECORD_FINISH',
+        kind,
+        name,
+        recordId,
+        error
       });
-      await dispatch(removeItems(kind, name, recordId, true));
-    } catch (_error) {
-      error = _error;
-    }
 
-    dispatch({
-      type: 'DELETE_ENTITY_RECORD_FINISH',
-      kind,
-      name,
-      recordId,
-      error
-    });
-    return deletedRecord;
-  } finally {
-    dispatch.__unstableReleaseStoreLock(lock);
-  }
+      if (hasError && throwOnError) {
+        throw error;
+      }
+
+      return deletedRecord;
+    } finally {
+      dispatch.__unstableReleaseStoreLock(lock);
+    }
+  };
 };
 /**
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}  kind               Kind of the edited entity record.
- * @param {string}  name               Name of the edited entity record.
- * @param {number}  recordId           Record ID of the edited entity record.
- * @param {Object}  edits              The edits.
- * @param {Object}  options            Options for the edit.
- * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
+ * @param {string}  kind                 Kind of the edited entity record.
+ * @param {string}  name                 Name of the edited entity record.
+ * @param {number}  recordId             Record ID of the edited entity record.
+ * @param {Object}  edits                The edits.
+ * @param {Object}  options              Options for the edit.
+ * @param {boolean} [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
 
-const editEntityRecord = (kind, name, recordId, edits, options = {}) => ({
-  select,
-  dispatch
-}) => {
-  const entity = select.getEntity(kind, name);
+const editEntityRecord = function (kind, name, recordId, edits) {
+  let options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+  return _ref2 => {
+    let {
+      select,
+      dispatch
+    } = _ref2;
+    const entityConfig = select.getEntityConfig(kind, name);
 
-  if (!entity) {
-    throw new Error(`The entity being edited (${kind}, ${name}) does not have a loaded config.`);
-  }
-
-  const {
-    transientEdits = {},
-    mergedEdits = {}
-  } = entity;
-  const record = select.getRawEntityRecord(kind, name, recordId);
-  const editedRecord = select.getEditedEntityRecord(kind, name, recordId);
-  const edit = {
-    kind,
-    name,
-    recordId,
-    // Clear edits when they are equal to their persisted counterparts
-    // so that the property is not considered dirty.
-    edits: Object.keys(edits).reduce((acc, key) => {
-      const recordValue = record[key];
-      const editedRecordValue = editedRecord[key];
-      const value = mergedEdits[key] ? { ...editedRecordValue,
-        ...edits[key]
-      } : edits[key];
-      acc[key] = (0,external_lodash_namespaceObject.isEqual)(recordValue, value) ? undefined : value;
-      return acc;
-    }, {}),
-    transientEdits
-  };
-  dispatch({
-    type: 'EDIT_ENTITY_RECORD',
-    ...edit,
-    meta: {
-      undo: !options.undoIgnore && { ...edit,
-        // Send the current values for things like the first undo stack entry.
-        edits: Object.keys(edits).reduce((acc, key) => {
-          acc[key] = editedRecord[key];
-          return acc;
-        }, {})
-      }
+    if (!entityConfig) {
+      throw new Error(`The entity being edited (${kind}, ${name}) does not have a loaded config.`);
     }
-  });
+
+    const {
+      transientEdits = {},
+      mergedEdits = {}
+    } = entityConfig;
+    const record = select.getRawEntityRecord(kind, name, recordId);
+    const editedRecord = select.getEditedEntityRecord(kind, name, recordId);
+    const edit = {
+      kind,
+      name,
+      recordId,
+      // Clear edits when they are equal to their persisted counterparts
+      // so that the property is not considered dirty.
+      edits: Object.keys(edits).reduce((acc, key) => {
+        const recordValue = record[key];
+        const editedRecordValue = editedRecord[key];
+        const value = mergedEdits[key] ? { ...editedRecordValue,
+          ...edits[key]
+        } : edits[key];
+        acc[key] = (0,external_lodash_namespaceObject.isEqual)(recordValue, value) ? undefined : value;
+        return acc;
+      }, {}),
+      transientEdits
+    };
+    dispatch({
+      type: 'EDIT_ENTITY_RECORD',
+      ...edit,
+      meta: {
+        undo: !options.undoIgnore && { ...edit,
+          // Send the current values for things like the first undo stack entry.
+          edits: Object.keys(edits).reduce((acc, key) => {
+            acc[key] = editedRecord[key];
+            return acc;
+          }, {})
+        }
+      }
+    });
+  };
 };
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
- *
- * @return {undefined}
  */
 
-const undo = () => ({
-  select,
-  dispatch
-}) => {
+const undo = () => _ref3 => {
+  let {
+    select,
+    dispatch
+  } = _ref3;
   const undoEdit = select.getUndoEdit();
 
   if (!undoEdit) {
@@ -1342,14 +1614,13 @@ const undo = () => ({
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
- *
- * @return {undefined}
  */
 
-const redo = () => ({
-  select,
-  dispatch
-}) => {
+const redo = () => _ref4 => {
+  let {
+    select,
+    dispatch
+  } = _ref4;
   const redoEdit = select.getRedoEdit();
 
   if (!redoEdit) {
@@ -1378,158 +1649,172 @@ function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                       Kind of the received entity.
- * @param {string}   name                       Name of the received entity.
- * @param {Object}   record                     Record to be saved.
- * @param {Object}   options                    Saving options.
- * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]  Internal use only. Function to
- *                                              call instead of `apiFetch()`.
- *                                              Must return a promise.
+ * @param {string}   kind                         Kind of the received entity.
+ * @param {string}   name                         Name of the received entity.
+ * @param {Object}   record                       Record to be saved.
+ * @param {Object}   options                      Saving options.
+ * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 
-const saveEntityRecord = (kind, name, record, {
-  isAutosave = false,
-  __unstableFetch = (external_wp_apiFetch_default())
-} = {}) => async ({
-  select,
-  resolveSelect,
-  dispatch
-}) => {
-  const entities = await dispatch(getKindEntities(kind));
-  const entity = (0,external_lodash_namespaceObject.find)(entities, {
-    kind,
-    name
-  });
+const saveEntityRecord = function (kind, name, record) {
+  let {
+    isAutosave = false,
+    __unstableFetch = (external_wp_apiFetch_default()),
+    throwOnError = false
+  } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+  return async _ref5 => {
+    let {
+      select,
+      resolveSelect,
+      dispatch
+    } = _ref5;
+    const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+    const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
+      kind,
+      name
+    });
 
-  if (!entity || entity !== null && entity !== void 0 && entity.__experimentalNoFetch) {
-    return;
-  }
-
-  const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
-  const recordId = record[entityIdKey];
-  const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'data', kind, name, recordId || esm_browser_v4()], {
-    exclusive: true
-  });
-
-  try {
-    // Evaluate optimized edits.
-    // (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
-    for (const [key, value] of Object.entries(record)) {
-      if (typeof value === 'function') {
-        const evaluatedValue = value(select.getEditedEntityRecord(kind, name, recordId));
-        dispatch.editEntityRecord(kind, name, recordId, {
-          [key]: evaluatedValue
-        }, {
-          undoIgnore: true
-        });
-        record[key] = evaluatedValue;
-      }
+    if (!entityConfig || entityConfig !== null && entityConfig !== void 0 && entityConfig.__experimentalNoFetch) {
+      return;
     }
 
-    dispatch({
-      type: 'SAVE_ENTITY_RECORD_START',
-      kind,
-      name,
-      recordId,
-      isAutosave
+    const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+    const recordId = record[entityIdKey];
+    const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'records', kind, name, recordId || esm_browser_v4()], {
+      exclusive: true
     });
-    let updatedRecord;
-    let error;
 
     try {
-      const path = `${entity.baseURL}${recordId ? '/' + recordId : ''}`;
-      const persistedRecord = select.getRawEntityRecord(kind, name, recordId);
+      // Evaluate optimized edits.
+      // (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
+      for (const [key, value] of Object.entries(record)) {
+        if (typeof value === 'function') {
+          const evaluatedValue = value(select.getEditedEntityRecord(kind, name, recordId));
+          dispatch.editEntityRecord(kind, name, recordId, {
+            [key]: evaluatedValue
+          }, {
+            undoIgnore: true
+          });
+          record[key] = evaluatedValue;
+        }
+      }
 
-      if (isAutosave) {
-        // Most of this autosave logic is very specific to posts.
-        // This is fine for now as it is the only supported autosave,
-        // but ideally this should all be handled in the back end,
-        // so the client just sends and receives objects.
-        const currentUser = select.getCurrentUser();
-        const currentUserId = currentUser ? currentUser.id : undefined;
-        const autosavePost = resolveSelect.getAutosave(persistedRecord.type, persistedRecord.id, currentUserId); // Autosaves need all expected fields to be present.
-        // So we fallback to the previous autosave and then
-        // to the actual persisted entity if the edits don't
-        // have a value.
+      dispatch({
+        type: 'SAVE_ENTITY_RECORD_START',
+        kind,
+        name,
+        recordId,
+        isAutosave
+      });
+      let updatedRecord;
+      let error;
+      let hasError = false;
 
-        let data = { ...persistedRecord,
-          ...autosavePost,
-          ...record
-        };
-        data = Object.keys(data).reduce((acc, key) => {
-          if (['title', 'excerpt', 'content'].includes(key)) {
-            acc[key] = data[key];
-          }
+      try {
+        const path = `${entityConfig.baseURL}${recordId ? '/' + recordId : ''}`;
+        const persistedRecord = select.getRawEntityRecord(kind, name, recordId);
 
-          return acc;
-        }, {
-          status: data.status === 'auto-draft' ? 'draft' : data.status
-        });
-        updatedRecord = await __unstableFetch({
-          path: `${path}/autosaves`,
-          method: 'POST',
-          data
-        }); // An autosave may be processed by the server as a regular save
-        // when its update is requested by the author and the post had
-        // draft or auto-draft status.
+        if (isAutosave) {
+          // Most of this autosave logic is very specific to posts.
+          // This is fine for now as it is the only supported autosave,
+          // but ideally this should all be handled in the back end,
+          // so the client just sends and receives objects.
+          const currentUser = select.getCurrentUser();
+          const currentUserId = currentUser ? currentUser.id : undefined;
+          const autosavePost = await resolveSelect.getAutosave(persistedRecord.type, persistedRecord.id, currentUserId); // Autosaves need all expected fields to be present.
+          // So we fallback to the previous autosave and then
+          // to the actual persisted entity if the edits don't
+          // have a value.
 
-        if (persistedRecord.id === updatedRecord.id) {
-          let newRecord = { ...persistedRecord,
-            ...data,
-            ...updatedRecord
+          let data = { ...persistedRecord,
+            ...autosavePost,
+            ...record
           };
-          newRecord = Object.keys(newRecord).reduce((acc, key) => {
-            // These properties are persisted in autosaves.
+          data = Object.keys(data).reduce((acc, key) => {
             if (['title', 'excerpt', 'content'].includes(key)) {
-              acc[key] = newRecord[key];
-            } else if (key === 'status') {
-              // Status is only persisted in autosaves when going from
-              // "auto-draft" to "draft".
-              acc[key] = persistedRecord.status === 'auto-draft' && newRecord.status === 'draft' ? newRecord.status : persistedRecord.status;
-            } else {
-              // These properties are not persisted in autosaves.
-              acc[key] = persistedRecord[key];
+              acc[key] = data[key];
             }
 
             return acc;
-          }, {});
-          dispatch.receiveEntityRecords(kind, name, newRecord, undefined, true);
+          }, {
+            status: data.status === 'auto-draft' ? 'draft' : data.status
+          });
+          updatedRecord = await __unstableFetch({
+            path: `${path}/autosaves`,
+            method: 'POST',
+            data
+          }); // An autosave may be processed by the server as a regular save
+          // when its update is requested by the author and the post had
+          // draft or auto-draft status.
+
+          if (persistedRecord.id === updatedRecord.id) {
+            let newRecord = { ...persistedRecord,
+              ...data,
+              ...updatedRecord
+            };
+            newRecord = Object.keys(newRecord).reduce((acc, key) => {
+              // These properties are persisted in autosaves.
+              if (['title', 'excerpt', 'content'].includes(key)) {
+                acc[key] = newRecord[key];
+              } else if (key === 'status') {
+                // Status is only persisted in autosaves when going from
+                // "auto-draft" to "draft".
+                acc[key] = persistedRecord.status === 'auto-draft' && newRecord.status === 'draft' ? newRecord.status : persistedRecord.status;
+              } else {
+                // These properties are not persisted in autosaves.
+                acc[key] = persistedRecord[key];
+              }
+
+              return acc;
+            }, {});
+            dispatch.receiveEntityRecords(kind, name, newRecord, undefined, true);
+          } else {
+            dispatch.receiveAutosaves(persistedRecord.id, updatedRecord);
+          }
         } else {
-          dispatch.receiveAutosaves(persistedRecord.id, updatedRecord);
-        }
-      } else {
-        let edits = record;
+          let edits = record;
 
-        if (entity.__unstablePrePersist) {
-          edits = { ...edits,
-            ...entity.__unstablePrePersist(persistedRecord, edits)
-          };
-        }
+          if (entityConfig.__unstablePrePersist) {
+            edits = { ...edits,
+              ...entityConfig.__unstablePrePersist(persistedRecord, edits)
+            };
+          }
 
-        updatedRecord = await __unstableFetch({
-          path,
-          method: recordId ? 'PUT' : 'POST',
-          data: edits
-        });
-        dispatch.receiveEntityRecords(kind, name, updatedRecord, undefined, true, edits);
+          updatedRecord = await __unstableFetch({
+            path,
+            method: recordId ? 'PUT' : 'POST',
+            data: edits
+          });
+          dispatch.receiveEntityRecords(kind, name, updatedRecord, undefined, true, edits);
+        }
+      } catch (_error) {
+        hasError = true;
+        error = _error;
       }
-    } catch (_error) {
-      error = _error;
-    }
 
-    dispatch({
-      type: 'SAVE_ENTITY_RECORD_FINISH',
-      kind,
-      name,
-      recordId,
-      error,
-      isAutosave
-    });
-    return updatedRecord;
-  } finally {
-    dispatch.__unstableReleaseStoreLock(lock);
-  }
+      dispatch({
+        type: 'SAVE_ENTITY_RECORD_FINISH',
+        kind,
+        name,
+        recordId,
+        error,
+        isAutosave
+      });
+
+      if (hasError && throwOnError) {
+        throw error;
+      }
+
+      return updatedRecord;
+    } finally {
+      dispatch.__unstableReleaseStoreLock(lock);
+    }
+  };
 };
 /**
  * Runs multiple core-data actions at the same time using one API request.
@@ -1550,13 +1835,14 @@ const saveEntityRecord = (kind, name, record, {
  *                         `saveEntityRecord`, `saveEditedEntityRecord`, and
  *                         `deleteEntityRecord`.
  *
- * @return {Promise} A promise that resolves to an array containing the return
- *                   values of each function given in `requests`.
+ * @return {(thunkArgs: Object) => Promise} A promise that resolves to an array containing the return
+ *                                          values of each function given in `requests`.
  */
 
-const __experimentalBatch = requests => async ({
-  dispatch
-}) => {
+const __experimentalBatch = requests => async _ref6 => {
+  let {
+    dispatch
+  } = _ref6;
   const batch = createBatch();
   const api = {
     saveEntityRecord(kind, name, record, options) {
@@ -1591,17 +1877,30 @@ const __experimentalBatch = requests => async ({
  * @param {Object} options  Saving options.
  */
 
-const saveEditedEntityRecord = (kind, name, recordId, options) => async ({
-  select,
-  dispatch
-}) => {
+const saveEditedEntityRecord = (kind, name, recordId, options) => async _ref7 => {
+  let {
+    select,
+    dispatch
+  } = _ref7;
+
   if (!select.hasEditsForEntityRecord(kind, name, recordId)) {
     return;
   }
 
+  const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+  const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
+    kind,
+    name
+  });
+
+  if (!entityConfig) {
+    return;
+  }
+
+  const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
   const edits = select.getEntityRecordNonTransientEdits(kind, name, recordId);
   const record = {
-    id: recordId,
+    [entityIdKey]: recordId,
     ...edits
   };
   return await dispatch.saveEntityRecord(kind, name, record, options);
@@ -1616,10 +1915,12 @@ const saveEditedEntityRecord = (kind, name, recordId, options) => async ({
  * @param {Object} options     Saving options.
  */
 
-const __experimentalSaveSpecifiedEntityEdits = (kind, name, recordId, itemsToSave, options) => async ({
-  select,
-  dispatch
-}) => {
+const __experimentalSaveSpecifiedEntityEdits = (kind, name, recordId, itemsToSave, options) => async _ref8 => {
+  let {
+    select,
+    dispatch
+  } = _ref8;
+
   if (!select.hasEditsForEntityRecord(kind, name, recordId)) {
     return;
   }
@@ -1638,17 +1939,19 @@ const __experimentalSaveSpecifiedEntityEdits = (kind, name, recordId, itemsToSav
 /**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
+ * @deprecated since WP 5.9, use receiveUserPermission instead.
+ *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?
  *
  * @return {Object} Action object.
  */
 
 function receiveUploadPermissions(hasUploadPermissions) {
-  return {
-    type: 'RECEIVE_USER_PERMISSION',
-    key: 'create/media',
-    isAllowed: hasUploadPermissions
-  };
+  external_wp_deprecated_default()("wp.data.dispatch( 'core' ).receiveUploadPermissions", {
+    since: '5.9',
+    alternative: 'receiveUserPermission'
+  });
+  return receiveUserPermission('create/media', hasUploadPermissions);
 }
 /**
  * Returns an action object used in signalling that the current user has
@@ -1684,7 +1987,7 @@ function receiveAutosaves(postId, autosaves) {
     autosaves: (0,external_lodash_namespaceObject.castArray)(autosaves)
   };
 }
-//# sourceMappingURL=actions.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/entities.js
 /**
  * External dependencies
@@ -1703,11 +2006,14 @@ function receiveAutosaves(postId, autosaves) {
 
 const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = ['title', 'excerpt', 'content'];
-const defaultEntities = [{
+const rootEntitiesConfig = [{
   label: (0,external_wp_i18n_namespaceObject.__)('Base'),
   name: '__unstableBase',
   kind: 'root',
-  baseURL: ''
+  baseURL: '/',
+  baseURLParams: {
+    _fields: ['description', 'gmt_offset', 'home', 'name', 'site_icon', 'site_icon_url', 'site_logo', 'timezone_string', 'url'].join(',')
+  }
 }, {
   label: (0,external_wp_i18n_namespaceObject.__)('Site'),
   name: 'site',
@@ -1734,7 +2040,8 @@ const defaultEntities = [{
     context: 'edit'
   },
   plural: 'mediaItems',
-  label: (0,external_wp_i18n_namespaceObject.__)('Media')
+  label: (0,external_wp_i18n_namespaceObject.__)('Media'),
+  rawAttributes: ['caption', 'title', 'description']
 }, {
   name: 'taxonomy',
   kind: 'root',
@@ -1796,7 +2103,7 @@ const defaultEntities = [{
 }, {
   name: 'menu',
   kind: 'root',
-  baseURL: '/__experimental/menus',
+  baseURL: '/wp/v2/menus',
   baseURLParams: {
     context: 'edit'
   },
@@ -1805,7 +2112,7 @@ const defaultEntities = [{
 }, {
   name: 'menuItem',
   kind: 'root',
-  baseURL: '/__experimental/menu-items',
+  baseURL: '/wp/v2/menu-items',
   baseURLParams: {
     context: 'edit'
   },
@@ -1815,19 +2122,63 @@ const defaultEntities = [{
 }, {
   name: 'menuLocation',
   kind: 'root',
-  baseURL: '/__experimental/menu-locations',
+  baseURL: '/wp/v2/menu-locations',
   baseURLParams: {
     context: 'edit'
   },
   plural: 'menuLocations',
   label: (0,external_wp_i18n_namespaceObject.__)('Menu Location'),
   key: 'name'
+}, {
+  name: 'navigationArea',
+  kind: 'root',
+  baseURL: '/wp/v2/block-navigation-areas',
+  baseURLParams: {
+    context: 'edit'
+  },
+  plural: 'navigationAreas',
+  label: (0,external_wp_i18n_namespaceObject.__)('Navigation Area'),
+  key: 'name',
+  getTitle: record => record === null || record === void 0 ? void 0 : record.description
+}, {
+  label: (0,external_wp_i18n_namespaceObject.__)('Global Styles'),
+  name: 'globalStyles',
+  kind: 'root',
+  baseURL: '/wp/v2/global-styles',
+  baseURLParams: {
+    context: 'edit'
+  },
+  plural: 'globalStylesVariations',
+  // Should be different than name.
+  getTitle: record => {
+    var _record$title;
+
+    return (record === null || record === void 0 ? void 0 : (_record$title = record.title) === null || _record$title === void 0 ? void 0 : _record$title.rendered) || (record === null || record === void 0 ? void 0 : record.title);
+  }
+}, {
+  label: (0,external_wp_i18n_namespaceObject.__)('Themes'),
+  name: 'theme',
+  kind: 'root',
+  baseURL: '/wp/v2/themes',
+  baseURLParams: {
+    context: 'edit'
+  },
+  key: 'stylesheet'
+}, {
+  label: (0,external_wp_i18n_namespaceObject.__)('Plugins'),
+  name: 'plugin',
+  kind: 'root',
+  baseURL: '/wp/v2/plugins',
+  baseURLParams: {
+    context: 'edit'
+  },
+  key: 'plugin'
 }];
-const kinds = [{
-  name: 'postType',
+const additionalEntityConfigLoaders = [{
+  kind: 'postType',
   loadEntities: loadPostTypeEntities
 }, {
-  name: 'taxonomy',
+  kind: 'taxonomy',
   loadEntities: loadTaxonomyEntities
 }];
 /**
@@ -1863,18 +2214,21 @@ const prePersistPostType = (persistedRecord, edits) => {
 
 async function loadPostTypeEntities() {
   const postTypes = await external_wp_apiFetch_default()({
-    path: '/wp/v2/types?context=edit'
+    path: '/wp/v2/types?context=view'
   });
   return (0,external_lodash_namespaceObject.map)(postTypes, (postType, name) => {
+    var _postType$rest_namesp;
+
     const isTemplate = ['wp_template', 'wp_template_part'].includes(name);
+    const namespace = (_postType$rest_namesp = postType === null || postType === void 0 ? void 0 : postType.rest_namespace) !== null && _postType$rest_namesp !== void 0 ? _postType$rest_namesp : 'wp/v2';
     return {
       kind: 'postType',
-      baseURL: '/wp/v2/' + postType.rest_base,
+      baseURL: `/${namespace}/${postType.rest_base}`,
       baseURLParams: {
         context: 'edit'
       },
       name,
-      label: postType.labels.singular_name,
+      label: postType.name,
       transientEdits: {
         blocks: true,
         selection: true
@@ -1884,9 +2238,9 @@ async function loadPostTypeEntities() {
       },
       rawAttributes: POST_RAW_ATTRIBUTES,
       getTitle: record => {
-        var _record$title;
+        var _record$title2;
 
-        return (record === null || record === void 0 ? void 0 : (_record$title = record.title) === null || _record$title === void 0 ? void 0 : _record$title.rendered) || (record === null || record === void 0 ? void 0 : record.title) || (isTemplate ? (0,external_lodash_namespaceObject.startCase)(record.slug) : String(record.id));
+        return (record === null || record === void 0 ? void 0 : (_record$title2 = record.title) === null || _record$title2 === void 0 ? void 0 : _record$title2.rendered) || (record === null || record === void 0 ? void 0 : record.title) || (isTemplate ? (0,external_lodash_namespaceObject.startCase)(record.slug) : String(record.id));
       },
       __unstablePrePersist: isTemplate ? undefined : prePersistPostType,
       __unstable_rest_base: postType.rest_base
@@ -1902,22 +2256,34 @@ async function loadPostTypeEntities() {
 
 async function loadTaxonomyEntities() {
   const taxonomies = await external_wp_apiFetch_default()({
-    path: '/wp/v2/taxonomies?context=edit'
+    path: '/wp/v2/taxonomies?context=view'
   });
   return (0,external_lodash_namespaceObject.map)(taxonomies, (taxonomy, name) => {
+    var _taxonomy$rest_namesp;
+
+    const namespace = (_taxonomy$rest_namesp = taxonomy === null || taxonomy === void 0 ? void 0 : taxonomy.rest_namespace) !== null && _taxonomy$rest_namesp !== void 0 ? _taxonomy$rest_namesp : 'wp/v2';
     return {
       kind: 'taxonomy',
-      baseURL: '/wp/v2/' + taxonomy.rest_base,
+      baseURL: `/${namespace}/${taxonomy.rest_base}`,
       baseURLParams: {
         context: 'edit'
       },
       name,
-      label: taxonomy.labels.singular_name
+      label: taxonomy.name
     };
   });
 }
 /**
  * Returns the entity's getter method name given its kind and name.
+ *
+ * @example
+ * ```js
+ * const nameSingular = getMethodName( 'root', 'theme', 'get' );
+ * // nameSingular is getRootTheme
+ *
+ * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * // namePlural is setRootThemes
+ * ```
  *
  * @param {string}  kind      Entity kind.
  * @param {string}  name      Entity name.
@@ -1928,14 +2294,16 @@ async function loadTaxonomyEntities() {
  */
 
 
-const getMethodName = (kind, name, prefix = 'get', usePlural = false) => {
-  const entity = (0,external_lodash_namespaceObject.find)(defaultEntities, {
+const getMethodName = function (kind, name) {
+  let prefix = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'get';
+  let usePlural = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  const entityConfig = (0,external_lodash_namespaceObject.find)(rootEntitiesConfig, {
     kind,
     name
   });
   const kindPrefix = kind === 'root' ? '' : (0,external_lodash_namespaceObject.upperFirst)((0,external_lodash_namespaceObject.camelCase)(kind));
   const nameSuffix = (0,external_lodash_namespaceObject.upperFirst)((0,external_lodash_namespaceObject.camelCase)(name)) + (usePlural ? 's' : '');
-  const suffix = usePlural && entity.plural ? (0,external_lodash_namespaceObject.upperFirst)((0,external_lodash_namespaceObject.camelCase)(entity.plural)) : nameSuffix;
+  const suffix = usePlural && entityConfig !== null && entityConfig !== void 0 && entityConfig.plural ? (0,external_lodash_namespaceObject.upperFirst)((0,external_lodash_namespaceObject.camelCase)(entityConfig.plural)) : nameSuffix;
   return `${prefix}${kindPrefix}${suffix}`;
 };
 /**
@@ -1943,32 +2311,33 @@ const getMethodName = (kind, name, prefix = 'get', usePlural = false) => {
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 
-const getKindEntities = kind => async ({
-  select,
-  dispatch
-}) => {
-  let entities = select.getEntitiesByKind(kind);
+const getOrLoadEntitiesConfig = kind => async _ref => {
+  let {
+    select,
+    dispatch
+  } = _ref;
+  let configs = select.getEntitiesConfig(kind);
 
-  if (entities && entities.length !== 0) {
-    return entities;
+  if (configs && configs.length !== 0) {
+    return configs;
   }
 
-  const kindConfig = (0,external_lodash_namespaceObject.find)(kinds, {
-    name: kind
+  const loader = (0,external_lodash_namespaceObject.find)(additionalEntityConfigLoaders, {
+    kind
   });
 
-  if (!kindConfig) {
+  if (!loader) {
     return [];
   }
 
-  entities = await kindConfig.loadEntities();
-  dispatch(addEntities(entities));
-  return entities;
+  configs = await loader.loadEntities();
+  dispatch(addEntities(configs));
+  return configs;
 };
-//# sourceMappingURL=entities.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/get-normalized-comma-separable.js
 /**
  * Given a value which can be specified as one or the other of a comma-separated
@@ -1990,7 +2359,7 @@ function getNormalizedCommaSeparable(value) {
 }
 
 /* harmony default export */ var get_normalized_comma_separable = (getNormalizedCommaSeparable);
-//# sourceMappingURL=get-normalized-comma-separable.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/with-weak-map-cache.js
 /**
  * External dependencies
@@ -2028,7 +2397,7 @@ function withWeakMapCache(fn) {
 }
 
 /* harmony default export */ var with_weak_map_cache = (withWeakMapCache);
-//# sourceMappingURL=with-weak-map-cache.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/queried-data/get-query-parts.js
 /**
  * WordPress dependencies
@@ -2101,17 +2470,21 @@ function getQueryParts(query) {
         // While in theory, we could exclude "_fields" from the stableKey
         // because two request with different fields have the same results
         // We're not able to ensure that because the server can decide to omit
-        // fields from the response even if we explicitely asked for it.
+        // fields from the response even if we explicitly asked for it.
         // Example: Asking for titles in posts without title support.
         if (key === '_fields') {
-          parts.fields = get_normalized_comma_separable(value); // Make sure to normalize value for `stableKey`
+          var _getNormalizedCommaSe;
+
+          parts.fields = (_getNormalizedCommaSe = get_normalized_comma_separable(value)) !== null && _getNormalizedCommaSe !== void 0 ? _getNormalizedCommaSe : []; // Make sure to normalize value for `stableKey`
 
           value = parts.fields.join();
         } // Two requests with different include values cannot have same results.
 
 
         if (key === 'include') {
-          parts.include = get_normalized_comma_separable(value).map(Number); // Normalize value for `stableKey`.
+          var _getNormalizedCommaSe2;
+
+          parts.include = ((_getNormalizedCommaSe2 = get_normalized_comma_separable(value)) !== null && _getNormalizedCommaSe2 !== void 0 ? _getNormalizedCommaSe2 : []).map(Number); // Normalize value for `stableKey`.
 
           value = parts.include.join();
         } // While it could be any deterministic string, for simplicity's
@@ -2132,7 +2505,7 @@ function getQueryParts(query) {
   return parts;
 }
 /* harmony default export */ var get_query_parts = (with_weak_map_cache(getQueryParts));
-//# sourceMappingURL=get-query-parts.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/queried-data/reducer.js
 /**
  * External dependencies
@@ -2177,6 +2550,8 @@ function getContextFromAction(action) {
 
 
 function getMergedItemIds(itemIds, nextItemIds, page, perPage) {
+  var _itemIds$length;
+
   const receivedAllIds = page === 1 && perPage === -1;
 
   if (receivedAllIds) {
@@ -2186,14 +2561,14 @@ function getMergedItemIds(itemIds, nextItemIds, page, perPage) {
   const nextItemIdsStartIndex = (page - 1) * perPage; // If later page has already been received, default to the larger known
   // size of the existing array, else calculate as extending the existing.
 
-  const size = Math.max(itemIds.length, nextItemIdsStartIndex + nextItemIds.length); // Preallocate array since size is known.
+  const size = Math.max((_itemIds$length = itemIds === null || itemIds === void 0 ? void 0 : itemIds.length) !== null && _itemIds$length !== void 0 ? _itemIds$length : 0, nextItemIdsStartIndex + nextItemIds.length); // Preallocate array since size is known.
 
   const mergedItemIds = new Array(size);
 
   for (let i = 0; i < size; i++) {
     // Preserve existing item ID except for subset of range of next items.
     const isInNextItemsRange = i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + nextItemIds.length;
-    mergedItemIds[i] = isInNextItemsRange ? nextItemIds[i - nextItemIdsStartIndex] : itemIds[i];
+    mergedItemIds[i] = isInNextItemsRange ? nextItemIds[i - nextItemIdsStartIndex] : itemIds === null || itemIds === void 0 ? void 0 : itemIds[i];
   }
 
   return mergedItemIds;
@@ -2208,7 +2583,10 @@ function getMergedItemIds(itemIds, nextItemIds, page, perPage) {
  * @return {Object} Next state.
  */
 
-function items(state = {}, action) {
+function items() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_ITEMS':
       {
@@ -2240,13 +2618,16 @@ function items(state = {}, action) {
  * In such cases, completeness is used as an indication of whether it would be
  * safe to use queried data for a non-`_fields`-limited request.
  *
- * @param {Object<string,boolean>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
  *
- * @return {Object<string,boolean>} Next state.
+ * @return {Object<string,Object<string,boolean>>} Next state.
  */
 
-function itemIsComplete(state = {}, action) {
+function itemIsComplete() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_ITEMS':
       {
@@ -2257,7 +2638,7 @@ function itemIsComplete(state = {}, action) {
         } = action; // An item is considered complete if it is received without an associated
         // fields query. Ideally, this would be implemented in such a way where the
         // complete aggregate of all fields would satisfy completeness. Since the
-        // fields are not consistent across all entity types, this would require
+        // fields are not consistent across all entities, this would require
         // introspection on the REST schema for each entity to know which fields
         // compose a complete item for that entity.
 
@@ -2310,7 +2691,9 @@ replace_action(action => {
   return action;
 }), on_sub_key('context'), // Queries shape is shared, but keyed by query `stableKey` part. Original
 // reducer tracks only a single query object.
-on_sub_key('stableKey')])((state = null, action) => {
+on_sub_key('stableKey')])(function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   const {
     type,
     page,
@@ -2333,7 +2716,10 @@ on_sub_key('stableKey')])((state = null, action) => {
  * @return {Object} Next state.
  */
 
-const queries = (state = {}, action) => {
+const queries = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_ITEMS':
       return receiveQueries(state, action);
@@ -2361,7 +2747,7 @@ const queries = (state = {}, action) => {
   itemIsComplete,
   queries
 }));
-//# sourceMappingURL=reducer.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/reducer.js
 /**
  * External dependencies
@@ -2392,7 +2778,10 @@ const queries = (state = {}, action) => {
  * @return {Object} Updated state.
  */
 
-function terms(state = {}, action) {
+function terms() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_TERMS':
       return { ...state,
@@ -2411,10 +2800,13 @@ function terms(state = {}, action) {
  * @return {Object} Updated state.
  */
 
-function users(state = {
-  byId: {},
-  queries: {}
-}, action) {
+function users() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    byId: {},
+    queries: {}
+  };
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_USER_QUERY':
       return {
@@ -2438,7 +2830,10 @@ function users(state = {
  * @return {Object} Updated state.
  */
 
-function currentUser(state = {}, action) {
+function currentUser() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_CURRENT_USER':
       return action.currentUser;
@@ -2455,7 +2850,10 @@ function currentUser(state = {}, action) {
  * @return {Object} Updated state.
  */
 
-function taxonomies(state = [], action) {
+function taxonomies() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_TAXONOMIES':
       return action.taxonomies;
@@ -2466,13 +2864,16 @@ function taxonomies(state = [], action) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 
-function currentTheme(state = undefined, action) {
+function currentTheme() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_CURRENT_THEME':
       return action.currentTheme.stylesheet;
@@ -2481,38 +2882,64 @@ function currentTheme(state = undefined, action) {
   return state;
 }
 /**
- * Reducer managing installed themes.
+ * Reducer managing the current global styles id.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string|undefined} Updated state.
  */
 
-function themes(state = {}, action) {
+function currentGlobalStylesId() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
-    case 'RECEIVE_CURRENT_THEME':
+    case 'RECEIVE_CURRENT_GLOBAL_STYLES_ID':
+      return action.id;
+  }
+
+  return state;
+}
+/**
+ * Reducer managing the theme base global styles.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+
+function themeBaseGlobalStyles() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case 'RECEIVE_THEME_GLOBAL_STYLES':
       return { ...state,
-        [action.currentTheme.stylesheet]: action.currentTheme
+        [action.stylesheet]: action.globalStyles
       };
   }
 
   return state;
 }
 /**
- * Reducer managing theme supports data.
+ * Reducer managing the theme global styles variations.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 
-function themeSupports(state = {}, action) {
+function themeGlobalStyleVariations() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
-    case 'RECEIVE_THEME_SUPPORTS':
+    case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
       return { ...state,
-        ...action.themeSupports
+        [action.stylesheet]: action.variations
       };
   }
 
@@ -2540,8 +2967,11 @@ function entity(entityConfig) {
     };
   })])((0,external_wp_data_namespaceObject.combineReducers)({
     queriedData: reducer,
-    edits: (state = {}, action) => {
+    edits: function () {
       var _action$query$context, _action$query;
+
+      let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      let action = arguments.length > 1 ? arguments[1] : undefined;
 
       switch (action.type) {
         case 'RECEIVE_ITEMS':
@@ -2604,7 +3034,10 @@ function entity(entityConfig) {
 
       return state;
     },
-    saving: (state = {}, action) => {
+    saving: function () {
+      let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      let action = arguments.length > 1 ? arguments[1] : undefined;
+
       switch (action.type) {
         case 'SAVE_ENTITY_RECORD_START':
         case 'SAVE_ENTITY_RECORD_FINISH':
@@ -2619,7 +3052,10 @@ function entity(entityConfig) {
 
       return state;
     },
-    deleting: (state = {}, action) => {
+    deleting: function () {
+      let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      let action = arguments.length > 1 ? arguments[1] : undefined;
+
       switch (action.type) {
         case 'DELETE_ENTITY_RECORD_START':
         case 'DELETE_ENTITY_RECORD_FINISH':
@@ -2645,7 +3081,10 @@ function entity(entityConfig) {
  */
 
 
-function entitiesConfig(state = defaultEntities, action) {
+function entitiesConfig() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : rootEntitiesConfig;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'ADD_ENTITIES':
       return [...state, ...action.entities];
@@ -2662,14 +3101,17 @@ function entitiesConfig(state = defaultEntities, action) {
  * @return {Object} Updated state.
  */
 
-const entities = (state = {}, action) => {
-  const newConfig = entitiesConfig(state.config, action); // Generates a dynamic reducer for the entities
+const entities = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+  const newConfig = entitiesConfig(state.config, action); // Generates a dynamic reducer for the entities.
 
   let entitiesDataReducer = state.reducer;
 
   if (!entitiesDataReducer || newConfig !== state.config) {
     const entitiesByKind = (0,external_lodash_namespaceObject.groupBy)(newConfig, 'kind');
-    entitiesDataReducer = (0,external_wp_data_namespaceObject.combineReducers)(Object.entries(entitiesByKind).reduce((memo, [kind, subEntities]) => {
+    entitiesDataReducer = (0,external_wp_data_namespaceObject.combineReducers)(Object.entries(entitiesByKind).reduce((memo, _ref) => {
+      let [kind, subEntities] = _ref;
       const kindReducer = (0,external_wp_data_namespaceObject.combineReducers)(subEntities.reduce((kindMemo, entityConfig) => ({ ...kindMemo,
         [entityConfig.name]: entity(entityConfig)
       }), {}));
@@ -2678,15 +3120,15 @@ const entities = (state = {}, action) => {
     }, {}));
   }
 
-  const newData = entitiesDataReducer(state.data, action);
+  const newData = entitiesDataReducer(state.records, action);
 
-  if (newData === state.data && newConfig === state.config && entitiesDataReducer === state.reducer) {
+  if (newData === state.records && newConfig === state.config && entitiesDataReducer === state.reducer) {
     return state;
   }
 
   return {
     reducer: entitiesDataReducer,
-    data: newData,
+    records: newData,
     config: newConfig
   };
 };
@@ -2702,7 +3144,10 @@ const entities = (state = {}, action) => {
 const UNDO_INITIAL_STATE = [];
 UNDO_INITIAL_STATE.offset = 0;
 let lastEditAction;
-function reducer_undo(state = UNDO_INITIAL_STATE, action) {
+function reducer_undo() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : UNDO_INITIAL_STATE;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'EDIT_ENTITY_RECORD':
     case 'CREATE_UNDO_LEVEL':
@@ -2738,7 +3183,18 @@ function reducer_undo(state = UNDO_INITIAL_STATE, action) {
           // to continue as if we were creating an explicit undo level. This
           // will result in an extra undo level being appended with the flattened
           // undo values.
+          // We also have to take into account if the `lastEditAction` had opted out
+          // of being tracked in undo history, like the action that persists the latest
+          // content right before saving. In that case we have to update the `lastEditAction`
+          // to avoid returning early before applying the existing flattened undos.
           isCreateUndoLevel = true;
+
+          if (!lastEditAction.meta.undo) {
+            lastEditAction.meta.undo = {
+              edits: {}
+            };
+          }
+
           action = lastEditAction;
         } else {
           return nextState;
@@ -2807,7 +3263,10 @@ function reducer_undo(state = UNDO_INITIAL_STATE, action) {
  * @return {Object} Updated state.
  */
 
-function embedPreviews(state = {}, action) {
+function embedPreviews() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_EMBED_PREVIEW':
       const {
@@ -2831,7 +3290,10 @@ function embedPreviews(state = {}, action) {
  * @return {Object} Updated state.
  */
 
-function userPermissions(state = {}, action) {
+function userPermissions() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_USER_PERMISSION':
       return { ...state,
@@ -2850,7 +3312,10 @@ function userPermissions(state = {}, action) {
  * @return {Object} Updated state.
  */
 
-function autosaves(state = {}, action) {
+function autosaves() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'RECEIVE_AUTOSAVES':
       const {
@@ -2868,17 +3333,18 @@ function autosaves(state = {}, action) {
   terms,
   users,
   currentTheme,
+  currentGlobalStylesId,
   currentUser,
+  themeGlobalStyleVariations,
+  themeBaseGlobalStyles,
   taxonomies,
-  themes,
-  themeSupports,
   entities,
   undo: reducer_undo,
   embedPreviews,
   userPermissions,
   autosaves
 }));
-//# sourceMappingURL=reducer.js.map
+
 ;// CONCATENATED MODULE: ./node_modules/rememo/es/rememo.js
 
 
@@ -3155,11 +3621,8 @@ function isShallowEqual( a, b, fromIndex ) {
 	return callSelector;
 }
 
-;// CONCATENATED MODULE: external ["wp","deprecated"]
-var external_wp_deprecated_namespaceObject = window["wp"]["deprecated"];
-var external_wp_deprecated_default = /*#__PURE__*/__webpack_require__.n(external_wp_deprecated_namespaceObject);
 // EXTERNAL MODULE: ./node_modules/equivalent-key-map/equivalent-key-map.js
-var equivalent_key_map = __webpack_require__(3909);
+var equivalent_key_map = __webpack_require__(2167);
 var equivalent_key_map_default = /*#__PURE__*/__webpack_require__.n(equivalent_key_map);
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/queried-data/selectors.js
 /**
@@ -3273,7 +3736,8 @@ function getQueriedItemsUncached(state, query) {
  */
 
 
-const getQueriedItems = rememo((state, query = {}) => {
+const getQueriedItems = rememo(function (state) {
+  let query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   let queriedItemsCache = queriedItemsCacheByState.get(state);
 
   if (queriedItemsCache) {
@@ -3291,12 +3755,12 @@ const getQueriedItems = rememo((state, query = {}) => {
   queriedItemsCache.set(query, items);
   return items;
 });
-//# sourceMappingURL=selectors.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/is-raw-attribute.js
 /**
  * Checks whether the attribute is a "raw" attribute or not.
  *
- * @param {Object} entity    Entity data.
+ * @param {Object} entity    Entity record.
  * @param {string} attribute Attribute name.
  *
  * @return {boolean} Is the attribute raw
@@ -3304,7 +3768,7 @@ const getQueriedItems = rememo((state, query = {}) => {
 function isRawAttribute(entity, attribute) {
   return (entity.rawAttributes || []).includes(attribute);
 }
-//# sourceMappingURL=is-raw-attribute.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/selectors.js
 /**
  * External dependencies
@@ -3327,16 +3791,14 @@ function isRawAttribute(entity, attribute) {
 
 
 /**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
  * other pure component which performs `shouldComponentUpdate` check on props.
  * This should be used as a last resort, since the normalized data should be
  * maintained by the reducer result in state.
- *
- * @type {Array}
  */
 
-const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 /**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
@@ -3394,8 +3856,9 @@ const getUserQueryResults = rememo((state, queryID) => {
   return (0,external_lodash_namespaceObject.map)(queryResults, id => state.users.byId[id]);
 }, (state, queryID) => [state.users.queries[queryID], state.users.byId]);
 /**
- * Returns whether the entities for the give kind are loaded.
+ * Returns the loaded entities for the given kind.
  *
+ * @deprecated since WordPress 6.0. Use getEntitiesConfig instead
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  *
@@ -3403,21 +3866,55 @@ const getUserQueryResults = rememo((state, queryID) => {
  */
 
 function getEntitiesByKind(state, kind) {
+  external_wp_deprecated_default()("wp.data.select( 'core' ).getEntitiesByKind()", {
+    since: '6.0',
+    alternative: "wp.data.select( 'core' ).getEntitiesConfig()"
+  });
+  return getEntitiesConfig(state, kind);
+}
+/**
+ * Returns the loaded entities for the given kind.
+ *
+ * @param {Object} state Data state.
+ * @param {string} kind  Entity kind.
+ *
+ * @return {Array<Object>} Array of entities with config matching kind.
+ */
+
+function getEntitiesConfig(state, kind) {
   return (0,external_lodash_namespaceObject.filter)(state.entities.config, {
     kind
   });
 }
 /**
- * Returns the entity object given its kind and name.
+ * Returns the entity config given its kind and name.
+ *
+ * @deprecated since WordPress 6.0. Use getEntityConfig instead
+ * @param {Object} state Data state.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ *
+ * @return {Object} Entity config
+ */
+
+function getEntity(state, kind, name) {
+  external_wp_deprecated_default()("wp.data.select( 'core' ).getEntity()", {
+    since: '6.0',
+    alternative: "wp.data.select( 'core' ).getEntityConfig()"
+  });
+  return getEntityConfig(state, kind, name);
+}
+/**
+ * Returns the entity config given its kind and name.
  *
  * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  * @param {string} name  Entity name.
  *
- * @return {Object} Entity
+ * @return {Object} Entity config
  */
 
-function getEntity(state, kind, name) {
+function getEntityConfig(state, kind, name) {
   return (0,external_lodash_namespaceObject.find)(state.entities.config, {
     kind,
     name
@@ -3434,13 +3931,13 @@ function getEntity(state, kind, name) {
  * @param {number}  key   Record's key
  * @param {?Object} query Optional query.
  *
- * @return {Object?} Record.
+ * @return {Object|undefined} Record.
  */
 
 const getEntityRecord = rememo((state, kind, name, key, query) => {
   var _query$context, _queriedState$items$c;
 
-  const queriedState = (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData']);
+  const queriedState = (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData']);
 
   if (!queriedState) {
     return undefined;
@@ -3462,8 +3959,10 @@ const getEntityRecord = rememo((state, kind, name, key, query) => {
   const item = (_queriedState$items$c = queriedState.items[context]) === null || _queriedState$items$c === void 0 ? void 0 : _queriedState$items$c[key];
 
   if (item && query._fields) {
+    var _getNormalizedCommaSe;
+
     const filteredItem = {};
-    const fields = get_normalized_comma_separable(query._fields);
+    const fields = (_getNormalizedCommaSe = get_normalized_comma_separable(query._fields)) !== null && _getNormalizedCommaSe !== void 0 ? _getNormalizedCommaSe : [];
 
     for (let f = 0; f < fields.length; f++) {
       const field = fields[f].split('.');
@@ -3479,10 +3978,10 @@ const getEntityRecord = rememo((state, kind, name, key, query) => {
   var _query$context2;
 
   const context = (_query$context2 = query === null || query === void 0 ? void 0 : query.context) !== null && _query$context2 !== void 0 ? _query$context2 : 'default';
-  return [(0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'itemIsComplete', context, recordId])];
+  return [(0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'itemIsComplete', context, recordId])];
 });
 /**
- * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
+ * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
  * @param {Object} state State tree
  * @param {string} kind  Entity kind.
@@ -3510,7 +4009,7 @@ function __experimentalGetEntityRecordNoResolver(state, kind, name, key) {
 const getRawEntityRecord = rememo((state, kind, name, key) => {
   const record = getEntityRecord(state, kind, name, key);
   return record && Object.keys(record).reduce((accumulator, _key) => {
-    if (isRawAttribute(getEntity(state, kind, name), _key)) {
+    if (isRawAttribute(getEntityConfig(state, kind, name), _key)) {
       // Because edits are the "raw" attribute values,
       // we return those from record selectors to make rendering,
       // comparisons, and joins with edits easier.
@@ -3525,7 +4024,7 @@ const getRawEntityRecord = rememo((state, kind, name, key) => {
   var _query$context3;
 
   const context = (_query$context3 = query === null || query === void 0 ? void 0 : query.context) !== null && _query$context3 !== void 0 ? _query$context3 : 'default';
-  return [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'itemIsComplete', context, recordId])];
+  return [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'itemIsComplete', context, recordId])];
 });
 /**
  * Returns true if records have been received for the given set of parameters,
@@ -3555,13 +4054,11 @@ function hasEntityRecords(state, kind, name, query) {
 
 function getEntityRecords(state, kind, name, query) {
   // Queried data state is prepopulated for all known entities. If this is not
-  // assigned for the given parameters, then it is known to not exist. Thus, a
-  // return value of an empty array is used instead of `null` (where `null` is
-  // otherwise used to represent an unknown state).
-  const queriedState = (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData']);
+  // assigned for the given parameters, then it is known to not exist.
+  const queriedState = (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData']);
 
   if (!queriedState) {
-    return EMPTY_ARRAY;
+    return null;
   }
 
   return getQueriedItems(queriedState, query);
@@ -3577,25 +4074,27 @@ function getEntityRecords(state, kind, name, query) {
 const __experimentalGetDirtyEntityRecords = rememo(state => {
   const {
     entities: {
-      data
+      records
     }
   } = state;
   const dirtyRecords = [];
-  Object.keys(data).forEach(kind => {
-    Object.keys(data[kind]).forEach(name => {
-      const primaryKeys = Object.keys(data[kind][name].edits).filter(primaryKey => hasEditsForEntityRecord(state, kind, name, primaryKey));
+  Object.keys(records).forEach(kind => {
+    Object.keys(records[kind]).forEach(name => {
+      const primaryKeys = Object.keys(records[kind][name].edits).filter(primaryKey => // The entity record must exist (not be deleted),
+      // and it must have edits.
+      getEntityRecord(state, kind, name, primaryKey) && hasEditsForEntityRecord(state, kind, name, primaryKey));
 
       if (primaryKeys.length) {
-        const entity = getEntity(state, kind, name);
+        const entityConfig = getEntityConfig(state, kind, name);
         primaryKeys.forEach(primaryKey => {
-          var _entity$getTitle;
+          var _entityConfig$getTitl;
 
           const entityRecord = getEditedEntityRecord(state, kind, name, primaryKey);
           dirtyRecords.push({
             // We avoid using primaryKey because it's transformed into a string
             // when it's used as an object key.
-            key: entityRecord[entity.key || DEFAULT_ENTITY_KEY],
-            title: (entity === null || entity === void 0 ? void 0 : (_entity$getTitle = entity.getTitle) === null || _entity$getTitle === void 0 ? void 0 : _entity$getTitle.call(entity, entityRecord)) || '',
+            key: entityRecord[entityConfig.key || DEFAULT_ENTITY_KEY],
+            title: (entityConfig === null || entityConfig === void 0 ? void 0 : (_entityConfig$getTitl = entityConfig.getTitle) === null || _entityConfig$getTitl === void 0 ? void 0 : _entityConfig$getTitl.call(entityConfig, entityRecord)) || '',
             name,
             kind
           });
@@ -3604,7 +4103,7 @@ const __experimentalGetDirtyEntityRecords = rememo(state => {
     });
   });
   return dirtyRecords;
-}, state => [state.entities.data]);
+}, state => [state.entities.records]);
 /**
  * Returns the list of entities currently being saved.
  *
@@ -3616,25 +4115,25 @@ const __experimentalGetDirtyEntityRecords = rememo(state => {
 const __experimentalGetEntitiesBeingSaved = rememo(state => {
   const {
     entities: {
-      data
+      records
     }
   } = state;
   const recordsBeingSaved = [];
-  Object.keys(data).forEach(kind => {
-    Object.keys(data[kind]).forEach(name => {
-      const primaryKeys = Object.keys(data[kind][name].saving).filter(primaryKey => isSavingEntityRecord(state, kind, name, primaryKey));
+  Object.keys(records).forEach(kind => {
+    Object.keys(records[kind]).forEach(name => {
+      const primaryKeys = Object.keys(records[kind][name].saving).filter(primaryKey => isSavingEntityRecord(state, kind, name, primaryKey));
 
       if (primaryKeys.length) {
-        const entity = getEntity(state, kind, name);
+        const entityConfig = getEntityConfig(state, kind, name);
         primaryKeys.forEach(primaryKey => {
-          var _entity$getTitle2;
+          var _entityConfig$getTitl2;
 
           const entityRecord = getEditedEntityRecord(state, kind, name, primaryKey);
           recordsBeingSaved.push({
             // We avoid using primaryKey because it's transformed into a string
             // when it's used as an object key.
-            key: entityRecord[entity.key || DEFAULT_ENTITY_KEY],
-            title: (entity === null || entity === void 0 ? void 0 : (_entity$getTitle2 = entity.getTitle) === null || _entity$getTitle2 === void 0 ? void 0 : _entity$getTitle2.call(entity, entityRecord)) || '',
+            key: entityRecord[entityConfig.key || DEFAULT_ENTITY_KEY],
+            title: (entityConfig === null || entityConfig === void 0 ? void 0 : (_entityConfig$getTitl2 = entityConfig.getTitle) === null || _entityConfig$getTitl2 === void 0 ? void 0 : _entityConfig$getTitl2.call(entityConfig, entityRecord)) || '',
             name,
             kind
           });
@@ -3643,7 +4142,7 @@ const __experimentalGetEntitiesBeingSaved = rememo(state => {
     });
   });
   return recordsBeingSaved;
-}, state => [state.entities.data]);
+}, state => [state.entities.records]);
 /**
  * Returns the specified entity record's edits.
  *
@@ -3656,7 +4155,7 @@ const __experimentalGetEntitiesBeingSaved = rememo(state => {
  */
 
 function getEntityRecordEdits(state, kind, name, recordId) {
-  return (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'edits', recordId]);
+  return (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'edits', recordId]);
 }
 /**
  * Returns the specified entity record's non transient edits.
@@ -3676,7 +4175,7 @@ function getEntityRecordEdits(state, kind, name, recordId) {
 const getEntityRecordNonTransientEdits = rememo((state, kind, name, recordId) => {
   const {
     transientEdits
-  } = getEntity(state, kind, name) || {};
+  } = getEntityConfig(state, kind, name) || {};
   const edits = getEntityRecordEdits(state, kind, name, recordId) || {};
 
   if (!transientEdits) {
@@ -3690,7 +4189,7 @@ const getEntityRecordNonTransientEdits = rememo((state, kind, name, recordId) =>
 
     return acc;
   }, {});
-}, (state, kind, name, recordId) => [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'edits', recordId])]);
+}, (state, kind, name, recordId) => [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'edits', recordId])]);
 /**
  * Returns true if the specified entity record has edits,
  * and false otherwise.
@@ -3709,10 +4208,10 @@ function hasEditsForEntityRecord(state, kind, name, recordId) {
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {Object?} The entity record, merged with its edits.
  */
@@ -3723,7 +4222,7 @@ const getEditedEntityRecord = rememo((state, kind, name, recordId) => ({ ...getR
   var _query$context4;
 
   const context = (_query$context4 = query === null || query === void 0 ? void 0 : query.context) !== null && _query$context4 !== void 0 ? _query$context4 : 'default';
-  return [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'queriedData', 'itemIsComplete', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'edits', recordId])];
+  return [state.entities.config, (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'items', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'queriedData', 'itemIsComplete', context, recordId]), (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'edits', recordId])];
 });
 /**
  * Returns true if the specified entity record is autosaving, and false otherwise.
@@ -3740,22 +4239,22 @@ function isAutosavingEntityRecord(state, kind, name, recordId) {
   const {
     pending,
     isAutosave
-  } = (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'saving', recordId], {});
+  } = (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'saving', recordId], {});
   return Boolean(pending && isAutosave);
 }
 /**
  * Returns true if the specified entity record is saving, and false otherwise.
  *
- * @param {Object} state    State tree.
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {number} recordId Record ID.
+ * @param {Object}        state    State tree.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record ID.
  *
  * @return {boolean} Whether the entity record is saving or not.
  */
 
 function isSavingEntityRecord(state, kind, name, recordId) {
-  return (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'saving', recordId, 'pending'], false);
+  return (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'saving', recordId, 'pending'], false);
 }
 /**
  * Returns true if the specified entity record is deleting, and false otherwise.
@@ -3769,7 +4268,7 @@ function isSavingEntityRecord(state, kind, name, recordId) {
  */
 
 function isDeletingEntityRecord(state, kind, name, recordId) {
-  return (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'deleting', recordId, 'pending'], false);
+  return (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'deleting', recordId, 'pending'], false);
 }
 /**
  * Returns the specified entity record's last save error.
@@ -3783,7 +4282,7 @@ function isDeletingEntityRecord(state, kind, name, recordId) {
  */
 
 function getLastEntitySaveError(state, kind, name, recordId) {
-  return (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'saving', recordId, 'error']);
+  return (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'saving', recordId, 'error']);
 }
 /**
  * Returns the specified entity record's last delete error.
@@ -3797,7 +4296,7 @@ function getLastEntitySaveError(state, kind, name, recordId) {
  */
 
 function getLastEntityDeleteError(state, kind, name, recordId) {
-  return (0,external_lodash_namespaceObject.get)(state.entities.data, [kind, name, 'deleting', recordId, 'error']);
+  return (0,external_lodash_namespaceObject.get)(state.entities.records, [kind, name, 'deleting', recordId, 'error']);
 }
 /**
  * Returns the current undo offset for the
@@ -3872,7 +4371,18 @@ function hasRedo(state) {
  */
 
 function getCurrentTheme(state) {
-  return state.themes[state.currentTheme];
+  return getEntityRecord(state, 'root', 'theme', state.currentTheme);
+}
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+
+function __experimentalGetCurrentGlobalStylesId(state) {
+  return state.currentGlobalStylesId;
 }
 /**
  * Return theme supports data in the index.
@@ -3883,7 +4393,9 @@ function getCurrentTheme(state) {
  */
 
 function getThemeSupports(state) {
-  return state.themeSupports;
+  var _getCurrentTheme$them, _getCurrentTheme;
+
+  return (_getCurrentTheme$them = (_getCurrentTheme = getCurrentTheme(state)) === null || _getCurrentTheme === void 0 ? void 0 : _getCurrentTheme.theme_supports) !== null && _getCurrentTheme$them !== void 0 ? _getCurrentTheme$them : EMPTY_OBJECT;
 }
 /**
  * Returns the embed preview for the given URL.
@@ -3959,13 +4471,13 @@ function canUser(state, action, resource, id) {
  */
 
 function canUserEditEntityRecord(state, kind, name, recordId) {
-  const entity = getEntity(state, kind, name);
+  const entityConfig = getEntityConfig(state, kind, name);
 
-  if (!entity) {
+  if (!entityConfig) {
     return false;
   }
 
-  const resource = entity.__unstable_rest_base;
+  const resource = entityConfig.__unstable_rest_base;
   return canUser(state, 'update', resource, recordId);
 }
 /**
@@ -4059,31 +4571,64 @@ function __experimentalGetTemplateForLink(state, link) {
 
   return template;
 }
-//# sourceMappingURL=selectors.js.map
-;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/if-not-resolved.js
 /**
- * Higher-order function which invokes the given resolver only if it has not
- * already been resolved with the arguments passed to the enhanced function.
+ * Retrieve the current theme's base global styles
  *
- * This only considers resolution state, and notably does not support resolver
- * custom `isFulfilled` behavior.
+ * @param {Object} state Editor state.
  *
- * @param {Function} resolver     Original resolver.
- * @param {string}   selectorName Selector name associated with resolver.
+ * @return {Object|null} The Global Styles object.
+ */
+
+function __experimentalGetCurrentThemeBaseGlobalStyles(state) {
+  const currentTheme = getCurrentTheme(state);
+
+  if (!currentTheme) {
+    return null;
+  }
+
+  return state.themeBaseGlobalStyles[currentTheme.stylesheet];
+}
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string|null} The current global styles ID.
+ */
+
+function __experimentalGetCurrentThemeGlobalStylesVariations(state) {
+  const currentTheme = getCurrentTheme(state);
+
+  if (!currentTheme) {
+    return null;
+  }
+
+  return state.themeGlobalStyleVariations[currentTheme.stylesheet];
+}
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/utils/forward-resolver.js
+/**
+ * Higher-order function which forward the resolution to another resolver with the same arguments.
+ *
+ * @param {string} resolverName forwarded resolver.
  *
  * @return {Function} Enhanced resolver.
  */
-const ifNotResolved = (resolver, selectorName) => (...args) => async ({
-  select,
-  dispatch
-}) => {
-  if (!select.hasStartedResolution(selectorName, args)) {
-    await dispatch(resolver(...args));
+const forwardResolver = resolverName => function () {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
   }
+
+  return async _ref => {
+    let {
+      resolveSelect
+    } = _ref;
+    await resolveSelect[resolverName](...args);
+  };
 };
 
-/* harmony default export */ var if_not_resolved = (ifNotResolved);
-//# sourceMappingURL=if-not-resolved.js.map
+/* harmony default export */ var forward_resolver = (forwardResolver);
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/resolvers.js
 /**
  * External dependencies
@@ -4109,9 +4654,10 @@ const ifNotResolved = (resolver, selectorName) => (...args) => async ({
  *                                 include with request.
  */
 
-const resolvers_getAuthors = query => async ({
-  dispatch
-}) => {
+const resolvers_getAuthors = query => async _ref => {
+  let {
+    dispatch
+  } = _ref;
   const path = (0,external_wp_url_namespaceObject.addQueryArgs)('/wp/v2/users/?who=authors&per_page=100', query);
   const users = await external_wp_apiFetch_default()({
     path
@@ -4122,9 +4668,10 @@ const resolvers_getAuthors = query => async ({
  * Requests the current user from the REST API.
  */
 
-const resolvers_getCurrentUser = () => async ({
-  dispatch
-}) => {
+const resolvers_getCurrentUser = () => async _ref2 => {
+  let {
+    dispatch
+  } = _ref2;
   const currentUser = await external_wp_apiFetch_default()({
     path: '/wp/v2/users/me'
   });
@@ -4140,78 +4687,81 @@ const resolvers_getCurrentUser = () => async ({
  *                                 include with request.
  */
 
-const resolvers_getEntityRecord = (kind, name, key = '', query) => async ({
-  select,
-  dispatch
-}) => {
-  const entities = await dispatch(getKindEntities(kind));
-  const entity = (0,external_lodash_namespaceObject.find)(entities, {
-    kind,
-    name
-  });
-
-  if (!entity || entity !== null && entity !== void 0 && entity.__experimentalNoFetch) {
-    return;
-  }
-
-  const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'data', kind, name, key], {
-    exclusive: false
-  });
-
-  try {
-    if (query !== undefined && query._fields) {
-      // If requesting specific fields, items and query association to said
-      // records are stored by ID reference. Thus, fields must always include
-      // the ID.
-      query = { ...query,
-        _fields: (0,external_lodash_namespaceObject.uniq)([...(get_normalized_comma_separable(query._fields) || []), entity.key || DEFAULT_ENTITY_KEY]).join()
-      };
-    } // Disable reason: While true that an early return could leave `path`
-    // unused, it's important that path is derived using the query prior to
-    // additional query modifications in the condition below, since those
-    // modifications are relevant to how the data is tracked in state, and not
-    // for how the request is made to the REST API.
-    // eslint-disable-next-line @wordpress/no-unused-vars-before-return
-
-
-    const path = (0,external_wp_url_namespaceObject.addQueryArgs)(entity.baseURL + (key ? '/' + key : ''), { ...entity.baseURLParams,
-      ...query
+const resolvers_getEntityRecord = function (kind, name) {
+  let key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  let query = arguments.length > 3 ? arguments[3] : undefined;
+  return async _ref3 => {
+    let {
+      select,
+      dispatch
+    } = _ref3;
+    const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+    const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
+      kind,
+      name
     });
 
-    if (query !== undefined) {
-      query = { ...query,
-        include: [key]
-      }; // The resolution cache won't consider query as reusable based on the
-      // fields, so it's tested here, prior to initiating the REST request,
-      // and without causing `getEntityRecords` resolution to occur.
-
-      const hasRecords = select.hasEntityRecords(kind, name, query);
-
-      if (hasRecords) {
-        return;
-      }
+    if (!entityConfig || entityConfig !== null && entityConfig !== void 0 && entityConfig.__experimentalNoFetch) {
+      return;
     }
 
-    const record = await external_wp_apiFetch_default()({
-      path
+    const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'records', kind, name, key], {
+      exclusive: false
     });
-    dispatch.receiveEntityRecords(kind, name, record, query);
-  } catch (error) {// We need a way to handle and access REST API errors in state
-    // Until then, catching the error ensures the resolver is marked as resolved.
-  } finally {
-    dispatch.__unstableReleaseStoreLock(lock);
-  }
+
+    try {
+      if (query !== undefined && query._fields) {
+        // If requesting specific fields, items and query association to said
+        // records are stored by ID reference. Thus, fields must always include
+        // the ID.
+        query = { ...query,
+          _fields: (0,external_lodash_namespaceObject.uniq)([...(get_normalized_comma_separable(query._fields) || []), entityConfig.key || DEFAULT_ENTITY_KEY]).join()
+        };
+      } // Disable reason: While true that an early return could leave `path`
+      // unused, it's important that path is derived using the query prior to
+      // additional query modifications in the condition below, since those
+      // modifications are relevant to how the data is tracked in state, and not
+      // for how the request is made to the REST API.
+      // eslint-disable-next-line @wordpress/no-unused-vars-before-return
+
+
+      const path = (0,external_wp_url_namespaceObject.addQueryArgs)(entityConfig.baseURL + (key ? '/' + key : ''), { ...entityConfig.baseURLParams,
+        ...query
+      });
+
+      if (query !== undefined) {
+        query = { ...query,
+          include: [key]
+        }; // The resolution cache won't consider query as reusable based on the
+        // fields, so it's tested here, prior to initiating the REST request,
+        // and without causing `getEntityRecords` resolution to occur.
+
+        const hasRecords = select.hasEntityRecords(kind, name, query);
+
+        if (hasRecords) {
+          return;
+        }
+      }
+
+      const record = await external_wp_apiFetch_default()({
+        path
+      });
+      dispatch.receiveEntityRecords(kind, name, record, query);
+    } finally {
+      dispatch.__unstableReleaseStoreLock(lock);
+    }
+  };
 };
 /**
  * Requests an entity's record from the REST API.
  */
 
-const resolvers_getRawEntityRecord = if_not_resolved(resolvers_getEntityRecord, 'getEntityRecord');
+const resolvers_getRawEntityRecord = forward_resolver('getEntityRecord');
 /**
  * Requests an entity's record from the REST API.
  */
 
-const resolvers_getEditedEntityRecord = if_not_resolved(resolvers_getRawEntityRecord, 'getRawEntityRecord');
+const resolvers_getEditedEntityRecord = forward_resolver('getEntityRecord');
 /**
  * Requests the entity's records from the REST API.
  *
@@ -4220,77 +4770,81 @@ const resolvers_getEditedEntityRecord = if_not_resolved(resolvers_getRawEntityRe
  * @param {Object?} query Query Object.
  */
 
-const resolvers_getEntityRecords = (kind, name, query = {}) => async ({
-  dispatch
-}) => {
-  const entities = await dispatch(getKindEntities(kind));
-  const entity = (0,external_lodash_namespaceObject.find)(entities, {
-    kind,
-    name
-  });
-
-  if (!entity || entity !== null && entity !== void 0 && entity.__experimentalNoFetch) {
-    return;
-  }
-
-  const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'data', kind, name], {
-    exclusive: false
-  });
-
-  try {
-    var _query;
-
-    if (query._fields) {
-      // If requesting specific fields, items and query association to said
-      // records are stored by ID reference. Thus, fields must always include
-      // the ID.
-      query = { ...query,
-        _fields: (0,external_lodash_namespaceObject.uniq)([...(get_normalized_comma_separable(query._fields) || []), entity.key || DEFAULT_ENTITY_KEY]).join()
-      };
-    }
-
-    const path = (0,external_wp_url_namespaceObject.addQueryArgs)(entity.baseURL, { ...entity.baseURLParams,
-      ...query
+const resolvers_getEntityRecords = function (kind, name) {
+  let query = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  return async _ref4 => {
+    let {
+      dispatch
+    } = _ref4;
+    const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+    const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
+      kind,
+      name
     });
-    let records = Object.values(await external_wp_apiFetch_default()({
-      path
-    })); // If we request fields but the result doesn't contain the fields,
-    // explicitely set these fields as "undefined"
-    // that way we consider the query "fullfilled".
 
-    if (query._fields) {
-      records = records.map(record => {
-        query._fields.split(',').forEach(field => {
-          if (!record.hasOwnProperty(field)) {
-            record[field] = undefined;
-          }
+    if (!entityConfig || entityConfig !== null && entityConfig !== void 0 && entityConfig.__experimentalNoFetch) {
+      return;
+    }
+
+    const lock = await dispatch.__unstableAcquireStoreLock(STORE_NAME, ['entities', 'records', kind, name], {
+      exclusive: false
+    });
+
+    try {
+      var _query;
+
+      if (query._fields) {
+        // If requesting specific fields, items and query association to said
+        // records are stored by ID reference. Thus, fields must always include
+        // the ID.
+        query = { ...query,
+          _fields: (0,external_lodash_namespaceObject.uniq)([...(get_normalized_comma_separable(query._fields) || []), entityConfig.key || DEFAULT_ENTITY_KEY]).join()
+        };
+      }
+
+      const path = (0,external_wp_url_namespaceObject.addQueryArgs)(entityConfig.baseURL, { ...entityConfig.baseURLParams,
+        ...query
+      });
+      let records = Object.values(await external_wp_apiFetch_default()({
+        path
+      })); // If we request fields but the result doesn't contain the fields,
+      // explicitely set these fields as "undefined"
+      // that way we consider the query "fullfilled".
+
+      if (query._fields) {
+        records = records.map(record => {
+          query._fields.split(',').forEach(field => {
+            if (!record.hasOwnProperty(field)) {
+              record[field] = undefined;
+            }
+          });
+
+          return record;
         });
+      }
 
-        return record;
-      });
+      dispatch.receiveEntityRecords(kind, name, records, query); // When requesting all fields, the list of results can be used to
+      // resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+      // See https://github.com/WordPress/gutenberg/pull/26575
+
+      if (!((_query = query) !== null && _query !== void 0 && _query._fields) && !query.context) {
+        const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+        const resolutionsArgs = records.filter(record => record[key]).map(record => [kind, name, record[key]]);
+        dispatch({
+          type: 'START_RESOLUTIONS',
+          selectorName: 'getEntityRecord',
+          args: resolutionsArgs
+        });
+        dispatch({
+          type: 'FINISH_RESOLUTIONS',
+          selectorName: 'getEntityRecord',
+          args: resolutionsArgs
+        });
+      }
+    } finally {
+      dispatch.__unstableReleaseStoreLock(lock);
     }
-
-    dispatch.receiveEntityRecords(kind, name, records, query); // When requesting all fields, the list of results can be used to
-    // resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
-    // See https://github.com/WordPress/gutenberg/pull/26575
-
-    if (!((_query = query) !== null && _query !== void 0 && _query._fields) && !query.context) {
-      const key = entity.key || DEFAULT_ENTITY_KEY;
-      const resolutionsArgs = records.filter(record => record[key]).map(record => [kind, name, record[key]]);
-      dispatch({
-        type: 'START_RESOLUTIONS',
-        selectorName: 'getEntityRecord',
-        args: resolutionsArgs
-      });
-      dispatch({
-        type: 'FINISH_RESOLUTIONS',
-        selectorName: 'getEntityRecord',
-        args: resolutionsArgs
-      });
-    }
-  } finally {
-    dispatch.__unstableReleaseStoreLock(lock);
-  }
+  };
 };
 
 resolvers_getEntityRecords.shouldInvalidate = (action, kind, name) => {
@@ -4301,11 +4855,13 @@ resolvers_getEntityRecords.shouldInvalidate = (action, kind, name) => {
  */
 
 
-const resolvers_getCurrentTheme = () => async ({
-  dispatch
-}) => {
-  const activeThemes = await external_wp_apiFetch_default()({
-    path: '/wp/v2/themes?status=active'
+const resolvers_getCurrentTheme = () => async _ref5 => {
+  let {
+    dispatch,
+    resolveSelect
+  } = _ref5;
+  const activeThemes = await resolveSelect.getEntityRecords('root', 'theme', {
+    status: 'active'
   });
   dispatch.receiveCurrentTheme(activeThemes[0]);
 };
@@ -4313,23 +4869,18 @@ const resolvers_getCurrentTheme = () => async ({
  * Requests theme supports data from the index.
  */
 
-const resolvers_getThemeSupports = () => async ({
-  dispatch
-}) => {
-  const activeThemes = await external_wp_apiFetch_default()({
-    path: '/wp/v2/themes?status=active'
-  });
-  dispatch.receiveThemeSupports(activeThemes[0].theme_supports);
-};
+const resolvers_getThemeSupports = forward_resolver('getCurrentTheme');
 /**
  * Requests a preview from the from the Embed API.
  *
  * @param {string} url URL to get the preview for.
  */
 
-const resolvers_getEmbedPreview = url => async ({
-  dispatch
-}) => {
+const resolvers_getEmbedPreview = url => async _ref6 => {
+  let {
+    dispatch
+  } = _ref6;
+
   try {
     const embedProxyResponse = await external_wp_apiFetch_default()({
       path: (0,external_wp_url_namespaceObject.addQueryArgs)('/oembed/1.0/proxy', {
@@ -4352,9 +4903,12 @@ const resolvers_getEmbedPreview = url => async ({
  * @param {?string} id       ID of the rest resource to check.
  */
 
-const resolvers_canUser = (action, resource, id) => async ({
-  dispatch
-}) => {
+const resolvers_canUser = (action, resource, id) => async _ref7 => {
+  var _response$headers;
+
+  let {
+    dispatch
+  } = _ref7;
   const methods = {
     create: 'POST',
     read: 'GET',
@@ -4373,31 +4927,19 @@ const resolvers_canUser = (action, resource, id) => async ({
   try {
     response = await external_wp_apiFetch_default()({
       path,
-      // Ideally this would always be an OPTIONS request, but unfortunately there's
-      // a bug in the REST API which causes the Allow header to not be sent on
-      // OPTIONS requests to /posts/:id routes.
-      // https://core.trac.wordpress.org/ticket/45753
-      method: id ? 'GET' : 'OPTIONS',
+      method: 'OPTIONS',
       parse: false
     });
   } catch (error) {
     // Do nothing if our OPTIONS request comes back with an API error (4xx or
     // 5xx). The previously determined isAllowed value will remain in the store.
     return;
-  }
+  } // Optional chaining operator is used here because the API requests don't
+  // return the expected result in the native version. Instead, API requests
+  // only return the result, without including response properties like the headers.
 
-  let allowHeader;
 
-  if ((0,external_lodash_namespaceObject.hasIn)(response, ['headers', 'get'])) {
-    // If the request is fetched using the fetch api, the header can be
-    // retrieved using the 'get' method.
-    allowHeader = response.headers.get('allow');
-  } else {
-    // If the request was preloaded server-side and is returned by the
-    // preloading middleware, the header will be a simple property.
-    allowHeader = (0,external_lodash_namespaceObject.get)(response, ['headers', 'Allow'], '');
-  }
-
+  const allowHeader = (_response$headers = response.headers) === null || _response$headers === void 0 ? void 0 : _response$headers.get('allow');
   const key = (0,external_lodash_namespaceObject.compact)([action, resource, id]).join('/');
   const isAllowed = (0,external_lodash_namespaceObject.includes)(allowHeader, method);
   dispatch.receiveUserPermission(key, isAllowed);
@@ -4411,20 +4953,21 @@ const resolvers_canUser = (action, resource, id) => async ({
  * @param {string} recordId Record's id.
  */
 
-const resolvers_canUserEditEntityRecord = (kind, name, recordId) => async ({
-  dispatch
-}) => {
-  const entities = await dispatch(getKindEntities(kind));
-  const entity = (0,external_lodash_namespaceObject.find)(entities, {
+const resolvers_canUserEditEntityRecord = (kind, name, recordId) => async _ref8 => {
+  let {
+    dispatch
+  } = _ref8;
+  const configs = await dispatch(getOrLoadEntitiesConfig(kind));
+  const entityConfig = (0,external_lodash_namespaceObject.find)(configs, {
     kind,
     name
   });
 
-  if (!entity) {
+  if (!entityConfig) {
     return;
   }
 
-  const resource = entity.__unstable_rest_base;
+  const resource = entityConfig.__unstable_rest_base;
   await dispatch(resolvers_canUser('update', resource, recordId));
 };
 /**
@@ -4434,10 +4977,11 @@ const resolvers_canUserEditEntityRecord = (kind, name, recordId) => async ({
  * @param {number} postId   The id of the parent post.
  */
 
-const resolvers_getAutosaves = (postType, postId) => async ({
-  dispatch,
-  resolveSelect
-}) => {
+const resolvers_getAutosaves = (postType, postId) => async _ref9 => {
+  let {
+    dispatch,
+    resolveSelect
+  } = _ref9;
   const {
     rest_base: restBase
   } = await resolveSelect.getPostType(postType);
@@ -4459,9 +5003,10 @@ const resolvers_getAutosaves = (postType, postId) => async ({
  * @param {number} postId   The id of the parent post.
  */
 
-const resolvers_getAutosave = (postType, postId) => async ({
-  resolveSelect
-}) => {
+const resolvers_getAutosave = (postType, postId) => async _ref10 => {
+  let {
+    resolveSelect
+  } = _ref10;
   await resolveSelect.getAutosaves(postType, postId);
 };
 /**
@@ -4470,10 +5015,11 @@ const resolvers_getAutosave = (postType, postId) => async ({
  * @param {string} link Link.
  */
 
-const resolvers_experimentalGetTemplateForLink = link => async ({
-  dispatch,
-  resolveSelect
-}) => {
+const resolvers_experimentalGetTemplateForLink = link => async _ref11 => {
+  let {
+    dispatch,
+    resolveSelect
+  } = _ref11;
   // Ideally this should be using an apiFetch call
   // We could potentially do so by adding a "filter" to the `wp_template` end point.
   // Also it seems the returned object is not a regular REST API post type.
@@ -4482,9 +5028,12 @@ const resolvers_experimentalGetTemplateForLink = link => async ({
   try {
     template = await window.fetch((0,external_wp_url_namespaceObject.addQueryArgs)(link, {
       '_wp-find-template': true
-    })).then(res => res.json()).then(({
-      data
-    }) => data);
+    })).then(res => res.json()).then(_ref12 => {
+      let {
+        data
+      } = _ref12;
+      return data;
+    });
   } catch (e) {// For non-FSE themes, it is possible that this request returns an error.
   }
 
@@ -4504,7 +5053,50 @@ const resolvers_experimentalGetTemplateForLink = link => async ({
 resolvers_experimentalGetTemplateForLink.shouldInvalidate = action => {
   return (action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS') && action.invalidateCache && action.kind === 'postType' && action.name === 'wp_template';
 };
-//# sourceMappingURL=resolvers.js.map
+
+const resolvers_experimentalGetCurrentGlobalStylesId = () => async _ref13 => {
+  let {
+    dispatch,
+    resolveSelect
+  } = _ref13;
+  const activeThemes = await resolveSelect.getEntityRecords('root', 'theme', {
+    status: 'active'
+  });
+  const globalStylesURL = (0,external_lodash_namespaceObject.get)(activeThemes, [0, '_links', 'wp:user-global-styles', 0, 'href']);
+
+  if (globalStylesURL) {
+    const globalStylesObject = await external_wp_apiFetch_default()({
+      url: globalStylesURL
+    });
+
+    dispatch.__experimentalReceiveCurrentGlobalStylesId(globalStylesObject.id);
+  }
+};
+const resolvers_experimentalGetCurrentThemeBaseGlobalStyles = () => async _ref14 => {
+  let {
+    resolveSelect,
+    dispatch
+  } = _ref14;
+  const currentTheme = await resolveSelect.getCurrentTheme();
+  const themeGlobalStyles = await external_wp_apiFetch_default()({
+    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}`
+  });
+
+  dispatch.__experimentalReceiveThemeBaseGlobalStyles(currentTheme.stylesheet, themeGlobalStyles);
+};
+const resolvers_experimentalGetCurrentThemeGlobalStylesVariations = () => async _ref15 => {
+  let {
+    resolveSelect,
+    dispatch
+  } = _ref15;
+  const currentTheme = await resolveSelect.getCurrentTheme();
+  const variations = await external_wp_apiFetch_default()({
+    path: `/wp/v2/global-styles/themes/${currentTheme.stylesheet}/variations`
+  });
+
+  dispatch.__experimentalReceiveThemeGlobalStyleVariations(currentTheme.stylesheet, variations);
+};
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/locks/utils.js
 function deepCopyLocksTreePath(tree, path) {
   const newTree = { ...tree
@@ -4563,9 +5155,11 @@ function* iterateDescendants(node) {
     stack.push(...Object.values(childNode.children));
   }
 }
-function hasConflictingLock({
-  exclusive
-}, locks) {
+function hasConflictingLock(_ref, locks) {
+  let {
+    exclusive
+  } = _ref;
+
   if (exclusive && locks.length) {
     return true;
   }
@@ -4576,7 +5170,7 @@ function hasConflictingLock({
 
   return false;
 }
-//# sourceMappingURL=utils.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/locks/reducer.js
 /**
  * Internal dependencies
@@ -4598,7 +5192,10 @@ const DEFAULT_STATE = {
  * @return {Object} Updated state.
  */
 
-function locks(state = DEFAULT_STATE, action) {
+function locks() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_STATE;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
   switch (action.type) {
     case 'ENQUEUE_LOCK_REQUEST':
       {
@@ -4647,7 +5244,7 @@ function locks(state = DEFAULT_STATE, action) {
 
   return state;
 }
-//# sourceMappingURL=reducer.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/locks/selectors.js
 /**
  * Internal dependencies
@@ -4656,9 +5253,10 @@ function locks(state = DEFAULT_STATE, action) {
 function getPendingLockRequests(state) {
   return state.requests;
 }
-function isLockAvailable(state, store, path, {
-  exclusive
-}) {
+function isLockAvailable(state, store, path, _ref) {
+  let {
+    exclusive
+  } = _ref;
   const storePath = [store, ...path];
   const locks = state.tree; // Validate all parents and the node itself
 
@@ -4689,7 +5287,7 @@ function isLockAvailable(state, store, path, {
 
   return true;
 }
-//# sourceMappingURL=selectors.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/locks/engine.js
 /**
  * Internal dependencies
@@ -4756,7 +5354,7 @@ function createLocks() {
     release
   };
 }
-//# sourceMappingURL=engine.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/locks/actions.js
 /**
  * Internal dependencies
@@ -4765,9 +5363,10 @@ function createLocks() {
 function createLocksActions() {
   const locks = createLocks();
 
-  function __unstableAcquireStoreLock(store, path, {
-    exclusive
-  }) {
+  function __unstableAcquireStoreLock(store, path, _ref) {
+    let {
+      exclusive
+    } = _ref;
     return () => locks.acquire(store, path, exclusive);
   }
 
@@ -4780,7 +5379,7 @@ function createLocksActions() {
     __unstableReleaseStoreLock
   };
 }
-//# sourceMappingURL=actions.js.map
+
 ;// CONCATENATED MODULE: external ["wp","element"]
 var external_wp_element_namespaceObject = window["wp"]["element"];
 ;// CONCATENATED MODULE: external ["wp","blocks"]
@@ -4799,48 +5398,50 @@ var external_wp_blocks_namespaceObject = window["wp"]["blocks"];
  */
 
 
-const entity_provider_EMPTY_ARRAY = [];
+/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
+
+const EMPTY_ARRAY = [];
 /**
  * Internal dependencies
  */
 
 
-const entity_provider_entities = { ...defaultEntities.reduce((acc, entity) => {
-    if (!acc[entity.kind]) {
-      acc[entity.kind] = {};
+const entityContexts = { ...rootEntitiesConfig.reduce((acc, loader) => {
+    if (!acc[loader.kind]) {
+      acc[loader.kind] = {};
     }
 
-    acc[entity.kind][entity.name] = {
-      context: (0,external_wp_element_namespaceObject.createContext)()
+    acc[loader.kind][loader.name] = {
+      context: (0,external_wp_element_namespaceObject.createContext)(undefined)
     };
     return acc;
   }, {}),
-  ...kinds.reduce((acc, kind) => {
-    acc[kind.name] = {};
+  ...additionalEntityConfigLoaders.reduce((acc, loader) => {
+    acc[loader.kind] = {};
     return acc;
   }, {})
 };
 
-const entity_provider_getEntity = (kind, type) => {
-  if (!entity_provider_entities[kind]) {
+const getEntityContext = (kind, name) => {
+  if (!entityContexts[kind]) {
     throw new Error(`Missing entity config for kind: ${kind}.`);
   }
 
-  if (!entity_provider_entities[kind][type]) {
-    entity_provider_entities[kind][type] = {
-      context: (0,external_wp_element_namespaceObject.createContext)()
+  if (!entityContexts[kind][name]) {
+    entityContexts[kind][name] = {
+      context: (0,external_wp_element_namespaceObject.createContext)(undefined)
     };
   }
 
-  return entity_provider_entities[kind][type];
+  return entityContexts[kind][name].context;
 };
 /**
  * Context provider component for providing
- * an entity for a specific entity type.
+ * an entity for a specific entity.
  *
  * @param {Object} props          The component's props.
  * @param {string} props.kind     The entity kind.
- * @param {string} props.type     The entity type.
+ * @param {string} props.type     The entity name.
  * @param {number} props.id       The entity ID.
  * @param {*}      props.children The children to wrap.
  *
@@ -4849,13 +5450,14 @@ const entity_provider_getEntity = (kind, type) => {
  */
 
 
-function EntityProvider({
-  kind,
-  type,
-  id,
-  children
-}) {
-  const Provider = entity_provider_getEntity(kind, type).context.Provider;
+function EntityProvider(_ref) {
+  let {
+    kind,
+    type: name,
+    id,
+    children
+  } = _ref;
+  const Provider = getEntityContext(kind, name).Provider;
   return (0,external_wp_element_namespaceObject.createElement)(Provider, {
     value: id
   }, children);
@@ -4865,11 +5467,11 @@ function EntityProvider({
  * provided entity of the specified type.
  *
  * @param {string} kind The entity kind.
- * @param {string} type The entity type.
+ * @param {string} name The entity name.
  */
 
-function useEntityId(kind, type) {
-  return (0,external_wp_element_namespaceObject.useContext)(entity_provider_getEntity(kind, type).context);
+function useEntityId(kind, name) {
+  return (0,external_wp_element_namespaceObject.useContext)(getEntityContext(kind, name));
 }
 /**
  * Hook that returns the value and a setter for the
@@ -4877,7 +5479,7 @@ function useEntityId(kind, type) {
  * entity of the specified type.
  *
  * @param {string} kind  The entity kind.
- * @param {string} type  The entity type.
+ * @param {string} name  The entity name.
  * @param {string} prop  The property name.
  * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
@@ -4889,8 +5491,8 @@ function useEntityId(kind, type) {
  * 							  `protected` props.
  */
 
-function useEntityProp(kind, type, prop, _id) {
-  const providerId = useEntityId(kind, type);
+function useEntityProp(kind, name, prop, _id) {
+  const providerId = useEntityId(kind, name);
   const id = _id !== null && _id !== void 0 ? _id : providerId;
   const {
     value,
@@ -4900,22 +5502,22 @@ function useEntityProp(kind, type, prop, _id) {
       getEntityRecord,
       getEditedEntityRecord
     } = select(STORE_NAME);
-    const entity = getEntityRecord(kind, type, id); // Trigger resolver.
+    const record = getEntityRecord(kind, name, id); // Trigger resolver.
 
-    const editedEntity = getEditedEntityRecord(kind, type, id);
-    return entity && editedEntity ? {
-      value: editedEntity[prop],
-      fullValue: entity[prop]
+    const editedRecord = getEditedEntityRecord(kind, name, id);
+    return record && editedRecord ? {
+      value: editedRecord[prop],
+      fullValue: record[prop]
     } : {};
-  }, [kind, type, id, prop]);
+  }, [kind, name, id, prop]);
   const {
     editEntityRecord
   } = (0,external_wp_data_namespaceObject.useDispatch)(STORE_NAME);
   const setValue = (0,external_wp_element_namespaceObject.useCallback)(newValue => {
-    editEntityRecord(kind, type, id, {
+    editEntityRecord(kind, name, id, {
       [prop]: newValue
     });
-  }, [kind, type, id, prop]);
+  }, [kind, name, id, prop]);
   return [value, setValue, fullValue];
 }
 /**
@@ -4930,17 +5532,18 @@ function useEntityProp(kind, type, prop, _id) {
  * or similar components or hooks.
  *
  * @param {string} kind         The entity kind.
- * @param {string} type         The entity type.
+ * @param {string} name         The entity name.
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 
-function useEntityBlockEditor(kind, type, {
-  id: _id
-} = {}) {
-  const providerId = useEntityId(kind, type);
+function useEntityBlockEditor(kind, name) {
+  let {
+    id: _id
+  } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  const providerId = useEntityId(kind, name);
   const id = _id !== null && _id !== void 0 ? _id : providerId;
   const {
     content,
@@ -4949,12 +5552,12 @@ function useEntityBlockEditor(kind, type, {
     const {
       getEditedEntityRecord
     } = select(STORE_NAME);
-    const editedEntity = getEditedEntityRecord(kind, type, id);
+    const editedRecord = getEditedEntityRecord(kind, name, id);
     return {
-      blocks: editedEntity.blocks,
-      content: editedEntity.content
+      blocks: editedRecord.blocks,
+      content: editedRecord.content
     };
-  }, [kind, type, id]);
+  }, [kind, name, id]);
   const {
     __unstableCreateUndoLevel,
     editEntityRecord
@@ -4965,7 +5568,7 @@ function useEntityBlockEditor(kind, type, {
     // set content to a function already or the blocks are already in state.
     if (content && typeof content !== 'function' && !blocks) {
       const parsedContent = (0,external_wp_blocks_namespaceObject.parse)(content);
-      editEntityRecord(kind, type, id, {
+      editEntityRecord(kind, name, id, {
         blocks: parsedContent
       }, {
         undoIgnore: true
@@ -4983,18 +5586,21 @@ function useEntityBlockEditor(kind, type, {
     const noChange = blocks === edits.blocks;
 
     if (noChange) {
-      return __unstableCreateUndoLevel(kind, type, id);
+      return __unstableCreateUndoLevel(kind, name, id);
     } // We create a new function here on every persistent edit
     // to make sure the edit makes the post dirty and creates
     // a new undo level.
 
 
-    edits.content = ({
-      blocks: blocksForSerialization = []
-    }) => (0,external_wp_blocks_namespaceObject.__unstableSerializeAndClean)(blocksForSerialization);
+    edits.content = _ref2 => {
+      let {
+        blocks: blocksForSerialization = []
+      } = _ref2;
+      return (0,external_wp_blocks_namespaceObject.__unstableSerializeAndClean)(blocksForSerialization);
+    };
 
-    editEntityRecord(kind, type, id, edits);
-  }, [kind, type, id, blocks]);
+    editEntityRecord(kind, name, id, edits);
+  }, [kind, name, id, blocks]);
   const onInput = (0,external_wp_element_namespaceObject.useCallback)((newBlocks, options) => {
     const {
       selection
@@ -5003,11 +5609,288 @@ function useEntityBlockEditor(kind, type, {
       blocks: newBlocks,
       selection
     };
-    editEntityRecord(kind, type, id, edits);
-  }, [kind, type, id]);
-  return [blocks !== null && blocks !== void 0 ? blocks : entity_provider_EMPTY_ARRAY, onInput, onChange];
+    editEntityRecord(kind, name, id, edits);
+  }, [kind, name, id]);
+  return [blocks !== null && blocks !== void 0 ? blocks : EMPTY_ARRAY, onInput, onChange];
 }
-//# sourceMappingURL=entity-provider.js.map
+
+// EXTERNAL MODULE: ./node_modules/memize/index.js
+var memize = __webpack_require__(9756);
+var memize_default = /*#__PURE__*/__webpack_require__.n(memize);
+;// CONCATENATED MODULE: ./packages/core-data/build-module/hooks/memoize.js
+/**
+ * External dependencies
+ */
+ // re-export due to restrictive esModuleInterop setting
+
+/* harmony default export */ var memoize = ((memize_default()));
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/hooks/constants.js
+/* eslint-disable-next-line no-shadow */
+let Status;
+
+(function (Status) {
+  Status["Idle"] = "IDLE";
+  Status["Resolving"] = "RESOLVING";
+  Status["Error"] = "ERROR";
+  Status["Success"] = "SUCCESS";
+})(Status || (Status = {}));
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/hooks/use-query-select.js
+/**
+ * WordPress dependencies
+ */
+
+/**
+ * Internal dependencies
+ */
+
+
+
+const META_SELECTORS = ['getIsResolving', 'hasStartedResolution', 'hasFinishedResolution', 'isResolving', 'getCachedResolvers'];
+
+/**
+ * Like useSelect, but the selectors return objects containing
+ * both the original data AND the resolution info.
+ *
+ * @param {Function} mapQuerySelect see useSelect
+ * @param {Array}    deps           see useSelect
+ *
+ * @example
+ * ```js
+ * import { useQuerySelect } from '@wordpress/data';
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ *
+ * function PageTitleDisplay( { id } ) {
+ *   const { data: page, isResolving } = useQuerySelect( ( query ) => {
+ *     return query( coreDataStore ).getEntityRecord( 'postType', 'page', id )
+ *   }, [ id ] );
+ *
+ *   if ( isResolving ) {
+ *     return 'Loading...';
+ *   }
+ *
+ *   return page.title;
+ * }
+ *
+ * // Rendered in the application:
+ * // <PageTitleDisplay id={ 10 } />
+ * ```
+ *
+ * In the above example, when `PageTitleDisplay` is rendered into an
+ * application, the page and the resolution details will be retrieved from
+ * the store state using the `mapSelect` callback on `useQuerySelect`.
+ *
+ * If the id prop changes then any page in the state for that id is
+ * retrieved. If the id prop doesn't change and other props are passed in
+ * that do change, the title will not change because the dependency is just
+ * the id.
+ * @see useSelect
+ *
+ * @return {QuerySelectResponse} Queried data.
+ */
+function __experimentalUseQuerySelect(mapQuerySelect, deps) {
+  return (0,external_wp_data_namespaceObject.useSelect)((select, registry) => {
+    const resolve = store => enrichSelectors(select(store));
+
+    return mapQuerySelect(resolve, registry);
+  }, deps);
+}
+
+/**
+ * Transform simple selectors into ones that return an object with the
+ * original return value AND the resolution info.
+ *
+ * @param {Object} selectors Selectors to enrich
+ * @return {EnrichedSelectors} Enriched selectors
+ */
+const enrichSelectors = memoize(selectors => {
+  const resolvers = {};
+
+  for (const selectorName in selectors) {
+    if (META_SELECTORS.includes(selectorName)) {
+      continue;
+    }
+
+    Object.defineProperty(resolvers, selectorName, {
+      get: () => function () {
+        const {
+          getIsResolving,
+          hasFinishedResolution
+        } = selectors;
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        const isResolving = !!getIsResolving(selectorName, args);
+        const hasResolved = !isResolving && hasFinishedResolution(selectorName, args);
+        const data = selectors[selectorName](...args);
+        let status;
+
+        if (isResolving) {
+          status = Status.Resolving;
+        } else if (hasResolved) {
+          if (data) {
+            status = Status.Success;
+          } else {
+            status = Status.Error;
+          }
+        } else {
+          status = Status.Idle;
+        }
+
+        return {
+          data,
+          status,
+          isResolving,
+          hasResolved
+        };
+      }
+    });
+  }
+
+  return resolvers;
+});
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/hooks/use-entity-record.js
+/**
+ * Internal dependencies
+ */
+
+
+
+/**
+ * Resolves the specified entity record.
+ *
+ * @param  kind                                 Kind of the requested entity.
+ * @param  name                                 Name of the requested  entity.
+ * @param  recordId                             Record ID of the requested entity.
+ * @param  options                              Hook options.
+ * @param  [options.enabled=true] Whether to run the query or short-circuit and return null. Defaults to true.
+ * @example
+ * ```js
+ * import { useEntityRecord } from '@wordpress/core-data';
+ *
+ * function PageTitleDisplay( { id } ) {
+ *   const { record, isResolving } = useEntityRecord( 'postType', 'page', id );
+ *
+ *   if ( isResolving ) {
+ *     return 'Loading...';
+ *   }
+ *
+ *   return record.title;
+ * }
+ *
+ * // Rendered in the application:
+ * // <PageTitleDisplay id={ 1 } />
+ * ```
+ *
+ * In the above example, when `PageTitleDisplay` is rendered into an
+ * application, the page and the resolution details will be retrieved from
+ * the store state using `getEntityRecord()`, or resolved if missing.
+ *
+ * @return {EntityRecordResolution<RecordType>} Entity record data.
+ * @template RecordType
+ */
+function __experimentalUseEntityRecord(kind, name, recordId) {
+  let options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    enabled: true
+  };
+  const {
+    data: record,
+    ...rest
+  } = __experimentalUseQuerySelect(query => {
+    if (!options.enabled) {
+      return null;
+    }
+
+    return query(store).getEntityRecord(kind, name, recordId);
+  }, [kind, name, recordId, options.enabled]);
+  return {
+    record,
+    ...rest
+  };
+}
+
+;// CONCATENATED MODULE: ./packages/core-data/build-module/hooks/use-entity-records.js
+/**
+ * WordPress dependencies
+ */
+
+/**
+ * Internal dependencies
+ */
+
+
+
+
+/**
+ * Resolves the specified entity records.
+ *
+ * @param  kind                                 Kind of the requested entities.
+ * @param  name                                 Name of the requested entities.
+ * @param  queryArgs                            HTTP query for the requested entities.
+ * @param  options                              Hook options.
+ * @example
+ * ```js
+ * import { useEntityRecord } from '@wordpress/core-data';
+ *
+ * function PageTitlesList() {
+ *   const { records, isResolving } = useEntityRecords( 'postType', 'page' );
+ *
+ *   if ( isResolving ) {
+ *     return 'Loading...';
+ *   }
+ *
+ *   return (
+ *     <ul>
+ *       {records.map(( page ) => (
+ *         <li>{ page.title }</li>
+ *       ))}
+ *     </ul>
+ *   );
+ * }
+ *
+ * // Rendered in the application:
+ * // <PageTitlesList />
+ * ```
+ *
+ * In the above example, when `PageTitlesList` is rendered into an
+ * application, the list of records and the resolution details will be retrieved from
+ * the store state using `getEntityRecords()`, or resolved if missing.
+ *
+ * @return Entity records data.
+ * @template RecordType
+ */
+function __experimentalUseEntityRecords(kind, name) {
+  let queryArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  let options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    enabled: true
+  };
+  // Serialize queryArgs to a string that can be safely used as a React dep.
+  // We can't just pass queryArgs as one of the deps, because if it is passed
+  // as an object literal, then it will be a different object on each call even
+  // if the values remain the same.
+  const queryAsString = (0,external_wp_url_namespaceObject.addQueryArgs)('', queryArgs);
+  const {
+    data: records,
+    ...rest
+  } = __experimentalUseQuerySelect(query => {
+    if (!options.enabled) {
+      return {
+        data: []
+      };
+    }
+
+    return query(store).getEntityRecords(kind, name, queryArgs);
+  }, [kind, name, queryAsString, options.enabled]);
+  return {
+    records,
+    ...rest
+  };
+}
+
 ;// CONCATENATED MODULE: external ["wp","htmlEntities"]
 var external_wp_htmlEntities_namespaceObject = window["wp"]["htmlEntities"];
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/fetch/__experimental-fetch-link-suggestions.js
@@ -5080,7 +5963,9 @@ var external_wp_htmlEntities_namespaceObject = window["wp"]["htmlEntities"];
  * @return {Promise< WPLinkSearchResult[] >} List of search suggestions
  */
 
-const fetchLinkSuggestions = async (search, searchOptions = {}, settings = {}) => {
+const fetchLinkSuggestions = async function (search) {
+  let searchOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  let settings = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   const {
     isInitialSuggestions = false,
     type = undefined,
@@ -5111,7 +5996,7 @@ const fetchLinkSuggestions = async (search, searchOptions = {}, settings = {}) =
           }
         };
       });
-    }).catch(() => []) // fail by returning no results
+    }).catch(() => []) // Fail by returning no results.
     );
   }
 
@@ -5158,7 +6043,7 @@ const fetchLinkSuggestions = async (search, searchOptions = {}, settings = {}) =
   }
 
   return Promise.all(queries).then(results => {
-    return results.reduce((accumulator, current) => accumulator.concat(current), //flatten list
+    return results.reduce((accumulator, current) => accumulator.concat(current), // Flatten list.
     []).filter(
     /**
      * @param {{ id: number }} result
@@ -5167,7 +6052,7 @@ const fetchLinkSuggestions = async (search, searchOptions = {}, settings = {}) =
       return !!result.id;
     }).slice(0, perPage).map(
     /**
-     * @param {{ id: number, url:string, title?:string, subtype?: string, type?: string }} result
+     * @param {{ id: number, meta?: object, url:string, title?:string, subtype?: string, type?: string }} result
      */
     result => {
       var _result$meta;
@@ -5184,7 +6069,7 @@ const fetchLinkSuggestions = async (search, searchOptions = {}, settings = {}) =
 };
 
 /* harmony default export */ var _experimental_fetch_link_suggestions = (fetchLinkSuggestions);
-//# sourceMappingURL=__experimental-fetch-link-suggestions.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/fetch/__experimental-fetch-url-data.js
 /**
  * WordPress dependencies
@@ -5226,8 +6111,9 @@ const CACHE = new Map();
  * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
  */
 
-const fetchUrlData = async (url, options = {}) => {
-  const endpoint = '/__experimental/url-details';
+const fetchUrlData = async function (url) {
+  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const endpoint = '/wp-block-editor/v1/url-details';
   const args = {
     url: (0,external_wp_url_namespaceObject.prependHTTP)(url)
   };
@@ -5240,7 +6126,7 @@ const fetchUrlData = async (url, options = {}) => {
 
   const protocol = (0,external_wp_url_namespaceObject.getProtocol)(url);
 
-  if (!(0,external_wp_url_namespaceObject.isValidProtocol)(protocol) || !protocol.startsWith('http') || !/^https?:\/\/[^\/\s]/i.test(url)) {
+  if (!protocol || !(0,external_wp_url_namespaceObject.isValidProtocol)(protocol) || !protocol.startsWith('http') || !/^https?:\/\/[^\/\s]/i.test(url)) {
     return Promise.reject(`${url} does not have a valid protocol. URLs must be "http" based`);
   }
 
@@ -5258,11 +6144,11 @@ const fetchUrlData = async (url, options = {}) => {
 };
 
 /* harmony default export */ var _experimental_fetch_url_data = (fetchUrlData);
-//# sourceMappingURL=__experimental-fetch-url-data.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/fetch/index.js
 
 
-//# sourceMappingURL=index.js.map
+
 ;// CONCATENATED MODULE: ./packages/core-data/build-module/index.js
 /**
  * WordPress dependencies
@@ -5279,11 +6165,11 @@ const fetchUrlData = async (url, options = {}) => {
 
 
  // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
-// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecordss)
-// Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
+// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
+// Instead of getEntityRecord, the consumer could use more user-friendly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
-const entitySelectors = defaultEntities.reduce((result, entity) => {
+const entitySelectors = rootEntitiesConfig.reduce((result, entity) => {
   const {
     kind,
     name
@@ -5291,11 +6177,11 @@ const entitySelectors = defaultEntities.reduce((result, entity) => {
 
   result[getMethodName(kind, name)] = (state, key, query) => getEntityRecord(state, kind, name, key, query);
 
-  result[getMethodName(kind, name, 'get', true)] = (state, ...args) => getEntityRecords(state, kind, name, ...args);
+  result[getMethodName(kind, name, 'get', true)] = (state, query) => getEntityRecords(state, kind, name, query);
 
   return result;
 }, {});
-const entityResolvers = defaultEntities.reduce((result, entity) => {
+const entityResolvers = rootEntitiesConfig.reduce((result, entity) => {
   const {
     kind,
     name
@@ -5305,13 +6191,19 @@ const entityResolvers = defaultEntities.reduce((result, entity) => {
 
   const pluralMethodName = getMethodName(kind, name, 'get', true);
 
-  result[pluralMethodName] = (...args) => resolvers_getEntityRecords(kind, name, ...args);
+  result[pluralMethodName] = function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
 
-  result[pluralMethodName].shouldInvalidate = (action, ...args) => resolvers_getEntityRecords.shouldInvalidate(action, kind, name, ...args);
+    return resolvers_getEntityRecords(kind, name, ...args);
+  };
+
+  result[pluralMethodName].shouldInvalidate = action => resolvers_getEntityRecords.shouldInvalidate(action, kind, name);
 
   return result;
 }, {});
-const entityActions = defaultEntities.reduce((result, entity) => {
+const entityActions = rootEntitiesConfig.reduce((result, entity) => {
   const {
     kind,
     name
@@ -5335,8 +6227,7 @@ const storeConfig = () => ({
   },
   resolvers: { ...resolvers_namespaceObject,
     ...entityResolvers
-  },
-  __experimentalUseThunks: true
+  }
 });
 /**
  * Store definition for the code data namespace.
@@ -5352,7 +6243,10 @@ const store = (0,external_wp_data_namespaceObject.createReduxStore)(STORE_NAME, 
 
 
 
-//# sourceMappingURL=index.js.map
+
+
+
+
 }();
 (window.wp = window.wp || {}).coreData = __webpack_exports__;
 /******/ })()

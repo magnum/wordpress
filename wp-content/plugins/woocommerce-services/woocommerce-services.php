@@ -7,11 +7,11 @@
  * Author URI: https://woocommerce.com/
  * Text Domain: woocommerce-services
  * Domain Path: /i18n/languages/
- * Version: 1.25.19
+ * Version: 1.25.25
  * WC requires at least: 3.5.5
- * WC tested up to: 5.5
+ * WC tested up to: 6.3
  *
- * Copyright (c) 2017-2021 Automattic
+ * Copyright (c) 2017-2022 Automattic
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ if ( ! class_exists( 'WC_Connect_Loader' ) ) {
 	define( 'WOOCOMMERCE_CONNECT_MINIMUM_JETPACK_VERSION', '7.5' );
 	define( 'WOOCOMMERCE_CONNECT_MAX_JSON_DECODE_DEPTH', 32 );
 
-	if ( ! defined( 'WOOCOMMERCE_CONNECT_SERVER_API_VERSION ' ) ) {
+	if ( ! defined( 'WOOCOMMERCE_CONNECT_SERVER_API_VERSION' ) ) {
 		define( 'WOOCOMMERCE_CONNECT_SERVER_API_VERSION', '5' );
 	}
 

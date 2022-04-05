@@ -156,9 +156,19 @@ class CommerceMerchantSettings extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstra
     public function createShippingProfile(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('handling_time' => 'map', 'is_default_shipping_profile' => 'bool', 'name' => 'string', 'reference_id' => 'string', 'shipping_destinations' => 'list<map>');
+        $param_types = array('handling_time' => 'map', 'is_default' => 'bool', 'is_default_shipping_profile' => 'bool', 'name' => 'string', 'reference_id' => 'string', 'shipping_destinations' => 'list<map>');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/shipping_profiles', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function getShops(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array();
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/shops', new \PYS_PRO_GLOBAL\FacebookAds\Object\Shop(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Shop::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

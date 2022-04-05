@@ -29,7 +29,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property array  pinterest_custom_params
  * @property array  ga_custom_params
  * @property array  ga_params
- * @property string ga_version
  *
  * @property bool   ga_enabled
  * @property string ga_event_action
@@ -164,7 +163,7 @@ class CustomEvent {
         'ga_params'             => array(),
         'ga_custom_params'      => array(),
         'ga_custom_params_enabled'    => false,
-        'ga_version'           => "",
+
 
         'bing_enabled' => false,
         'bing_event_action' => null,
@@ -211,6 +210,12 @@ class CustomEvent {
 
 			$state = get_post_meta( $post_id, '_pys_event_state', true );
 			$this->enabled = $state == 'active' ? true : false;
+
+
+            if(count(GA()->getPixelIDs()) == 0) {
+                $this->data['ga_enabled'] = false;
+                $this->clearGa();
+            }
 
 		}
 
@@ -555,120 +560,143 @@ class CustomEvent {
     public function isBingEnabled() {
         return (bool) $this->bing_enabled;
     }
+    public function isGaV4() {
+        $all = GA()->getPixelIDs();
+        if(count($all) == 0) {
+            return false;
+        }
+        return strpos($all[0], 'G') === 0;
+    }
+    private function clearGa() {
+        $this->data['ga_params'] = array();
+        $this->data['ga_custom_params'] = array();
+        $this->data['ga_event_action'] = 'CustomEvent';
+        $this->data['ga_custom_event_action']=null;
+        $this->data['ga_non_interactive'] =  false;
+        // old
+        $this->data['ga_event_category'] = null;
+        $this->data['ga_event_label'] = null;
+        $this->data['ga_event_value'] = null;
+    }
 
     private function updateGA( $args) {
-        if(GA()->isUse4Version()) {
-            $this->data['ga_enabled'] = isset( $args['ga_enabled'] ) && $args['ga_enabled'] ? true : false;
 
-            if($this->data['ga_enabled']) {
+        $all = GA()->getPixelIDs();
 
-                $this->data['ga_event_action'] = isset( $args['ga_event_action'] )
+        $this->data['ga_enabled'] = count($all) > 0
+            && isset( $args['ga_enabled']  )
+            && $args['ga_enabled'];
+
+        if(!$this->data['ga_enabled']) {
+            $this->clearGa();
+        } else {
+            if($this->isGaV4()) {
+
+                    $this->data['ga_event_action'] = isset( $args['ga_event_action'] )
+                        ? sanitize_text_field( $args['ga_event_action'] )
+                        : 'view_item';
+
+                    $this->data['ga_custom_event_action'] = $this->ga_event_action == '_custom' || $this->ga_event_action == 'CustomEvent' && !empty( $args['ga_custom_event_action'] )
+                        ? sanitizeKey( $args['ga_custom_event_action'] )
+                        : null;
+
+                    $this->data['ga_params'] = array();
+
+
+                    foreach ($this->GAEvents as $group) {
+                        foreach ($group as $name => $fields) {
+                            if($name == $this->data['ga_event_action']) {
+                                foreach ($fields as $field) {
+                                    $this->data['ga_params'][$field] = isset($args['ga_params'][$field]) ? $args['ga_params'][$field] : "";
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    if ( isset( $args['ga_params'] ) ) {
+                        foreach ($args['ga_params'] as $key => $val) {
+                            $this->data['ga_params'][$key] = sanitize_text_field( $val );
+                        }
+                    }
+
+                    // reset old custom params
+                    $this->data['ga_custom_params'] = array();
+
+                    // custom params
+                    if ( isset( $args['ga_custom_params'] ) ) {
+
+                        foreach ( $args['ga_custom_params'] as $custom_param ) {
+
+                            if ( ! empty( $custom_param['name'] ) && ! empty( $custom_param['value'] ) ) {
+
+                                $this->data['ga_custom_params'][] = array(
+                                    'name'  => sanitize_text_field( $custom_param['name'] ),
+                                    'value' => sanitize_text_field( $custom_param['value'] ),
+                                );
+
+                            }
+
+                        }
+
+                    }
+                    $this->data['ga_non_interactive'] = isset( $args['ga_non_interactive'] ) && $args['ga_non_interactive'] ? true : false;
+
+
+
+            } else {
+
+                $ga_event_actions = array(
+                    '_custom',
+                    'add_payment_info',
+                    'add_to_cart',
+                    'add_to_wishlist',
+                    'begin_checkout',
+                    'checkout_progress',
+                    'generate_lead',
+                    'login',
+                    'purchase',
+                    'refund',
+                    'remove_from_cart',
+                    'search',
+                    'select_content',
+                    'set_checkout_option',
+                    'share',
+                    'sign_up',
+                    'view_item',
+                    'view_item_list',
+                    'view_promotion',
+                    'view_search_results',
+                );
+
+                // event action
+                $this->data['ga_event_action'] = isset( $args['ga_event_action'] ) && in_array( $args['ga_event_action'], $ga_event_actions )
                     ? sanitize_text_field( $args['ga_event_action'] )
                     : 'view_item';
 
-                $this->data['ga_custom_event_action'] = $this->ga_event_action == '_custom' || $this->ga_event_action == 'CustomEvent' && !empty( $args['ga_custom_event_action'] )
+                // custom event type
+                $this->data['ga_custom_event_action'] = $this->ga_event_action == '_custom' && !empty( $args['ga_custom_event_action'] )
                     ? sanitizeKey( $args['ga_custom_event_action'] )
                     : null;
 
-                $this->data['ga_params'] = array();
-                $this->data['ga_version'] = "4";
-
-                foreach ($this->GAEvents as $group) {
-                    foreach ($group as $name => $fields) {
-                        if($name == $this->data['ga_event_action']) {
-                            foreach ($fields as $field) {
-                                $this->data['ga_params'][$field] = isset($args['ga_params'][$field]) ? $args['ga_params'][$field] : "";
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                if ( isset( $args['ga_params'] ) ) {
-                    foreach ($args['ga_params'] as $key => $val) {
-                        $this->data['ga_params'][$key] = sanitize_text_field( $val );
-                    }
-                }
-
-                // reset old custom params
-                $this->data['ga_custom_params'] = array();
-
-                // custom params
-                if ( isset( $args['ga_custom_params'] ) ) {
-
-                    foreach ( $args['ga_custom_params'] as $custom_param ) {
-
-                        if ( ! empty( $custom_param['name'] ) && ! empty( $custom_param['value'] ) ) {
-
-                            $this->data['ga_custom_params'][] = array(
-                                'name'  => sanitize_text_field( $custom_param['name'] ),
-                                'value' => sanitize_text_field( $custom_param['value'] ),
-                            );
-
-                        }
-
-                    }
-
-                }
+                $this->data['ga_event_category']  = ! empty( $args['ga_event_category'] ) ? sanitize_text_field( $args['ga_event_category'] ) : null;
+                $this->data['ga_event_label']     = ! empty( $args['ga_event_label'] ) ? sanitize_text_field( $args['ga_event_label'] ) : null;
+                $this->data['ga_event_value']     = ! empty( $args['ga_event_value'] ) ? sanitize_text_field( $args['ga_event_value'] ) : null;
                 $this->data['ga_non_interactive'] = isset( $args['ga_non_interactive'] ) && $args['ga_non_interactive'] ? true : false;
-            } else {
-                $this->data['ga_params'] = array();
-                $this->data['ga_version'] = "";
-                $this->data['ga_custom_params'] = array();
-                $this->data['ga_event_action'] = 'CustomEvent';
-                $this->data['ga_custom_event_action']=null;
-                $this->data['ga_non_interactive'] =  false;
             }
-
-
-        } else {
-            $this->data['ga_enabled'] = isset( $args['ga_enabled'] ) && $args['ga_enabled'] ? true : false;
-
-            $ga_event_actions = array(
-                '_custom',
-                'add_payment_info',
-                'add_to_cart',
-                'add_to_wishlist',
-                'begin_checkout',
-                'checkout_progress',
-                'generate_lead',
-                'login',
-                'purchase',
-                'refund',
-                'remove_from_cart',
-                'search',
-                'select_content',
-                'set_checkout_option',
-                'share',
-                'sign_up',
-                'view_item',
-                'view_item_list',
-                'view_promotion',
-                'view_search_results',
-            );
-
-            // event action
-            $this->data['ga_event_action'] = isset( $args['ga_event_action'] ) && in_array( $args['ga_event_action'], $ga_event_actions )
-                ? sanitize_text_field( $args['ga_event_action'] )
-                : 'view_item';
-
-            // custom event type
-            $this->data['ga_custom_event_action'] = $this->ga_event_action == '_custom' && !empty( $args['ga_custom_event_action'] )
-                ? sanitizeKey( $args['ga_custom_event_action'] )
-                : null;
-
-            $this->data['ga_event_category']  = ! empty( $args['ga_event_category'] ) ? sanitize_text_field( $args['ga_event_category'] ) : null;
-            $this->data['ga_event_label']     = ! empty( $args['ga_event_label'] ) ? sanitize_text_field( $args['ga_event_label'] ) : null;
-            $this->data['ga_event_value']     = ! empty( $args['ga_event_value'] ) ? sanitize_text_field( $args['ga_event_value'] ) : null;
-            $this->data['ga_non_interactive'] = isset( $args['ga_non_interactive'] ) && $args['ga_non_interactive'] ? true : false;
         }
+
+
 
 
     }
 
     public function getGACustomParams() {
-        if($this->getGaVersion() == "4") {
-            return $this->ga_custom_params;
+        if($this->isGaV4()) {
+            if(is_array($this->ga_custom_params)) {
+                return $this->ga_custom_params;
+            }
+            return [];
         }
         $custom = array();
         if($this->ga_event_category) {
@@ -685,8 +713,12 @@ class CustomEvent {
     }
 
     public function getGaParams() {
-        if($this->getGaVersion() == "4")
-            return $this->ga_params;
+        if($this->isGaV4())
+            if(is_array($this->ga_params)) {
+                return $this->ga_params;
+            } else {
+                return [];
+            }
         $list = array();
         foreach ($this->GAEvents as $group) {
             foreach ($group as $name => $fields) {
@@ -701,9 +733,5 @@ class CustomEvent {
         return $list;
     }
 
-    public function getGaVersion() {
-        if(isset($this->data['ga_version']))
-            return $this->ga_version;
-        return "";
-    }
+
 }

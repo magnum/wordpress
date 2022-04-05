@@ -6,12 +6,14 @@ use FluentCrm\App\Models\Subscriber;
 
 /**
  * Class FCRM_TAG_TO_USER
+ *
  * @package Uncanny_Automator
  */
 class FCRM_USER_TO_LIST {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'FCRM';
@@ -33,7 +35,6 @@ class FCRM_USER_TO_LIST {
 	 */
 	public function define_action() {
 
-
 		$action = array(
 			'author'             => Automator()->get_author_name(),
 			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/fluentcrm/' ),
@@ -46,12 +47,16 @@ class FCRM_USER_TO_LIST {
 			'priority'           => 10,
 			'accepted_args'      => 1,
 			'execution_function' => array( $this, 'list_to_user' ),
-			'options'            => [
-				Automator()->helpers->recipe->fluent_crm->options->fluent_crm_lists( esc_attr_x( 'Lists', 'Fluent Forms', 'uncanny-automator' ), $this->action_meta, [
-					'supports_multiple_values' => true,
-					'is_any'                   => false
-				] ),
-			],
+			'options'            => array(
+				Automator()->helpers->recipe->fluent_crm->options->fluent_crm_lists(
+					esc_attr_x( 'Lists', 'Fluent Forms', 'uncanny-automator' ),
+					$this->action_meta,
+					array(
+						'supports_multiple_values' => true,
+						'is_any'                   => false,
+					)
+				),
+			),
 		);
 
 		Automator()->register->action( $action );
@@ -67,32 +72,52 @@ class FCRM_USER_TO_LIST {
 	 */
 	public function list_to_user( $user_id, $action_data, $recipe_id ) {
 
-
 		$lists     = array_map( 'intval', json_decode( $action_data['meta'][ $this->action_meta ] ) );
 		$user_info = get_userdata( $user_id );
 
 		if ( $user_info ) {
 			$subscriber = Subscriber::where( 'email', $user_info->user_email )->first();
 
+			// User exists but is not a FluentCRM contact.
+			$subscriber = Automator()->helpers->recipe->fluent_crm->add_user_as_contact( $user_info );
+
+			// Did not create new contact successfully.
+			if ( false === $subscriber || is_null( $subscriber ) ) {
+
+				// Do nothing.
+				$action_data['do-nothing'] = true;
+
+				// Complete with errors.
+				$action_data['complete_with_errors'] = true;
+
+				// Send some error message to the log.
+				$message = esc_html__( 'There was an error while trying to add the user as a FluentCRM contact.', 'uncanny-automator' );
+
+				Automator()->complete_action( $user_id, $action_data, $recipe_id, $message );
+
+				return;
+
+			}
+
 			if ( $subscriber ) {
 
-				$existingLists   = $subscriber->lists;
-				$existingListIds = array();
-				foreach ( $existingLists as $list ) {
-					if ( in_array( $list->id, $lists ) ) {
-						$existingListIds[] = $list->title;
+				$existing_lists    = $subscriber->lists;
+				$existing_list_ids = array();
+				foreach ( $existing_lists as $list ) {
+					if ( in_array( $list->id, $lists, true ) ) {
+						$existing_list_ids[] = $list->title;
 					}
 				}
 
 				$subscriber->attachLists( $lists );
 
-				if ( empty( $existingListIds ) ) {
+				if ( empty( $existing_list_ids ) ) {
 					Automator()->complete_action( $user_id, $action_data, $recipe_id );
 
 					return;
 				} else {
 
-					if ( count( $existingListIds ) === count( $lists ) ) {
+					if ( count( $existing_list_ids ) === count( $lists ) ) {
 						// ALL lists were already assigned
 						$action_data['do-nothing']           = true;
 						$action_data['complete_with_errors'] = true;
@@ -103,7 +128,7 @@ class FCRM_USER_TO_LIST {
 							implode(
 							/* translators: Character to separate items */
 								__( ',', 'uncanny-automator' ) . ' ',
-								$existingListIds
+								$existing_list_ids
 							)
 						);
 
@@ -116,23 +141,7 @@ class FCRM_USER_TO_LIST {
 
 					return;
 
-
 				}
-			} else {
-				// User is not a contact
-				$args['do-nothing']                  = true;
-				$action_data['do-nothing']           = true;
-				$action_data['complete_with_errors'] = true;
-
-				$message = sprintf(
-				/* translators: 1. The user email */
-					_x( 'User is not a contact: %1$s', 'FluentCRM', 'uncanny-automator' ),
-					$user_info->user_email
-				);
-
-				Automator()->complete_action( $user_id, $action_data, $recipe_id, $message );
-
-				return;
 			}
 		} else {
 			// User does not exist

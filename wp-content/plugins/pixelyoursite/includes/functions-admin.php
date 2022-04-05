@@ -481,7 +481,7 @@ function adminRenderNoPixelsNotice() {
     ?>
 
     <div class="notice notice-warning is-dismissible pys_core_no_pixels_notice">
-        <p>You have no pixel configured with PixelYourSite. You can add the Facebook Pixel, Google Analytics or the
+        <p>You have no pixel configured with PixelYourSite. You can add the Meta Pixel (formerly Facebook Pixel), Google Analytics or the
             Pinterest Tag. <a href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite' ) ); ?>">Start tracking
                 everything now</a></p>
     </div>
@@ -530,7 +530,7 @@ function adminRenderNoPixelNotice( $plugin ) {
     <div class="notice notice-warning is-dismissible pys_<?php esc_attr_e( $slug ); ?>_no_pixel_notice">
         <?php if ( $slug == 'facebook' ) : ?>
 
-            <p>Add your Facebook pixel ID and start tracking everything with PixelYourSite. <a
+            <p>Add your Meta Pixel (formerly Facebook Pixel) ID and start tracking everything with PixelYourSite. <a
                         href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite' ) ); ?>">Click Here</a></p>
         
         <?php elseif ( $slug == 'ga' && ( isWooCommerceActive() || isEddActive() ) ) : ?>

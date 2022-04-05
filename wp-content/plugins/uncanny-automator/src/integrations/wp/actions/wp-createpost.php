@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class WP_CREATEPOST
+ *
  * @package Uncanny_Automator
  */
 class WP_CREATEPOST {
@@ -127,6 +128,24 @@ class WP_CREATEPOST {
 					Automator()->helpers->recipe->field->text_field( 'WPCPOSTSLUG', esc_attr__( 'Slug', 'uncanny-automator' ), true, 'text', '', false ),
 					Automator()->helpers->recipe->field->text_field( 'WPCPOSTCONTENT', esc_attr__( 'Content', 'uncanny-automator' ), true, 'textarea', '', false ),
 					array(
+						'option_code' => 'WPCPOSTEXCERPT',
+						/* translators: Post Excerpt field */
+						'label'       => esc_attr__( 'Excerpt', 'uncanny-automator' ),
+						'placeholder' => '',
+						'input_type'  => 'textarea',
+						'required'    => false,
+					),
+					// The photo url field.
+					array(
+						'option_code' => 'FEATURED_IMAGE_URL',
+						/* translators: Email field */
+						'label'       => esc_attr__( 'Featured image URL', 'uncanny-automator' ),
+						'placeholder' => esc_attr__( 'https://examplewebsite.com/path/to/image.jpg', 'uncanny-automator' ),
+						'input_type'  => 'url',
+						'required'    => false,
+						'description' => esc_attr__( 'The URL must include a supported image file extension (e.g. .jpg, .png, .svg, etc.). Some sites may block remote image download.', 'uncanny-automator' ),
+					),
+					array(
 						'input_type'        => 'repeater',
 						'option_code'       => 'CPMETA_PAIRS',
 						'label'             => esc_attr__( 'Meta', 'uncanny-automator' ),
@@ -173,6 +192,9 @@ class WP_CREATEPOST {
 		$post_title   = Automator()->parse->text( $action_data['meta']['WPCPOSTTITLE'], $recipe_id, $user_id, $args );
 		$post_slug    = Automator()->parse->text( $action_data['meta']['WPCPOSTSLUG'], $recipe_id, $user_id, $args );
 		$post_content = Automator()->parse->text( $action_data['meta']['WPCPOSTCONTENT'], $recipe_id, $user_id, $args );
+		$post_excerpt = Automator()->parse->text( $action_data['meta']['WPCPOSTEXCERPT'], $recipe_id, $user_id, $args );
+		$post_fimage  = Automator()->parse->text( $action_data['meta']['FEATURED_IMAGE_URL'], $recipe_id, $user_id, $args );
+		$post_fimage  = filter_var( $post_fimage, FILTER_SANITIZE_URL );
 		$post_author  = Automator()->parse->text( $action_data['meta']['WPCPOSTAUTHOR'], $recipe_id, $user_id, $args );
 		$post_status  = Automator()->parse->text( $action_data['meta']['WPCPOSTSTATUS'], $recipe_id, $user_id, $args );
 		$post_type    = $action_data['meta'][ $this->action_code ];
@@ -181,6 +203,7 @@ class WP_CREATEPOST {
 		$post_args['post_title']   = sanitize_text_field( $post_title );
 		$post_args['post_name']    = sanitize_title( $post_slug );
 		$post_args['post_content'] = $post_content;
+		$post_args['post_excerpt'] = $post_excerpt;
 		$post_args['post_type']    = $post_type;
 		$post_args['post_status']  = $post_status;
 		$post_args['post_author']  = 0;
@@ -199,6 +222,11 @@ class WP_CREATEPOST {
 		$post_id = wp_insert_post( $post_args );
 
 		if ( $post_id ) {
+
+			if ( ! empty( $post_fimage ) ) {
+				$this->add_featured_image( $post_fimage, $post_id );
+			}
+
 			$meta_pairs = json_decode( $action_data['meta']['CPMETA_PAIRS'], true );
 			if ( ! empty( $meta_pairs ) ) {
 				foreach ( $meta_pairs as $pair ) {
@@ -210,6 +238,37 @@ class WP_CREATEPOST {
 		}
 
 		Automator()->complete_action( $user_id, $action_data, $recipe_id );
+	}
+
+	/**
+	 *
+	 * @param $image_url
+	 * @param $post_id
+	 */
+	public function add_featured_image( $image_url, $post_id ) {
+		$upload_dir = wp_upload_dir();
+		$image_data = file_get_contents( $image_url );
+		$filename   = basename( $image_url );
+
+		if ( wp_mkdir_p( $upload_dir['path'] ) ) {
+			$file = $upload_dir['path'] . '/' . $filename;
+		} else {
+			$file = $upload_dir['basedir'] . '/' . $filename;
+		}
+		file_put_contents( $file, $image_data );
+
+		$wp_filetype = wp_check_filetype( $filename, null );
+		$attachment  = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title'     => sanitize_file_name( $filename ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+		$attach_id   = wp_insert_attachment( $attachment, $file, $post_id );
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+		$res1        = wp_update_attachment_metadata( $attach_id, $attach_data );
+		$res2        = set_post_thumbnail( $post_id, $attach_id );
 	}
 
 }

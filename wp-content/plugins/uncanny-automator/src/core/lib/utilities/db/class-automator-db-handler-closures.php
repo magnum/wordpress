@@ -5,6 +5,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Automator_DB_Handler_Closures
+ *
  * @package Uncanny_Automator
  */
 class Automator_DB_Handler_Closures {
@@ -89,6 +90,35 @@ class Automator_DB_Handler_Closures {
 			array(
 				'automator_recipe_id'     => $recipe_id,
 				'automator_recipe_log_id' => $automator_recipe_log_id,
+			)
+		);
+	}
+
+	/**
+	 * @param $recipe_id
+	 *
+	 * @return void
+	 */
+	public function delete_by_recipe_id( $recipe_id ) {
+		global $wpdb;
+		$closure_tbl      = $wpdb->prefix . Automator()->db->tables->closure;
+		$closure_meta_tbl = $wpdb->prefix . Automator()->db->tables->closure_meta;
+		$closure          = $wpdb->get_col( $wpdb->prepare( "SELECT `ID` FROM $closure_tbl WHERE automator_recipe_id=%d", $recipe_id ) ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $closure ) {
+			foreach ( $closure as $automator_closure_log_id ) {
+				// delete from uap_closure_log_meta
+				$wpdb->delete(
+					$closure_meta_tbl,
+					array( 'automator_closure_log_id' => $automator_closure_log_id )
+				);
+			}
+		}
+
+		// delete from uap_closure_log
+		$wpdb->delete(
+			$closure_tbl,
+			array(
+				'automator_recipe_id' => $recipe_id,
 			)
 		);
 	}

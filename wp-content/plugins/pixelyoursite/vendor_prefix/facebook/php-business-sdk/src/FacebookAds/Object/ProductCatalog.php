@@ -45,6 +45,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatBreakdownsValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedDelimiterValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedEncodingValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedFeedTypeValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedIngestionSourceTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedItemSubTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedOverrideTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedQuotedFieldsModeValues;
@@ -53,6 +54,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemCommerceTaxCategoryValue
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemConditionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemGenderValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemMarkedForProductLaunchValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemOriginCountryValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemVisibilityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\VehicleAvailabilityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\VehicleBodyStyleValues;
@@ -127,6 +129,16 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
+    public function getArEffectsBatchStatus(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('handle' => 'string');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/ar_effects_batch_status', new \PYS_PRO_GLOBAL\FacebookAds\Object\AREffectsBatchStatus(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AREffectsBatchStatus::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
     public function deleteAssignedUsers(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -187,22 +199,22 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function getAutos(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/autos', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
     public function createBatch(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
         $param_types = array('allow_upsert' => 'bool', 'fbe_external_business_id' => 'string', 'requests' => 'list<map>');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/batch', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductCatalog(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductCatalog::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function createCatalogWebsiteSetting(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('is_allowed_to_crawl' => 'bool');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/catalog_website_settings', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -440,8 +452,8 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
     public function createProductFeed(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('country' => 'string', 'default_currency' => 'string', 'deletion_enabled' => 'bool', 'delimiter' => 'delimiter_enum', 'encoding' => 'encoding_enum', 'feed_type' => 'feed_type_enum', 'file_name' => 'string', 'item_sub_type' => 'item_sub_type_enum', 'migrated_from_feed_id' => 'string', 'name' => 'string', 'override_type' => 'override_type_enum', 'override_value' => 'string', 'quoted_fields_mode' => 'quoted_fields_mode_enum', 'rules' => 'list<string>', 'schedule' => 'string', 'selected_override_fields' => 'list<string>', 'update_schedule' => 'string');
-        $enums = array('delimiter_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedDelimiterValues::getInstance()->getValues(), 'encoding_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedEncodingValues::getInstance()->getValues(), 'feed_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedFeedTypeValues::getInstance()->getValues(), 'item_sub_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedItemSubTypeValues::getInstance()->getValues(), 'override_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedOverrideTypeValues::getInstance()->getValues(), 'quoted_fields_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedQuotedFieldsModeValues::getInstance()->getValues());
+        $param_types = array('country' => 'string', 'default_currency' => 'string', 'deletion_enabled' => 'bool', 'delimiter' => 'delimiter_enum', 'encoding' => 'encoding_enum', 'feed_type' => 'feed_type_enum', 'file_name' => 'string', 'ingestion_source_type' => 'ingestion_source_type_enum', 'item_sub_type' => 'item_sub_type_enum', 'migrated_from_feed_id' => 'string', 'name' => 'string', 'override_type' => 'override_type_enum', 'override_value' => 'string', 'primary_feed_ids' => 'list<string>', 'quoted_fields_mode' => 'quoted_fields_mode_enum', 'rules' => 'list<string>', 'schedule' => 'string', 'selected_override_fields' => 'list<string>', 'update_schedule' => 'string');
+        $enums = array('delimiter_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedDelimiterValues::getInstance()->getValues(), 'encoding_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedEncodingValues::getInstance()->getValues(), 'feed_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedFeedTypeValues::getInstance()->getValues(), 'ingestion_source_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedIngestionSourceTypeValues::getInstance()->getValues(), 'item_sub_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedItemSubTypeValues::getInstance()->getValues(), 'override_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedOverrideTypeValues::getInstance()->getValues(), 'quoted_fields_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedQuotedFieldsModeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/product_feeds', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeed(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeed::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -480,7 +492,7 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
     public function createProductSet(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('filter' => 'Object', 'metadata' => 'map', 'name' => 'string', 'retailer_id' => 'string');
+        $param_types = array('filter' => 'Object', 'metadata' => 'map', 'name' => 'string', 'ordering_info' => 'list<unsigned int>', 'publish_to_shops' => 'list<map>', 'retailer_id' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/product_sets', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductSet(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
@@ -510,8 +522,8 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
     public function createProduct(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('additional_image_urls' => 'list<string>', 'additional_uploaded_image_ids' => 'list<string>', 'additional_variant_attributes' => 'map', 'android_app_name' => 'string', 'android_class' => 'string', 'android_package' => 'string', 'android_url' => 'string', 'availability' => 'availability_enum', 'brand' => 'string', 'category' => 'string', 'category_specific_fields' => 'map', 'checkout_url' => 'string', 'color' => 'string', 'commerce_tax_category' => 'commerce_tax_category_enum', 'condition' => 'condition_enum', 'currency' => 'string', 'custom_data' => 'map', 'custom_label_0' => 'string', 'custom_label_1' => 'string', 'custom_label_2' => 'string', 'custom_label_3' => 'string', 'custom_label_4' => 'string', 'description' => 'string', 'expiration_date' => 'string', 'fb_product_category' => 'string', 'gender' => 'gender_enum', 'gtin' => 'string', 'image_url' => 'string', 'inventory' => 'unsigned int', 'ios_app_name' => 'string', 'ios_app_store_id' => 'unsigned int', 'ios_url' => 'string', 'ipad_app_name' => 'string', 'ipad_app_store_id' => 'unsigned int', 'ipad_url' => 'string', 'iphone_app_name' => 'string', 'iphone_app_store_id' => 'unsigned int', 'iphone_url' => 'string', 'launch_date' => 'string', 'manufacturer_part_number' => 'string', 'marked_for_product_launch' => 'marked_for_product_launch_enum', 'material' => 'string', 'mobile_link' => 'string', 'name' => 'string', 'offer_price_amount' => 'unsigned int', 'offer_price_end_date' => 'datetime', 'offer_price_start_date' => 'datetime', 'ordering_index' => 'unsigned int', 'pattern' => 'string', 'price' => 'unsigned int', 'product_type' => 'string', 'quantity_to_sell_on_facebook' => 'unsigned int', 'retailer_id' => 'string', 'retailer_product_group_id' => 'string', 'return_policy_days' => 'unsigned int', 'sale_price' => 'unsigned int', 'sale_price_end_date' => 'datetime', 'sale_price_start_date' => 'datetime', 'short_description' => 'string', 'size' => 'string', 'start_date' => 'string', 'url' => 'string', 'visibility' => 'visibility_enum', 'windows_phone_app_id' => 'string', 'windows_phone_app_name' => 'string', 'windows_phone_url' => 'string');
-        $enums = array('availability_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemAvailabilityValues::getInstance()->getValues(), 'commerce_tax_category_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemCommerceTaxCategoryValues::getInstance()->getValues(), 'condition_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemConditionValues::getInstance()->getValues(), 'gender_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemGenderValues::getInstance()->getValues(), 'marked_for_product_launch_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemMarkedForProductLaunchValues::getInstance()->getValues(), 'visibility_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemVisibilityValues::getInstance()->getValues());
+        $param_types = array('additional_image_urls' => 'list<string>', 'additional_uploaded_image_ids' => 'list<string>', 'additional_variant_attributes' => 'map', 'android_app_name' => 'string', 'android_class' => 'string', 'android_package' => 'string', 'android_url' => 'string', 'availability' => 'availability_enum', 'brand' => 'string', 'category' => 'string', 'category_specific_fields' => 'map', 'checkout_url' => 'string', 'color' => 'string', 'commerce_tax_category' => 'commerce_tax_category_enum', 'condition' => 'condition_enum', 'currency' => 'string', 'custom_data' => 'map', 'custom_label_0' => 'string', 'custom_label_1' => 'string', 'custom_label_2' => 'string', 'custom_label_3' => 'string', 'custom_label_4' => 'string', 'description' => 'string', 'expiration_date' => 'string', 'fb_product_category' => 'string', 'gender' => 'gender_enum', 'gtin' => 'string', 'image_url' => 'string', 'importer_address' => 'map', 'importer_name' => 'string', 'inventory' => 'unsigned int', 'ios_app_name' => 'string', 'ios_app_store_id' => 'unsigned int', 'ios_url' => 'string', 'ipad_app_name' => 'string', 'ipad_app_store_id' => 'unsigned int', 'ipad_url' => 'string', 'iphone_app_name' => 'string', 'iphone_app_store_id' => 'unsigned int', 'iphone_url' => 'string', 'launch_date' => 'string', 'manufacturer_info' => 'string', 'manufacturer_part_number' => 'string', 'marked_for_product_launch' => 'marked_for_product_launch_enum', 'material' => 'string', 'mobile_link' => 'string', 'name' => 'string', 'offer_price_amount' => 'unsigned int', 'offer_price_end_date' => 'datetime', 'offer_price_start_date' => 'datetime', 'ordering_index' => 'unsigned int', 'origin_country' => 'origin_country_enum', 'pattern' => 'string', 'price' => 'unsigned int', 'product_type' => 'string', 'quantity_to_sell_on_facebook' => 'unsigned int', 'retailer_id' => 'string', 'retailer_product_group_id' => 'string', 'return_policy_days' => 'unsigned int', 'sale_price' => 'unsigned int', 'sale_price_end_date' => 'datetime', 'sale_price_start_date' => 'datetime', 'short_description' => 'string', 'size' => 'string', 'start_date' => 'string', 'url' => 'string', 'visibility' => 'visibility_enum', 'windows_phone_app_id' => 'string', 'windows_phone_app_name' => 'string', 'windows_phone_url' => 'string');
+        $enums = array('availability_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemAvailabilityValues::getInstance()->getValues(), 'commerce_tax_category_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemCommerceTaxCategoryValues::getInstance()->getValues(), 'condition_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemConditionValues::getInstance()->getValues(), 'gender_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemGenderValues::getInstance()->getValues(), 'marked_for_product_launch_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemMarkedForProductLaunchValues::getInstance()->getValues(), 'origin_country_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemOriginCountryValues::getInstance()->getValues(), 'visibility_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemVisibilityValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/products', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductItem(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductItem::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -561,7 +573,7 @@ class ProductCatalog extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
     {
         $this->assureId();
         $param_types = array('segment_use_cases' => 'list<segment_use_cases_enum>');
-        $enums = array('segment_use_cases_enum' => array('AFFILIATE_SELLER_STOREFRONT', 'AFFILIATE_TAGGED_ONLY', 'COLLAB_ADS', 'COLLAB_ADS_FOR_MARKETPLACE_PARTNER', 'COLLAB_ADS_SEGMENT_WITHOUT_SEGMENT_SYNCING', 'CREATORS_AS_SELLERS', 'IG_SHOPPING', 'IG_SHOPPING_SUGGESTED_PRODUCTS', 'MARKETPLACE_SHOPS', 'TEST'));
+        $enums = array('segment_use_cases_enum' => array('AFFILIATE_SELLER_STOREFRONT', 'COLLAB_ADS', 'COLLAB_ADS_FOR_MARKETPLACE_PARTNER', 'COLLAB_ADS_SEGMENT_WITHOUT_SEGMENT_SYNCING', 'CREATORS_AS_SELLERS', 'DIGITAL_CIRCULARS', 'FB_LIVE_SHOPPING', 'IG_SHOPPING', 'IG_SHOPPING_SUGGESTED_PRODUCTS', 'MARKETPLACE_SHOPS', 'TEST'));
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductCatalog(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductCatalog::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);

@@ -29,7 +29,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPlacePageSetFields;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetCategoryValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues;
 /**
@@ -59,7 +58,6 @@ class AdPlacePageSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
     protected static function getReferencedEnums()
     {
         $ref_enums = array();
-        $ref_enums['Category'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetCategoryValues::getInstance()->getValues();
         $ref_enums['LocationTypes'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues();
         $ref_enums['TargetedAreaType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues();
         return $ref_enums;

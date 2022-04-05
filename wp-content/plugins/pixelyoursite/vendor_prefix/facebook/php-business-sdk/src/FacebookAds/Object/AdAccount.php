@@ -58,12 +58,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeOperatorValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdDatePresetValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdExecutionOptionsValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdOperatorValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetCategoryValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewAdFormatValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewRenderTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleStatusValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleUiCreationSourceValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetBidStrategyValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetBillingEventValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetDatePresetValues;
@@ -173,8 +173,8 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createAdPlacePageSet(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('category' => 'category_enum', 'location_types' => 'list<location_types_enum>', 'name' => 'string', 'parent_page' => 'string', 'targeted_area_type' => 'targeted_area_type_enum');
-        $enums = array('category_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetCategoryValues::getInstance()->getValues(), 'location_types_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues(), 'targeted_area_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues());
+        $param_types = array('location_types' => 'list<location_types_enum>', 'name' => 'string', 'parent_page' => 'string', 'targeted_area_type' => 'targeted_area_type_enum');
+        $enums = array('location_types_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues(), 'targeted_area_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/ad_place_page_sets', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -183,8 +183,8 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createAdPlacePageSetsAsync(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('category' => 'category_enum', 'location_types' => 'list<location_types_enum>', 'name' => 'string', 'parent_page' => 'string', 'targeted_area_type' => 'targeted_area_type_enum');
-        $enums = array('category_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetCategoryValues::getInstance()->getValues(), 'location_types_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues(), 'targeted_area_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues());
+        $param_types = array('location_types' => 'list<location_types_enum>', 'name' => 'string', 'parent_page' => 'string', 'targeted_area_type' => 'targeted_area_type_enum');
+        $enums = array('location_types_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues(), 'targeted_area_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/ad_place_page_sets_async', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -215,7 +215,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/adcloudplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/adcloudplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\CloudGame(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CloudGame::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -305,7 +305,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/adplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\PlayableContent(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\PlayableContent::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/adplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -315,7 +315,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $this->assureId();
         $param_types = array('app_id' => 'string', 'name' => 'string', 'session_id' => 'string', 'source' => 'file', 'source_url' => 'string', 'source_zip' => 'file');
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\PlayableContent(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\PlayableContent::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adplayables', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -343,8 +343,8 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createAdRulesLibrary(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('account_id' => 'string', 'evaluation_spec' => 'Object', 'execution_spec' => 'Object', 'name' => 'string', 'schedule_spec' => 'Object', 'status' => 'status_enum');
-        $enums = array('status_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleStatusValues::getInstance()->getValues());
+        $param_types = array('account_id' => 'string', 'evaluation_spec' => 'Object', 'execution_spec' => 'Object', 'name' => 'string', 'schedule_spec' => 'Object', 'status' => 'status_enum', 'ui_creation_source' => 'ui_creation_source_enum');
+        $enums = array('status_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleStatusValues::getInstance()->getValues(), 'ui_creation_source_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleUiCreationSourceValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adrules_library', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdRule(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdRule::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -403,7 +403,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createAdSet(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('adlabels' => 'list<Object>', 'adset_schedule' => 'list<Object>', 'attribution_spec' => 'list<map>', 'bid_adjustments' => 'Object', 'bid_amount' => 'int', 'bid_constraints' => 'map<string, Object>', 'bid_strategy' => 'bid_strategy_enum', 'billing_event' => 'billing_event_enum', 'campaign_id' => 'string', 'campaign_spec' => 'Object', 'creative_sequence' => 'list<string>', 'daily_budget' => 'unsigned int', 'daily_imps' => 'unsigned int', 'daily_min_spend_target' => 'unsigned int', 'daily_spend_cap' => 'unsigned int', 'date_format' => 'string', 'destination_type' => 'destination_type_enum', 'end_time' => 'datetime', 'execution_options' => 'list<execution_options_enum>', 'frequency_control_specs' => 'list<Object>', 'full_funnel_exploration_mode' => 'full_funnel_exploration_mode_enum', 'is_dynamic_creative' => 'bool', 'lifetime_budget' => 'unsigned int', 'lifetime_imps' => 'unsigned int', 'lifetime_min_spend_target' => 'unsigned int', 'lifetime_spend_cap' => 'unsigned int', 'line_number' => 'unsigned int', 'multi_optimization_goal_weight' => 'multi_optimization_goal_weight_enum', 'name' => 'string', 'optimization_goal' => 'optimization_goal_enum', 'optimization_sub_event' => 'optimization_sub_event_enum', 'pacing_type' => 'list<string>', 'promoted_object' => 'Object', 'rb_prediction_id' => 'string', 'rf_prediction_id' => 'string', 'source_adset_id' => 'string', 'start_time' => 'datetime', 'status' => 'status_enum', 'targeting' => 'Targeting', 'time_based_ad_rotation_id_blocks' => 'list<list<unsigned int>>', 'time_based_ad_rotation_intervals' => 'list<unsigned int>', 'time_start' => 'datetime', 'time_stop' => 'datetime', 'topline_id' => 'string', 'tune_for_category' => 'tune_for_category_enum', 'upstream_events' => 'map');
+        $param_types = array('adlabels' => 'list<Object>', 'adset_schedule' => 'list<Object>', 'attribution_spec' => 'list<map>', 'bid_adjustments' => 'Object', 'bid_amount' => 'int', 'bid_constraints' => 'map<string, Object>', 'bid_strategy' => 'bid_strategy_enum', 'billing_event' => 'billing_event_enum', 'campaign_id' => 'string', 'campaign_spec' => 'Object', 'creative_sequence' => 'list<string>', 'daily_budget' => 'unsigned int', 'daily_imps' => 'unsigned int', 'daily_min_spend_target' => 'unsigned int', 'daily_spend_cap' => 'unsigned int', 'date_format' => 'string', 'destination_type' => 'destination_type_enum', 'end_time' => 'datetime', 'execution_options' => 'list<execution_options_enum>', 'existing_customer_budget_percentage' => 'unsigned int', 'frequency_control_specs' => 'list<Object>', 'full_funnel_exploration_mode' => 'full_funnel_exploration_mode_enum', 'is_dynamic_creative' => 'bool', 'lifetime_budget' => 'unsigned int', 'lifetime_imps' => 'unsigned int', 'lifetime_min_spend_target' => 'unsigned int', 'lifetime_spend_cap' => 'unsigned int', 'line_number' => 'unsigned int', 'multi_optimization_goal_weight' => 'multi_optimization_goal_weight_enum', 'name' => 'string', 'optimization_goal' => 'optimization_goal_enum', 'optimization_sub_event' => 'optimization_sub_event_enum', 'pacing_type' => 'list<string>', 'promoted_object' => 'Object', 'rb_prediction_id' => 'string', 'rf_prediction_id' => 'string', 'source_adset_id' => 'string', 'start_time' => 'datetime', 'status' => 'status_enum', 'targeting' => 'Targeting', 'time_based_ad_rotation_id_blocks' => 'list<list<unsigned int>>', 'time_based_ad_rotation_intervals' => 'list<unsigned int>', 'time_start' => 'datetime', 'time_stop' => 'datetime', 'topline_id' => 'string', 'tune_for_category' => 'tune_for_category_enum', 'upstream_events' => 'map');
         $enums = array('bid_strategy_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetBidStrategyValues::getInstance()->getValues(), 'billing_event_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetBillingEventValues::getInstance()->getValues(), 'destination_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetDestinationTypeValues::getInstance()->getValues(), 'execution_options_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetExecutionOptionsValues::getInstance()->getValues(), 'full_funnel_exploration_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetFullFunnelExplorationModeValues::getInstance()->getValues(), 'multi_optimization_goal_weight_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetMultiOptimizationGoalWeightValues::getInstance()->getValues(), 'optimization_goal_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetOptimizationGoalValues::getInstance()->getValues(), 'optimization_sub_event_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetOptimizationSubEventValues::getInstance()->getValues(), 'status_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetStatusValues::getInstance()->getValues(), 'tune_for_category_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetTuneForCategoryValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adsets', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdSet(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
@@ -435,7 +435,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $this->assureId();
         $param_types = array('name' => 'string');
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adspixels', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdsPixel(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdsPixel::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/adspixels', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -606,6 +606,16 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('custom_categories_only' => 'bool');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/broadtargetingcategories', new \PYS_PRO_GLOBAL\FacebookAds\Object\BroadTargetingCategories(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\BroadTargetingCategories::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function getBusinessProjects(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('business' => 'string');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/businessprojects', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -816,6 +826,16 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('app_id' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/ios_fourteen_campaign_limits', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdAccountIosFourteenCampaignLimits(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdAccountIosFourteenCampaignLimits::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function createManagedPartnerAd(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('campaign_group_id' => 'unsigned int', 'campaign_group_status' => 'campaign_group_status_enum', 'conversion_domain' => 'string', 'end_time' => 'unsigned int', 'lifetime_budget' => 'unsigned int', 'override_creative_text' => 'string', 'override_targeting_countries' => 'list<string>', 'product_set_id' => 'string', 'start_time' => 'unsigned int', 'use_marketplace_template' => 'bool', 'use_seller_template' => 'bool');
+        $enums = array('campaign_group_status_enum' => array('ACTIVE', 'ADSET_PAUSED', 'ARCHIVED', 'CAMPAIGN_PAUSED', 'DELETED', 'DISAPPROVED', 'IN_PROCESS', 'PAUSED', 'PENDING_BILLING_INFO', 'PENDING_REVIEW', 'PREAPPROVED', 'WITH_ISSUES'));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/managed_partner_ads', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -1083,7 +1103,7 @@ class AdAccount extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('agency_client_declaration' => 'map', 'attribution_spec' => 'list<Object>', 'business_info' => 'map', 'currency' => 'currency_enum', 'end_advertiser' => 'string', 'is_notifications_enabled' => 'bool', 'media_agency' => 'string', 'name' => 'string', 'partner' => 'string', 'spend_cap' => 'float', 'spend_cap_action' => 'string', 'timezone_id' => 'unsigned int', 'tos_accepted' => 'map');
+        $param_types = array('agency_client_declaration' => 'map', 'attribution_spec' => 'list<Object>', 'business_info' => 'map', 'currency' => 'currency_enum', 'end_advertiser' => 'string', 'existing_customers' => 'list<string>', 'is_notifications_enabled' => 'bool', 'media_agency' => 'string', 'name' => 'string', 'partner' => 'string', 'spend_cap' => 'float', 'spend_cap_action' => 'string', 'timezone_id' => 'unsigned int', 'tos_accepted' => 'map');
         $enums = array('currency_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountCurrencyValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdAccount(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdAccount::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

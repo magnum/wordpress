@@ -17,7 +17,7 @@ if(isset($_GET['clear_logs'])) {
 
 <div class="card card-static">
     <div class="card-header ">
-        <?php PYS()->render_switcher_input('logs_enable');?> Plugin Logs
+        <?php PYS()->render_switcher_input('pys_logs_enable');?> Plugin Logs
         <div style="float: right;margin-top: 10px;">
             <a style="margin-right: 30px" href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&clear_logs=true">Clear Logs</a>
             <a href="<?= PYS_Logger::get_log_file_url() ?>" target="_blank" download>Download Logs</a>

@@ -243,3 +243,5 @@
 	Bug Fix: Improved support for plugins using their own updater
 2.1.9 - 2021-08-17 - Josh Oakes
 	Enhancement: PHP 8 compatibility
+2.1.10 - 2022-03-23 - Josh Oakes
+	Bug Fix: Fix compatibility issue with fallback UTF-8 encoder on PHP 7.4+

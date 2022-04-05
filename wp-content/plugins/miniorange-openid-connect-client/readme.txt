@@ -2,8 +2,8 @@
 Contributors: cyberlord92
 Tags: openid, sso, openid connect, oidc, openidconnect
 Requires at least: 3.0.1
-Tested up to: 5.8
-Stable tag: 2.1.5
+Tested up to: 5.9
+Stable tag: 2.1.6
 License: MIT/Expat
 License URI: https://docs.miniorange.com/mit-license
 
@@ -157,6 +157,10 @@ On configure OpenID page, check if your app is already there in default app list
 
 
 == Changelog ==
+
+= 2.1.6 =
+* Compatibility with WordPress 5.9
+* Minor bug fixes
 
 = 2.1.5 =
 * Compatibility with WordPress 5.8

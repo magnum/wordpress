@@ -51,9 +51,10 @@ class FlightFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const ORIGIN_CITY = 'origin_city';
     const PRICE = 'price';
     const SANITIZED_IMAGES = 'sanitized_images';
+    const UNIT_PRICE = 'unit_price';
     const URL = 'url';
     public function getFieldTypes()
     {
-        return array('applinks' => 'CatalogItemAppLinks', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'description' => 'string', 'destination_airport' => 'string', 'destination_city' => 'string', 'flight_id' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'oneway_currency' => 'string', 'oneway_price' => 'string', 'origin_airport' => 'string', 'origin_city' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'url' => 'string');
+        return array('applinks' => 'CatalogItemAppLinks', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'description' => 'string', 'destination_airport' => 'string', 'destination_city' => 'string', 'flight_id' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'oneway_currency' => 'string', 'oneway_price' => 'string', 'origin_airport' => 'string', 'origin_city' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'unit_price' => 'Object', 'url' => 'string');
     }
 }

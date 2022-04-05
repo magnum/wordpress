@@ -1,9 +1,9 @@
 === AutomatorWP ===
-Contributors: automatorwp, rubengc, eneribs, pacogon, flabernardez
+Contributors: automatorwp, rubengc, eneribs, pacogon, dioni00, flabernardez
 Tags: automator, automation, zapier, webhook, marketing
 Requires at least: 4.4
-Tested up to: 5.8
-Stable tag: 1.8.6
+Tested up to: 5.9
+Stable tag: 2.0.7
 License: GNU AGPL v3.0
 License URI: http://www.gnu.org/licenses/agpl-3.0.html
 
@@ -93,6 +93,7 @@ AutomatorWP works with different WordPress plugins, including:
 * [ActiveMember360](https://automatorwp.com/add-ons/activemember360/)
 * [Advanced Ads](https://automatorwp.com/add-ons/advanced-ads/)
 * [AffiliateWP](https://automatorwp.com/add-ons/affiliatewp/)
+* [Amelia](https://automatorwp.com/add-ons/ameliabooking/)
 * [AnsPress](https://automatorwp.com/add-ons/anspress/)
 * [Awesome Support](https://automatorwp.com/add-ons/awesome-support/)
 * [bbPress](https://automatorwp.com/add-ons/bbpress/)
@@ -101,10 +102,12 @@ AutomatorWP works with different WordPress plugins, including:
 * [Caldera Forms](https://automatorwp.com/add-ons/caldera-forms/)
 * [Contact Form 7](https://automatorwp.com/add-ons/contact-form-7/)
 * [DigiMember](https://automatorwp.com/add-ons/digimember/)
+* [Divi](https://automatorwp.com/add-ons/divi/)
 * [Easy Digital Downloads](https://automatorwp.com/add-ons/easy-digital-downloads/)
 * [Elementor](https://automatorwp.com/add-ons/elementor-forms/)
 * [Favorites](https://automatorwp.com/add-ons/favorites/)
 * [FluentCRM](https://automatorwp.com/add-ons/fluentcrm/)
+* [Fluent Support](https://automatorwp.com/add-ons/fluent-support/)
 * [Formidable Forms](https://automatorwp.com/add-ons/formidable-forms/)
 * [Forminator](https://automatorwp.com/add-ons/forminator/)
 * [GamiPress](https://automatorwp.com/add-ons/gamipress/)
@@ -154,9 +157,15 @@ AutomatorWP works with different WordPress plugins, including:
 
 AutomatorWP can also work with external platforms, furthermore WordPress plugins, like these below:
 
+* [ActiveCampaign](https://automatorwp.com/add-ons/activecampaign/)
 * [HubSpot](https://automatorwp.com/add-ons/hubspot/)
+* [Google Sheets](https://automatorwp.com/add-ons/google-sheets/)
+* [IFTTT](https://automatorwp.com/add-ons/ifttt/)
+* [Integrately](https://automatorwp.com/add-ons/integrately/)
 * [Integromat](https://automatorwp.com/add-ons/integromat/)
+* [Notion](https://automatorwp.com/add-ons/notion/)
 * [Twilio](https://automatorwp.com/add-ons/twilio/)
+* [Twitter](https://automatorwp.com/add-ons/twitter/)
 * [Zapier](https://automatorwp.com/add-ons/zapier/)
 * [Zoom](https://automatorwp.com/add-ons/zoom/)
 
@@ -259,52 +268,62 @@ No, We're unable to provide custom development services, as our focus is develop
 
 == Changelog ==
 
-= 1.8.6 =
-
-* **Improvements**
-* LearnDash: Update code to match with latest LearnDash changes.
-
-= 1.8.5 =
-
-* **Bug Fixes**
-* Fixed issue during database tables creation for numeric keys.
-
-= 1.8.4 =
-
-* **Improvements**
-* Ensure to provide a key length during database indexes creation to avoid issues with databases that requires key length.
-
-= 1.8.3 =
-
-* **Improvements**
-* Improved database indexes creation to ensure maximum performance on the AutomatorWP tables.
-* Ensure the creation of table indexes during installation.
-* Updated AutomatorWP table versions to force table indexes creation on already installed websites.
-* Updated Custom Tables library.
-
-= 1.8.2 =
-
-* **Developer Notes**
-* Added more hooks to make the triggers replacement more flexible.
-
-= 1.8.1 =
-
-* **Improvements**
-* Tutor LMS: Ensure to mark the enrollment as completed on "Enoll user in a course" action.
-
-= 1.8.0.1 =
-
-* **Improvements**
-* Ensure to get the existent cache for database recounting queries.
-
-= 1.8.0 =
+= 2.0.7 =
 
 * **New Features**
-* WordPress: New filter: User with field exists or does not exists.
-* New integration: SliceWP.
-* SliceWP: New trigger: User becomes an affiliate.
+* New Integration: Amelia.
+* Amelia: New trigger: User books an appointment.
+* Amelia: New anonymous trigger: Guest books an appointment.
 * **Improvements**
-* Improved the way to detect that all actions of an automation has been executed.
-* Ensure to clear the completion times cache when a filter entry gets registered.
+* Added support for datetime fields.
+
+= 2.0.6 =
+
+* **New Features**
+* New integration: ActiveCampaign.
+* ActiveCampaign: New trigger: User added to ActiveCampaign.
+* ActiveCampaign: New trigger: Tag added to user.
+* ActiveCampaign: New action: Add user to ActiveCampaign.
+* ActiveCampaign: New action: Add tag to user.
+* **Improvements**
+* Update code to prevent PHP warnings caused by old PHP versions.
+* TutorLMS: Updated code to match with TutorLMS 2.0.
+
+= 2.0.5 =
+
+* **Developer Notes**
+* Added the object_id parameter when parsing the automation item label.
+
+= 2.0.4 =
+
+* **Improvements**
+* Added support to render options with multiples values in triggers or actions labels.
+
+= 2.0.3 =
+
+* **Improvements**
+* LearnPress: Updated enroll user to course action to match with the latest LearnPress version.
+* WPLMS: Updated check to meet if WPLMS is installed to match latest WPLMS v4.3.
+
+= 2.0.2 =
+
+* **Developer Notes**
+* Updated CMB2 library to 2.10.1.
+
+= 2.0.1 =
+
+* **Improvements**
+* Dashboard updated with new links to documentation.
+* **Bug Fixes**
+* Fixed issue with the reset password link and URL replacement.
+
+= 2.0.0 =
+
+* **New Features**
+* Added the "Dashboard" page.
+* New tag: Added the {date} tag to render the current date & time with support for custom formats using the is as {date:FORMAT}.
+* New tag: Added the {timestamp} tag to render the current timestamp.
+* **Improvements**
+* WooCommerce: Added support to detect manual memberships assignations.
 * **Developer Notes**
 * Moved old changelog to changelog.txt.

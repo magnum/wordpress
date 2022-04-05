@@ -174,8 +174,7 @@ class EventsWoo extends EventsFactory {
     {
         switch ($event) {
             case 'woo_remove_from_cart':{
-                $event = new GroupedEvent($event,EventTypes::$DYNAMIC);
-                return $event;
+                return $this->getRemoveFromCartEvents($event);
             }
 
             case 'woo_initiate_checkout':
@@ -184,21 +183,21 @@ class EventsWoo extends EventsFactory {
             case 'woo_view_category':
             case 'woo_view_item_list':
             case 'woo_view_content':
-                return new SingleEvent($event,EventTypes::$STATIC);
+                return new SingleEvent($event,EventTypes::$STATIC,'woo');
 
             case 'woo_add_to_cart_on_button_click':
-                return new SingleEvent($event,EventTypes::$DYNAMIC);
+                return new SingleEvent($event,EventTypes::$DYNAMIC,'woo');
             case 'woo_purchase' : {
                 $events = array();
                 $order_key = sanitize_key($_REQUEST['key']);
                 $order_id = (int) wc_get_order_id_by_order_key( $order_key );
 
                 update_post_meta( $order_id, '_pys_purchase_event_fired', true );
-                $events[] = new SingleEvent($event,EventTypes::$STATIC);
+                $events[] = new SingleEvent($event,EventTypes::$STATIC,'woo');
 
                 // add child event complete_registration
                 if(PYS()->getOption( 'woo_complete_registration_enabled' )) {
-                    $events[] = new SingleEvent('woo_complete_registration',EventTypes::$STATIC);
+                    $events[] = new SingleEvent('woo_complete_registration',EventTypes::$STATIC,'woo');
                 }
 
 
@@ -239,6 +238,17 @@ class EventsWoo extends EventsFactory {
         }
         return false;
     }
+
+    function getRemoveFromCartEvents($eventId) {
+        $events = [];
+        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+            $event = new SingleEvent($eventId,EventTypes::$DYNAMIC,self::getSlug());
+            $event->args = ['key'=>$cart_item_key,'item'=>$cart_item];
+            $events[]=$event;
+        }
+        return $events;
+    }
+
     private function getWooCartActiveCategories($activeIds) {
         $fireForCategory = array();
         foreach (WC()->cart->cart_contents as $cart_item_key => $cart_item) {
@@ -270,9 +280,18 @@ class EventsWoo extends EventsFactory {
         }
         return array_unique($fireForCategory);
     }
-
-    function getWooCustomerTotals(){
-        return PYS()->getEventsManager()->getWooCustomerTotals();
+    /**
+     * Always returns empty customer LTV-related values to make plugin compatible with PRO version.
+     * Used by Pinterest add-on.
+     *
+     * @return array
+     */
+    function getCustomerTotals($order_id = null){
+         return [
+            'ltv' => null,
+            'avg_order_value' => null,
+            'orders_count' => null,
+        ];
     }
 
     function getEvents() {

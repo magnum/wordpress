@@ -1,11 +1,14 @@
 <?php
 
 namespace PixelYourSite;
+/**
+ * @deprecated
+ */
 class GroupedEvent extends PYSEvent
 {
     private $events = array();
-    public function __construct($id, $type) {
-        parent::__construct($id, $type);
+    public function __construct($id, $type,$category='') {
+        parent::__construct($id, $type,$category);
     }
 
     /**

@@ -32,7 +32,12 @@ function wooProductIsType( $product, $type ) {
 	}
 
 }
-
+function wooIsRequestContainOrderId() {
+    return  isset( $_REQUEST['key'] )  && $_REQUEST['key'] != ""
+        || isset( $_REQUEST['referenceCode'] )  && $_REQUEST['referenceCode'] != ""
+        || isset( $_REQUEST['ref_venta'] )  && $_REQUEST['ref_venta'] != ""
+        || !empty( $_REQUEST['wcf-order'] );
+}
 function getWooProductPriceToDisplay( $product_id, $qty = 1 ) {
 
 	if ( ! $product = wc_get_product( $product_id ) ) {
@@ -46,18 +51,17 @@ function getWooProductPriceToDisplay( $product_id, $qty = 1 ) {
             return $salePrice['discounted_price'];
         }
     }
+    $productPrice = "";
 
-	if ( isWooCommerceVersionGte( '2.7' ) ) {
+    // take min price for variable product
+    if($product->get_type() == "variable") {
+        $prices = $product->get_variation_prices( true );
+        if(!empty( $prices['price'] )) {
+            $productPrice = current( $prices['price'] );
+        }
+    }
 
-		return (float) wc_get_price_to_display( $product, array( 'qty' => $qty ) );
-
-	} else {
-
-		return 'incl' === get_option( 'woocommerce_tax_display_shop' )
-			? $product->get_price_including_tax( $qty )
-			: $product->get_price_excluding_tax( $qty );
-
-	}
+    return (float) wc_get_price_to_display( $product, array( 'qty' => $qty,'price'=>$productPrice ) );
 }
 
 function getWooCartSubtotal() {

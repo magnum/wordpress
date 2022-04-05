@@ -34,11 +34,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EventEventStateFilterValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EventOnlineEventFormatValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EventTimeFilterValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EventTypeValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoProjectionValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoSpatialAudioFormatValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStatusValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStereoscopicModeValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStreamTypeValues;
 /**
  * This class is auto-generated.
  *
@@ -99,9 +94,9 @@ class Event extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createLiveVideo(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('content_tags' => 'list<string>', 'description' => 'string', 'enable_backup_ingest' => 'bool', 'encoding_settings' => 'string', 'fisheye_video_cropped' => 'bool', 'front_z_rotation' => 'float', 'is_audio_only' => 'bool', 'is_spherical' => 'bool', 'live_encoders' => 'list<string>', 'original_fov' => 'unsigned int', 'planned_start_time' => 'int', 'privacy' => 'string', 'projection' => 'projection_enum', 'published' => 'bool', 'schedule_custom_profile_image' => 'file', 'spatial_audio_format' => 'spatial_audio_format_enum', 'status' => 'status_enum', 'stereoscopic_mode' => 'stereoscopic_mode_enum', 'stop_on_delete_stream' => 'bool', 'stream_type' => 'stream_type_enum', 'title' => 'string');
-        $enums = array('projection_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoProjectionValues::getInstance()->getValues(), 'spatial_audio_format_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoSpatialAudioFormatValues::getInstance()->getValues(), 'status_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStatusValues::getInstance()->getValues(), 'stereoscopic_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStereoscopicModeValues::getInstance()->getValues(), 'stream_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStreamTypeValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/live_videos', new \PYS_PRO_GLOBAL\FacebookAds\Object\LiveVideo(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\LiveVideo::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $param_types = array('content_tags' => 'list<string>', 'description' => 'string', 'enable_backup_ingest' => 'bool', 'encoding_settings' => 'string', 'fisheye_video_cropped' => 'bool', 'front_z_rotation' => 'float', 'is_audio_only' => 'bool', 'is_spherical' => 'bool', 'live_encoders' => 'list<string>', 'original_fov' => 'unsigned int', 'privacy' => 'string', 'projection' => 'projection_enum', 'published' => 'bool', 'schedule_custom_profile_image' => 'file', 'spatial_audio_format' => 'spatial_audio_format_enum', 'status' => 'status_enum', 'stereoscopic_mode' => 'stereoscopic_mode_enum', 'stop_on_delete_stream' => 'bool', 'stream_type' => 'stream_type_enum', 'title' => 'string');
+        $enums = array('projection_enum' => array('CUBEMAP', 'EQUIRECTANGULAR', 'HALF_EQUIRECTANGULAR'), 'spatial_audio_format_enum' => array('ambiX_4'), 'status_enum' => array('LIVE_NOW', 'SCHEDULED_CANCELED', 'SCHEDULED_LIVE', 'SCHEDULED_UNPUBLISHED', 'UNPUBLISHED'), 'stereoscopic_mode_enum' => array('LEFT_RIGHT', 'MONO', 'TOP_BOTTOM'), 'stream_type_enum' => array('AMBIENT', 'REGULAR'));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/livevideos', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

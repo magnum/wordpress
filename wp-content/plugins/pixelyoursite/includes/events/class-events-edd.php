@@ -136,15 +136,15 @@ class EventsEdd extends EventsFactory {
             case 'edd_add_to_cart_on_checkout_page' :
             case 'edd_view_category':
             case 'edd_view_content':{
-                return new SingleEvent($event,EventTypes::$STATIC);
+                return new SingleEvent($event,EventTypes::$STATIC,'edd');
             }
 
             case 'edd_remove_from_cart': {
-                return new GroupedEvent($event,EventTypes::$DYNAMIC);
+                return $this->getRemoveFromCartEvents($event);
             }
             case 'edd_add_to_cart_on_button_click': {
 
-                return new SingleEvent($event,EventTypes::$DYNAMIC);
+                return new SingleEvent($event,EventTypes::$DYNAMIC,'edd');
             }
         }
     }
@@ -176,6 +176,18 @@ class EventsEdd extends EventsFactory {
 
         }
         return false;
+    }
+
+    private function getRemoveFromCartEvents($eventId) {
+        $events = [];
+
+
+        foreach (edd_get_cart_contents() as $cart_item_key => $cart_item) {
+            $event = new SingleEvent($eventId,EventTypes::$DYNAMIC,self::getSlug());
+            $event->args = ['key'=>$cart_item_key,'item'=>$cart_item];
+            $events[]=$event;
+        }
+        return $events;
     }
 
     private function getEddCartActiveCategories($categoryPixels){

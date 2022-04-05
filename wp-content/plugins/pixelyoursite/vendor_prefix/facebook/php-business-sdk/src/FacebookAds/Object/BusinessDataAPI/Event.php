@@ -47,8 +47,8 @@ class Event
         $this->container['data_processing_options_state'] = isset($data['data_processing_options_state']) ? $data['data_processing_options_state'] : null;
     }
     /**
-     * Sets a Facebook pixel Standard Event or Custom Event name
-     * @param string $event_name A Facebook pixel Standard Event or Custom Event name.
+     * Sets a Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name
+     * @param string $event_name A Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name.
      * @return $this
      */
     public function setEventName($event_name)
@@ -154,7 +154,7 @@ class Event
         return $request;
     }
     /**
-     * Gets Facebook pixel Standard Event or Custom Event name.
+     * Gets Meta Pixel (formerly Facebook Pixel) Standard Event or Custom Event name.
      * @return string
      */
     public function getEventName()

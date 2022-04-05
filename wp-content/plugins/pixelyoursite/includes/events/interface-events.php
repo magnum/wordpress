@@ -37,10 +37,11 @@ abstract class EventsFactory {
                     if(!is_array($events))  $events = array($events); // some type of events can return array
 
                     foreach ($events as $event) {
-                        $isSuccess = $pixel->addParamsToEvent( $event );
-                        if(!$isSuccess || !apply_filters("pys_validate_pixel_event",true,$event,$pixel)) continue;
-
-                        $eventsList[$pixel->getSlug()][] = $event;
+                        $singleEvents = $pixel->generateEvents( $event );
+                        foreach ($singleEvents as $singleEvent) {
+                            if(!apply_filters("pys_validate_pixel_event",true,$singleEvent,$pixel)) continue;
+                            $eventsList[$pixel->getSlug()][] = $singleEvent;
+                        }
                     }
                 }
             }

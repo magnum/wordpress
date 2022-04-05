@@ -12,6 +12,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- Enable EDD -->
 <div class="card card-static">
+    <div class="card-body">
+        <div  class="row">
+            <div class="col">
+                <?php renderDummySwitcher( false); ?>
+                <h4 class="switcher-label">Facebook auto-renewals purchase tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+        <div  class="row">
+            <div class="col">
+                <?php renderDummySwitcher( false); ?>
+                <h4 class="switcher-label">Google Analytics auto-renewals purchase tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+        <p class="small">
+            The plugin will send a purchase event using Facebook and Google Analytics API when auto-renewals take place. This feature is not yet supported for GA4 properties.
+        </p>
+    </div>
+</div>
+<div class="card card-static">
     <div class="card-header">
         General
     </div>
@@ -57,7 +76,24 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 </div>
 
-
+<!--  Transaction ID -->
+<div class="card ">
+    <div class="card-header">
+        Transaction ID <?php renderProBadge(); ?> <?php cardCollapseBtn(); ?>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-5 form-inline">
+                <label>Prefix: </label><?php renderDummyTextInput("Prefix");?>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <p>Consider adding a prefix for transactions IDs if you use the same tags on multiple websites.</p>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- AddToCart -->
 <div class="card">
     <div class="card-header">
@@ -192,7 +228,7 @@ e&utm_campaign=pro-feature' ); ?>
         <div class="card-header">
             Pinterest Tag ID setting
             <?php renderProBadge("https://www.pixelyoursite.com/pinterest-tag?utm_source=pys-free-plugin&utm_medium=pinterest-badge&utm_campaign=requiere-free-add-on",
-            "Requires free add-on"); ?>
+            "Requires paid add-on"); ?>
         </div>
     </div>
 <?php endif; ?>
@@ -237,6 +273,8 @@ e&utm_campaign=pro-feature' ); ?>
         </div>
     </div>
 <?php endif; ?>
+
+
 <hr>
 <!-- Google Dynamic Remarketing Vertical -->
 <div class="card  card-disabled">
@@ -1003,7 +1041,7 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <p>All events get the following parameters for all the tags: <i>page_title, post_type, post_id, event_URL, user_role, plugin, landing_page (pro), event_time (pro), event_day (pro), event_month (pro), traffic_source (pro), UTMs (pro).</i></p>
                 <p>The Purchase event will have the following extra-parameters: <i>category_name, num_items, tags, total (pro), transactions_count (pro), tax (pro), predicted_ltv (pro), average_order (pro), coupon_used (pro), coupon_code (pro), shipping (pro), shipping_cost (pro).</i></p>
-                <p>The Facebook Pixel events are Dynamic Ads ready.</p>
+                <p>The Meta Pixel (formerly Facebook Pixel) events are Dynamic Ads ready.</p>
                 <p>The Google Analytics events track the data Enhanced Ecommerce or Monetization (GA4).</p>
                 <p>The Pinterest events have the required data for Dynamic Remarketing.</p>
             </div>

@@ -11,6 +11,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 /**
  * Class Logs_List_Table
+ *
  * @package Uncanny_Automator
  */
 class Logs_List_Table extends WP_List_Table {
@@ -61,7 +62,6 @@ class Logs_List_Table extends WP_List_Table {
 
 	/**
 	 * Prepare items/data
-	 *
 	 */
 	public function prepare_items() {
 		global $wpdb, $_wp_column_headers;
@@ -407,7 +407,7 @@ class Logs_List_Table extends WP_List_Table {
 					$recipe_type_name = esc_attr_x( 'Anonymous', 'Recipe', 'uncanny-automator' );
 				}
 			}
-			$run_number_log = 'anonymous' === $current_type ? 1 : $run_number;
+			$run_number_log = 'anonymous' === $current_type ? 0 === absint( $recipe->run_number ) ? 1 : $recipe->run_number : $recipe->run_number;
 			$url            = sprintf(
 				'%s?post_type=%s&page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&minimal=1',
 				admin_url( 'edit.php' ),
@@ -417,11 +417,23 @@ class Logs_List_Table extends WP_List_Table {
 				$run_number_log,
 				absint( $recipe_log_id )
 			);
+			$delete_url     = sprintf(
+				'%s?post_type=%s&page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&delete_specific_activity=1&wpnonce=' . wp_create_nonce( AUTOMATOR_FREE_ITEM_NAME ),
+				admin_url( 'edit.php' ),
+				'uo-recipe',
+				'uncanny-automator-recipe-log',
+				$recipe_id,
+				$run_number_log,
+				absint( $recipe_log_id )
+			);
 
 			$actions = array(
-				'view' => sprintf( '<a href="%s" data-lity class="button button-secondary">%s</a>', $url, esc_attr__( 'Details', 'uncanny-automator' ) ),
+				'view' => sprintf( '<a href="%s" data-lity class="button button-primary">%s</a>', $url, esc_attr__( 'Details', 'uncanny-automator' ) ),
 				//Removed: 'rerun' => sprintf( '<a href="%s" onclick="javascript: return confirm(\"%s\")">%s</a>', '#', esc_attr__( 'Are you sure you want to re-run this recipe?', 'uncanny-automator' ), esc_attr__( 'Re-run', 'uncanny-automator' ) ),
 			);
+			if ( true === apply_filters( 'automator_allow_users_to_delete_in_progress_recipe_runs', true, $recipe_id ) ) {
+				$actions['delete'] = sprintf( '<a href="%s" class="button button-secondary" onclick="javascript: return confirm(\'%s\')">%s</a>', $delete_url, esc_attr__( 'Are you sure you want to delete this run? This action is irreversible.', 'uncanny-automator' ), esc_attr__( 'Delete', 'uncanny-automator' ) );
+			}
 
 			$data[] = array(
 				'recipe_type'      => $recipe_type_name,
@@ -430,7 +442,7 @@ class Logs_List_Table extends WP_List_Table {
 				'display_name'     => $user_name,
 				'recipe_completed' => $recipe_status,
 				'run_number'       => $run_number,
-				'actions'          => join( ' | ', $actions ), // Added.
+				'actions'          => join( ' ', $actions ), // Added.
 			);
 		}
 
@@ -501,7 +513,7 @@ class Logs_List_Table extends WP_List_Table {
 				}
 			}
 
-			$run_number_log = 'anonymous' === $current_type ? 1 : $run_number;
+			$run_number_log = 'anonymous' === $current_type ? 0 === absint( $recipe->run_number ) ? 1 : $recipe->run_number : $recipe->run_number;
 
 			$url     = sprintf( '%s?post_type=%s&page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&minimal=1', admin_url( 'edit.php' ), 'uo-recipe', 'uncanny-automator-recipe-activity-details', $recipe_id, $run_number_log, absint( $recipe_log_id ) );
 			$actions = array(
@@ -531,7 +543,6 @@ class Logs_List_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function format_trigger_data( $triggers ) {
-
 
 		$data         = array();
 		$recipes_data = Automator()->get_recipes_data( false );
@@ -615,7 +626,7 @@ class Logs_List_Table extends WP_List_Table {
 				'recipe_completed'   => $recipe_status,
 				'recipe_date_time'   => $recipe_date_completed,
 				'recipe_run_number'  => $recipe_run_number,
-				'trigger_run_number' => sprintf( esc_attr__( '%d of %d', 'uncanny-automator' ), $trigger_run_number, $trigger_total_times ),
+				'trigger_run_number' => sprintf( esc_attr__( '%1$d of %2$d', 'uncanny-automator' ), $trigger_run_number, $trigger_total_times ),
 				'display_name'       => $user_name,
 			);
 		}
@@ -678,8 +689,8 @@ class Logs_List_Table extends WP_List_Table {
 			// and replace the curly brackets of the sentence token with the <span>
 			// > output: "Send an email to <span>{{user_email}}</span>"
 			$sentence = preg_replace(
-				'(\{\{(.*?)\}\}(?=\s|$))',
-				"<span class=\"uap-logs-table-item-name__token\">$1</span>",
+				'({{(.*?)}}(?=\s|$))',
+				'<span class="uap-logs-table-item-name__token">$1</span>',
 				$sentence
 			);
 		}
@@ -806,7 +817,8 @@ class Logs_List_Table extends WP_List_Table {
 				$filter_html = ob_get_clean();
 			}
 
-			echo $filter_html;
+			// There's HTML involved. Ignoring
+			echo $filter_html; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

@@ -41,10 +41,11 @@ class InvoiceCampaignFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnu
     const CAMPAIGN_NAME = 'campaign_name';
     const CLICKS = 'clicks';
     const CONVERSIONS = 'conversions';
+    const DESCRIPTION = 'description';
     const IMPRESSIONS = 'impressions';
     const TAGS = 'tags';
     public function getFieldTypes()
     {
-        return array('ad_account_id' => 'string', 'billed_amount_details' => 'BilledAmountDetails', 'campaign_id' => 'string', 'campaign_name' => 'string', 'clicks' => 'unsigned int', 'conversions' => 'unsigned int', 'impressions' => 'unsigned int', 'tags' => 'list<string>');
+        return array('ad_account_id' => 'string', 'billed_amount_details' => 'BilledAmountDetails', 'campaign_id' => 'string', 'campaign_name' => 'string', 'clicks' => 'unsigned int', 'conversions' => 'unsigned int', 'description' => 'string', 'impressions' => 'unsigned int', 'tags' => 'list<string>');
     }
 }

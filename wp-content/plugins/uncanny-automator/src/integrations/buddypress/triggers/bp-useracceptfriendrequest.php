@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class BP_USERACCEPTFRIENDREQUEST
+ *
  * @package Uncanny_Automator
  */
 class BP_USERACCEPTFRIENDREQUEST {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'BP';
@@ -30,8 +32,6 @@ class BP_USERACCEPTFRIENDREQUEST {
 	 * Define and register the trigger by pushing it into the Automator object
 	 */
 	public function define_trigger() {
-
-
 
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
@@ -62,16 +62,48 @@ class BP_USERACCEPTFRIENDREQUEST {
 	 */
 	public function bp_friends_friendship_accepted( $id, $initiator_user_id, $friend_user_id, $friendship ) {
 
-
-
-		$args = [
+		$pass_args = array(
 			'code'           => $this->trigger_code,
 			'meta'           => $this->trigger_meta,
 			'user_id'        => $friend_user_id,
 			'ignore_post_id' => true,
 			'is_signed_in'   => true,
-		];
+		);
 
-		Automator()->maybe_add_trigger_entry( $args );
+		$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
+
+		if ( $args ) {
+			foreach ( $args as $result ) {
+				if ( true === $result['result'] ) {
+
+					$trigger_meta = array(
+						'user_id'        => $friend_user_id,
+						'trigger_id'     => $result['args']['trigger_id'],
+						'trigger_log_id' => $result['args']['get_trigger_id'],
+						'run_number'     => $result['args']['run_number'],
+					);
+
+					$friend = get_userdata( $initiator_user_id );
+
+					$trigger_meta['meta_key']   = 'FRIEND_ID';
+					$trigger_meta['meta_value'] = $friend->ID;
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FRIEND_EMAIL';
+					$trigger_meta['meta_value'] = maybe_serialize( $friend->user_email );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FRIEND_FIRSTNAME';
+					$trigger_meta['meta_value'] = maybe_serialize( $friend->user_firstname );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FRIEND_LASTNAME';
+					$trigger_meta['meta_value'] = maybe_serialize( $friend->user_lastname );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					Automator()->maybe_trigger_complete( $result['args'] );
+				}
+			}
+		}
 	}
 }

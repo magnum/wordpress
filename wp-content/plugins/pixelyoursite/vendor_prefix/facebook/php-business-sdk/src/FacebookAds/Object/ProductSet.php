@@ -171,7 +171,7 @@ class ProductSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('filter' => 'Object', 'metadata' => 'map', 'name' => 'string', 'retailer_id' => 'string');
+        $param_types = array('filter' => 'Object', 'metadata' => 'map', 'name' => 'string', 'ordering_info' => 'list<unsigned int>', 'publish_to_shops' => 'list<map>', 'retailer_id' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductSet(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

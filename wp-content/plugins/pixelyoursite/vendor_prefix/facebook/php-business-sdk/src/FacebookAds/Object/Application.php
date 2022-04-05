@@ -118,6 +118,16 @@ class Application extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
+    public function getAdNetworkPlacements(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('request_id' => 'string');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/adnetwork_placements', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacement(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacement::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
     public function getAdNetworkAnalytics(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -218,16 +228,6 @@ class Application extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function getAppInsights(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('aggregateBy' => 'aggregateBy_enum', 'breakdowns' => 'list<string>', 'ecosystem' => 'ecosystem_enum', 'event_name' => 'string', 'intervals_to_aggregate' => 'int', 'metric_key' => 'string', 'period' => 'period_enum', 'since' => 'datetime', 'until' => 'datetime');
-        $enums = array('aggregateBy_enum' => array('AVERAGE_JOURNEY_LENGTH', 'CONVERTED_JOURNEY_PERCENT', 'COUNT', 'COUNT_IDENTIFIED_USERS', 'COUNT_PER_USER', 'DAU', 'EVENT_LATEST_FIRE_TIME', 'EVENT_SOURCE_IDS', 'JOURNEY_CHANNEL_INCLUSION', 'JOURNEY_INCLUSION', 'MAU', 'MEDIAN_JOURNEY_LENGTH', 'MEDIAN_VALUE', 'MEDIAN_VALUE_PER_USER', 'OVERLAP', 'PERCENTILES_COUNT', 'PERCENTILES_USD_VALUE', 'PERCENTILES_VALUE', 'SCORE', 'SESSIONS_PER_JOURNEY', 'SESSION_BOUNCE_RATE', 'SUM', 'SUM_IDENTIFIED_USERS', 'SUM_PER_EVENT', 'TOPK', 'UNKNOWN_USERS', 'USD_SUM', 'USD_SUM_IDENTIFIED_USERS', 'USD_SUM_PER_EVENT', 'USD_SUM_PER_USER', 'USD_VALUE_PER_USER', 'USERS', 'USER_PROPERTY_USER_COUNT', 'VALUE_PER_USER', 'WAU'), 'ecosystem_enum' => array('GAME', 'NON_GAME'), 'period_enum' => array('daily', 'days_28', 'days_60', 'days_90', 'hourly', 'lifetime', 'mins_15', 'monthly', 'range', 'weekly'));
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/app_insights', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
     public function getAppInstalledGroups(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -294,16 +294,6 @@ class Application extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('device_id' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/button_auto_detection_device_selection', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function createButtonIndexing(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('app_version' => 'string', 'device_id' => 'string', 'extinfo' => 'string', 'indexed_button_list' => 'list<map>');
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/button_indexing', new \PYS_PRO_GLOBAL\FacebookAds\Object\Application(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Application::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -398,16 +388,6 @@ class Application extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function createLeaderboardsSetScore(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('extra_data' => 'string', 'name' => 'string', 'player_id' => 'string', 'score' => 'unsigned int');
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/leaderboards_set_score', new \PYS_PRO_GLOBAL\FacebookAds\Object\Application(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Application::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
     public function createMmpAuditing(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -444,16 +424,6 @@ class Application extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('advertiser_tracking_enabled' => 'bool', 'application_tracking_enabled' => 'bool', 'custom_events' => 'list<Object>', 'logging_source' => 'logging_source_enum', 'logging_target' => 'logging_target_enum', 'page_id' => 'unsigned int', 'page_scoped_user_id' => 'unsigned int');
         $enums = array('logging_source_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ApplicationLoggingSourceValues::getInstance()->getValues(), 'logging_target_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ApplicationLoggingTargetValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/page_activities', new \PYS_PRO_GLOBAL\FacebookAds\Object\Application(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Application::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function deletePaymentCurrencies(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('currency_url' => 'string');
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, '/payment_currencies', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

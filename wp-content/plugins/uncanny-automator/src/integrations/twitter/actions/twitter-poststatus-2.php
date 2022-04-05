@@ -44,26 +44,27 @@ class TWITTER_POSTSTATUS_2 {
 
 		$action = array(
 			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/twitter/' ),
+			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/twitter/' ),
 			'integration'        => self::$integration,
 			'code'               => $this->action_code,
-			'sentence'           => sprintf( __( 'Post {{a status:%1$s}} to Twitter', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( 'Post {{a status}} to Twitter', 'uncanny-automator' ),
+			'sentence'           => sprintf( __( 'Post {{a tweet:%1$s}} to Twitter', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name' => __( 'Post {{a tweet}} to Twitter', 'uncanny-automator' ),
 			'priority'           => 10,
 			'accepted_args'      => 1,
 			'requires_user'      => false,
 			'execution_function' => array( $this, 'post_status' ),
 			'options_group'      => array(
 				$this->action_meta => array(
-					Automator()->helpers->recipe->twitter->textarea_field( 
-						'TWITTERSTATUSCONTENT', 
-						esc_attr__( 'Status', 'uncanny-automator' ), 
-						true, 
-						'textarea', 
-						'', 
+					Automator()->helpers->recipe->twitter->textarea_field(
+						'TWITTERSTATUSCONTENT',
+						esc_attr__( 'Status', 'uncanny-automator' ),
 						true,
-						 esc_attr__( 'Messages posted to Twitter have a 280 character limit.', 'uncanny-automator' ),
-						 __( 'Enter the message', 'uncanny-automator' ), 278 
+						'textarea',
+						'',
+						true,
+						esc_attr__( 'Messages posted to Twitter have a 280 character limit.', 'uncanny-automator' ),
+						__( 'Enter the message', 'uncanny-automator' ),
+						278
 					),
 					// Image field.
 					Automator()->helpers->recipe->field->text(
@@ -130,7 +131,7 @@ class TWITTER_POSTSTATUS_2 {
 		// Get twitter credentials.
 		$request_body = Automator()->helpers->recipe->twitter->get_client();
 
-		$url = Automator()->helpers->recipe->twitter->automator_api;
+		$url = Twitter_Helpers::$automator_api;
 
 		$request_body['action']    = 'statuses_update';
 		$request_body['status']    = $status;
@@ -159,7 +160,7 @@ class TWITTER_POSTSTATUS_2 {
 			$error_msg = $response->get_error_message();
 
 			throw new \Exception( $error_msg );
-			
+
 		}
 
 	}
@@ -176,7 +177,7 @@ class TWITTER_POSTSTATUS_2 {
 		// Get twitter credentials.
 		$request_body = Automator()->helpers->recipe->twitter->get_client();
 
-		$url = Automator()->helpers->recipe->twitter->automator_api;
+		$url = Twitter_Helpers::$automator_api;
 
 		$request_body['action'] = 'media_upload';
 		$request_body['media']  = $media;

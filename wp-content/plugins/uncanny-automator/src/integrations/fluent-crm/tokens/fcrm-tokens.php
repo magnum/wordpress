@@ -9,18 +9,20 @@ use FluentCrm\App\Models\Tag;
 
 /**
  * Class Fcrm_Tokens
+ *
  * @package Uncanny_Automator
  */
 class Fcrm_Tokens {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'FCRM';
 
 	/**
-	 * Wpff_Tokens constructor.
+	 * Tokens constructor.
 	 */
 	public function __construct() {
 		add_filter( 'automator_maybe_trigger_fcrm_fcrmlist_tokens', array( $this, 'fcrm_possible_tokens' ), 20, 2 );
@@ -31,12 +33,14 @@ class Fcrm_Tokens {
 	}
 
 	/**
+	 * Fluent CRM possible tokens.
+	 *
 	 * @param array $tokens
 	 * @param array $args
 	 *
 	 * @return array
 	 */
-	function fcrm_possible_tokens( $tokens = array(), $args = array() ) {
+	public function fcrm_possible_tokens( $tokens = array(), $args = array() ) {
 
 		$trigger_meta = $args['meta'];
 
@@ -65,6 +69,8 @@ class Fcrm_Tokens {
 	}
 
 	/**
+	 * Proccesses Fluent CRM tokens.
+	 *
 	 * @param $value
 	 * @param $pieces
 	 * @param $recipe_id
@@ -94,17 +100,24 @@ class Fcrm_Tokens {
 			) {
 
 				// value is the list or lists(if any list was selected) that the subscriber was added too
-
 				global $wpdb;
 
 				// Get a serialized array of list_ids OR tag_ids added to subscriber
 				$entry = $wpdb->get_var(
-					"SELECT meta_value
-													FROM {$wpdb->prefix}uap_trigger_log_meta
-													WHERE meta_key = '$trigger_meta'
-													AND automator_trigger_log_id = $trigger_log_id
-													AND automator_trigger_id = $trigger_id
-													LIMIT 0, 1"
+					$wpdb->prepare(
+						"SELECT meta_value
+							FROM {$wpdb->prefix}uap_trigger_log_meta
+							WHERE meta_key = %s
+							AND automator_trigger_log_id = %d
+							AND automator_trigger_id = %d
+							LIMIT 0, 1",
+						$trigger_meta,
+						// String. The trigger meta.
+						$trigger_log_id,
+						// Integer. The trigger log id.
+							$trigger_id
+						// Integer. The trigger id.
+					)
 				);
 
 				if ( $entry ) {
@@ -124,7 +137,7 @@ class Fcrm_Tokens {
 
 							if ( ! empty( $lists ) ) {
 								foreach ( $lists as $list ) {
-									if ( 0 === absint( $trigger_list ) && in_array( $list->id, $list_ids ) ) {
+									if ( 0 === absint( $trigger_list ) && in_array( $list->id, $list_ids, true ) ) {
 										// Any list was selected
 										$list_names[] = esc_html( $list->title );
 									} elseif ( (int) $list->id === (int) $trigger_list ) {
@@ -135,10 +148,11 @@ class Fcrm_Tokens {
 							}
 
 							return implode( ', ', $list_names );
-						}
-					}
+						}//end if
+					}//end if
 
 					if ( 'FCRMTAG' === $trigger_meta ) {
+
 						// ids added to subscriber during trigger
 						$tag_ids = maybe_unserialize( $entry );
 
@@ -153,7 +167,7 @@ class Fcrm_Tokens {
 
 							if ( ! empty( $tags ) ) {
 								foreach ( $tags as $tag ) {
-									if ( 0 === absint( $trigger_tag ) && in_array( $tag->id, $tag_ids ) ) {
+									if ( 0 === absint( $trigger_tag ) && in_array( $tag->id, $tag_ids, true ) ) {
 										// Any tag was selected
 										$tag_names[] = esc_html( $tag->title );
 									} elseif ( (int) $tag->id === (int) $trigger_tag ) {
@@ -164,12 +178,12 @@ class Fcrm_Tokens {
 							}
 
 							return implode( ', ', $tag_names );
-						}
-					}
-				}
+						}//end if
+					}//end if
+				}//end if
 
 				return '';
-			}
+			}//end if
 
 			if ( 'FCRMLIST' === $pieces['1'] || 'FCRMTAG' === $pieces['1'] ) {
 
@@ -179,12 +193,16 @@ class Fcrm_Tokens {
 
 				// Get the subscriber ID
 				$entry = $wpdb->get_var(
-					"SELECT meta_value
-													FROM {$wpdb->prefix}uap_trigger_log_meta
-													WHERE meta_key = 'subscriber_id'
-													AND automator_trigger_log_id = $trigger_log_id
-													AND automator_trigger_id = $trigger_id
-													LIMIT 0, 1"
+					$wpdb->prepare(
+						"SELECT meta_value
+						FROM {$wpdb->prefix}uap_trigger_log_meta
+						WHERE meta_key = 'subscriber_id'
+						AND automator_trigger_log_id = %d
+						AND automator_trigger_id = %d
+						LIMIT 0, 1",
+						$trigger_log_id,
+						$trigger_id
+					)
 				);
 
 				if ( absint( $entry ) ) {
@@ -207,8 +225,8 @@ class Fcrm_Tokens {
 				}
 
 				return '';
-			}
-		}
+			}//end if
+		}//end if
 
 		return $value;
 	}
@@ -227,6 +245,7 @@ class Fcrm_Tokens {
 	 */
 	public function fcrm_status_tokens( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
 
+		// Bail out if Fluent CRM Api is not found.
 		if ( ! function_exists( '\FluentCrmApi' ) ) {
 			return $value;
 		}
@@ -239,9 +258,27 @@ class Fcrm_Tokens {
 
 			$property = str_replace( 'FLUENTCRM_STATUS_FIELD_', '', $pieces[2] );
 
+			$trigger_id = $replace_args['trigger_id'];
+
+			$trigger_log_id = $replace_args['trigger_log_id'];
+
+			// Get the trigger run number.
+			$run_number = Automator()->get->trigger_run_number( $trigger_id, $trigger_log_id, $user_id );
+
+			// Get the trigger meta value inserted from the trigger.
+			$contact_email = Automator()->get->maybe_get_meta_value_from_trigger_log(
+				'FCRMUSERUPDATEDSTATUS',
+				$trigger_id,
+				$trigger_log_id,
+				$run_number,
+				$user_id
+			);
+
+			// Get FluentCRM Contacts API instance.
 			$contact_api = \FluentCrmApi( 'contacts' );
 
-			$contact = $contact_api->getContactByUserId( $user_id );
+			// Query the contact by email address.
+			$contact = $contact_api->getContactByUserRef( $contact_email );
 
 			$token_value = '';
 
@@ -249,7 +286,12 @@ class Fcrm_Tokens {
 				$token_value = $contact->$property;
 			} else {
 				// Try custom field.
-				$token_value = $this->get_custom_field_value( $property, $contact->id );
+				$contact_id = 0;
+				if ( isset( $contact->id ) ) {
+					$contact_id = $contact->id;
+				}
+
+				$token_value = $this->get_custom_field_value( $property, $contact_id );
 			}
 
 			return $token_value;

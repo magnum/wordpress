@@ -38,7 +38,9 @@ class ProfileTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const ANGRY = 'ANGRY';
     const CARE = 'CARE';
+    const FIRE = 'FIRE';
     const HAHA = 'HAHA';
+    const HUNDRED = 'HUNDRED';
     const LIKE = 'LIKE';
     const LOVE = 'LOVE';
     const NONE = 'NONE';

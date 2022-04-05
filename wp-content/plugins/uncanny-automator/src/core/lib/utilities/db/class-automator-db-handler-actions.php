@@ -5,6 +5,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Automator_DB_Handler_Actions
+ *
  * @package Uncanny_Automator
  */
 class Automator_DB_Handler_Actions {
@@ -210,6 +211,52 @@ class Automator_DB_Handler_Actions {
 			array(
 				'automator_recipe_id'     => $recipe_id,
 				'automator_recipe_log_id' => $automator_recipe_log_id,
+			)
+		);
+	}
+
+	/**
+	 * update_menu_order
+	 *
+	 * @param int $action_id
+	 * @param int $order
+	 *
+	 * @return void
+	 */
+	public function update_menu_order( $action_id, $order ) {
+		wp_update_post(
+			array(
+				'ID'         => $action_id,
+				'menu_order' => $order,
+			)
+		);
+	}
+
+	/**
+	 * @param $recipe_id
+	 *
+	 * @return void
+	 */
+	public function delete_by_recipe_id( $recipe_id ) {
+		global $wpdb;
+		$action_tbl      = $wpdb->prefix . Automator()->db->tables->action;
+		$action_meta_tbl = $wpdb->prefix . Automator()->db->tables->action_meta;
+		$actions         = $wpdb->get_col( $wpdb->prepare( "SELECT `ID` FROM $action_tbl WHERE automator_recipe_id=%d", $recipe_id ) ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $actions ) {
+			foreach ( $actions as $automator_action_log_id ) {
+				// delete from uap_action_log_meta
+				$wpdb->delete(
+					$action_meta_tbl,
+					array( 'automator_action_log_id' => $automator_action_log_id )
+				);
+			}
+		}
+
+		// delete from uap_action_log
+		$wpdb->delete(
+			$action_tbl,
+			array(
+				'automator_recipe_id' => $recipe_id,
 			)
 		);
 	}

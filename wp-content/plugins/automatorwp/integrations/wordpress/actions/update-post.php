@@ -33,25 +33,6 @@ class AutomatorWP_WordPress_Update_Post extends AutomatorWP_Integration_Action {
     public $post_meta = array();
 
     /**
-     * Register required hooks
-     *
-     * @since 1.0.0
-     */
-    public function hooks() {
-
-        // Log post ID
-        add_filter( 'automatorwp_user_completed_action_post_id', array( $this, 'post_id' ), 10, 6 );
-
-        // Log meta data
-        add_filter( 'automatorwp_user_completed_action_log_meta', array( $this, 'log_meta' ), 10, 5 );
-
-        // Log fields
-        add_filter( 'automatorwp_log_fields', array( $this, 'log_fields' ), 10, 5 );
-
-        parent::hooks();
-    }
-
-    /**
      * Register the trigger
      *
      * @since 1.0.0
@@ -282,6 +263,25 @@ class AutomatorWP_WordPress_Update_Post extends AutomatorWP_Integration_Action {
 
         }
 
+    }
+
+    /**
+     * Register required hooks
+     *
+     * @since 1.0.0
+     */
+    public function hooks() {
+
+        // Log post ID
+        add_filter( 'automatorwp_user_completed_action_post_id', array( $this, 'post_id' ), 10, 6 );
+
+        // Log meta data
+        add_filter( 'automatorwp_user_completed_action_log_meta', array( $this, 'log_meta' ), 10, 5 );
+
+        // Log fields
+        add_filter( 'automatorwp_log_fields', array( $this, 'log_fields' ), 10, 5 );
+
+        parent::hooks();
     }
 
     /**

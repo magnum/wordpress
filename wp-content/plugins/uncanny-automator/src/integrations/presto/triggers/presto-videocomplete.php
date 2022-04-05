@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class PRESTO_VIDEOCOMPLETE
+ *
  * @package Uncanny_Automator
  */
 class PRESTO_VIDEOCOMPLETE {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'PRESTO';
@@ -30,8 +32,6 @@ class PRESTO_VIDEOCOMPLETE {
 	 * Define and register the trigger by pushing it into the Automator object
 	 */
 	public function define_trigger() {
-
-
 
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),

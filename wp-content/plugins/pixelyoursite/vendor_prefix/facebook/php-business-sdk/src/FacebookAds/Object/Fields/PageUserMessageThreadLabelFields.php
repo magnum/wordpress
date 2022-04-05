@@ -36,9 +36,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 class PageUserMessageThreadLabelFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const ID = 'id';
-    const NAME = 'name';
+    const PAGE_LABEL_NAME = 'page_label_name';
     public function getFieldTypes()
     {
-        return array('id' => 'string', 'name' => 'string');
+        return array('id' => 'string', 'page_label_name' => 'string');
     }
 }

@@ -170,7 +170,7 @@ class CommerceOrder extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObjec
     public function createShipment(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('external_redemption_link' => 'string', 'external_shipment_id' => 'string', 'fulfillment' => 'map', 'idempotency_key' => 'string', 'items' => 'list<map>', 'merchant_order_reference' => 'string', 'shipment_origin_postal_code' => 'string', 'shipping_tax_details' => 'map', 'tracking_info' => 'map');
+        $param_types = array('external_redemption_link' => 'string', 'external_shipment_id' => 'string', 'fulfillment' => 'map', 'idempotency_key' => 'string', 'items' => 'list<map>', 'merchant_order_reference' => 'string', 'shipment_origin_postal_code' => 'string', 'shipping_tax_details' => 'map', 'should_use_default_fulfillment_location' => 'bool', 'tracking_info' => 'map');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/shipments', new \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

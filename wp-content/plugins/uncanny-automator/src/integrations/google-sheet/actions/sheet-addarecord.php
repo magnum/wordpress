@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class SHEET_ADDARECORD
+ *
  * @package Uncanny_Automator
  */
 class SHEET_ADDARECORD {
@@ -86,14 +87,14 @@ class SHEET_ADDARECORD {
 						'required'          => true,
 						'fields'            => array(
 							array(
-								'option_code' => 'COLUMN_NAME',
+								'option_code' => 'GS_COLUMN_NAME',
 								'label'       => __( 'Column', 'uncanny-automator' ),
 								'input_type'  => 'text',
 								'required'    => true,
 								'read_only'   => true,
 								'options'     => array(),
 							),
-							Automator()->helpers->recipe->field->text_field( 'COLUMN_VALUE', __( 'Value', 'uncanny-automator' ), true, 'text', '', false ),
+							Automator()->helpers->recipe->field->text_field( 'GS_COLUMN_VALUE', __( 'Value', 'uncanny-automator' ), true, 'text', '', false ),
 						),
 						'add_row_button'    => __( 'Add pair', 'uncanny-automator' ),
 						'remove_row_button' => __( 'Remove pair', 'uncanny-automator' ),
@@ -148,15 +149,15 @@ class SHEET_ADDARECORD {
 					},
 					// i18n
 					i18n: {
-						checkingHooks: "<?php printf( __( "We're checking for columns. We'll keep trying for %s seconds.", 'uncanny-automator' ), '{{time}}' ); ?>",
-						noResultsTrouble: "<?php _e( 'We had trouble finding columns.', 'uncanny-automator' ); ?>",
-						noResultsSupport: "<?php _e( 'See more details or get help', 'uncanny-automator' ); ?>",
-						samplesModalTitle: "<?php _e( "Here is the data we've collected", 'uncanny-automator' ); ?>",
-						samplesModalWarning: "<?php /* translators: 1. Button */ printf( __( 'Clicking on \"%1$s\" will remove your current fields and will use the ones on the table above instead.', 'uncanny-automator' ), '{{confirmButton}}' ); ?>",
-						samplesTableValueType: "<?php _e( 'Value type', 'uncanny-automator' ); ?>",
-						samplesTableReceivedData: "<?php _e( 'Received data', 'uncanny-automator' ); ?>",
-						samplesModalButtonConfirm: "<?php /* translators: Non-personal infinitive verb */ _e( 'Use these fields', 'uncanny-automator' ); ?>",
-						samplesModalButtonCancel: "<?php /* translators: Non-personal infinitive verb */ _e( 'Do nothing', 'uncanny-automator' ); ?>",
+						checkingHooks: "<?php printf( esc_html__( "We're checking for columns. We'll keep trying for %s seconds.", 'uncanny-automator' ), '{{time}}' ); ?>",
+						noResultsTrouble: "<?php esc_html_e( 'We had trouble finding columns.', 'uncanny-automator' ); ?>",
+						noResultsSupport: "<?php esc_html_e( 'See more details or get help', 'uncanny-automator' ); ?>",
+						samplesModalTitle: "<?php esc_html_e( "Here is the data we've collected", 'uncanny-automator' ); ?>",
+						samplesModalWarning: "<?php /* translators: 1. Button */ printf( esc_html__( 'Clicking on \"%1$s\" will remove your current fields and will use the ones on the table above instead.', 'uncanny-automator' ), '{{confirmButton}}' ); ?>",
+						samplesTableValueType: "<?php esc_html_e( 'Value type', 'uncanny-automator' ); ?>",
+						samplesTableReceivedData: "<?php esc_html_e( 'Received data', 'uncanny-automator' ); ?>",
+						samplesModalButtonConfirm: "<?php /* translators: Non-personal infinitive verb */ esc_html_e( 'Use these fields', 'uncanny-automator' ); ?>",
+						samplesModalButtonCancel: "<?php /* translators: Non-personal infinitive verb */ esc_html_e( 'Do nothing', 'uncanny-automator' ); ?>",
 					}
 				}
 
@@ -270,7 +271,7 @@ class SHEET_ADDARECORD {
 								jQuery.each(rows, function (index, row) {
 									// Add row
 									worksheetFields.addRow({
-										COLUMN_NAME: row.key
+										GS_COLUMN_NAME: row.key
 									}, false);
 								});
 
@@ -356,9 +357,18 @@ class SHEET_ADDARECORD {
 		}
 
 		for ( $i = 0; $i < count( $fields ); $i ++ ) {
-			$key                = $fields[ $i ]['COLUMN_NAME'];
-			$value              = Automator()->parse->text( $fields[ $i ]['COLUMN_VALUE'], $recipe_id, $user_id, $args );
+
+			$key = $fields[ $i ]['GS_COLUMN_NAME'];
+
+			$value = Automator()->parse->text( $fields[ $i ]['GS_COLUMN_VALUE'], $recipe_id, $user_id, $args );
+
+			// Allow overwrite.
+			if ( true === apply_filters( 'automator_google_sheets_disable_tokens_html', true ) ) {
+				$value = wp_strip_all_tags( $value );
+			}
+
 			$key_values[ $key ] = $value;
+
 			if ( ! empty( $value ) ) {
 				$check_all_empty = false;
 			}
@@ -413,7 +423,7 @@ class SHEET_ADDARECORD {
 			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
 
 			return;
-		}
+		}//end try
 	}
 
 }

@@ -59,12 +59,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStreamTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\MediaFingerprintFingerprintContentTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\NativeOfferBarcodeTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\NativeOfferLocationTypeValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageAlignmentValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageAttireValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageBackdatedTimeGranularityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageCheckinEntryPointValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointIconValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointLabelValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageFoodStylesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageFormattingValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGreetingDialogDisplayValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGuestChatModeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageMessagingTypeValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageMobileChatDisplayValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageModelValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageNotificationTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PagePermittedTasksValues;
@@ -123,6 +129,12 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $ref_enums['TemporaryStatus'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageTemporaryStatusValues::getInstance()->getValues();
         $ref_enums['PermittedTasks'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PagePermittedTasksValues::getInstance()->getValues();
         $ref_enums['Tasks'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageTasksValues::getInstance()->getValues();
+        $ref_enums['Alignment'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageAlignmentValues::getInstance()->getValues();
+        $ref_enums['EntryPointIcon'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointIconValues::getInstance()->getValues();
+        $ref_enums['EntryPointLabel'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointLabelValues::getInstance()->getValues();
+        $ref_enums['GreetingDialogDisplay'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGreetingDialogDisplayValues::getInstance()->getValues();
+        $ref_enums['GuestChatMode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGuestChatModeValues::getInstance()->getValues();
+        $ref_enums['MobileChatDisplay'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageMobileChatDisplayValues::getInstance()->getValues();
         $ref_enums['BackdatedTimeGranularity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageBackdatedTimeGranularityValues::getInstance()->getValues();
         $ref_enums['CheckinEntryPoint'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageCheckinEntryPointValues::getInstance()->getValues();
         $ref_enums['Formatting'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageFormattingValues::getInstance()->getValues();
@@ -240,16 +252,6 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function getAudioIsrcs(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/audio_isrcs', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
     public function deleteBlocked(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -280,22 +282,22 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function deleteBusinessData(array $fields = array(), array $params = array(), $pending = \false)
+    public function createBusinessDatum(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('email' => 'string', 'external_id' => 'string', 'object_name' => 'object_name_enum', 'order_id' => 'string', 'order_item_id' => 'string');
-        $enums = array('object_name_enum' => array('contact', 'order', 'order_item'));
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, '/business_data', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $param_types = array('data' => 'list<string>', 'partner_agent' => 'string', 'processing_type' => 'string');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/business_data', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
-    public function createBusinessDatum(array $fields = array(), array $params = array(), $pending = \false)
+    public function getBusinessProjects(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('data' => 'list<string>', 'partner_agent' => 'string');
+        $param_types = array('business' => 'string');
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/business_data', new \PYS_PRO_GLOBAL\FacebookAds\Object\Page(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Page::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/businessprojects', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -346,6 +348,26 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('background_color' => 'string', 'body_element_ids' => 'list<string>', 'enable_swipe_to_open' => 'bool', 'is_hidden' => 'bool', 'is_published' => 'bool', 'name' => 'string', 'source_template_id' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/canvases', new \PYS_PRO_GLOBAL\FacebookAds\Object\Canvas(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Canvas::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function getChatPlugin(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array();
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/chat_plugin', new \PYS_PRO_GLOBAL\FacebookAds\Object\ChatPlugin(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ChatPlugin::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function createChatPlugin(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('alignment' => 'alignment_enum', 'desktop_bottom_spacing' => 'unsigned int', 'desktop_side_spacing' => 'unsigned int', 'entry_point_icon' => 'entry_point_icon_enum', 'entry_point_label' => 'entry_point_label_enum', 'greeting_dialog_display' => 'greeting_dialog_display_enum', 'guest_chat_mode' => 'guest_chat_mode_enum', 'mobile_bottom_spacing' => 'unsigned int', 'mobile_chat_display' => 'mobile_chat_display_enum', 'mobile_side_spacing' => 'unsigned int', 'theme_color' => 'string', 'welcome_screen_greeting' => 'string');
+        $enums = array('alignment_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageAlignmentValues::getInstance()->getValues(), 'entry_point_icon_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointIconValues::getInstance()->getValues(), 'entry_point_label_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageEntryPointLabelValues::getInstance()->getValues(), 'greeting_dialog_display_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGreetingDialogDisplayValues::getInstance()->getValues(), 'guest_chat_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageGuestChatModeValues::getInstance()->getValues(), 'mobile_chat_display_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PageMobileChatDisplayValues::getInstance()->getValues());
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/chat_plugin', new \PYS_PRO_GLOBAL\FacebookAds\Object\Page(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\Page::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -424,7 +446,7 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     {
         $this->assureId();
         $param_types = array('action' => 'action_enum', 'action_reason' => 'action_reason_enum', 'countries' => 'Object', 'match_content_type' => 'match_content_type_enum', 'matched_asset_id' => 'string', 'reference_asset_id' => 'string');
-        $enums = array('action_enum' => array('BLOCK', 'CLAIM_AD_EARNINGS', 'MANUAL_REVIEW', 'MONITOR', 'REQUEST_TAKEDOWN'), 'action_reason_enum' => array('ARTIST_OBJECTION', 'OBJECTIONABLE_CONTENT', 'PREMIUM_MUSIC_VIDEO', 'PRERELEASE_CONTENT', 'PRODUCT_PARAMETERS', 'RESTRICTED_CONTENT', 'UNAUTHORIZED_COMMERCIAL_USE'), 'match_content_type_enum' => array('AUDIO_ONLY', 'VIDEO_AND_AUDIO', 'VIDEO_ONLY'));
+        $enums = array('action_enum' => array('BLOCK', 'CLAIM_AD_EARNINGS', 'MANUAL_REVIEW', 'MONITOR', 'REQUEST_TAKEDOWN'), 'action_reason_enum' => array('ARTICLE_17_PREFLAGGING', 'ARTIST_OBJECTION', 'OBJECTIONABLE_CONTENT', 'PREMIUM_MUSIC_VIDEO', 'PRERELEASE_CONTENT', 'PRODUCT_PARAMETERS', 'RESTRICTED_CONTENT', 'UNAUTHORIZED_COMMERCIAL_USE'), 'match_content_type_enum' => array('AUDIO_ONLY', 'VIDEO_AND_AUDIO', 'VIDEO_ONLY'));
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/copyright_manual_claims', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -463,7 +485,7 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createCustomLabel(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('name' => 'string');
+        $param_types = array('name' => 'string', 'page_label_name' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/custom_labels', new \PYS_PRO_GLOBAL\FacebookAds\Object\PageUserMessageThreadLabel(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\PageUserMessageThreadLabel::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
@@ -600,6 +622,16 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
+    public function getInsightsExports(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('data_level' => 'list<string>', 'from_creation_date' => 'datetime');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/insights_exports', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
     public function getInstagramAccounts(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -713,7 +745,7 @@ class Page extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createLiveVideo(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('content_tags' => 'list<string>', 'crossposting_actions' => 'list<map>', 'custom_labels' => 'list<string>', 'description' => 'string', 'enable_backup_ingest' => 'bool', 'encoding_settings' => 'string', 'fisheye_video_cropped' => 'bool', 'front_z_rotation' => 'float', 'game_show' => 'map', 'is_audio_only' => 'bool', 'is_spherical' => 'bool', 'live_encoders' => 'list<string>', 'original_fov' => 'unsigned int', 'planned_start_time' => 'int', 'privacy' => 'string', 'projection' => 'projection_enum', 'published' => 'bool', 'schedule_custom_profile_image' => 'file', 'spatial_audio_format' => 'spatial_audio_format_enum', 'status' => 'status_enum', 'stereoscopic_mode' => 'stereoscopic_mode_enum', 'stop_on_delete_stream' => 'bool', 'stream_type' => 'stream_type_enum', 'targeting' => 'Object', 'title' => 'string');
+        $param_types = array('content_tags' => 'list<string>', 'crossposting_actions' => 'list<map>', 'custom_labels' => 'list<string>', 'description' => 'string', 'enable_backup_ingest' => 'bool', 'encoding_settings' => 'string', 'fisheye_video_cropped' => 'bool', 'front_z_rotation' => 'float', 'game_show' => 'map', 'is_audio_only' => 'bool', 'is_spherical' => 'bool', 'live_encoders' => 'list<string>', 'original_fov' => 'unsigned int', 'privacy' => 'string', 'projection' => 'projection_enum', 'published' => 'bool', 'schedule_custom_profile_image' => 'file', 'spatial_audio_format' => 'spatial_audio_format_enum', 'status' => 'status_enum', 'stereoscopic_mode' => 'stereoscopic_mode_enum', 'stop_on_delete_stream' => 'bool', 'stream_type' => 'stream_type_enum', 'targeting' => 'Object', 'title' => 'string');
         $enums = array('projection_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoProjectionValues::getInstance()->getValues(), 'spatial_audio_format_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoSpatialAudioFormatValues::getInstance()->getValues(), 'status_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStatusValues::getInstance()->getValues(), 'stereoscopic_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStereoscopicModeValues::getInstance()->getValues(), 'stream_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LiveVideoStreamTypeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/live_videos', new \PYS_PRO_GLOBAL\FacebookAds\Object\LiveVideo(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\LiveVideo::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

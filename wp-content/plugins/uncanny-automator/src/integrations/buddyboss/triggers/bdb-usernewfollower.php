@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class BDB_USERNEWFOLLOWER
+ *
  * @package Uncanny_Automator
  */
 class BDB_USERNEWFOLLOWER {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'BDB';
@@ -30,8 +32,6 @@ class BDB_USERNEWFOLLOWER {
 	 * Define and register the trigger by pushing it into the Automator object
 	 */
 	public function define_trigger() {
-
-
 
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
@@ -61,15 +61,47 @@ class BDB_USERNEWFOLLOWER {
 	 */
 	public function bp_start_following_user( $follow ) {
 
-
-
-		$args = [
+		$pass_args = array(
 			'code'           => $this->trigger_code,
 			'meta'           => $this->trigger_meta,
 			'user_id'        => $follow->follower_id,
 			'ignore_post_id' => true,
-		];
+		);
 
-		Automator()->maybe_add_trigger_entry( $args );
+		$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
+
+		if ( $args ) {
+			foreach ( $args as $result ) {
+				if ( true === $result['result'] ) {
+
+					$trigger_meta = array(
+						'user_id'        => $follow->follower_id,
+						'trigger_id'     => $result['args']['trigger_id'],
+						'trigger_log_id' => $result['args']['get_trigger_id'],
+						'run_number'     => $result['args']['run_number'],
+					);
+
+					$follower = get_userdata( $follow->leader_id );
+
+					$trigger_meta['meta_key']   = 'FOLLOWER_ID';
+					$trigger_meta['meta_value'] = $follower->ID;
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FOLLOWER_EMAIL';
+					$trigger_meta['meta_value'] = maybe_serialize( $follower->user_email );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FOLLOWER_FIRSTNAME';
+					$trigger_meta['meta_value'] = maybe_serialize( $follower->user_firstname );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'FOLLOWER_LASTNAME';
+					$trigger_meta['meta_value'] = maybe_serialize( $follower->user_lastname );
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					Automator()->maybe_trigger_complete( $result['args'] );
+				}
+			}
+		}
 	}
 }

@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedDelimiterValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedEncodingValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedFeedTypeValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedIngestionSourceTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedItemSubTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedOverrideTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedQuotedFieldsModeValues;
@@ -67,6 +68,7 @@ class ProductFeed extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $ref_enums['QuotedFieldsMode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedQuotedFieldsModeValues::getInstance()->getValues();
         $ref_enums['Encoding'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedEncodingValues::getInstance()->getValues();
         $ref_enums['FeedType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedFeedTypeValues::getInstance()->getValues();
+        $ref_enums['IngestionSourceType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedIngestionSourceTypeValues::getInstance()->getValues();
         $ref_enums['ItemSubType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedItemSubTypeValues::getInstance()->getValues();
         $ref_enums['OverrideType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedOverrideTypeValues::getInstance()->getValues();
         return $ref_enums;
@@ -87,16 +89,6 @@ class ProductFeed extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('bulk_pagination' => 'bool', 'filter' => 'Object');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/automotive_models', new \PYS_PRO_GLOBAL\FacebookAds\Object\AutomotiveModel(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AutomotiveModel::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getAutos(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/autos', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -177,6 +169,16 @@ class ProductFeed extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
         $param_types = array('attribute' => 'string', 'params' => 'map', 'rule_type' => 'rule_type_enum');
         $enums = array('rule_type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedRuleRuleTypeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/rules', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedRule(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedRule::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
+    public function createSupplementaryFeedAssoc(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('assoc_data' => 'list<map>');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/supplementary_feed_assocs', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

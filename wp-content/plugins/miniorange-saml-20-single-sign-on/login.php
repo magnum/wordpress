@@ -3,7 +3,7 @@
  * Plugin Name: miniOrange SSO using SAML 2.0
  * Plugin URI: http://miniorange.com/
  * Description: miniOrange SAML plugin allows sso/login using Azure, Azure B2C, Okta, ADFS, Keycloak, Onelogin, Salesforce, Google Apps (Gsuite), Salesforce, Shibboleth, Centrify, Ping, Auth0 and other Identity Providers. It acts as a SAML Service Provider which can be configured to establish a trust between the plugin and IDP to securely authenticate and login the user to WordPress site.
- * Version: 4.9.09
+ * Version: 4.9.18
  * Author: miniOrange
  * Author URI: http://miniorange.com/
  * License: MIT/Expat
@@ -15,13 +15,9 @@ include_once dirname( __FILE__ ) . '/mo_login_saml_sso_widget.php';
 require( 'mo-saml-class-customer.php' );
 require( 'mo_saml_settings_page.php' );
 require( 'MetadataReader.php' );
-require( "feedback_form.php" );
-require_once "PointersManager.php";
 include_once 'Utilities.php';
 include_once 'mo_saml_logger.php';
 include_once  'WPConfigEditor.php';
-
-require_once dirname(__FILE__) . '/includes/lib/MoSAMLPointer.php';
 
 class saml_mo_login {
 
@@ -40,11 +36,17 @@ class saml_mo_login {
 		add_action( 'admin_footer', array( $this, 'feedback_request' ) );
 		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), array($this,'mo_saml_plugin_action_links') );
 		register_activation_hook(__FILE__,array($this,'plugin_activate'));
-		add_action( 'wp_ajax_skip_entire_plugin_tour', array($this, 'handle_skip_entire_plugin'));
+        add_action('login_form', array( $this, 'mo_saml_modify_login_form' ) );
 		add_action('plugins_loaded', array($this, 'mo_saml_load_translations'));
+        add_action( 'wp_ajax_skip_entire_plugin_tour', array($this, 'close_welcome_modal'));
 		register_shutdown_function( array( $this, 'log_errors' ) );
 
 	}
+
+    function close_welcome_modal(){
+        update_option('mo_is_new_user',1);
+
+    }
 
 	function miniorange_admin_notices(){
 		if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_upgrade_message" ) {
@@ -66,7 +68,7 @@ class saml_mo_login {
 		if($saml_logger->is_log_file_writable() && MoSAMLLogger::is_debugging_enabled()){
 			add_action('admin_notices', function (){echo wp_kses_post( sprintf(
 			/* translators: %s: documentation URL */
-				__( '<div class="updated" style="margin-left: auto"><p/> miniOrange SAML 2.0 logs are active. Want to turn it off? <a href="%s">Learn more here.</a></div>', 'miniorange-saml-20-single-sign-on' ),
+				__( '<div class="updated" ><p/> miniOrange SAML 2.0 logs are active. Want to turn it off? <a href="%s">Learn more here.</a></div>', 'miniorange-saml-20-single-sign-on' ),
 				admin_url().'admin.php?page=mo_saml_enable_debug_logs'
 			) ); } );
 		}
@@ -101,31 +103,6 @@ class saml_mo_login {
 	}
 
 
-	function handle_skip_entire_plugin(){
-		update_option('mo_is_new_user',1);
-		$uid = get_current_user_id();
-		$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-		$array_dissmised_pointers = array_diff($array_dissmised_pointers,$this->merge_all_pointers());
-		update_option('plugin_wise_tour_initiated',true);
-		$array_dissmised_pointers = array_merge($array_dissmised_pointers,$this->merge_all_pointers());
-		update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
-		exit;
-	}
-
-	function merge_all_pointers(){
-
-		$array = array();
-		return array_merge($array, mo_saml_options_enum_pointersMoSAML::$ATTRIBUTE_MAPPING,
-			mo_saml_options_enum_pointersMoSAML::$DEFAULT_SKIP,
-			mo_saml_options_enum_pointersMoSAML::$IDENTITY_PROVIDER,
-			mo_saml_options_enum_pointersMoSAML::$REDIRECTION_LINK,
-			mo_saml_options_enum_pointersMoSAML::$SERVICE_PROVIDER);
-
-	}
-
-
-
-
 	function feedback_request() {
 
 		mo_saml_display_saml_feedback_form();
@@ -138,6 +115,7 @@ class saml_mo_login {
 	}
 
 	public function mo_saml_deactivate(){
+        delete_option('mo_is_new_user');
 
 		if(mo_saml_is_customer_registered_saml(false))
 			return;
@@ -204,7 +182,6 @@ class saml_mo_login {
 				delete_option( 'mo_saml_transactionId' );
 				delete_option( 'mo_saml_show_mo_idp_message' );
 				delete_option('mo_saml_admin_email');
-				delete_option('mo_is_new_user');
 			}
 			switch_to_blog( $original_blog_id );
 		}
@@ -212,34 +189,19 @@ class saml_mo_login {
 
 	function plugin_settings_style( $page) {
 		if ( $page != 'toplevel_page_mo_saml_settings' && !(isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_licensing') && $page != 'miniorange-saml-2-0-sso_page_mo_saml_enable_debug_logs') {
-			return;
+            if($page != 'index.php')
+		        return;
 		}
-		if((isset($_REQUEST['tab']) && $_REQUEST['tab'] == 'licensing') || (isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_licensing')){
-			wp_enqueue_style( 'mo_saml_bootstrap_css', plugins_url( 'includes/css/bootstrap/bootstrap.min.css', __FILE__ ) );
+		if((isset($_REQUEST['tab']) && $_REQUEST['tab'] == 'licensing') || (isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_licensing') || (isset($_REQUEST['tab']) && $_REQUEST['tab'] == 'save') || (isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_settings') || (isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_enable_debug_logs')){
+			wp_enqueue_style( 'mo_saml_bootstrap_css', plugins_url( 'includes/css/bootstrap/bootstrap.min.css', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, 'all' );
 		}
 
 		wp_enqueue_style('mo_saml_jquery_ui_style',plugins_url('includes/css/jquery-ui.min.css', __FILE__), array(), mo_saml_options_plugin_constants::Version, 'all');
+        wp_enqueue_style( 'mo_saml_admin_gotham_font_style', 'https://fonts.cdnfonts.com/css/gotham', array(), mo_saml_options_plugin_constants::Version, 'all' );
 		wp_enqueue_style( 'mo_saml_admin_settings_style', plugins_url( 'includes/css/style_settings.min.css', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, 'all' );
-		wp_enqueue_style( 'mo_saml_admin_settings_phone_style', plugins_url( 'includes/css/phone.css', __FILE__ ) );
+		wp_enqueue_style( 'mo_saml_admin_settings_phone_style', plugins_url( 'includes/css/phone.css', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, 'all' );
 		wp_enqueue_style( 'mo_saml_time_settings_style', plugins_url( 'includes/css/datetime-style-settings.min.css', __FILE__ ), array(),mo_saml_options_plugin_constants::Version, 'all' );
-		wp_enqueue_style( 'mo_saml_wpb-fa', plugins_url( 'includes/css/style-icon.css', __FILE__ ) );
-		$file = plugin_dir_path( __FILE__ ) . 'pointers.php';
-		$manager = new MoSAMLPointersManager( $file, '4.8.52', 'custom_admin_pointers' );
-		$manager->parse();
-		$pointers = $manager->filter( $page );
-		if ( empty( $pointers ) ) {
-			return;
-		}
-		wp_enqueue_style( 'wp-pointer' );
-		$js_url = plugins_url( 'includes\js\pointers.js', __FILE__ );
-		wp_enqueue_script( 'custom_admin_pointers', $js_url, array('wp-pointer'), NULL, TRUE );
-		$data = array(
-			'close_label' => __('Close','miniorange-saml-20-single-sign-on'),
-			'next_label' => __( 'Next','miniorange-saml-20-single-sign-on' ),
-			'pointers' => $pointers
-		);
-		wp_localize_script( 'custom_admin_pointers', 'MOAdminPointers', $data );
-
+		wp_enqueue_style( 'mo_saml_wpb-fa', plugins_url( 'includes/css/style-icon.css', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, 'all' );
 
 	}
 
@@ -248,7 +210,6 @@ class saml_mo_login {
 		if ( $page != 'toplevel_page_mo_saml_settings' && !(isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_licensing') && $page != 'miniorange-saml-2-0-sso_page_mo_saml_enable_debug_logs') {
 			return;
 		}
-		wp_register_script( 'rml-script', plugins_url( 'includes/js/skip_tour.js',__FILE__), array('jquery'), null, true );
 		wp_localize_script( 'rml-script', 'readmelater_ajax', array( 'ajax_url' => admin_url('admin-ajax.php')) );
 
 
@@ -257,18 +218,50 @@ class saml_mo_login {
 		wp_enqueue_script('jquery-ui-datepicker');
 		wp_enqueue_script('mo_saml_select2_script', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js');
 		wp_enqueue_script('mo_saml_timepicker_script', 'https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js');
-		wp_enqueue_script( 'mo_saml_admin_settings_script', plugins_url( 'includes/js/settings.js', __FILE__ ) );
-		wp_enqueue_script( 'mo_saml_admin_settings_phone_script', plugins_url( 'includes/js/phone.js', __FILE__ ) );
+		wp_enqueue_script( 'mo_saml_admin_settings_script', plugins_url( 'includes/js/settings.min.js', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, false );
+		wp_enqueue_script( 'mo_saml_admin_settings_phone_script', plugins_url( 'includes/js/phone.min.js', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, false );
 
 		if((isset($_REQUEST['tab']) && $_REQUEST['tab'] == 'licensing') || (isset($_REQUEST['page']) && $_REQUEST['page'] == 'mo_saml_licensing')){
-			wp_enqueue_script( 'mo_saml_modernizr_script', plugins_url( 'includes/js/modernizr.js', __FILE__ ) );
-			wp_enqueue_script( 'mo_saml_popover_script', plugins_url( 'includes/js/bootstrap/popper.min.js', __FILE__ ) );
-			wp_enqueue_script( 'mo_saml_bootstrap_script', plugins_url( 'includes/js/bootstrap/bootstrap.min.js', __FILE__ ) );
+			wp_enqueue_script( 'mo_saml_modernizr_script', plugins_url( 'includes/js/modernizr.js', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, false );
+			wp_enqueue_script( 'mo_saml_popover_script', plugins_url( 'includes/js/bootstrap/popper.min.js', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, false );
+			wp_enqueue_script( 'mo_saml_bootstrap_script', plugins_url( 'includes/js/bootstrap/bootstrap.min.js', __FILE__ ), array(), mo_saml_options_plugin_constants::Version, false );
 		}
 
 
 	}
 
+    function mo_saml_modify_login_form() {
+        if(get_option('mo_saml_add_sso_button_wp') == 'true')
+            $this->mo_saml_add_sso_button();
+    }
+
+    function mo_saml_add_sso_button() {
+        if(!is_user_logged_in()){
+            $saml_idp_name = get_option('saml_identity_name');
+            $customButtonText = $saml_idp_name ? 'Login with '. $saml_idp_name : 'Login with SSO';
+			$html = '
+                <script>
+                window.onload = function() {
+	                var target_btn = document.getElementById("mo_saml_button");
+	                var before_element = document.querySelector("#loginform p");
+	                before_element.before(target_btn);
+                };                  
+                    function loginWithSSOButton(id) {
+                        if( id === "mo_saml_login_sso_button")
+                            document.getElementById("saml_user_login_input").value = "saml_user_login";
+                        document.getElementById("loginform").submit(); 
+                    }
+				</script>
+                <input id="saml_user_login_input" type="hidden" name="option" value="">
+                <div id="mo_saml_button" style="height:88px;">
+                	<div id="mo_saml_login_sso_button" onclick="loginWithSSOButton(this.id)" style="width:100%;display:flex;justify-content:center;align-items:center;font-size:14px;margin-bottom:1.3rem" class="button button-primary">
+                    <img style="width:20px;height:15px;padding-right:1px" src="'. plugin_dir_url(__FILE__) . 'images/lock-icon.png">'.$customButtonText.'
+                	</div>
+                	<div style="padding:5px;font-size:14px;height:20px;text-align:center"><b>OR</b></div>
+            	</div>';
+			echo $html;
+        }
+    }
 
 	function mo_saml_cleanup_logs() {
 		$logger = new MoSAMLLogger();
@@ -289,11 +282,6 @@ class saml_mo_login {
 				update_option('mo_saml_guest_log',true);
 				update_option('mo_saml_guest_enabled',true);
 				update_option( 'mo_saml_free_version', 1 );
-				$uid = get_current_user_id();
-				$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-				$array_dissmised_pointers = array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-				$array_dissmised_pointers = array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT_SKIP);
-				update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
 
 			}
 			switch_to_blog($original_blog_id);
@@ -301,11 +289,6 @@ class saml_mo_login {
 			update_option('mo_saml_guest_log',true);
 			update_option('mo_saml_guest_enabled',true);
 			update_option( 'mo_saml_free_version', 1 );
-			$uid = get_current_user_id();
-			$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-			$array_dissmised_pointers = array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-			$array_dissmised_pointers = array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-			update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
 		}
 		update_option('mo_plugin_do_activation_redirect', true);
 	}
@@ -330,75 +313,6 @@ class saml_mo_login {
 			$saml_logger = new MoSAMLLogger();
 			$mo_saml_utils = new Utilities();
 
-			if(self::mo_check_option_admin_referer('dismiss_pointers'))
-			{
-
-				$uid = get_current_user_id();
-				$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-				if ( isset( $_GET['tab'] ) ) {
-					$active_tab = $_GET['tab'];
-					if($active_tab == 'save')
-						$array_dissmised_pointers=array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$SERVICE_PROVIDER);
-					elseif($active_tab == 'config')
-						$array_dissmised_pointers=array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$IDENTITY_PROVIDER);
-					elseif ($active_tab == 'opt')
-						$array_dissmised_pointers=array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$ATTRIBUTE_MAPPING);
-					elseif ($active_tab == 'general')
-						$array_dissmised_pointers=array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$REDIRECTION_LINK);
-
-				}else {
-					$array_dissmised_pointers=array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT,mo_saml_options_enum_pointersMoSAML::$SERVICE_PROVIDER,mo_saml_options_enum_pointersMoSAML::$ATTRIBUTE_MAPPING,
-						mo_saml_options_enum_pointersMoSAML::$IDENTITY_PROVIDER, mo_saml_options_enum_pointersMoSAML::$REDIRECTION_LINK);
-				}
-
-				update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
-				return;
-
-
-			}
-
-			if(self::mo_check_option_admin_referer('restart_plugin_tour'))
-			{
-
-				update_option('mo_is_new_user',1);
-
-				$uid = get_current_user_id();
-				$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-				$array_dissmised_pointers=array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-				update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
-				update_option('plugin_wise_tour_initiated',true);
-				$request_uri = $_SERVER['REQUEST_URI'];
-				$redirect_array=explode('&',htmlentities($request_uri));
-				$redirect= $redirect_array[0];
-				header("Location: ".$redirect);
-				return;
-
-
-			}
-
-			if(self::mo_check_option_admin_referer('skip_plugin_tour'))
-			{
-
-				update_option('mo_is_new_user',1);
-
-				$uid = get_current_user_id();
-				$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-				$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-				update_option('plugin_wise_tour_initiated',true);
-
-				$array_dissmised_pointers = array_merge($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT_SKIP);
-
-				update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
-				$redirect_array =explode('&',htmlentities($_SERVER['REQUEST_URI']));
-				$redirect=$redirect_array[0];
-
-				header("Location: ".$redirect);
-				return;
-
-
-			}
-
-
 			if(self::mo_check_option_admin_referer("clear_attrs_list")){
 				delete_option("mo_saml_test_config_attrs");
 				update_option('mo_saml_message',__('List of attributes cleared','miniorange-saml-20-single-sign-on'));
@@ -406,36 +320,6 @@ class saml_mo_login {
 				$saml_logger->add_log(mo_saml_error_log::showMessage('CLEAR_ATTR_LIST'),MoSAMLLogger::INFO);
 			}
 
-			if ( self::mo_check_option_admin_referer("clear_pointers")) {
-
-				$uid = get_current_user_id();
-				$array_dissmised_pointers = explode( ',', (string) get_user_meta( $uid, 'dismissed_wp_pointers', TRUE ) );
-
-
-				switch ($_POST['button_name']){
-					case mo_saml_options_tab_names::Entire_plugin_tour:
-						$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$DEFAULT);
-						break;
-					case mo_saml_options_tab_names::Attribute_role_mapping:
-						$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$ATTRIBUTE_MAPPING);
-						break;
-					case mo_saml_options_tab_names::Identity_provider_settting:
-						$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$IDENTITY_PROVIDER);
-						break;
-					case mo_saml_options_tab_names::Redirection_sso_links:
-						$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$REDIRECTION_LINK);
-						break;
-					case mo_saml_options_tab_names::Service_provider_settings:
-						update_option('service_provider_setup_tour_initiated',true);
-						$array_dissmised_pointers = array_diff($array_dissmised_pointers,mo_saml_options_enum_pointersMoSAML::$SERVICE_PROVIDER);
-						break;
-
-				}
-
-
-				update_user_meta($uid,'dismissed_wp_pointers',implode(",",$array_dissmised_pointers));
-				return;
-			}
 			if ( isset( $_POST['option'] ) and $_POST['option'] == "mo_saml_mo_idp_message" ) {
 				update_option( 'mo_saml_show_mo_idp_message', 1 );
 
@@ -496,7 +380,7 @@ class saml_mo_login {
 							$saml_x509_certificate[ $key ] = Utilities::sanitize_certificate( $value );
 
 							if ( ! @openssl_x509_read( $saml_x509_certificate[ $key ] ) ) {
-								update_option( 'mo_saml_message', __('Invalid certificate: Please provide a valid certificate.','miniorange-saml-20-single-sign-on') );
+								update_option( 'mo_saml_message', __('Invalid certificate: Please provide a valid X.509 certificate.','miniorange-saml-20-single-sign-on') );
 								$mo_saml_utils->mo_saml_show_error_message();
 								delete_option( 'saml_x509_certificate' );
 								$saml_logger->add_log(mo_saml_error_log::showMessage('INVALID_CERT'),MoSAMLLogger::ERROR);
@@ -539,21 +423,26 @@ class saml_mo_login {
 					if($b2c_tenant_id_postfix !== false)
 						$b2c_tenant_id = substr($b2c_tenant_id, 0, $b2c_tenant_id_postfix);
 					update_option('saml_b2c_tenant_id', $b2c_tenant_id);
-					$log_message = ['b2c_tenant_id'=> $b2c_tenant_id ];
+					$log_message = array(
+						'b2c_tenant_id'=> $b2c_tenant_id
+					);
 					$saml_logger->add_log(mo_saml_error_log::showMessage('AZURE_B2C_CONFIGURATION_TENTENT_ID',$log_message), MoSAMLLogger::DEBUG);
 
 				}
 				if(isset($_POST['saml_IdentityExperienceFramework_id']) and !empty($_POST['saml_IdentityExperienceFramework_id'])){
 					$saml_IdentityExperienceFramework_id = htmlspecialchars($_POST['saml_IdentityExperienceFramework_id']);
 					update_option('saml_IdentityExperienceFramework_id', $saml_IdentityExperienceFramework_id);
-					$log_message = ['saml_IdentityExperienceFramework_id' =>  $saml_IdentityExperienceFramework_id  ];
+					$log_message = array(
+						'saml_IdentityExperienceFramework_id' =>  $saml_IdentityExperienceFramework_id
+					);
 					$saml_logger->add_log(mo_saml_error_log::showMessage('AZURE_B2C_CONFIGURATION_IEF_ID',$log_message), MoSAMLLogger::DEBUG);
 				}
 				if(isset($_POST['saml_ProxyIdentityExperienceFramework_id']) and !empty($_POST['saml_ProxyIdentityExperienceFramework_id'])){
 					$saml_ProxyIdentityExperienceFramework_id = htmlspecialchars($_POST['saml_ProxyIdentityExperienceFramework_id']);
 					update_option('saml_ProxyIdentityExperienceFramework_id', $saml_ProxyIdentityExperienceFramework_id);
-					$log_message = '[Service Provider Setup] Configuration saved:
-                    [ Azure B2C saml_ProxyIdentityExperienceFramework_id = ' . $saml_ProxyIdentityExperienceFramework_id . ' ]';
+					$log_message = array(
+						'Azure B2C saml_ProxyIdentityExperienceFramework_id' => $saml_ProxyIdentityExperienceFramework_id
+					);
 					$saml_logger->add_log(mo_saml_error_log::showMessage('AZURE_B2C_CONFIGURATION_PEF_ID',$log_message), MoSAMLLogger::DEBUG);
 				}
 
@@ -561,10 +450,6 @@ class saml_mo_login {
 				update_option( 'mo_saml_message', __('Identity Provider details saved successfully.','miniorange-saml-20-single-sign-on' ));
 				$mo_saml_utils->mo_saml_show_success_message();
 
-			}
-
-			if(self::mo_check_option_admin_referer('generate_b2c_policies')){
-				$this->mo_saml_generate_b2c_policies($saml_logger);
 			}
 
 			if(self::mo_check_option_admin_referer('update_sso_config')){
@@ -625,6 +510,7 @@ class saml_mo_login {
 			}
 
 			if(self::mo_check_option_admin_referer("mo_saml_demo_request_option")){
+
 				if(isset($_POST['mo_saml_demo_email']))
 					$demo_email = htmlspecialchars($_POST['mo_saml_demo_email']);
 
@@ -649,7 +535,11 @@ class saml_mo_login {
 				if(empty($demo_email)){
 					$demo_email = get_option('mo_saml_admin_email');
 					$status = "Error :" ."Email address for Demo is Empty.";
-				}else{
+				} else if (!filter_var($demo_email, FILTER_VALIDATE_EMAIL)) {
+                    update_option( 'mo_saml_message', __('Please enter a valid email address.' ,'miniorange-saml-20-single-sign-on'));
+                    $mo_saml_utils->mo_saml_show_error_message();
+                    return;
+                }else{
 					$license_plans_slugs = mo_saml_license_plans::$license_plans_slug;
 					if(array_key_exists($demo_plan_selected,$license_plans_slugs)){
 						$url = 'https://demo.miniorange.com/wordpress-saml-demo/';
@@ -757,65 +647,109 @@ class saml_mo_login {
 				}
 
 				//validation and sanitization
-				$email           = '';
-				$password        = '';
-				$confirmPassword = '';
+                $email = '';
+                $password = '';
+                $confirmPassword = '';
 
-				if ( $mo_saml_utils->mo_saml_check_empty_or_null( $_POST['email'] ) || $mo_saml_utils->mo_saml_check_empty_or_null( $_POST['password'] ) || $mo_saml_utils->mo_saml_check_empty_or_null( $_POST['confirmPassword'] ) ) {
+                if(isset($_POST['registerEmail']) and !empty($_POST['registerEmail'])) {
 
-					update_option( 'mo_saml_message', __('Please enter the required fields.','miniorange-saml-20-single-sign-on' ));
-					$mo_saml_utils->mo_saml_show_error_message();
+                    if ($mo_saml_utils->mo_saml_check_empty_or_null($_POST['password']) || $mo_saml_utils->mo_saml_check_empty_or_null($_POST['confirmPassword'])) {
 
-					return;
-				}  else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-					update_option( 'mo_saml_message', __('Please enter a valid email address.','miniorange-saml-20-single-sign-on' ));
-					$mo_saml_utils->mo_saml_show_error_message();
-					return;
-				}
-				else if($this->checkPasswordpattern(htmlspecialchars($_POST['password']))){
-					update_option( 'mo_saml_message', __('Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*-_) should be present.','miniorange-saml-20-single-sign-on' ));
-					$mo_saml_utils->mo_saml_show_error_message();
-					return;
-				}
-				else {
+                        update_option('mo_saml_message', __('Please enter the required fields.', 'miniorange-saml-20-single-sign-on'));
+                        $mo_saml_utils->mo_saml_show_error_message();
 
-					$email           = sanitize_email( $_POST['email'] );
-					$password        = stripslashes( htmlspecialchars($_POST['password'] ));
-					$confirmPassword = stripslashes( htmlspecialchars($_POST['confirmPassword'] ));
-				}
-				update_option( 'mo_saml_admin_email', $email );
+                        return;
+                    } else if (!filter_var($_POST['registerEmail'], FILTER_VALIDATE_EMAIL)) {
+                        update_option('mo_saml_message', __('Please enter a valid email address.', 'miniorange-saml-20-single-sign-on'));
+                        $mo_saml_utils->mo_saml_show_error_message();
+                        return;
+                    } else if ($this->checkPasswordpattern(htmlspecialchars($_POST['password']))) {
+                        update_option('mo_saml_message', __('Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*-_) should be present.', 'miniorange-saml-20-single-sign-on'));
+                        $mo_saml_utils->mo_saml_show_error_message();
+                        return;
+                    } else {
 
-				if ( strcmp( $password, $confirmPassword ) == 0 ) {
-					update_option( 'mo_saml_admin_password', $password );
-					$email    = get_option( 'mo_saml_admin_email' );
-					$customer = new CustomerSaml();
-					$content  = json_decode( $customer->check_customer(), true );
-					if(!is_null($content)){
-						if ( strcasecmp( $content['status'], 'CUSTOMER_NOT_FOUND' ) == 0 ) {
+                        $email = sanitize_email($_POST['registerEmail']);
+                        $password = stripslashes(htmlspecialchars($_POST['password']));
+                        $confirmPassword = stripslashes(htmlspecialchars($_POST['confirmPassword']));
+                    }
+                    update_option('mo_saml_admin_email', $email);
 
-							$response = $this->create_customer();
-							if(is_array($response) && array_key_exists('status', $response) && $response['status'] == 'success'){
-								wp_redirect( admin_url( '/admin.php?page=mo_saml_settings&tab=licensing' ), 301 );
-								exit;
-							}
-						} else {
-							$response = $this-> get_current_customer();
-							if(is_array($response) && array_key_exists('status', $response) && $response['status'] == 'success'){
-								wp_redirect( admin_url( '/admin.php?page=mo_saml_settings&tab=licensing' ), 301 );
-								exit;
-							}
-							//$this->mo_saml_show_error_message();
-						}
-					}
+                    if (strcmp($password, $confirmPassword) == 0) {
+                        update_option('mo_saml_admin_password', $password);
+                        $email = get_option('mo_saml_admin_email');
+                        $customer = new CustomerSaml();
+                        $content = json_decode($customer->check_customer(), true);
+                        if (!is_null($content)) {
+                            if (strcasecmp($content['status'], 'CUSTOMER_NOT_FOUND') == 0) {
 
-				} else {
-					update_option( 'mo_saml_message', __('Passwords do not match.','miniorange-saml-20-single-sign-on' ));
-					delete_option( 'mo_saml_verify_customer' );
-					$mo_saml_utils->mo_saml_show_error_message();
-				}
-				return;
-				//new starts here
+                                $response = $this->create_customer();
+                                if (is_array($response) && array_key_exists('status', $response) && $response['status'] == 'success') {
+                                    wp_redirect(admin_url('/admin.php?page=mo_saml_settings&tab=licensing'), 301);
+                                    exit;
+                                }
+                            } else {
+                                $response = $this->get_current_customer();
+                                if (is_array($response) && array_key_exists('status', $response) && $response['status'] == 'success') {
+                                    wp_redirect(admin_url('/admin.php?page=mo_saml_settings&tab=licensing'), 301);
+                                    exit;
+                                }
+                                //$this->mo_saml_show_error_message();
+                            }
+                        }
 
+                    } else {
+                        update_option('mo_saml_message', __('Passwords do not match.', 'miniorange-saml-20-single-sign-on'));
+                        delete_option('mo_saml_verify_customer');
+                        $mo_saml_utils->mo_saml_show_error_message();
+                    }
+                    return;
+                }
+                else if ( isset($_POST['loginEmail']) and !empty($_POST['loginEmail'])) {
+                    if ($mo_saml_utils->mo_saml_check_empty_or_null( $_POST['password'] ) ) {
+                        update_option( 'mo_saml_message', __('All the fields are required. Please enter valid entries.','miniorange-saml-20-single-sign-on' ));
+                        $mo_saml_utils->mo_saml_show_error_message();
+
+                        return;
+                    } else if($this->checkPasswordpattern(htmlspecialchars($_POST['password']))){
+                        update_option( 'mo_saml_message', __('Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*-_) should be present.' ,'miniorange-saml-20-single-sign-on'));
+                        $mo_saml_utils->mo_saml_show_error_message();
+                        return;
+                    }else {
+                        $email    = sanitize_email( $_POST['loginEmail'] );
+                        $password = stripslashes( htmlspecialchars($_POST['password'] ));
+                    }
+
+                    update_option( 'mo_saml_admin_email', $email );
+                    update_option( 'mo_saml_admin_password', $password );
+                    $customer    = new Customersaml();
+                    $content     = $customer->get_customer_key();
+                    if(!is_null($content)){
+                        $customerKey = json_decode( $content, true );
+                        if ( json_last_error() == JSON_ERROR_NONE ) {
+                            update_option( 'mo_saml_admin_customer_key', $customerKey['id'] );
+                            update_option( 'mo_saml_admin_api_key', $customerKey['apiKey'] );
+                            update_option( 'mo_saml_customer_token', $customerKey['token'] );
+                            $certificate = get_option( 'saml_x509_certificate' );
+                            if ( empty( $certificate ) ) {
+                                update_option( 'mo_saml_free_version', 1 );
+                            }
+                            update_option( 'mo_saml_admin_password', '' );
+                            update_option( 'mo_saml_message', __('Customer retrieved successfully','miniorange-saml-20-single-sign-on' ));
+                            update_option( 'mo_saml_registration_status', 'Existing User' );
+                            delete_option( 'mo_saml_verify_customer' );
+                            $mo_saml_utils->mo_saml_show_success_message();
+                            //if(is_array($response) && array_key_exists('status', $response) && $response['status'] == 'success'){
+                            wp_redirect( admin_url( '/admin.php?page=mo_saml_settings&tab=licensing' ), 301 );
+                            exit;
+                            //}
+                        } else {
+                            update_option( 'mo_saml_message', __('Invalid username or password. Please try again.','miniorange-saml-20-single-sign-on' ));
+                            $mo_saml_utils->mo_saml_show_error_message();
+                        }
+                        update_option( 'mo_saml_admin_password', '' );
+                    }
+                }
 			}
 			else if( self::mo_check_option_admin_referer("mosaml_metadata_download")){
 				mo_saml_miniorange_generate_metadata(true);
@@ -962,6 +896,21 @@ class saml_mo_login {
 				delete_option( 'mo_saml_admin_email' );
 				delete_option( 'mo_saml_admin_phone' );
 			}
+            else if(self::mo_check_option_admin_referer('mo_saml_add_sso_button_wp_option')){
+                if(mo_saml_is_sp_configured()) {
+                    if(array_key_exists("mo_saml_add_sso_button_wp", $_POST)) {
+                        $add_button = htmlspecialchars($_POST['mo_saml_add_sso_button_wp']);
+                    } else {
+                        $add_button = 'false';
+                    }
+                    update_option('mo_saml_add_sso_button_wp', $add_button);
+                    update_option('mo_saml_message', 'Sign in option updated.');
+                    $mo_saml_utils->mo_saml_show_success_message();
+                } else {
+                    update_option( 'mo_saml_message', 'Please complete '.addLink('Service Provider' , add_query_arg( array('tab' => 'save'), $_SERVER['REQUEST_URI'] )) . ' configuration first.');
+                    $mo_saml_utils->mo_saml_show_error_message();
+                }
+            }
 			else if ( self::mo_check_option_admin_referer("mo_saml_goto_login") ) {
 				delete_option( 'mo_saml_new_registration' );
 				update_option( 'mo_saml_verify_customer', 'true' );
@@ -1036,13 +985,15 @@ class saml_mo_login {
 							if($mo_saml_enable_logs) {
 								$wp_config_editor->update('MO_SAML_LOGGING', 'true'); //fatal error is call on null
 								$saml_logger->add_log("MO SAML Debug Logs Enabled",MoSAMLLogger::INFO);
-								define('MO_SAML_DEBUG_TRANSACTION',true);
 							}
 							else {
 								$saml_logger->add_log("MO SAML Debug Logs Disabled",MoSAMLLogger::INFO);
 								$wp_config_editor->update('MO_SAML_LOGGING', 'false');//fatal error
-                                define('MO_SAML_DEBUG_TRANSACTION',false);
 							}
+							$delay_for_file_write = (int) 2;
+							sleep($delay_for_file_write);
+							wp_redirect(saml_get_current_page_url());
+							exit();
 						} catch (Exception $e){
 							return;
 						}
@@ -1383,99 +1334,6 @@ class saml_mo_login {
 		$pattern = '/^[(\w)*(\!\@\#\$\%\^\&\*\.\-\_)*]+$/';
 
 		return !preg_match($pattern,$password);
-	}
-
-	function mo_saml_generate_b2c_policies($saml_logger){
-		$b2c_tenant_id_placeholder = 'b2c-tenant-name';
-		$saml_ProxyIdentityExperienceFramework_id_placeholder = 'ProxyIdentityExperienceFramework-app-id';
-		$saml_IdentityExperienceFramework_id_placeholder = 'IdentityExperienceFramework-app-id';
-
-		$b2c_tenant_id = get_option('saml_b2c_tenant_id');
-		$saml_ProxyIdentityExperienceFramework_id = get_option('saml_ProxyIdentityExperienceFramework_id');
-		$saml_IdentityExperienceFramework_id = get_option('saml_IdentityExperienceFramework_id');
-
-		$dir = plugin_dir_path( __FILE__ );
-		$dir = rtrim($dir, '/');
-		$dir = rtrim($dir, '\\');
-
-		$source_dir = $dir . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'azure-b2c-policies';
-		$destination = $dir . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'mo-azure-b2c-policies.zip';
-		$custom_policies_dir = $source_dir . DIRECTORY_SEPARATOR . $b2c_tenant_id . '-policies';
-		if(!is_dir($custom_policies_dir))
-			mkdir($custom_policies_dir, 0777, true);
-
-		if(is_dir($source_dir)){
-			$files = new DirectoryIterator($source_dir);
-			foreach ($files as $file){
-				$file = $file->getPathname();
-				if(is_file($file)){
-					$custom_policy_file = $custom_policies_dir . DIRECTORY_SEPARATOR . basename($file);
-					file_put_contents($custom_policy_file, str_replace($b2c_tenant_id_placeholder, $b2c_tenant_id, file_get_contents($file)));
-					file_put_contents($custom_policy_file, str_replace($saml_ProxyIdentityExperienceFramework_id_placeholder, $saml_ProxyIdentityExperienceFramework_id, file_get_contents($custom_policy_file)));
-					file_put_contents($custom_policy_file, str_replace($saml_IdentityExperienceFramework_id_placeholder, $saml_IdentityExperienceFramework_id, file_get_contents($custom_policy_file)));
-
-				}
-			}
-			$this->generateB2CCert($custom_policies_dir, $b2c_tenant_id);
-
-		}
-
-		$this->zipData($custom_policies_dir,$destination);
-
-
-		$log_message = 'Azure B2C Policies Generated';
-		$saml_logger->add_log(mo_saml_error_log::showMessage('AZURE_B2C_POLICIES'), MoSAMLLogger::INFO);
-
-		header("Content-type: application/zip");
-		header("Content-Disposition: attachment; filename=mo-azure-b2c-policies.zip");
-		header("Content-length: " . filesize($destination));
-		header("Pragma: no-cache");
-		header("Expires: 0");
-		readfile("$destination");
-
-	}
-
-	function generateB2CCert($custom_policies_dir, $b2c_tenant_id){
-		$dn = array(
-			"CN" => "app." . $b2c_tenant_id . ".onmicrosoft.com"
-		);
-		$privkey = openssl_pkey_new(array(
-			"private_key_bits" => 2048,
-			"private_key_type" => OPENSSL_KEYTYPE_RSA,
-		));
-		$csr = openssl_csr_new($dn, $privkey, array('digest_alg' => 'sha256'));
-		$x509 = openssl_csr_sign($csr, null, $privkey, $days=365, array('digest_alg' => 'sha256'));
-
-		$certFile = $custom_policies_dir . DIRECTORY_SEPARATOR . $b2c_tenant_id . '-cert.pfx';
-		openssl_pkcs12_export_to_file($x509, $certFile, $privkey, $b2c_tenant_id);
-	}
-
-	function zipData($source, $destination) {
-		if(file_exists($destination))
-			unlink($destination);
-		if (extension_loaded('zip') && file_exists($source) && count(glob($source . DIRECTORY_SEPARATOR . '*')) !== 0) {
-			$zip = new ZipArchive();
-			if ($zip->open($destination, ZIPARCHIVE::CREATE)) {
-				$source = realpath($source);
-				if (is_dir($source) === true) {
-					$iterator = new RecursiveDirectoryIterator($source);
-					// skip dot files while iterating
-					$iterator->setFlags(RecursiveDirectoryIterator::SKIP_DOTS);
-					$files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST);
-
-					foreach ($files as $file) {
-						$file = realpath($file);
-						if (is_file($file) === true) {
-							$zip->addFromString(str_replace($source . DIRECTORY_SEPARATOR, '', $file), file_get_contents($file));
-						}
-					}
-				} else if (is_file($source)) {
-					$zip->addFromString(basename($source), file_get_contents($source));
-				}
-			}
-			return $zip->close();
-		}
-		return false;
 	}
 }
 new saml_mo_login;

@@ -41,6 +41,7 @@ class CustomAudienceContentTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\A
     const FLIGHT = 'FLIGHT';
     const HOME_LISTING = 'HOME_LISTING';
     const HOTEL = 'HOTEL';
+    const JOB = 'JOB';
     const LOCAL_SERVICE_BUSINESS = 'LOCAL_SERVICE_BUSINESS';
     const LOCATION_BASED_ITEM = 'LOCATION_BASED_ITEM';
     const MEDIA_TITLE = 'MEDIA_TITLE';

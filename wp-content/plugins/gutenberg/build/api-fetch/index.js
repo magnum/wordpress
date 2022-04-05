@@ -64,7 +64,7 @@ function createNonceMiddleware(nonce) {
 }
 
 /* harmony default export */ var nonce = (createNonceMiddleware);
-//# sourceMappingURL=nonce.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/namespace-endpoint.js
 /**
  * @type {import('../types').APIFetchMiddleware}
@@ -92,7 +92,7 @@ const namespaceAndEndpointMiddleware = (options, next) => {
 };
 
 /* harmony default export */ var namespace_endpoint = (namespaceAndEndpointMiddleware);
-//# sourceMappingURL=namespace-endpoint.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/root-url.js
 /**
  * Internal dependencies
@@ -133,80 +133,84 @@ const createRootURLMiddleware = rootURL => (options, next) => {
 };
 
 /* harmony default export */ var root_url = (createRootURLMiddleware);
-//# sourceMappingURL=root-url.js.map
+
+;// CONCATENATED MODULE: external ["wp","url"]
+var external_wp_url_namespaceObject = window["wp"]["url"];
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/preloading.js
 /**
- * Given a path, returns a normalized path where equal query parameter values
- * will be treated as identical, regardless of order they appear in the original
- * text.
- *
- * @param {string} path Original path.
- *
- * @return {string} Normalized path.
+ * WordPress dependencies
  */
-function getStablePath(path) {
-  const splitted = path.split('?');
-  const query = splitted[1];
-  const base = splitted[0];
 
-  if (!query) {
-    return base;
-  } // 'b=1&c=2&a=5'
-
-
-  return base + '?' + query // [ 'b=1', 'c=2', 'a=5' ]
-  .split('&') // [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-  .map(entry => entry.split('=')) // [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-  .sort((a, b) => a[0].localeCompare(b[0])) // [ 'a=5', 'b=1', 'c=2' ]
-  .map(pair => pair.join('=')) // 'a=5&b=1&c=2'
-  .join('&');
-}
 /**
  * @param {Record<string, any>} preloadedData
  * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
 
 function createPreloadingMiddleware(preloadedData) {
-  const cache = Object.keys(preloadedData).reduce((result, path) => {
-    result[getStablePath(path)] = preloadedData[path];
-    return result;
-  },
-  /** @type {Record<string, any>} */
-  {});
+  const cache = Object.fromEntries(Object.entries(preloadedData).map(_ref => {
+    let [path, data] = _ref;
+    return [(0,external_wp_url_namespaceObject.normalizePath)(path), data];
+  }));
   return (options, next) => {
     const {
       parse = true
     } = options;
+    /** @type {string | void} */
 
-    if (typeof options.path === 'string') {
-      const method = options.method || 'GET';
-      const path = getStablePath(options.path);
+    let rawPath = options.path;
 
-      if ('GET' === method && cache[path]) {
-        const cacheData = cache[path]; // Unsetting the cache key ensures that the data is only used a single time
+    if (!rawPath && options.url) {
+      const {
+        rest_route: pathFromQuery,
+        ...queryArgs
+      } = (0,external_wp_url_namespaceObject.getQueryArgs)(options.url);
 
-        delete cache[path];
-        return Promise.resolve(parse ? cacheData.body : new window.Response(JSON.stringify(cacheData.body), {
-          status: 200,
-          statusText: 'OK',
-          headers: cacheData.headers
-        }));
-      } else if ('OPTIONS' === method && cache[method] && cache[method][path]) {
-        const cacheData = cache[method][path]; // Unsetting the cache key ensures that the data is only used a single time
-
-        delete cache[method][path];
-        return Promise.resolve(parse ? cacheData.body : cacheData);
+      if (typeof pathFromQuery === 'string') {
+        rawPath = (0,external_wp_url_namespaceObject.addQueryArgs)(pathFromQuery, queryArgs);
       }
+    }
+
+    if (typeof rawPath !== 'string') {
+      return next(options);
+    }
+
+    const method = options.method || 'GET';
+    const path = (0,external_wp_url_namespaceObject.normalizePath)(rawPath);
+
+    if ('GET' === method && cache[path]) {
+      const cacheData = cache[path]; // Unsetting the cache key ensures that the data is only used a single time.
+
+      delete cache[path];
+      return prepareResponse(cacheData, !!parse);
+    } else if ('OPTIONS' === method && cache[method] && cache[method][path]) {
+      const cacheData = cache[method][path]; // Unsetting the cache key ensures that the data is only used a single time.
+
+      delete cache[method][path];
+      return prepareResponse(cacheData, !!parse);
     }
 
     return next(options);
   };
 }
+/**
+ * This is a helper function that sends a success response.
+ *
+ * @param {Record<string, any>} responseData
+ * @param {boolean}             parse
+ * @return {Promise<any>} Promise with the response.
+ */
+
+
+function prepareResponse(responseData, parse) {
+  return Promise.resolve(parse ? responseData.body : new window.Response(JSON.stringify(responseData.body), {
+    status: 200,
+    statusText: 'OK',
+    headers: responseData.headers
+  }));
+}
 
 /* harmony default export */ var preloading = (createPreloadingMiddleware);
-//# sourceMappingURL=preloading.js.map
-;// CONCATENATED MODULE: external ["wp","url"]
-var external_wp_url_namespaceObject = window["wp"]["url"];
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/fetch-all-middleware.js
 /**
  * WordPress dependencies
@@ -225,14 +229,17 @@ var external_wp_url_namespaceObject = window["wp"]["url"];
  * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
 
-const modifyQuery = ({
-  path,
-  url,
-  ...options
-}, queryArgs) => ({ ...options,
-  url: url && (0,external_wp_url_namespaceObject.addQueryArgs)(url, queryArgs),
-  path: path && (0,external_wp_url_namespaceObject.addQueryArgs)(path, queryArgs)
-});
+const modifyQuery = (_ref, queryArgs) => {
+  let {
+    path,
+    url,
+    ...options
+  } = _ref;
+  return { ...options,
+    url: url && (0,external_wp_url_namespaceObject.addQueryArgs)(url, queryArgs),
+    path: path && (0,external_wp_url_namespaceObject.addQueryArgs)(path, queryArgs)
+  };
+};
 /**
  * Duplicates parsing functionality from apiFetch.
  *
@@ -344,7 +351,7 @@ const fetchAllMiddleware = async (options, next) => {
 };
 
 /* harmony default export */ var fetch_all_middleware = (fetchAllMiddleware);
-//# sourceMappingURL=fetch-all-middleware.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/http-v1.js
 /**
  * Set of HTTP methods which are eligible to be overridden.
@@ -390,7 +397,7 @@ const httpV1Middleware = (options, next) => {
 };
 
 /* harmony default export */ var http_v1 = (httpV1Middleware);
-//# sourceMappingURL=http-v1.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/user-locale.js
 /**
  * WordPress dependencies
@@ -417,7 +424,7 @@ const userLocaleMiddleware = (options, next) => {
 };
 
 /* harmony default export */ var user_locale = (userLocaleMiddleware);
-//# sourceMappingURL=user-locale.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/utils/response.js
 /**
  * WordPress dependencies
@@ -432,7 +439,9 @@ const userLocaleMiddleware = (options, next) => {
  * @return {Promise<any> | null | Response} Parsed response.
  */
 
-const response_parseResponse = (response, shouldParseResponse = true) => {
+const response_parseResponse = function (response) {
+  let shouldParseResponse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
   if (shouldParseResponse) {
     if (response.status === 204) {
       return null;
@@ -476,7 +485,8 @@ const parseJsonAndNormalizeError = response => {
  */
 
 
-const parseResponseAndNormalizeError = (response, shouldParseResponse = true) => {
+const parseResponseAndNormalizeError = function (response) {
+  let shouldParseResponse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   return Promise.resolve(response_parseResponse(response, shouldParseResponse)).catch(res => parseAndThrowError(res, shouldParseResponse));
 };
 /**
@@ -487,7 +497,9 @@ const parseResponseAndNormalizeError = (response, shouldParseResponse = true) =>
  * @return {Promise<any>} Parsed response.
  */
 
-function parseAndThrowError(response, shouldParseResponse = true) {
+function parseAndThrowError(response) {
+  let shouldParseResponse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
   if (!shouldParseResponse) {
     throw response;
   }
@@ -500,7 +512,7 @@ function parseAndThrowError(response, shouldParseResponse = true) {
     throw error || unknownError;
   });
 }
-//# sourceMappingURL=response.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/middlewares/media-upload.js
 /**
  * WordPress dependencies
@@ -585,7 +597,7 @@ const mediaUploadMiddleware = (options, next) => {
 };
 
 /* harmony default export */ var media_upload = (mediaUploadMiddleware);
-//# sourceMappingURL=media-upload.js.map
+
 ;// CONCATENATED MODULE: ./packages/api-fetch/build-module/index.js
 /**
  * WordPress dependencies
@@ -691,7 +703,7 @@ const defaultFetchHandler = nextOptions => {
     headers['Content-Type'] = 'application/json';
   }
 
-  const responsePromise = window.fetch( // fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+  const responsePromise = window.fetch( // Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
   url || path || window.location.href, { ...DEFAULT_OPTIONS,
     ...remainingOptions,
     body,
@@ -766,7 +778,7 @@ apiFetch.createRootURLMiddleware = root_url;
 apiFetch.fetchAllMiddleware = fetch_all_middleware;
 apiFetch.mediaUploadMiddleware = media_upload;
 /* harmony default export */ var build_module = (apiFetch);
-//# sourceMappingURL=index.js.map
-(window.wp = window.wp || {}).apiFetch = __webpack_exports__.default;
+
+(window.wp = window.wp || {}).apiFetch = __webpack_exports__["default"];
 /******/ })()
 ;

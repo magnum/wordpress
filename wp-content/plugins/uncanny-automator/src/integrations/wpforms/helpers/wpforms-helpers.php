@@ -7,6 +7,7 @@ use WPForms_Form_Handler;
 
 /**
  * Class Wpforms_Helpers
+ *
  * @package Uncanny_Automator
  */
 class Wpforms_Helpers {
@@ -93,6 +94,10 @@ class Wpforms_Helpers {
 			'fill_values_in'  => $target_field,
 			'endpoint'        => $end_point,
 			'options'         => $options,
+			'relevant_tokens' => array(
+				$option_code          => esc_attr__( 'Form title', 'uncanny-automator' ),
+				$option_code . '_ID'  => esc_attr__( 'Form ID', 'uncanny-automator' ),
+			),
 		);
 
 		return apply_filters( 'uap_option_list_wp_forms', $option );

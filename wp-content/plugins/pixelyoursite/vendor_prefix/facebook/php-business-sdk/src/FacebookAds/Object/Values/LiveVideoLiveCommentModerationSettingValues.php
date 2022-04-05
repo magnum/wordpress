@@ -38,9 +38,12 @@ class LiveVideoLiveCommentModerationSettingValues extends \PYS_PRO_GLOBAL\Facebo
 {
     const VALUE_DEFAULT = 'DEFAULT';
     const DISCUSSION = 'DISCUSSION';
+    const FOLLOWED = 'FOLLOWED';
     const FOLLOWER = 'FOLLOWER';
+    const NO_HYPERLINK = 'NO_HYPERLINK';
     const PROTECTED_MODE = 'PROTECTED_MODE';
     const RESTRICTED = 'RESTRICTED';
     const SLOW = 'SLOW';
     const SUPPORTER = 'SUPPORTER';
+    const TAGGED = 'TAGGED';
 }

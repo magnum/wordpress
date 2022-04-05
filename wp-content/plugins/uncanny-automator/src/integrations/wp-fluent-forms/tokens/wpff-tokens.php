@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Wpff_Tokens
+ *
  * @package Uncanny_Automator
  */
 class Wpff_Tokens {
@@ -12,18 +13,24 @@ class Wpff_Tokens {
 	 * Wpff_Tokens constructor.
 	 */
 	public function __construct() {
-		add_filter( 'automator_maybe_trigger_wpff_anonwpffforms_tokens', [
-			$this,
-			'wpff_possible_tokens',
-		], 20, 2 );
+		add_filter(
+			'automator_maybe_trigger_wpff_anonwpffforms_tokens',
+			array(
+				$this,
+				'wpff_possible_tokens',
+			),
+			20,
+			2
+		);
 
-		add_filter( 'automator_maybe_trigger_wpff_wpffforms_tokens', [ $this, 'wpff_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_trigger_wpff_wpffforms_tokens', [ $this, 'wpff_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_parse_token', [ $this, 'wpff_token' ], 20, 6 );
+		add_filter( 'automator_maybe_trigger_wpff_wpffforms_tokens', array( $this, 'wpff_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'wpff_token' ), 20, 6 );
 	}
 
 
 	/**
+	 * The possible tokens.
+	 *
 	 * @param array $tokens
 	 * @param array $args
 	 *
@@ -38,14 +45,18 @@ class Wpff_Tokens {
 		$forms = array();
 		global $wpdb;
 		$fluent_active = true;
+
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}fluentform_forms'" ) !== "{$wpdb->prefix}fluentform_forms" ) {
 			$fluent_active = false;
 		}
+
 		if ( true === $fluent_active && ! empty( $form_id ) && 0 !== $form_id && is_numeric( $form_id ) ) {
+
 			$form = wpFluent()->table( 'fluentform_forms' )->where( 'id', '=', $form_id )
-			                  ->select( [ 'id', 'title', 'form_fields' ] )
+			                  ->select( array( 'id', 'title', 'form_fields' ) )
 			                  ->orderBy( 'id', 'DESC' )
 			                  ->get();
+
 			if ( $form ) {
 				$form               = array_pop( $form );
 				$forms[ $form->id ] = json_decode( $form->form_fields, true );
@@ -80,7 +91,6 @@ class Wpff_Tokens {
 
 											$multi_input = $field_or_multi_input['fields'];
 
-
 											foreach ( $multi_input as $field ) {
 
 												// Skip html only feilds that are not actual form inputs
@@ -97,10 +107,10 @@ class Wpff_Tokens {
 												if ( false === $field['settings']['visible'] ) {
 													continue;
 												}
-
-												$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta, $field_group_name );
+												if ( isset( $field['attributes']['name'] ) ) {
+													$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta, $field_group_name );
+												}
 											}
-
 										} else {
 
 											// Multiple fields are in a column and are NOT grouped
@@ -117,8 +127,10 @@ class Wpff_Tokens {
 												continue;
 											}
 
-											// Single field in column
-											$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta );
+											if ( isset( $field['attributes']['name'] ) ) {
+												// Single field in column
+												$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta );
+											}
 										}
 									}
 								}
@@ -140,14 +152,16 @@ class Wpff_Tokens {
 												$type = $field['attributes']['type'];
 											}
 										}
-										$fields_tokens[] = [
+										$fields_tokens[] = array(
 											'tokenId'         => $token_id,
 											'tokenName'       => $input_title,
 											'tokenType'       => $type,
 											'tokenIdentifier' => $trigger_meta,
-										];
+										);
 									} else {
-										$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta, $field_group_name );
+										if ( isset( $field['attributes']['name'] ) ) {
+											$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta, $field_group_name );
+										}
 									}
 								}
 							}
@@ -165,7 +179,10 @@ class Wpff_Tokens {
 
 							$field = $raw_field;
 
-							$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta );
+							if ( isset( $field['attributes']['name'] ) ) {
+								$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta );
+							}
+
 						}
 					}
 				}
@@ -178,6 +195,8 @@ class Wpff_Tokens {
 	}
 
 	/**
+	 * Create the list of tokens.
+	 *
 	 * @param $form_id
 	 * @param $field
 	 * @param $trigger_meta
@@ -188,7 +207,7 @@ class Wpff_Tokens {
 	public function create_token( $form_id, $field, $trigger_meta, $field_group_name = '' ) {
 
 		$field_label = '';
-		if ( isset( $field['settings']['label'] ) ) {
+		if ( isset( $field['settings']['label'] ) && ! empty( $field['settings']['label'] ) ) {
 			$field_label = $field['settings']['label'];
 		} elseif ( isset( $field['settings']['admin_field_label'] ) ) {
 			$field_label = $field['settings']['admin_field_label'];
@@ -202,10 +221,12 @@ class Wpff_Tokens {
 			$field_type = $field['element'];
 		}
 
-
 		switch ( $field_type ) {
 			case 'number':
 				$type = 'int';
+				break;
+			case 'email':
+				$type = 'email';
 				break;
 			default:
 				$type = 'text';
@@ -218,16 +239,18 @@ class Wpff_Tokens {
 			$token_id = "$form_id|$field_group_name|$field_name";
 		}
 
-		return [
+		return array(
 			'tokenId'         => $token_id,
 			'tokenName'       => $field_label,
 			'tokenType'       => $type,
 			'tokenIdentifier' => $trigger_meta,
-		];
+		);
 
 	}
 
 	/**
+	 * Process the token.
+	 *
 	 * @param $value
 	 * @param $pieces
 	 * @param $recipe_id
@@ -238,23 +261,36 @@ class Wpff_Tokens {
 	 * @return null|string
 	 */
 	public function wpff_token( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
+
 		if ( ! $pieces ) {
 			return $value;
 		}
-		if ( in_array( 'WPFFFORMS', $pieces ) || in_array( 'ANONWPFFFORMS', $pieces ) ) {
+
+		if ( in_array( 'WPFFFORMS', $pieces, true ) || in_array( 'ANONWPFFFORMS', $pieces, true ) ) {
 			global $wpdb;
 			$trigger_id     = $pieces[0];
 			$trigger_meta   = $pieces[1];
 			$field          = $pieces[2];
 			$trigger_log_id = isset( $replace_args['trigger_log_id'] ) ? absint( $replace_args['trigger_log_id'] ) : 0;
-			$entry          = $wpdb->get_var( "SELECT meta_value
-													FROM {$wpdb->prefix}uap_trigger_log_meta
-													WHERE meta_key = '$trigger_meta'
-													AND automator_trigger_log_id = $trigger_log_id
-													AND automator_trigger_id = $trigger_id
-													LIMIT 0, 1" );
-			$entry          = maybe_unserialize( $entry );
-			$to_match       = "{$trigger_id}:{$trigger_meta}:{$field}";
+
+			$entry = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value
+					FROM {$wpdb->prefix}uap_trigger_log_meta
+					WHERE meta_key = %s
+					AND automator_trigger_log_id = %d
+					AND automator_trigger_id = %d
+					LIMIT 0, 1",
+					$trigger_meta,
+					$trigger_log_id,
+					$trigger_id
+				)
+			);
+
+			$entry = maybe_unserialize( $entry );
+
+			$to_match = "{$trigger_id}:{$trigger_meta}:{$field}";
+
 			if ( is_array( $entry ) && key_exists( $to_match, $entry ) ) {
 				$value = $entry[ $to_match ];
 			} else {

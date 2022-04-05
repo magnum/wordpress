@@ -6,19 +6,19 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'e3a63fae0335d04b9da15863ffe723d1aa0990d7',
+    'reference' => '319af9d257918bb6564c75df2430ac6250626789',
     'name' => 'uncanny-owl/uncanny-automator',
   ),
   'versions' => 
   array (
     'firebase/php-jwt' => 
     array (
-      'pretty_version' => 'v5.4.0',
-      'version' => '5.4.0.0',
+      'pretty_version' => 'v5.5.1',
+      'version' => '5.5.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'd2113d9b2e0e349796e72d2a63cf9319100382d2',
+      'reference' => '83b609028194aa042ea33b5af2d41a7427de80e6',
     ),
     'uncanny-owl/uncanny-automator' => 
     array (
@@ -27,7 +27,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'e3a63fae0335d04b9da15863ffe723d1aa0990d7',
+      'reference' => '319af9d257918bb6564c75df2430ac6250626789',
     ),
   ),
 );

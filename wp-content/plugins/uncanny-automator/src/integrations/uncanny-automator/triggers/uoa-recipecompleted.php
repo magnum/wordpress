@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class UOA_RECIPECOMPLETED
+ *
  * @package Uncanny_Automator
  */
 class UOA_RECIPECOMPLETED {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'UOA';
@@ -206,6 +208,16 @@ class UOA_RECIPECOMPLETED {
 						'user_id'        => $user_id,
 						'trigger_id'     => $result['args']['trigger_id'],
 						'meta_key'       => 'UOARECIPES_action_log_url',
+						'meta_value'     => "recipe_id=$recipe_id&user_id=$user_id",
+						'trigger_log_id' => $result['args']['get_trigger_id'],
+						'run_number'     => $result['args']['run_number'],
+					)
+				);
+				Automator()->insert_trigger_meta(
+					array(
+						'user_id'        => $user_id,
+						'trigger_id'     => $result['args']['trigger_id'],
+						'meta_key'       => 'UOARECIPES_trigger_log_url',
 						'meta_value'     => "recipe_id=$recipe_id&user_id=$user_id",
 						'trigger_log_id' => $result['args']['get_trigger_id'],
 						'run_number'     => $result['args']['run_number'],

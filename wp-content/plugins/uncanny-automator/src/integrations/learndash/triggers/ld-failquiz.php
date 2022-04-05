@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class LD_FAILQUIZ
+ *
  * @package Uncanny_Automator
  */
 class LD_FAILQUIZ {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'LD';
@@ -31,8 +33,6 @@ class LD_FAILQUIZ {
 	 */
 	public function define_trigger() {
 
-
-
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/learndash/' ),
@@ -42,15 +42,15 @@ class LD_FAILQUIZ {
 			'sentence'            => sprintf( esc_attr__( 'A user fails {{a quiz:%1$s}} {{a number of:%2$s}} time(s)', 'uncanny-automator' ), $this->trigger_meta, 'NUMTIMES' ),
 			/* translators: Logged-in trigger - LearnDash */
 			'select_option_name'  => esc_attr__( 'A user fails {{a quiz}}', 'uncanny-automator' ),
-			'action'              => 'learndash_quiz_completed',
+			'action'              => 'learndash_quiz_submitted',
 			'priority'            => 15,
 			'accepted_args'       => 2,
-			'validation_function' => array( $this, 'quiz_completed' ),
+			'validation_function' => array( $this, 'quiz_submitted' ),
 			// very last call in WP, we need to make sure they viewed the page and didn't skip before is was fully viewable
-			'options'             => [
+			'options'             => array(
 				Automator()->helpers->recipe->learndash->options->all_ld_quiz(),
 				Automator()->helpers->recipe->options->number_of_times(),
-			],
+			),
 		);
 
 		Automator()->register->trigger( $trigger );
@@ -63,13 +63,15 @@ class LD_FAILQUIZ {
 	 *
 	 * @param $data
 	 */
-	public function quiz_completed( $data, $current_user ) {
+	public function quiz_submitted( $data, $current_user ) {
+		
+		if ( empty( $data ) ) {
+			return;
+		}
 
 		$q_status = $data['pass'];
 
 		if ( 0 === (int) $q_status ) {
-
-
 
 			$user    = $current_user;
 			$quiz    = $data['quiz'];
@@ -79,12 +81,12 @@ class LD_FAILQUIZ {
 				$user = wp_get_current_user();
 			}
 
-			$args = [
+			$args = array(
 				'code'    => $this->trigger_code,
 				'meta'    => $this->trigger_meta,
 				'post_id' => (int) $post_id,
 				'user_id' => $user->ID,
-			];
+			);
 
 			Automator()->maybe_add_trigger_entry( $args );
 		}

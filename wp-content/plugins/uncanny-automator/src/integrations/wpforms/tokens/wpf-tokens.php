@@ -6,6 +6,7 @@ use WPForms_Form_Handler;
 
 /**
  * Class Wpf_Tokens
+ *
  * @package Uncanny_Automator
  */
 class Wpf_Tokens {
@@ -57,12 +58,12 @@ class Wpf_Tokens {
 			'float',
 			'int',
 			'text',
+			'file-upload',
 		);
 		$disallowed_field_types = apply_filters(
 			'automator_wpforms_disallowed_fields',
 			array(
 				'pagebreak',
-				'file-upload',
 				'password',
 				'divider',
 				'entry-preview',
@@ -118,7 +119,8 @@ class Wpf_Tokens {
 		if ( empty( $pieces ) ) {
 			return $value;
 		}
-		if ( ! in_array( 'WPFFORMS', $pieces, true ) && ! in_array( 'ANONWPFFORMS', $pieces, true ) ) {
+		if ( ! in_array( 'WPFFORMS', $pieces, true ) && ! in_array( 'ANONWPFFORMS', $pieces, true )
+		     && ! in_array( 'ANONWPFSUBFORM', $pieces, true ) ) {
 			return $value;
 		}
 
@@ -131,6 +133,27 @@ class Wpf_Tokens {
 				foreach ( $trigger_data as $trigger ) {
 					if ( array_key_exists( $field . '_readable', $trigger['meta'] ) ) {
 						return $trigger['meta'][ $field . '_readable' ];
+					}
+				}
+			}
+		}
+
+		// Form ID
+		if ( 'WPFFORMS_ID' === $field ) {
+			if ( $trigger_data ) {
+				foreach ( $trigger_data as $trigger ) {
+					if ( array_key_exists( 'WPFFORMS', $trigger['meta'] ) ) {
+						return $trigger['meta']['WPFFORMS'];
+					}
+				}
+			}
+		}
+
+		if ( 'ANONWPFFORMS_ID' === $field ) {
+			if ( $trigger_data ) {
+				foreach ( $trigger_data as $trigger ) {
+					if ( array_key_exists( 'ANONWPFFORMS', $trigger['meta'] ) ) {
+						return $trigger['meta']['ANONWPFFORMS'];
 					}
 				}
 			}

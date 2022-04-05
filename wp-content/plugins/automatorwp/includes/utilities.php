@@ -1120,22 +1120,22 @@ function automatorwp_condition_matches( $a, $b, $condition ) {
             $matches = ( $a >= $b );
             break;
         case 'contains':
-            $matches = ( strpos( strval( $b ), $a ) !== false );
+            $matches = ( strpos( $a, strval( $b ) ) !== false );
             break;
         case 'not_contains':
-            $matches = ( strpos( strval( $b ), $a ) === false );
+            $matches = ( strpos( $a, strval( $b ) ) === false );
             break;
         case 'start_with':
-            $matches = ( automatorwp_starts_with( $b, $a ) );
+            $matches = ( automatorwp_starts_with( $a, $b ) );
             break;
         case 'not_start_with':
-            $matches = ( ! automatorwp_starts_with( $b, $a ) );
+            $matches = ( ! automatorwp_starts_with( $a, $b ) );
             break;
         case 'ends_with':
-            $matches = ( automatorwp_ends_with( $b, $a ) );
+            $matches = ( automatorwp_ends_with( $a, $b ) );
             break;
         case 'not_ends_with':
-            $matches = ( ! automatorwp_ends_with( $b, $a ) );
+            $matches = ( ! automatorwp_ends_with( $a, $b ) );
             break;
     }
 
@@ -1470,5 +1470,108 @@ function automatorwp_parse_function_arg_value( $value ) {
      * @return mixed
      */
     return apply_filters( 'automatorwp_parse_function_arg_value', $value );
+
+}
+
+/**
+ * Helper function to parse a condition to SQL
+ *
+ * @since 1.9.3
+ *
+ * @param string    $field      The field key
+ * @param string    $condition  The condition
+ * @param string    $value      The field value
+ * @param bool      $strict     True to force check the value type, false to always check the value as string
+ *
+ * @return string
+ */
+function automatorwp_utilities_parse_condition_to_sql( $field, $condition, $value, $strict = true ) {
+
+    $operator = '=';
+
+    switch( $condition ) {
+        case 'equal': $operator = '=';
+            break;
+        case 'not_equal': $operator = '!=';
+            break;
+        case 'contains':
+        case 'start_with':
+        case 'ends_with':
+            $operator = 'LIKE';
+            break;
+        case 'not_contains':
+        case 'not_start_with':
+        case 'not_ends_with':
+            $operator = 'NOT LIKE';
+            break;
+        case 'less_than': $operator = '<';
+            break;
+        case 'greater_than': $operator = '>';
+            break;
+        case 'less_or_equal': $operator = '<=';
+            break;
+        case 'greater_or_equal': $operator = '>=';
+            break;
+    }
+
+    $string_required_conditions = array(
+        'contains',
+        'not_contains',
+        'start_with',
+        'not_start_with',
+        'ends_with',
+        'not_ends_with',
+    );
+
+    if( $strict && is_numeric( $value ) && ! in_array( $condition, $string_required_conditions ) ) {
+        if ( strpos( $value , '.') !== false ) {
+            $value = (float) $value ;
+        } else {
+            $value = (int) $value;
+        }
+    } else {
+        $value = esc_sql( $value );
+
+        switch( $condition ) {
+            case 'contains':
+            case 'not_contains':
+                $value = "%{$value}%";
+                break;
+            case 'start_with':
+            case 'not_start_with':
+                $value = "{$value}%";
+                break;
+            case 'ends_with':
+            case 'not_ends_with':
+                $value = "%{$value}";
+                break;
+        }
+
+        $value = "'{$value}'";
+    }
+
+    return "{$field} {$operator} {$value}";
+
+}
+
+/**
+ * Helper function to implode array elements with a special glue for the last item
+ * Example: array( 1, 2, 3 ) imploded to "1, 2 and 3"
+ *
+ * @since 2.0.4
+ *
+ * @param string    $glue               Glue to join array items
+ * @param string    $glue_for_last_item Glue to join the last item
+ * @param array     $array              The array to implode
+ *
+ * @return string
+ */
+function automatorwp_implode_array( $glue = '', $glue_for_last_item = '', $array = array() ) {
+
+    $last  = array_slice( $array, -1 );
+    $first = join( $glue, array_slice( $array, 0, -1 ) );
+    $both  = array_filter( array_merge( array( $first ), $last ), 'strlen' );
+
+    return join( $glue_for_last_item, $both );
 
 }

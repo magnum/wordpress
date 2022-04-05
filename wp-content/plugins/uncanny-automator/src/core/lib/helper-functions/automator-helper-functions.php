@@ -45,7 +45,7 @@ function automator_update_recipe_run( $update, $where, $update_format, $where_fo
  * @package Uncanny_Automator
  * @version 3.0
  */
-function automator_add_text_field( $field_code, $label, $default = '',$required = true ) {
+function automator_add_text_field( $field_code, $label, $default = '', $required = true ) {
 	$options = array(
 		'option_code' => $field_code,
 		'input_type'  => 'text',
@@ -149,4 +149,28 @@ function automator_add_textarea_field( $field_code, $label, $default = '', $requ
 	);
 
 	return Automator()->helpers->recipe->field->text( $options );
+}
+
+/**
+ * Returns the URL of the settings page of a Premium Integration 
+ * 
+ * @param  String $settings_id The ID of the settings page of the integration
+ * @return String              The URL
+ */
+function automator_get_premium_integrations_settings_url( $settings_id = '' ) {
+    // Check if the ID is defined
+    if ( empty( $settings_id ) ) {
+        return;
+    }
+
+    // Create URL
+    return add_query_arg(
+        array(
+            'post_type'   => 'uo-recipe',
+            'page'        => 'uncanny-automator-config',
+            'tab'         => 'premium-integrations',
+            'integration' => $settings_id,
+        ),
+        admin_url( 'edit.php' )
+    );
 }

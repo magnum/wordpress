@@ -14,7 +14,7 @@ if(isset( $_REQUEST['id'] )) {
 } else {
     $event =  new CustomEvent();
 }
-
+$serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 
 ?>
 
@@ -457,7 +457,7 @@ if(isset( $_REQUEST['id'] )) {
                 <div class="row mt-3">
                     <div class="col ">
                         <?php
-                        if(GA()->isUse4Version()) :
+                        if($event->isGaV4()) :
                         ?>
                         <div class="row mb-3">
                             <div class="col col-offset-left form-inline" >
@@ -522,8 +522,6 @@ if(isset( $_REQUEST['id'] )) {
                                 </div>
                             <?php endforeach; ?>
                         </div>
-
-
                         <div class="row mt-3">
                             <div class="col-5"></div>
                             <div class="col-4">
@@ -547,10 +545,6 @@ if(isset( $_REQUEST['id'] )) {
                                     <strong>ATTENTION</strong>:​ the plugin automatically tracks ecommerce specific events for WooCommerce and Easy Digital Downloads. Make sure you really need this event.
                                 </div>
                             </div>
-                        <?php  elseif($event->getGaVersion() == "4"):  ?>
-                        <div class="row mb-3">
-                            Google Analytics doesn't work for this event. Enable Google Analytics 4
-                        </div>
 
                     <?php else:?>
                     <div class="row mb-3">
@@ -689,6 +683,12 @@ if(isset( $_REQUEST['id'] )) {
                     <li><code>[total]</code> - it will pull WooCommerce or EDD order's total when it exists</li>
                     <li><code>[subtotal]</code> - it will pull WooCommerce or EDD orders's subtotal when it exists</li>
                 </ul>
+                <p><strong class="text-secondary">Track URL parameters:</strong></p>
+                <p class="text-secondary"> Use <code>[url_ParameterName]</code> where ParameterName = the name of the parameter. <br/>
+                    Example:<br/>
+                    This is your URL: <?=$serverUrl?>?ParameterName=123<br/>
+                    The parameter value will be 123.<br/>
+                </p>
                 <p class="text-secondary mb-0"><strong>Note:</strong> if a parameter is missing from a particular
                     page, the event won't include it.</p>
             </div>

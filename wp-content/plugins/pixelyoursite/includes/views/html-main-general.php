@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <img class="tag-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/facebook-small-square.png">
                 </div>
                 <div class="col-6">
-                    Your Facebook Pixel
+                    Your Meta Pixel (formerly Facebook Pixel)
                 </div>
                 <div class="col-4">
                     <label for="fb_settings_switch" class="btn btn-block btn-sm btn-primary btn-settings">Click for settings</label>
@@ -45,21 +45,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 <div class="row mb-3">
                     <div class="col">
-                        Learn about Conversion API and Advanced Matching privacy and consent:
-                        <a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">watch video</a>
+                        <p>
+                            Learn about Conversion API and Advanced Matching privacy and consent:
+                            <a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">watch video</a>
+                        </p>
+                        <p>
+                            Install multiple Facebook Pixles with CAPI support:
+                            <a href="https://www.youtube.com/watch?v=HM98mGZshvc" target="_blank">watch video</a>
+                        </p>
+                        <p>
+                            What is Events Matching and EMQ and how you can improve it:
+                            <a href=" https://www.youtube.com/watch?v=3soI_Fl0JQw" target="_blank">watch video</a>
+                        </p>
                     </div>
                 </div>
 
                 <div class="plate pt-3 pb-3 mb-3">
                     <div class="row mb-3">
                         <div class="col-12">
-                            <h4 class="label">Facebook Pixel ID:</h4>
-                            <?php Facebook()->render_pixel_id( 'pixel_id', 'Facebook Pixel ID' ); ?>
+                            <h4 class="label">Meta Pixel (formerly Facebook Pixel) ID:</h4>
+                            <?php Facebook()->render_pixel_id( 'pixel_id', 'Meta Pixel (formerly Facebook Pixel) ID' ); ?>
                             <small class="form-text">
                                 <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-facebook-pixel?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                    target="_blank">How to get it?</a>
                             </small>
-                            <p class="mt-3 mb-0">Add multiple Facebook Pixels with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
+                            <p class="mt-3 mb-0">Add multiple Meta Pixel (formerly Facebook Pixel)s with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                                                                           target="_blank">pro version</a>.</p>
                         </div>
                     </div>
@@ -123,15 +133,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <input type="checkbox" id="gan_settings_switch" style="display: none">
         <div class="settings_content">
-            <div class="row pt-3 pb-3">
-                <div class="col-12">
-                    <?php GA()->render_switcher_input("use_4_version");?>
-                    <h4 class="switcher-label">Enable Google Analytics 4</h4>
-                    <div class="mt-1">
-                        <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/enable-google-analytics-4" target="_blank">Watch this help video</a>
-                    </div>
-                </div>
-            </div>
             <div class="plate pt-3 pb-3">
                 <div class="row mb-3">
                     <div class="col-12">
@@ -148,6 +149,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                         <p class="mt-3 ">Add multiple Google Analytics tags with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                                                                         target="_blank">pro version</a>.</p>
+                        <p>
+                            Install the old Google Analytics UA property and the new GA4 at the same time:
+                            <a href="https://www.youtube.com/watch?v=JUuss5sewxg" target="_blank">watch video</a>
+                        </p>
                     </div>
                 </div>
                 <?php if(isWPMLActive()) : ?>
@@ -175,6 +180,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                 Add the Google Ads tag with the <a
                         href="https://www.pixelyoursite.com/google-ads-tag?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                         target="_blank">pro version</a>.
+                <div class="mt-3">
+                    Learn how to install the Google Ads Tag:
+                    <a href="https://www.youtube.com/watch?v=plkv_v4nz8I" target="_blank">watch video</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row align-items-center">
+            <div class="col-2 py-4">
+                <img class="tag-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/tiktok-logo.png">
+            </div>
+            <div class="col-10">
+                Add the TikTok tag with the <a
+                        href="https://www.pixelyoursite.com/google-ads-tag?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
+                        target="_blank">pro version</a>.
+                <div class="small">TikTok Tag integration is in beta.</div>
+                <div class="mt-3">
+                    How to install the TikTok tag and how to get the ID: <a href="https://www.youtube.com/watch?v=zkb67djRnd0" target="_blank">watch video</a>
+                </div>
             </div>
         </div>
 
@@ -184,7 +208,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="panel panel-primary">
     <div class="row">
         <div class="col">
-            <p class="text-center">Learn how to use Facebook Pixel like a genuine expert. Download this Facebook
+            <p class="text-center">Learn how to use Meta Pixel (formerly Facebook Pixel) like a genuine expert. Download this Facebook
                 Pixel Essential Guide:</p>
             <p class="text-center mb-0">
                 <a href="https://www.pixelyoursite.com/facebook-pixel-pdf-guide?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-facebook-guide" class="btn btn-sm btn-save" target="_blank">Click to get the free guide</a>
@@ -202,11 +226,22 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row">
             <div class="col">
                 <p><a href="https://www.youtube.com/watch?v=uXTpgFu2V-E" target="_blank">How to configure Facebook Conversion API (2:51 min) - watch now</a></p>
-                <p><a href="https://www.youtube.com/watch?v=DZzFP4pSitU" target="_blank">Facebook Pixel, CAPI, and PixelYourSite MUST WATCH (8:19) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=DZzFP4pSitU" target="_blank">Meta Pixel (formerly Facebook Pixel), CAPI, and PixelYourSite MUST WATCH (8:19) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=QqAIO1ONc0I" target="_blank">How to test Facebook Conversion API (10:16 min) - watch now</a></p>
-                <p><a href="https://www.youtube.com/watch?v=1W1yA9L-6F8" target="_blank">Facebook Pixel Events and Parameters (12:05 min) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=1W1yA9L-6F8" target="_blank">Meta Pixel (formerly Facebook Pixel) Events and Parameters (12:05 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=sM9yNkBK6Eg" target="_blank">Potentially Violating Personal Data Sent to Facebook (7:30 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">Facebook Conversion API and the Consent Problem (9:25 min) - watch now</a></p>
+
+                <p><a href="https://www.youtube.com/watch?v=jJlhnF_QNxk" target="_blank">What you MUST know about Facebook Attribution Settings (8:49) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=hbecImCa9d0" target="_blank">Google Ads DATA-DRIVEN Attribution (8:14) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=kEp5BDg7dP0" target="_blank">How to fire EVENTS with PixelYourSite (22:28) - watch now</a></p>
+
+                <p><a href="https://www.youtube.com/watch?v=HM98mGZshvc" target="_blank">Multiple Meta Pixel (formerly Facebook Pixel)s with CAPI events for WordPress and WooCommerce (12:20) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=JUuss5sewxg" target="_blank">Multiple Google Analytics properties on WordPress and WooCommerce (6:17) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=vWRZc66eaPo" target="_blank">How to install the TikTok Tag on WordPress with PixelYourSite - WooCommerce Support (9:11) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=3soI_Fl0JQw" target="_blank">Facebook Event Matching and EMQ: How to IMPROVE it</a></p>
+                <p><a href="https://www.youtube.com/watch?v=zkb67djRnd0" target="_blank">FIX IT: PixelYourSite high number of admin-ajax requests (9:04) - watch now</a></p>
+
             </div>
         </div>
         <div class="row">
@@ -341,7 +376,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 <div  class=" form-inline">
                     <?php PYS()->render_checkbox_input( 'signal_page_scroll_enabled',"trigger for scroll value:" ); ?>
-                    <?php PYS()->render_number_input( 'signal_page_scroll_value',null,false,100 ); ?>
+                    <?php PYS()->render_number_input( 'signal_page_scroll_value','',false,100 ); ?>
                     <div>% (add %)</div>
                 </div>
 
@@ -460,7 +495,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="row mt-3">
                 <div class="col-6">
-                    <label>Facebook Pixel ID:</label>
+                    <label>Meta Pixel (formerly Facebook Pixel) ID:</label>
                     <?php Facebook()->render_text_input( 'fdp_pixel_id',"",true ); ?>
                 </div>
             </div>

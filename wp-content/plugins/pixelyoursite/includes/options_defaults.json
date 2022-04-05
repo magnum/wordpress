@@ -120,6 +120,6 @@
   "enable_edd_num_items_param": true,
   "enable_edd_product_price_param": true,
   "enable_remove_download_url_param": true,
-  "logs_enable": true,
+  "pys_logs_enable": false,
   "woo_add_to_cart_catch_method": "add_cart_js"
 }

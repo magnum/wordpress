@@ -73,7 +73,7 @@ if ( ! class_exists( 'CT_DataBase_Schema' ) ) :
 
             // Setup PRIMARY KEY definition
             $sql = implode( ', ', $fields_def ) . ', '
-                . 'PRIMARY KEY  (' . $this->primary_key . ')'; // Add two spaces to avoid issues
+                . 'PRIMARY KEY  (`' . $this->primary_key . '`)'; // Add two spaces to avoid issues
 
             // Setup KEY definitions
             if( ! empty( $this->keys ) ) {
@@ -96,7 +96,7 @@ if ( ! class_exists( 'CT_DataBase_Schema' ) ) :
             $schema = '';
 
             // Field name
-            $schema .= $field_id . ' ';
+            $schema .= '`' . $field_id . '` ';
 
             // Type definition
             $schema .= $field_args['type'];
@@ -233,17 +233,17 @@ if ( ! class_exists( 'CT_DataBase_Schema' ) ) :
                  * This means that an index which used to have room for floor(767/3) = 255 characters, now only has room for floor(767/4) = 191 characters.
                  */
                 $max_index_length = 191;
-                $length = max( $field_args['length'], $max_index_length );
+                $length = min( $field_args['length'], $max_index_length );
 
                 // Ensure that length has a value
                 if( $length === 0 ) {
                     $length = $max_index_length;
                 }
 
-                if( $this->is_numeric( $field_args['type'] ) ) {
-                    $this->keys[] = 'KEY ' . $field_id . '(' . $field_id . ')';
+                if( $this->is_numeric( $field_args['type'] ) || strtoupper( $field_args['type'] ) === 'DATETIME' ) {
+                    $this->keys[] = 'KEY `' . $field_id . '`(`' . $field_id . '`)';
                 } else {
-                    $this->keys[] = 'KEY ' . $field_id . '(' . $field_id . '(' . $length . '))';
+                    $this->keys[] = 'KEY `' . $field_id . '`(`' . $field_id . '`(' . $length . '))';
                 }
             }
 

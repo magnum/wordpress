@@ -9,15 +9,18 @@ class EventTypes {
 abstract class PYSEvent {
     protected $id;
     protected $type;
+    protected $category;
     public $args = null;
     /**
      * GroupedEvent constructor.
-     * @param $id // unique id  use in js object like key
-     * @param $type // can be static(fire when open page) or dynamic (fire when some event did)
+     * @param String $id // unique id  use in js object like key
+     * @param String $type // can be static(fire when open page) or dynamic (fire when some event did)
+     * @param String $category // event category like woo, edd signal etc
      */
-    public function __construct($id,$type){
+    public function __construct($id,$type,$category=''){
         $this->id = $id;
         $this->type = $type;
+        $this->category = $category;
     }
 
     function getId() {
@@ -26,5 +29,9 @@ abstract class PYSEvent {
 
     function getType() {
         return $this->type;
+    }
+
+    function getCategory() {
+        return $this->category;
     }
 }

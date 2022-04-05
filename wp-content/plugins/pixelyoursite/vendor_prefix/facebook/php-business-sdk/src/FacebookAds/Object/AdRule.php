@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleHistoryActionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleStatusValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleUiCreationSourceValues;
 /**
  * This class is auto-generated.
  *
@@ -59,6 +60,7 @@ class AdRule extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     {
         $ref_enums = array();
         $ref_enums['Status'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleStatusValues::getInstance()->getValues();
+        $ref_enums['UiCreationSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleUiCreationSourceValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function createExecute(array $fields = array(), array $params = array(), $pending = \false)

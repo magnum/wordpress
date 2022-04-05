@@ -296,6 +296,10 @@ function automatorwp_automation_ui_add_item_form( $automation, $item_type ) {
         $choices_filters['anonymous'] = (bool) ( $automation->type === 'anonymous' );
     }
 
+    // Sort integrations
+    $integrations = AutomatorWP()->integrations;
+    ksort( $integrations );
+
     ?>
 
     <div class="automatorwp-add-item-form" style="display: none;">
@@ -323,7 +327,7 @@ function automatorwp_automation_ui_add_item_form( $automation, $item_type ) {
 
                 <div class="automatorwp-integrations">
 
-                    <?php foreach( AutomatorWP()->integrations as $integration => $args ) : ?>
+                    <?php foreach( $integrations as $integration => $args ) : ?>
 
                         <?php // Skip filters
                         if( $integration === 'filter' ) continue; ?>
@@ -380,7 +384,7 @@ function automatorwp_automation_ui_add_item_form( $automation, $item_type ) {
 
                     <div class="automatorwp-select-trigger-label"><?php _e( 'Select a trigger', 'automatorwp' ); ?></div>
 
-                    <?php foreach( AutomatorWP()->integrations as $integration => $args ) : ?>
+                    <?php foreach( $integrations as $integration => $args ) : ?>
 
                         <?php // Skip filters
                         if( $integration === 'filter' ) continue; ?>
@@ -421,7 +425,7 @@ function automatorwp_automation_ui_add_item_form( $automation, $item_type ) {
 
                     <div class="automatorwp-select-action-label"><?php _e( 'Select an action', 'automatorwp' ); ?></div>
 
-                    <?php foreach( AutomatorWP()->integrations as $integration => $args ) : ?>
+                    <?php foreach( $integrations as $integration => $args ) : ?>
 
                         <select class="automatorwp-integration-choices"
                                 data-integration="<?php echo esc_attr( $integration ); ?>"
@@ -1058,29 +1062,46 @@ function automatorwp_get_automation_item_option_replacement( $object, $item_type
             $value = $field['default'];
         }
 
+        // Ensure the field value and escaped_value keys
+        $field['object_id'] = $object->id;
+        $field['value'] = $value;
+        $field['escaped_value'] = $value;
+
         // Select field
         if( in_array( $field['type'], array( 'select', 'automatorwp_select', 'automatorwp_select_filter' ) ) ) {
 
-            $options = array();
-
-            // Try to get the field options from field args
-            if( isset( $field['options'] ) ) {
-                $options = $field['options'];
-            } else if( isset( $field['options_cb'] ) && is_callable( $field['options_cb'] ) ) {
-
-                $field['value'] = $value;
-                $field['escaped_value'] = $value;
-                $field['args'] = $field;
-
-                $options = call_user_func( $field['options_cb'], (object) $field );
-            }
+            // Get the field options
+            $field_options = automatorwp_get_field_options( $field );
 
             // Try to get the displayed value
-            $found = automatorwp_get_array_key_value( $value, $options );
+            $found = automatorwp_get_array_key_value( $value, $field_options );
 
             if( $found ) {
                 $value = $found;
             }
+        }
+
+        // Array values
+        if( is_array( $value ) ) {
+
+            // Get the field options
+            $field_options = automatorwp_get_field_options( $field );
+
+            // Replace values by the options label
+            if( count( $field_options ) ) {
+                foreach( $value as $i => $v ) {
+                    // Try to get the displayed value
+                    $found = automatorwp_get_array_key_value( $v, $field_options );
+
+                    if( isset( $found ) ) {
+                        $value[$i] = $found;
+                    }
+                }
+            }
+
+            /* translators: The ampersand character who represents the word "and" */
+            $and = __( '&', 'automatorwp' );
+            $value = automatorwp_implode_array( ', ', " {$and} ", $value );
         }
 
         // Fallback to default option if exists

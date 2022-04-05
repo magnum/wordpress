@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Automator_Helpers_Recipe_Field
+ *
  * @package Uncanny_Automator
  */
 class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
@@ -162,7 +163,9 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 			'required'    => true,
 			'tokens'      => true,
 			'default'     => null,
+			'supports_tinymce' => null
 		);
+
 		$args        = wp_parse_args( $args, $defaults );
 		$option_code = $args['option_code'];
 		$label       = $args['label'];
@@ -172,6 +175,7 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 		$type        = $args['input_type'];
 		$default     = $args['default'];
 		$required    = $args['required'];
+		$supports_tinymce    = $args['supports_tinymce'];
 
 		$option = array(
 			'option_code'     => $option_code,
@@ -182,9 +186,11 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 			'supports_tokens' => $tokens,
 			'required'        => $required,
 			'default_value'   => $default,
+			'supports_tinymce'=> $supports_tinymce
 		);
 
-		if ( 'textarea' === $type ) {
+		// Enable TinyMCE by default for all textarea fields unless other specified
+		if ( is_null( $option['supports_tinymce'] ) && 'textarea' === $type ) {
 			$option['supports_tinymce'] = true;
 		}
 
@@ -247,7 +253,7 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 
 			// Required
 			// default: false
-			$field_args['required'] = isset( $args['required'] ) ? (boolean) $args['required'] : false;
+			$field_args['required'] = isset( $args['required'] ) ? (bool) $args['required'] : false;
 
 			// Label
 			if ( isset( $args['label'] ) ) {
@@ -379,9 +385,9 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 		);
 
 		// TODO:: add keys optionally
-//		'is_ajax'                  => false,
-//			'chained_to'               => null,
-//			'endpoint'                 => null,
+		//      'is_ajax'                  => false,
+		//          'chained_to'               => null,
+		//          'endpoint'                 => null,
 
 		return apply_filters( 'automator_option_select_field', $option );
 	}
@@ -435,7 +441,7 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 		$supports_tokens          = key_exists( 'supports_tokens', $args ) ? $args['supports_tokens'] : null;
 		$support_token            = apply_filters( 'uap_option_' . $option_code . '_select_field', array( false ), '3.0', 'automator_option_' . $option_code . '_select_field' );
 		$support_token            = apply_filters( 'automator_option_' . $option_code . '_select_field', $support_token );
-		$option                   = [
+		$option                   = array(
 			'option_code'              => $option_code,
 			'label'                    => $label,
 			'input_type'               => 'select',
@@ -448,7 +454,7 @@ class Automator_Helpers_Recipe_Field extends Automator_Helpers_Recipe {
 			'supports_tokens'          => $supports_tokens,
 			//'is_ajax'         => $is_ajax,
 			//'chained_to'      => $fill_values_in,
-		];
+		);
 
 		if ( ! empty( $relevant_tokens ) ) {
 			$option['relevant_tokens'] = $relevant_tokens;

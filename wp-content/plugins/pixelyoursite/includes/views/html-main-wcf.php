@@ -38,8 +38,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="plate">
                 <div class="row pt-3">
                     <div class="col">
-                        <h4 class="mb-3">Facebook Pixel</h4>
-                        <h4 class="label">Facebook Pixel ID:</h4>
+                        <h4 class="mb-3">Meta Pixel (formerly Facebook Pixel)</h4>
+                        <h4 class="label">Meta Pixel (formerly Facebook Pixel) ID:</h4>
                         <?php Facebook()->render_text_input( 'wcf_pixel_id', 'Add your pixel ID there',true ); ?>
                     </div>
                 </div>

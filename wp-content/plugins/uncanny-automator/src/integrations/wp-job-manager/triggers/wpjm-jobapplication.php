@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class WPJM_JOBAPPLICATION
+ *
  * @package Uncanny_Automator
  */
 class WPJM_JOBAPPLICATION {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'WPJM';
@@ -21,21 +23,21 @@ class WPJM_JOBAPPLICATION {
 	 * Set up Automator trigger constructor.
 	 */
 	public function __construct() {
+
 		$this->trigger_code = 'WPJMSUBMITJOBAPPLICATION';
 		$this->trigger_meta = 'WPJMJOBAPPLICATION';
-		//if ( is_admin() ) {
-		//	add_action( 'init', [ $this, 'plugins_loaded' ], 19 );
-		//} else {
-		$this->define_trigger();
-		//}
+
+		// Check if get_resume_files function exists from WPJM resume add-on.
+		if ( function_exists( 'get_resume_files' ) ) {
+			$this->define_trigger();
+		}
+
 	}
 
 	/**
 	 * Define and register the trigger by pushing it into the Automator object
 	 */
 	public function define_trigger() {
-
-
 
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
@@ -50,9 +52,9 @@ class WPJM_JOBAPPLICATION {
 			'priority'            => 20,
 			'accepted_args'       => 2,
 			'validation_function' => array( $this, 'new_job_application' ),
-			'options'             => [
+			'options'             => array(
 				Automator()->helpers->recipe->wp_job_manager->options->list_wpjm_jobs( null, $this->trigger_meta ),
-			],
+			),
 		);
 
 		Automator()->register->trigger( $trigger );
@@ -70,8 +72,6 @@ class WPJM_JOBAPPLICATION {
 	 */
 	public function new_job_application( $application_id, $job_id ) {
 
-
-
 		if ( empty( $job_id ) || ! is_numeric( $job_id ) ) {
 			return;
 		}
@@ -82,33 +82,33 @@ class WPJM_JOBAPPLICATION {
 			return;
 		}
 		$user_id = get_current_user_id();
-		if ( isset( $_POST['wp_job_manager_resumes_apply_with_resume'] ) && ! empty( $_POST['wp_job_manager_resumes_apply_with_resume'] ) ) {
-			if ( $application_id !== $_POST['wp_job_manager_resumes_apply_with_resume'] ) {
-				update_post_meta( $application_id, '_resume_id', $_POST['wp_job_manager_resumes_apply_with_resume'] );
+		if ( automator_filter_has_var( 'wp_job_manager_resumes_apply_with_resume', INPUT_POST ) && ! empty( automator_filter_input( 'wp_job_manager_resumes_apply_with_resume', INPUT_POST ) ) ) {
+			if ( $application_id !== automator_filter_input( 'wp_job_manager_resumes_apply_with_resume', INPUT_POST ) ) {
+				update_post_meta( $application_id, '_resume_id', automator_filter_input( 'wp_job_manager_resumes_apply_with_resume', INPUT_POST ) );
 			}
 		}
 		foreach ( $conditions['recipe_ids'] as $recipe_id => $trigger_id ) {
 			if ( ! Automator()->is_recipe_completed( $recipe_id, $user_id ) ) {
-				$trigger_args = [
+				$trigger_args = array(
 					'code'             => $this->trigger_code,
 					'meta'             => $this->trigger_meta,
 					'recipe_to_match'  => $recipe_id,
 					'trigger_to_match' => $trigger_id,
 					'post_id'          => $job_id,
 					'user_id'          => $user_id,
-				];
+				);
 
 				$args = Automator()->maybe_add_trigger_entry( $trigger_args, false );
 
 				if ( $args ) {
 					foreach ( $args as $result ) {
 						if ( true === $result['result'] ) {
-							$trigger_meta = [
+							$trigger_meta = array(
 								'user_id'        => $user_id,
 								'trigger_id'     => $result['args']['trigger_id'],
 								'trigger_log_id' => $result['args']['get_trigger_id'],
 								'run_number'     => $result['args']['run_number'],
-							];
+							);
 
 							$trigger_meta['meta_key']   = $this->trigger_meta;
 							$trigger_meta['meta_value'] = $job_id;
@@ -145,7 +145,7 @@ class WPJM_JOBAPPLICATION {
 
 		foreach ( $recipes as $recipe ) {
 			foreach ( $recipe['triggers'] as $trigger ) {
-				if ( key_exists( $trigger_meta, $trigger['meta'] ) && ( (int) $trigger['meta'][ $trigger_meta ] === (int) $entry_to_match || $trigger['meta'][ $trigger_meta ] === "-1" ) ) {
+				if ( key_exists( $trigger_meta, $trigger['meta'] ) && ( (int) $trigger['meta'][ $trigger_meta ] === (int) $entry_to_match || $trigger['meta'][ $trigger_meta ] === '-1' ) ) {
 					$recipe_ids[ $recipe['ID'] ] = $trigger['ID'];
 					break;
 				}

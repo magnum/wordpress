@@ -18,13 +18,18 @@ class Bdb_Tokens {
 	public static $integration = 'BDB';
 
 	public function __construct() {
-		add_filter( 'automator_maybe_trigger_bdb_tokens', [ $this, 'bdb_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_trigger_bdb_bdbforumstopic_tokens', [
-			$this,
-			'bdb_bdbforums_possible_tokens',
-		], 20, 2 );
-		add_filter( 'automator_maybe_trigger_bdb_bdbtopic_tokens', [ $this, 'bdb_topic_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_parse_token', [ $this, 'parse_bp_token' ], 20, 6 );
+		add_filter( 'automator_maybe_trigger_bdb_tokens', array( $this, 'bdb_possible_tokens' ), 20, 2 );
+		add_filter(
+			'automator_maybe_trigger_bdb_bdbforumstopic_tokens',
+			array(
+				$this,
+				'bdb_bdbforums_possible_tokens',
+			),
+			20,
+			2
+		);
+		add_filter( 'automator_maybe_trigger_bdb_bdbtopic_tokens', array( $this, 'bdb_topic_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'parse_bp_token' ), 20, 6 );
 
 	}
 
@@ -60,78 +65,143 @@ class Bdb_Tokens {
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];
 
-		$fields = [
-			[
+		$fields = array(
+			array(
 				'tokenId'         => 'BDBUSER',
 				'tokenName'       => __( 'Avatar URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERAVATAR',
-			],
-		];
+			),
+		);
 		// Get BDB xprofile fields from DB.
 		global $wpdb;
-		$fields_table    = $wpdb->prefix . "bp_xprofile_fields";
-		$xprofile_fields = $wpdb->get_results( "SELECT * FROM {$fields_table} WHERE parent_id = 0 ORDER BY field_order ASC" );
+
+		$xprofile_fields = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}bp_xprofile_fields WHERE parent_id = %d ORDER BY group_id ASC",
+				0
+			)
+		);
 
 		if ( ! empty( $xprofile_fields ) ) {
 			foreach ( $xprofile_fields as $field ) {
 				if ( 'socialnetworks' === $field->type ) {
-					$child_fields = $wpdb->get_results( "SELECT * FROM {$fields_table} WHERE parent_id = {$field->id} ORDER BY field_order ASC" );
+					$child_fields = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT * FROM {$wpdb->prefix}bp_xprofile_fields WHERE parent_id = %d ORDER BY group_id ASC",
+							$field->id
+						)
+					);
 					if ( ! empty( $child_fields ) ) {
 						foreach ( $child_fields as $child_field ) {
-							$fields[] = [
+							$fields[] = array(
 								'tokenId'         => 'BDBUSER',
 								'tokenName'       => $field->name . ' - ' . $child_field->name,
 								'tokenType'       => 'text',
 								'tokenIdentifier' => 'BDBXPROFILE:' . $field->id . '|' . $child_field->name,
-							];
+							);
 						}
 					}
 				} elseif ( 'membertypes' === $field->type ) {
-					$fields[] = [
+					$fields[] = array(
 						'tokenId'         => 'BDBUSER',
 						'tokenName'       => $field->name,
 						'tokenType'       => 'text',
 						'tokenIdentifier' => 'BDBXPROFILE:' . $field->id . '|membertypes',
-					];
+					);
 				} else {
-					$fields[] = [
+					$fields[] = array(
 						'tokenId'         => 'BDBUSER',
 						'tokenName'       => $field->name,
 						'tokenType'       => 'text',
 						'tokenIdentifier' => 'BDBXPROFILE:' . $field->id,
-					];
+					);
 				}
 			}
 		}
 
 		if ( isset( $args['triggers_meta']['code'] ) && 'BDBACTIVITYSTRM' === $args['triggers_meta']['code'] ) {
 
-			$fields[] = [
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_ID',
 				'tokenName'       => __( 'Activity ID', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_URL',
 				'tokenName'       => __( 'Activity URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_STREAM_URL',
 				'tokenName'       => __( 'Activity stream URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_CONTENT',
 				'tokenName'       => __( 'Activity content', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERACTIVITY',
-			];
+			);
 		}
+
+		if ( isset( $args['triggers_meta']['code'] ) && ( 'BDBUSERSENDSFRIENDREQUEST' === $args['triggers_meta']['code'] || 'BDBUSERACCEPTFRIENDREQUEST' === $args['triggers_meta']['code'] ) ) {
+			$trigger_code = $args['triggers_meta']['code'];
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_ID',
+				'tokenName'       => __( 'Friend ID', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_FIRSTNAME',
+				'tokenName'       => __( 'Friend first name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_LASTNAME',
+				'tokenName'       => __( 'Friend last name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_EMAIL',
+				'tokenName'       => __( 'Friend email', 'uncanny-automator' ),
+				'tokenType'       => 'email',
+				'tokenIdentifier' => $trigger_code,
+			);
+		} elseif ( isset( $args['triggers_meta']['code'] ) && 'BDBUSERNEWFOLLOWER' === $args['triggers_meta']['code'] ) {
+			$trigger_code = $args['triggers_meta']['code'];
+			$fields[]     = array(
+				'tokenId'         => 'FOLLOWER_ID',
+				'tokenName'       => __( 'Follower ID', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FOLLOWER_FIRSTNAME',
+				'tokenName'       => __( 'Follower first name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FOLLOWER_LASTNAME',
+				'tokenName'       => __( 'Follower last name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FOLLOWER_EMAIL',
+				'tokenName'       => __( 'Follower email', 'uncanny-automator' ),
+				'tokenType'       => 'email',
+				'tokenIdentifier' => $trigger_code,
+			);
+		}
+
 		$tokens = array_merge( $tokens, $fields );
 
 		return $tokens;
@@ -147,14 +217,14 @@ class Bdb_Tokens {
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];
 
-		$fields = [
-			[
+		$fields = array(
+			array(
 				'tokenId'         => 'BDBTOPICREPLY',
 				'tokenName'       => __( 'Reply content', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBUSERPOSTREPLYFORUM',
-			],
-		];
+			),
+		);
 
 		$tokens = array_merge( $tokens, $fields );
 
@@ -188,6 +258,9 @@ class Bdb_Tokens {
 
 				if ( isset( $pieces[2] ) && ! empty( $pieces[2] ) ) {
 					$value = $this->get_xprofile_data( $user_id, $pieces[2] );
+					if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $value ) !== false ) {
+						$value = date( 'Y-m-d', $value );
+					}
 				}
 			} elseif ( in_array( 'BDBTOPICREPLY', $pieces ) ) {
 				$piece = 'BDBTOPIC';
@@ -235,8 +308,8 @@ class Bdb_Tokens {
 						}
 					}
 				}
-			} elseif ( in_array( 'BDBUSERACTIVITY', $pieces ) ) {
-
+			} elseif ( in_array( 'BDBUSERACTIVITY', $pieces ) || in_array( 'BDBUSERSENDSFRIENDREQUEST', $pieces ) ||
+			           in_array( 'BDBUSERACCEPTFRIENDREQUEST', $pieces ) || in_array( 'BDBUSERNEWFOLLOWER', $pieces ) ) {
 				if ( $trigger_data ) {
 					foreach ( $trigger_data as $trigger ) {
 						$trigger_id     = $trigger['ID'];
@@ -244,7 +317,7 @@ class Bdb_Tokens {
 						$meta_key       = $pieces[2];
 						$meta_value     = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_key, $trigger_id, $trigger_log_id, $user_id );
 						if ( ! empty( $meta_value ) ) {
-							$value = $meta_value;
+							$value = maybe_unserialize( $meta_value );
 						}
 					}
 				}
@@ -306,32 +379,32 @@ class Bdb_Tokens {
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];
 
-		$fields = [
-			[
+		$fields = array(
+			array(
 				'tokenId'         => 'BDBTOPICID',
 				'tokenName'       => __( 'Topic ID', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBNEWTOPIC',
-			],
-			[
+			),
+			array(
 				'tokenId'         => 'BDBTOPICTITLE',
 				'tokenName'       => __( 'Topic title', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBNEWTOPIC',
-			],
-			[
+			),
+			array(
 				'tokenId'         => 'BDBTOPICURL',
 				'tokenName'       => __( 'Topic URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBNEWTOPIC',
-			],
-			[
+			),
+			array(
 				'tokenId'         => 'BDBTOPICCONTENT',
 				'tokenName'       => __( 'Topic content', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BDBNEWTOPIC',
-			],
-		];
+			),
+		);
 
 		$tokens = array_merge( $tokens, $fields );
 

@@ -42,9 +42,7 @@ class GA extends Settings implements Pixel {
 	    } );
     }
 
-    public function isUse4Version() {
-        return $this->getOption( 'use_4_version' );
-    }
+
 	
 	public function enabled() {
 		return $this->getOption( 'enabled' );
@@ -80,9 +78,11 @@ class GA extends Settings implements Pixel {
 	public function getPixelIDs() {
 
 		$ids = (array) $this->getOption( 'tracking_id' );
-		
-		return apply_filters("pys_ga_ids",(array) reset( $ids )) ; // return first id only
-		
+        if(count($ids) == 0) {
+            return apply_filters("pys_ga_ids",[]);
+        } else {
+            return apply_filters("pys_ga_ids",(array) reset( $ids )); // return first id only
+        }
 	}
 
     public function getPixelOptions()
@@ -101,13 +101,35 @@ class GA extends Settings implements Pixel {
             'crossDomainAcceptIncoming' => $this->getOption('cross_domain_accept_incoming'),
             'crossDomainDomains' => $this->getOption('cross_domain_domains'),
             'isDebugEnabled'                => $this->getPixelDebugMode(),
-            'isUse4Version'                 => $this->isUse4Version(),
             'disableAdvertisingFeatures'    => $this->getOption( 'disable_advertising_features' ),
             'disableAdvertisingPersonalization' => $this->getOption( 'disable_advertising_personalization' ),
             'wooVariableAsSimple' => $this->getOption( 'woo_variable_as_simple' )
         );
-
     }
+    /**
+     * Create pixel event and fill it
+     * @param SingleEvent $event
+     * @return SingleEvent[]
+     */
+    public function generateEvents($event) {
+        $pixelEvents = [];
+        if ( ! $this->configured() ) {
+            return [];
+        }
+
+        $pixelIds = $this->getPixelIDs();
+
+        if(count($pixelIds) > 0) {
+            $pixelEvent = clone $event;
+            if($this->addParamsToEvent($pixelEvent)) {
+                $pixelEvent->addPayload([ 'trackingIds' => $pixelIds ]);
+                $pixelEvents[] = $pixelEvent;
+            }
+        }
+
+        return $pixelEvents;
+    }
+
     //refactor it
     private function addDataToEvent($eventData,&$event) {
         $params = $eventData["data"];
@@ -140,10 +162,7 @@ class GA extends Settings implements Pixel {
                     }
             } break;
             case 'search_event': {
-                if($this->isUse4Version())
-                    $eventData =  getSearchEventDataV4();
-                else
-                    $eventData =  $this->getSearchEventData();
+                $eventData =  $this->getSearchEventData();
                 if ($eventData) {
                     $isActive = true;
                     $this->addDataToEvent($eventData, $event);
@@ -174,17 +193,8 @@ class GA extends Settings implements Pixel {
                 }
             }break;
             case 'woo_remove_from_cart':{
-                foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-                    if(is_a($event,GroupedEvent::class)) {
-                        $eventData =  $this->getWooRemoveFromCartParams( $cart_item );
-                        if ($eventData) {
-                            $child = new SingleEvent($cart_item_key,EventTypes::$DYNAMIC);
-                            $isActive = true;
-                            $this->addDataToEvent($eventData, $child);
-                            $event->addEvent($child);
-                        }
-                    }
-                }
+                $isActive =  $this->getWooRemoveFromCartParams( $event );
+
             }break;
             case 'woo_initiate_checkout':{
                 $eventData =  $this->getWooInitiateCheckoutEventParams();
@@ -223,18 +233,11 @@ class GA extends Settings implements Pixel {
                 }
             }break;
             case 'edd_remove_from_cart': {
-                if(is_a($event,GroupedEvent::class)) {
-                    foreach ( edd_get_cart_contents() as $cart_item_key => $cart_item ) {
-                        $eventData =  $this->getEddRemoveFromCartParams( $cart_item );
-                        if ($eventData) {
-                            $child = new SingleEvent($cart_item_key,EventTypes::$DYNAMIC);
-                            $isActive = true;
-                            $this->addDataToEvent($eventData, $child);
-                            $event->addEvent($child);
-                        }
-                    }
+                $eventData =  $this->getEddRemoveFromCartParams( $event->args['item'] );
+                if ($eventData) {
+                    $isActive = true;
+                    $this->addDataToEvent($eventData, $event);
                 }
-
             }break;
 
             case 'edd_view_category': {
@@ -282,6 +285,10 @@ class GA extends Settings implements Pixel {
             case 'edd_add_to_cart_on_button_click': {
                 if (  $this->getOption( 'edd_add_to_cart_enabled' ) && PYS()->getOption( 'edd_add_to_cart_on_button_click' ) ) {
                     $isActive = true;
+                    if($event->args != null) {
+                        $eventData =  $this->getEddAddToCartOnButtonClickEventParams( $event->args );
+                        $event->addParams($eventData);
+                    }
                     $event->addPayload(array(
                         'name'=>"add_to_cart"
                     ));
@@ -289,47 +296,13 @@ class GA extends Settings implements Pixel {
             }break;
         }
 
-        if($isActive) {
-
-            if($this->isUse4Version()) {
-                unset($event->params['event_category']);
-                unset($event->params['event_label']);
-
-                unset($event->params['ecomm_pagetype']);
-                unset($event->params['ecomm_prodid']);
-                unset($event->params['ecomm_totalvalue']);
-            }
-        }
         return $isActive;
     }
 
 
 	public function getEventData( $eventType, $args = null ) {
-		
-		if ( ! $this->configured() ) {
-			return false;
-		}
-        $data = false;
-		switch ( $eventType ) {
 
-			case 'woo_add_to_cart_on_button_click':
-                $data =  $this->getWooAddToCartOnButtonClickEventParams( $args );break;
-
-			case 'edd_add_to_cart_on_button_click':
-                $data =  $this->getEddAddToCartOnButtonClickEventParams( $args );break;
-
-		}
-        if($data && $this->isUse4Version()) {
-            unset($data['data']['event_category']);
-            unset($data['data']['event_label']);
-
-            unset($data['data']['ecomm_pagetype']);
-            unset($data['data']['ecomm_prodid']);
-            unset($data['data']['ecomm_totalvalue']);
-
-        }
-
-        return $data;
+        return false;
 	}
 	
 	public function outputNoScriptEvents() {
@@ -371,13 +344,17 @@ class GA extends Settings implements Pixel {
 					if ( isset( $event['params']['items'] ) ) {
 
 						foreach ( $event['params']['items'] as $key => $item ) {
-
-							@$args["pr{$key}id" ] = urlencode( $item['id'] );
-							@$args["pr{$key}nm"] = urlencode( $item['name'] );
-							@$args["pr{$key}ca"] = urlencode( $item['category'] );
+                            if(isset($item['id']))
+							    @$args["pr{$key}id" ] = urlencode( $item['id'] );
+                            if(isset($item['name']))
+							    @$args["pr{$key}nm"] = urlencode( $item['name'] );
+                            if(isset($item['category']))
+							    @$args["pr{$key}ca"] = urlencode( $item['category'] );
 							//@$args["pr{$key}va"] = urlencode( $item['id'] ); // variant
-							@$args["pr{$key}pr"] = urlencode( $item['price'] );
-							@$args["pr{$key}qt"] = urlencode( $item['quantity'] );
+                            if(isset($item['price']))
+							    @$args["pr{$key}pr"] = urlencode( $item['price'] );
+                            if(isset($item['quantity']))
+							    @$args["pr{$key}qt"] = urlencode( $item['quantity'] );
 
 						}
 						
@@ -449,16 +426,14 @@ class GA extends Settings implements Pixel {
 		if ( ! $event->isGoogleAnalyticsEnabled() || empty( $ga_action ) ) {
 			return false;
 		}
-        // not fire event if for new event type use old version
-        if($event->getGaVersion() == "4" && !$this->isUse4Version()) {
-            return false;
-        }
 
-        if($event->getGaVersion() == "4") {
+
+        if($event->isGaV4()) {
             $params = $event->getGaParams();
 
-            foreach ($event->getGACustomParams() as $item)
-                $params[$item['name']]=$item['value'];
+            foreach ($event->getGACustomParams() as $item) {
+                $params[$item['name']] = $item['value'];
+            }
 
         } else {
             $params = array(
@@ -658,12 +633,16 @@ class GA extends Settings implements Pixel {
 
 	}
 
-	private function getWooRemoveFromCartParams( $cart_item ) {
+    /**
+     * @param SingleEvent $event
+     * @return bool
+     */
+	private function getWooRemoveFromCartParams( $event ) {
 
 		if ( ! $this->getOption( 'woo_remove_from_cart_enabled' ) ) {
 			return false;
 		}
-
+        $cart_item = $event->args['item'];
 		$product_id = $cart_item['product_id'];
 
 		$product = wc_get_product( $product_id );
@@ -685,24 +664,27 @@ class GA extends Settings implements Pixel {
             $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
 		}
 
-		return array(
-			'data' => array(
-				'event_category'  => 'ecommerce',
-				'currency'        => get_woocommerce_currency(),
-				'items'           => array(
-					array(
-						'id'       => $product_id,
-						'name'     => $name,
-						'category' => $categories,
-						'quantity' => $cart_item['quantity'],
-						'price'    => getWooProductPriceToDisplay( $product_id, $cart_item['quantity'] ),
-						'variant'  => $variation_name,
-					),
-				),
-				'non_interaction' => $this->getOption( 'woo_remove_from_cart_non_interactive' ),
-			),
-		);
+        $data = [
+            'name' => "remove_from_cart"
+        ];
+        $params = [
+            'event_category'  => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
+            'items'           => array(
+                array(
+                    'id'       => $product_id,
+                    'name'     => $name,
+                    'category' => $categories,
+                    'quantity' => $cart_item['quantity'],
+                    'price'    => getWooProductPriceToDisplay( $product_id, $cart_item['quantity'] ),
+                    'variant'  => $variation_name,
+                ),
+            ),
+            'non_interaction' => $this->getOption( 'woo_remove_from_cart_non_interactive' ),];
+        $event->addParams($params);
+        $event->addPayload($data);
 
+		return true;
 	}
 
 	private function getWooInitiateCheckoutEventParams() {
@@ -762,9 +744,9 @@ class GA extends Settings implements Pixel {
 			 * Analytic's Product Performance report.
 			 */
 			if ( isWooCommerceVersionGte( '3.0' ) ) {
-				$price = $line_item['total'] + $line_item['total_tax'];
+				$price = pys_round($line_item['total'] + $line_item['total_tax']);
 			} else {
-				$price = $line_item['line_total'] + $line_item['line_tax'];
+				$price = pys_round($line_item['line_total'] + $line_item['line_tax']);
 			}
 
 			$qty = $line_item['qty'];
@@ -903,11 +885,6 @@ class GA extends Settings implements Pixel {
 	}
 
 	private function getEddAddToCartOnButtonClickEventParams( $download_id ) {
-
-		if ( ! $this->getOption( 'edd_add_to_cart_enabled' ) || ! PYS()->getOption( 'edd_add_to_cart_on_button_click' ) ) {
-			return false;
-		}
-
 		// maybe extract download price id
 		if ( strpos( $download_id, '_') !== false ) {
 			list( $download_id, $price_index ) = explode( '_', $download_id );
@@ -931,9 +908,7 @@ class GA extends Settings implements Pixel {
 			'non_interaction' => $this->getOption( 'edd_add_to_cart_non_interactive' ),
 		);
 		
-		return array(
-			'params' => $params,
-		);
+		return $params;
 
 	}
 
@@ -968,7 +943,7 @@ class GA extends Settings implements Pixel {
 				$item_options = $cart_item['options'];
 			}
 
-			if ( ! empty( $item_options ) && $item_options['price_id'] !== 0 ) {
+			if ( ! empty( $item_options ) && !empty($item_options['price_id'])) {
 				$price_index = $item_options['price_id'];
 			} else {
 				$price_index = null;
@@ -1049,6 +1024,7 @@ class GA extends Settings implements Pixel {
 		$price_index = ! empty( $cart_item['options'] ) ? $cart_item['options']['price_id'] : null;
 
 		return array(
+            'name' => 'remove_from_cart',
 			'data' => array(
 				'event_category'  => 'ecommerce',
 				'currency'        => edd_get_currency(),
@@ -1076,6 +1052,7 @@ class GA extends Settings implements Pixel {
 		}
 
 		$term = get_term_by( 'slug', get_query_var( 'term' ), 'download_category' );
+        if ( !$term ) return false;
 		$parent_ids = get_ancestors( $term->term_id, 'download_category', 'taxonomy' );
 
 		$download_categories = array();

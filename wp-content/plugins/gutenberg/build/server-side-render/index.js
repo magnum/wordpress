@@ -100,7 +100,9 @@ var external_wp_blocks_namespaceObject = window["wp"]["blocks"];
 
 
 
-function rendererPath(block, attributes = null, urlQueryArgs = {}) {
+function rendererPath(block) {
+  let attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  let urlQueryArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   return (0,external_wp_url_namespaceObject.addQueryArgs)(`/wp/v2/block-renderer/${block}`, {
     context: 'edit',
     ...(null !== attributes ? {
@@ -110,18 +112,20 @@ function rendererPath(block, attributes = null, urlQueryArgs = {}) {
   });
 }
 
-function DefaultEmptyResponsePlaceholder({
-  className
-}) {
+function DefaultEmptyResponsePlaceholder(_ref) {
+  let {
+    className
+  } = _ref;
   return (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Placeholder, {
     className: className
   }, (0,external_wp_i18n_namespaceObject.__)('Block rendered as empty.'));
 }
 
-function DefaultErrorResponsePlaceholder({
-  response,
-  className
-}) {
+function DefaultErrorResponsePlaceholder(_ref2) {
+  let {
+    response,
+    className
+  } = _ref2;
   const errorMessage = (0,external_wp_i18n_namespaceObject.sprintf)( // translators: %s: error message describing the problem
   (0,external_wp_i18n_namespaceObject.__)('Error loading block: %s'), response.errorMsg);
   return (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Placeholder, {
@@ -129,10 +133,11 @@ function DefaultErrorResponsePlaceholder({
   }, errorMessage);
 }
 
-function DefaultLoadingResponsePlaceholder({
-  children,
-  showLoader
-}) {
+function DefaultLoadingResponsePlaceholder(_ref3) {
+  let {
+    children,
+    showLoader
+  } = _ref3;
   return (0,external_wp_element_namespaceObject.createElement)("div", {
     style: {
       position: 'relative'
@@ -220,7 +225,7 @@ function ServerSideRender(props) {
   }, []);
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     // Don't debounce the first fetch. This ensures that the first render
-    // shows data as soon as possible
+    // shows data as soon as possible.
     if (prevProps === undefined) {
       fetchData();
     } else if (!(0,external_lodash_namespaceObject.isEqual)(prevProps, props)) {
@@ -247,6 +252,14 @@ function ServerSideRender(props) {
   const hasEmptyResponse = response === '';
   const hasError = response === null || response === void 0 ? void 0 : response.error;
 
+  if (isLoading) {
+    return (0,external_wp_element_namespaceObject.createElement)(LoadingResponsePlaceholder, _extends({}, props, {
+      showLoader: showLoader
+    }), hasResponse && (0,external_wp_element_namespaceObject.createElement)(external_wp_element_namespaceObject.RawHTML, {
+      className: className
+    }, response));
+  }
+
   if (hasEmptyResponse || !hasResponse) {
     return (0,external_wp_element_namespaceObject.createElement)(EmptyResponsePlaceholder, props);
   }
@@ -257,19 +270,11 @@ function ServerSideRender(props) {
     }, props));
   }
 
-  if (isLoading) {
-    return (0,external_wp_element_namespaceObject.createElement)(LoadingResponsePlaceholder, _extends({}, props, {
-      showLoader: showLoader
-    }), hasResponse && (0,external_wp_element_namespaceObject.createElement)(external_wp_element_namespaceObject.RawHTML, {
-      className: className
-    }, response));
-  }
-
   return (0,external_wp_element_namespaceObject.createElement)(external_wp_element_namespaceObject.RawHTML, {
     className: className
   }, response);
 }
-//# sourceMappingURL=server-side-render.js.map
+
 ;// CONCATENATED MODULE: ./packages/server-side-render/build-module/index.js
 
 
@@ -310,11 +315,12 @@ const ExportedServerSideRender = (0,external_wp_data_namespaceObject.withSelect)
   }
 
   return EMPTY_OBJECT;
-})(({
-  urlQueryArgs = EMPTY_OBJECT,
-  currentPostId,
-  ...props
-}) => {
+})(_ref => {
+  let {
+    urlQueryArgs = EMPTY_OBJECT,
+    currentPostId,
+    ...props
+  } = _ref;
   const newUrlQueryArgs = (0,external_wp_element_namespaceObject.useMemo)(() => {
     if (!currentPostId) {
       return urlQueryArgs;
@@ -333,6 +339,7 @@ const ExportedServerSideRender = (0,external_wp_data_namespaceObject.withSelect)
 if (window && window.wp && window.wp.components) {
   window.wp.components.ServerSideRender = (0,external_wp_element_namespaceObject.forwardRef)((props, ref) => {
     external_wp_deprecated_default()('wp.components.ServerSideRender', {
+      version: '6.2',
       since: '5.3',
       alternative: 'wp.serverSideRender'
     });
@@ -343,7 +350,7 @@ if (window && window.wp && window.wp.components) {
 }
 
 /* harmony default export */ var build_module = (ExportedServerSideRender);
-//# sourceMappingURL=index.js.map
-(window.wp = window.wp || {}).serverSideRender = __webpack_exports__.default;
+
+(window.wp = window.wp || {}).serverSideRender = __webpack_exports__["default"];
 /******/ })()
 ;

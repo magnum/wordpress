@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class EDD_ORDERREFUNDED
+ *
  * @package Uncanny_Automator
  */
 class EDD_ORDERREFUNDED {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'EDD';
@@ -17,9 +19,6 @@ class EDD_ORDERREFUNDED {
 	private $trigger_code;
 	private $trigger_meta;
 
-	/**
-	 * SetAutomatorTriggers constructor.
-	 */
 	public function __construct() {
 		$this->trigger_code = 'EDDORDERREFUND';
 		$this->trigger_meta = 'EDDORDERREFUNDED';
@@ -27,7 +26,9 @@ class EDD_ORDERREFUNDED {
 	}
 
 	/**
-	 * Define and register the trigger by pushing it into the Automator object
+	 * Define and register the trigger by pushing it into the Automator object.
+	 *
+	 * @return void.
 	 */
 	public function define_trigger() {
 		$trigger = array(
@@ -43,7 +44,7 @@ class EDD_ORDERREFUNDED {
 			'priority'            => 10,
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'edd_order_refunded' ),
-			'options'             => [],
+			'options'             => array(),
 		);
 		Automator()->register->trigger( $trigger );
 	}
@@ -57,7 +58,8 @@ class EDD_ORDERREFUNDED {
 	 */
 	public function edd_order_refunded( $order_id ) {
 
-		$order_detail = edd_get_payment( $order_id );
+		$order_detail   = edd_get_payment( $order_id );
+		$total_discount = 0;
 
 		if ( empty( $order_detail ) ) {
 			return;
@@ -71,12 +73,12 @@ class EDD_ORDERREFUNDED {
 			$user_id = wp_get_current_user()->ID;
 		}
 
-		$pass_args = [
+		$pass_args = array(
 			'code'    => $this->trigger_code,
 			'meta'    => $this->trigger_meta,
 			'post_id' => $post_id,
 			'user_id' => $user_id,
-		];
+		);
 
 		$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
 
@@ -84,18 +86,39 @@ class EDD_ORDERREFUNDED {
 			foreach ( $args as $result ) {
 				if ( true === $result['result'] ) {
 
-					$trigger_meta = [
+					$trigger_meta = array(
 						'user_id'        => $user_id,
 						'trigger_id'     => $result['args']['trigger_id'],
 						'trigger_log_id' => $result['args']['get_trigger_id'],
 						'run_number'     => $result['args']['run_number'],
-					];
+					);
 
-					$item_names  = array();
+					$item_names = array();
+
 					$order_items = edd_get_payment_meta_cart_details( $order_id );
+
 					foreach ( $order_items as $item ) {
 						$item_names[] = $item['name'];
+						// Sum the discount.
+						if ( is_numeric( $item['discount'] ) ) {
+							$total_discount += $item['discount'];
+						}
 					}
+
+					// Save the payment order info.
+					$payment_info = array(
+						'discount_codes'  => $order_detail->discounts,
+						'order_discounts' => $total_discount,
+						'order_subtotal'  => $order_detail->subtotal,
+						'order_total'     => $order_detail->total,
+						'order_tax'       => $order_detail->tax,
+						'payment_method'  => $order_detail->gateway,
+						'license_key'     => Automator()->helpers->recipe->edd->options->get_licenses( $payment_id ),
+					);
+
+					$trigger_meta['meta_key']   = 'EDD_DOWNLOAD_ORDER_PAYMENT_INFO';
+					$trigger_meta['meta_value'] = maybe_serialize( wp_json_encode( $payment_info ) );
+					Automator()->insert_trigger_meta( $trigger_meta );
 
 					$trigger_meta['meta_key']   = 'EDDORDER_ITEMS';
 					$trigger_meta['meta_value'] = maybe_serialize( implode( ',', $item_names ) );

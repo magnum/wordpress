@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row mb-3">
             <div class="col">
                 <?php Facebook()->render_switcher_input( 'enabled' ); ?>
-                <h4 class="switcher-label">Enable Facebook Pixel</h4>
+                <h4 class="switcher-label">Enable Meta Pixel (formerly Facebook Pixel)</h4>
             </div>
         </div>
 		<div class="row">
@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="col text-center">
             <p class="mb-0">Fire more events and parameters and improve your ads performance.
                 <br><a href="https://www.pixelyoursite.com/facebook-pixel-plugin?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-facebook-settings"
-                        target="_blank">Find more about the PRO Facebook Pixel implementation</a></p>
+                        target="_blank">Find more about the PRO Meta Pixel (formerly Facebook Pixel) implementation</a></p>
         </div>
     </div>
 </div>

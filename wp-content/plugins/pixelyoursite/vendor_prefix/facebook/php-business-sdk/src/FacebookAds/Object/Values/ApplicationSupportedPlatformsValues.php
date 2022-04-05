@@ -49,4 +49,5 @@ class ApplicationSupportedPlatformsValues extends \PYS_PRO_GLOBAL\FacebookAds\En
     const SUPPLEMENTARY_IMAGES = 'SUPPLEMENTARY_IMAGES';
     const WEB = 'WEB';
     const WINDOWS = 'WINDOWS';
+    const XIAOMI = 'XIAOMI';
 }

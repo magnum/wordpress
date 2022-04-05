@@ -61,10 +61,11 @@ class AutomotiveModelFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnu
     const TITLE = 'title';
     const TRANSMISSION = 'transmission';
     const TRIM = 'trim';
+    const UNIT_PRICE = 'unit_price';
     const URL = 'url';
     const YEAR = 'year';
     public function getFieldTypes()
     {
-        return array('applinks' => 'CatalogItemAppLinks', 'automotive_model_id' => 'string', 'availability' => 'string', 'body_style' => 'string', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'custom_label_0' => 'string', 'description' => 'string', 'drivetrain' => 'string', 'exterior_color' => 'string', 'finance_description' => 'string', 'finance_type' => 'string', 'fuel_type' => 'string', 'generation' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'interior_color' => 'string', 'interior_upholstery' => 'string', 'make' => 'string', 'model' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'title' => 'string', 'transmission' => 'string', 'trim' => 'string', 'url' => 'string', 'year' => 'unsigned int');
+        return array('applinks' => 'CatalogItemAppLinks', 'automotive_model_id' => 'string', 'availability' => 'string', 'body_style' => 'string', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'custom_label_0' => 'string', 'description' => 'string', 'drivetrain' => 'string', 'exterior_color' => 'string', 'finance_description' => 'string', 'finance_type' => 'string', 'fuel_type' => 'string', 'generation' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'interior_color' => 'string', 'interior_upholstery' => 'string', 'make' => 'string', 'model' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'title' => 'string', 'transmission' => 'string', 'trim' => 'string', 'unit_price' => 'Object', 'url' => 'string', 'year' => 'unsigned int');
     }
 }

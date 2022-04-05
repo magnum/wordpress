@@ -54,6 +54,6 @@ class AdAsyncRequestSetFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractE
     const AD_SPECS = 'ad_specs';
     public function getFieldTypes()
     {
-        return array('canceled_count' => 'int', 'created_time' => 'datetime', 'error_count' => 'int', 'id' => 'string', 'in_progress_count' => 'int', 'initial_count' => 'unsigned int', 'is_completed' => 'bool', 'name' => 'string', 'notification_mode' => 'NotificationMode', 'notification_result' => 'AdAsyncRequestSetNotificationResult', 'notification_status' => 'NotificationStatus', 'notification_uri' => 'string', 'owner_id' => 'string', 'success_count' => 'int', 'total_count' => 'unsigned int', 'updated_time' => 'datetime', 'ad_specs' => 'list<map>');
+        return array('canceled_count' => 'int', 'created_time' => 'datetime', 'error_count' => 'int', 'id' => 'string', 'in_progress_count' => 'int', 'initial_count' => 'unsigned int', 'is_completed' => 'bool', 'name' => 'string', 'notification_mode' => 'NotificationMode', 'notification_result' => 'AdAsyncRequestSetNotificationResult', 'notification_status' => 'string', 'notification_uri' => 'string', 'owner_id' => 'string', 'success_count' => 'int', 'total_count' => 'unsigned int', 'updated_time' => 'datetime', 'ad_specs' => 'list<map>');
     }
 }

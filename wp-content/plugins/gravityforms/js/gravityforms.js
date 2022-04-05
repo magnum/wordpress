@@ -666,6 +666,7 @@ gform.options = {
      */
 
     jqEditorAccordions: {
+    	header: 'button:not(.choices-ui__trigger):not(.conditional_logic_wrapper)',
         heightStyle: 'content',
         collapsible: true,
         animate: false,
@@ -675,7 +676,19 @@ gform.options = {
         activate: function( event ) {
             gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
         },
-    }
+    },
+
+	jqAddFieldAccordions: {
+		heightStyle: 'content',
+		collapsible: true,
+		animate: false,
+		create: function( event ) {
+			gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
+		},
+		activate: function( event ) {
+			gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
+		},
+	},
 };
 
 //------------------------------------------------
@@ -1184,7 +1197,6 @@ function gformCalculateProductPrice(form_id, productFieldId){
 
 
 function gformGetProductQuantity(formId, productFieldId) {
-
     //If product is not selected
     if (!gformIsProductSelected(formId, productFieldId)) {
         return 0;
@@ -1620,6 +1632,7 @@ function gformDeleteListItem( deleteButton, max ) {
 
     gformToggleIcons( $container, max );
     gformAdjustClasses( $container );
+    gformAdjustRowAttributes( $container );
 
     gform.doAction( 'gform_list_post_item_delete', $container );
 
@@ -1651,7 +1664,10 @@ function gformAdjustRowAttributes( $container ) {
     $container.find( '.gfield_list_group' ).each( function( i ) {
 
         var $input = jQuery( this ).find( 'input, select, textarea' );
-        $input.attr( 'aria-label', $input.data( 'aria-label-template' ).format( i + 1 ) );
+        $input.each( function( index, input ) {
+            var $this = jQuery( input );
+            $this.attr( 'aria-label', $this.data( 'aria-label-template' ).format( i + 1 ) );
+        } );
 
         var $remove = jQuery( this ).find( '.delete_list_item' );
         $remove.attr( 'aria-label', $remove.data( 'aria-label-template' ).format( i + 1 ) );
@@ -2936,6 +2952,8 @@ function gformValidateFileSize( field, max_file_size ) {
 				up.removeFile(file);
 				addMessage(up.settings.gf_vars.message_id, file.name + " - " + response.error.message);
 				$('#' + file.id ).html('');
+			} else {
+				up.settings.multipart_params[file.target_name] = response.data;
 			}
 		});
 
@@ -3315,9 +3333,14 @@ jQuery( document ).on( 'submit.gravityforms', '.gform_wrapper form', function( e
             if ( ! token ) {
                 // Execute the invisible captcha.
                 grecaptcha.execute($reCaptcha.data('widget-id'));
-                // Once the reCaptcha is triggered, set gf_submitting to true, so the form could be submitted if the
+
+                // Once the reCaptcha is triggered, set gf_submitting to false, so the form could be submitted if the
                 // reCaptcha modal is closed (by clicking on the area out of the modal or the reCaptcha response expires)
-                window['gf_submitting_' + formID] = false;
+  				// do it after 4 seconds to reduce chance of multiple clicks when modal is not displayed
+                setTimeout( function() {
+                	window['gf_submitting_' + formID] = false;
+                }, 4000);
+
                 event.preventDefault();
             }
         }

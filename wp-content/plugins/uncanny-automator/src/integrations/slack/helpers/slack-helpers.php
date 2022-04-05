@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Slack_Helpers
+ *
  * @package Uncanny_Automator
  */
 class Slack_Helpers {
@@ -19,49 +20,69 @@ class Slack_Helpers {
 	public $pro;
 
 	/**
-	 * @var Slack_Helpers
-	 */
-	public $setting_tab;
-
-	/**
 	 * @var bool
 	 */
 	public $load_options;
 
 	/**
+	 * The URL of the API for this integration
+	 *
+	 * @var String
+	 */
+	public static $api_integration_url;
+
+	/**
+	 * The Slack scope
+	 *
+	 * @var String
+	 */
+	public static $scope;
+
+	/**
 	 * Slack_Helpers constructor.
 	 */
 	public function __construct() {
+		self::$api_integration_url = AUTOMATOR_API_URL . 'v2/slack';
+		$this->load_settings();
+	}
 
-		$this->setting_tab   = 'slack_api';
-		$this->automator_api = AUTOMATOR_API_URL . 'v2/slack';
-		$this->scope         = 'channels:read,groups:read,channels:manage,groups:write,chat:write,users:read,chat:write.customize';
-
-		add_filter( 'uap_settings_tabs', array( $this, 'add_slack_api_settings' ), 15 );
-		add_action( 'init', array( $this, 'capture_oauth_tokens' ), 100, 3 );
-		add_filter( 'automator_after_settings_extra_buttons', array( $this, 'slack_connect_html' ), 10, 3 );
-
+	/**
+	 * Load the settings
+	 * 
+	 * @return void
+	 */
+	private function load_settings() {
+		include_once __DIR__ . '/../settings/settings-slack.php';
 	}
 
 	/**
 	 * @param Slack_Helpers $options
 	 */
-	public function setOptions( Slack_Helpers $options ) {
+	public function setOptions( Slack_Helpers $options ) { // phpcs:ignore
 		$this->options = $options;
 	}
 
 	/**
 	 * @param Slack_Helpers $pro
 	 */
-	public function setPro( \Uncanny_Automator_Pro\Slack_Pro_Helpers $pro ) {
+	public function setPro( \Uncanny_Automator_Pro\Slack_Pro_Helpers $pro ) { // phpcs:ignore
 		$this->pro = $pro;
+	}
+
+	/**
+	 * Checks whether this integration is connected
+	 *
+	 * @return boolean True if it's connected
+	 */
+	public static function get_is_connected() {
+		return ! empty( self::get_slack_client() );
 	}
 
 	/**
 	 *
 	 * @return array $tokens
 	 */
-	public function get_slack_client() {
+	public static function get_slack_client() {
 		$tokens = get_option( '_uncannyowl_slack_settings', array() );
 
 		if ( empty( $tokens ) ) {
@@ -97,7 +118,7 @@ class Slack_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -125,11 +146,14 @@ class Slack_Helpers {
 		$placeholder              = key_exists( 'placeholder', $args ) ? $args['placeholder'] : null;
 		$options                  = array();
 
-		$options[] = array( 'value' => '-1', 'text' => __( 'Select a channel', 'uncanny-automator' ) );
+		$options[] = array(
+			'value' => '-1',
+			'text'  => __( 'Select a channel', 'uncanny-automator' ),
+		);
 
-		$client = $this->get_slack_client();
+		$client = self::get_slack_client();
 
-		$response = wp_remote_get( $this->automator_api . '?action=get_conversations&types=public_channel,private_channel&token=' . $client->access_token, $args );
+		$response = wp_remote_get( self::$api_integration_url . '?action=get_conversations&types=public_channel,private_channel&token=' . $client->access_token, $args );
 
 		$body = null;
 
@@ -143,9 +167,15 @@ class Slack_Helpers {
 
 			foreach ( $data->channels as $channel ) {
 				if ( $channel->is_private ) {
-					$options[] = array( 'value' => $channel->id, 'text' => 'Private: ' . $channel->name );
+					$options[] = array(
+						'value' => $channel->id,
+						'text'  => 'Private: ' . $channel->name,
+					);
 				} else {
-					$options[] = array( 'value' => $channel->id, 'text' => $channel->name );
+					$options[] = array(
+						'value' => $channel->id,
+						'text'  => $channel->name,
+					);
 				}
 			}
 		}
@@ -174,7 +204,7 @@ class Slack_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -202,7 +232,10 @@ class Slack_Helpers {
 		$placeholder              = key_exists( 'placeholder', $args ) ? $args['placeholder'] : null;
 		$options                  = array();
 
-		$options[] = array( 'value' => '-1', 'text' => __( 'Select a channel', 'uncanny-automator' ) );
+		$options[] = array(
+			'value' => '-1',
+			'text'  => __( 'Select a channel', 'uncanny-automator' ),
+		);
 
 		if ( Automator()->helpers->recipe->load_helpers ) {
 
@@ -210,9 +243,9 @@ class Slack_Helpers {
 
 			if ( false === $options ) {
 
-				$client = $this->get_slack_client();
+				$client = self::get_slack_client();
 
-				$response = wp_remote_get( $this->automator_api . '?action=get_users&token=' . $client->access_token );
+				$response = wp_remote_get( self::$api_integration_url . '?action=get_users&token=' . $client->access_token );
 
 				$body = null;
 
@@ -222,7 +255,10 @@ class Slack_Helpers {
 
 					if ( $data && $data->ok ) {
 						foreach ( $data->members as $member ) {
-							$options[] = array( 'value' => $member->id, 'text' => $member->name );
+							$options[] = array(
+								'value' => $member->id,
+								'text'  => $member->name,
+							);
 						}
 					}
 				}
@@ -262,7 +298,7 @@ class Slack_Helpers {
 
 		$args = array();
 
-		$client = $this->get_slack_client();
+		$client = self::get_slack_client();
 
 		$args['body'] = array(
 			'action'  => 'post_message',
@@ -272,7 +308,7 @@ class Slack_Helpers {
 
 		$args = apply_filters( 'uap_slack_chat_post_message', $args );
 
-		$response = wp_remote_post( $this->automator_api, $args );
+		$response = wp_remote_post( self::$api_integration_url, $args );
 
 		return $response;
 	}
@@ -286,7 +322,7 @@ class Slack_Helpers {
 
 		$args = array();
 
-		$client = $this->get_slack_client();
+		$client = self::get_slack_client();
 
 		$args['body'] = array(
 			'action' => 'create_conversation',
@@ -296,7 +332,7 @@ class Slack_Helpers {
 
 		$args = apply_filters( 'uap_slack_conversations_create', $args );
 
-		$response = wp_remote_post( $this->automator_api, $args );
+		$response = wp_remote_post( self::$api_integration_url, $args );
 
 		return $response;
 	}
@@ -304,7 +340,7 @@ class Slack_Helpers {
 	/**
 	 * @param string $option_code
 	 * @param string $label
-	 * @param bool   $tokens
+	 * @param bool $tokens
 	 * @param string $type
 	 * @param string $default
 	 * @param bool
@@ -340,199 +376,6 @@ class Slack_Helpers {
 		);
 
 		return apply_filters( 'uap_option_text_field', $option );
-	
+
 	}
-
-	/**
-	 * Check if the settings tab should display.
-	 *
-	 * @return boolean.
-	 */
-	public function display_settings_tab() {
-
-		if ( Automator()->utilities->has_valid_license() ) {
-			return true;
-		}
-
-		if ( Automator()->utilities->is_from_modal_action() ) {
-			return true;
-		}
-
-		return ! empty( $this->get_slack_client() );
-	}
-
-	/**
-	 * @param $tabs
-	 *
-	 * @return mixed
-	 */
-	public function add_slack_api_settings( $tabs ) {
-
-		if ( $this->display_settings_tab() ) {
-			$tab_url                    = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab;
-			$tabs[ $this->setting_tab ] = array(
-				'name'           => __( 'Slack', 'uncanny-automator' ),
-				'title'          => __( 'Slack account settings', 'uncanny-automator' ),
-				'description'    => sprintf( '<p>%s</p>', __( 'Connecting to Slack requires signing into your account to link it to Automator. To get started, click the "Connect an account" button below or the "Disconnect account" button if you need to disconnect or connect a new account. Uncanny Automator can only connect to a single Slack account at one time. (It is not possible to set some recipes up under one account and then switch accounts, all recipes are mapped to the account selected on this page and existing recipes may break if they were set up under another account.)', 'uncanny-automator' ) ) . $this->get_user_info(),
-				'is_pro'         => false,
-				'settings_field' => 'uap_automator_slack_api_settings',
-				'wp_nonce_field' => 'uap_automator_slack_api_nonce',
-				'save_btn_name'  => 'uap_automator_slack_api_save',
-				'save_btn_title' => __( 'Save settings', 'uncanny-automator' ),
-				'fields'         => array(
-					'uap_automator_slack_api_bot_name' => array(
-						'title'       => __( 'Bot name:', 'uncanny-automator' ),
-						'type'        => 'text',
-						'css_classes' => '',
-						'placeholder' => 'Leave blank for default name',
-						'default'     => '',
-						'required'    => false,
-					),
-					'uap_automator_alck_api_bot_icon'  => array(
-						'title'       => __( 'Bot icon:', 'uncanny-automator' ),
-						'type'        => 'text',
-						'css_classes' => '',
-						'placeholder' => 'Leave blank for default icon',
-						'default'     => '',
-						'required'    => false,
-					),
-				),
-			);
-		}
-
-		return $tabs;
-	}
-
-	/**
-	 * @param $content
-	 * @param $active
-	 * @param $tab
-	 *
-	 * @return false|mixed|string
-	 */
-	public function slack_connect_html( $content, $active, $tab ) {
-
-		if ( 'slack_api' === $active ) {
-
-			$tab_url = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab;
-
-			$slack_client = $this->get_slack_client();
-
-			if ( $slack_client ) {
-				$button_text  = __( 'Disconnect account', 'uncanny-automator' );
-				$button_class = 'uo-disconnect-button';
-				$button_url   = $tab_url . '&disconnect=1';
-			} else {
-				$nonce        = wp_create_nonce( 'automator_slack_api_authentication' );
-				$plugin_ver   = InitializePlugin::PLUGIN_VERSION;
-				$api_ver      = '1.0';
-				$scope        = $this->scope;
-				$action       = 'slack_authorization_request';
-				$redirect_url = urlencode( $tab_url );
-				$button_url   = $this->automator_api . "?action={$action}&scope={$scope}&redirect_url={$redirect_url}&nonce={$nonce}&api_ver={$api_ver}&plugin_ver={$plugin_ver}";
-				$button_text  = __( 'Connect an account', 'uncanny-automator' );
-				$button_class = 'uo-connect-button';
-			}
-
-			ob_start();
-			?>
-
-			<a href="<?php echo $button_url; ?>"
-			   class="uo-settings-btn uo-settings-btn--secondary <?php echo $button_class; ?>">
-				<?php
-				echo $button_text;
-				?>
-			</a>
-
-			<style>
-				.uoa-slack-settings {
-					display: flex;
-					align-items: center;
-					margin: 15px 0 15px 0;
-					font-weight: 700;
-				}
-
-				.uoa-slack-settings__team-icon {
-					margin-right: 10px;
-				}
-
-				.uoa-slack-settings__team-name {
-					color: #400d40;
-				}
-
-				.uo-connect-button {
-					color: #fff;
-					background-color: #4fb840;
-				}
-
-				.uo-disconnect-button {
-					color: #fff;
-					background-color: #f58933;
-				}
-			</style>
-			<?php
-			$content = ob_get_contents();
-			ob_end_clean();
-		}
-
-		return $content;
-	}
-
-	/**
-	 * Captures the OAuthentication tokens.
-	 *
-	 * @return void.
-	 */
-	public function capture_oauth_tokens() {
-		if ( isset( $_REQUEST['tab'] ) && $this->setting_tab == $_REQUEST['tab'] ) {
-
-			if ( ! empty( $_GET['automator_api_message'] ) ) {
-				$tokens = Automator_Helpers_Recipe::automator_api_decode_message( $_GET['automator_api_message'], wp_create_nonce( 'automator_slack_api_authentication' ) );
-
-				if ( $tokens ) {
-					update_option( '_uncannyowl_slack_settings', $tokens );
-					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab . '&connect=1' ) );
-					die;
-				} else {
-					wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab . '&connect=2' ) );
-					die;
-				}
-			} elseif ( ! empty( $_GET['disconnect'] ) ) {
-				delete_option( '_uncannyowl_slack_settings' );
-				wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-settings&tab=' . $this->setting_tab ) );
-				die;
-			}
-		}
-	}
-
-	/**
-	 * Displays the user info.
-	 *
-	 * @return void
-	 */
-	public function get_user_info() {
-
-		ob_start();
-		/**
-		 * @var object $slack_client
-		 */
-		$slack_client = $this->get_slack_client();
-
-		// Bailout if client is not set.
-		if ( empty( $slack_client ) ) {
-			return;
-		}
-		?>
-		<div class="uoa-slack-settings">
-			<div class="uoa-slack-settings__team-icon">
-				<img width="24" src="<?php echo esc_url( plugin_dir_url( __DIR__ ) . 'img/slack-icon.svg' ); ?>" alt="" />
-			</div>
-			<div class="uoa-slack-settings__team-name">
-				<?php echo esc_html( $slack_client->team->name ); ?>
-			</div>
-		</div>
-		<?php
-		return ob_get_clean();
-	}
-
 }

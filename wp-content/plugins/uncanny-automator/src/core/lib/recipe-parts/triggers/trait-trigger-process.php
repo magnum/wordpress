@@ -5,9 +5,9 @@
  * Short description
  *
  * @class   Trigger_Process
- * @package Uncanny_Automator
- * @version 3.0
  * @since   3.0
+ * @version 3.0
+ * @package Uncanny_Automator
  * @author  Saad S.
  */
 
@@ -16,6 +16,7 @@ namespace Uncanny_Automator\Recipe;
 
 /**
  * Trait Trigger_Process
+ *
  * @package Uncanny_Automator
  */
 trait Trigger_Process {
@@ -24,7 +25,7 @@ trait Trigger_Process {
 	 *
 	 * @var $user_id
 	 */
-	protected $user_id;
+	protected $user_id = 0;
 
 	/**
 	 * @var
@@ -79,7 +80,7 @@ trait Trigger_Process {
 	 * @return mixed
 	 */
 	public function get_user_id() {
-		if ( empty( $this->user_id ) && is_user_logged_in() ) {
+		if ( ( empty( $this->user_id ) || 0 === $this->user_id ) && is_user_logged_in() ) {
 			$this->user_id = wp_get_current_user()->ID;
 		}
 

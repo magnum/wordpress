@@ -46,6 +46,7 @@ class AutomatorWP_WordPress_User_Field_Update extends AutomatorWP_Integration_Tr
                                 'user_login'    => __( 'Username', 'automatorwp' ),
                                 'user_email'    => __( 'Email', 'automatorwp' ),
                                 'display_name'  => __( 'Display name', 'automatorwp' ),
+                                'user_nicename' => __( 'Nicename', 'automatorwp' ),
                                 'user_pass'     => __( 'Password', 'automatorwp' ),
                                 'user_url'      => __( 'Website', 'automatorwp' ),
                             ),
@@ -89,6 +90,7 @@ class AutomatorWP_WordPress_User_Field_Update extends AutomatorWP_Integration_Tr
             'user_login',
             'user_email',
             'display_name',
+            'user_nicename',
             'user_pass',
             'user_url',
         );
@@ -257,6 +259,7 @@ class AutomatorWP_WordPress_User_Field_Update extends AutomatorWP_Integration_Tr
                 'user_login'    => __( 'Username', 'automatorwp' ),
                 'user_email'    => __( 'Email', 'automatorwp' ),
                 'display_name'  => __( 'Display name', 'automatorwp' ),
+                'user_nicename'  => __( 'Nicename', 'automatorwp' ),
                 'user_pass'     => __( 'Password', 'automatorwp' ),
                 'user_url'      => __( 'Website', 'automatorwp' ),
             ),

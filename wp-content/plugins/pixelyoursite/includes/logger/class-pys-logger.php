@@ -21,7 +21,7 @@ class PYS_Logger
     }
 
     public function init() {
-        $this->isEnabled = PYS()->getOption('logs_enable');
+        $this->isEnabled = PYS()->getOption('pys_logs_enable');
     }
 
     /**

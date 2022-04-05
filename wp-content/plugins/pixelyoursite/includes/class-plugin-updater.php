@@ -109,12 +109,17 @@ class Plugin_Updater {
 		}
 		
 		$version_info = $this->get_cached_version_info();
-		
+
 		if ( false === $version_info ) {
 			$version_info = $this->api_request( 'plugin_latest_version',
 				array( 'slug' => $this->slug, 'beta' => $this->beta ) );
-			
-			$this->set_version_info_cache( $version_info );
+
+            if($this->slug == "pixelyoursite-pinterest") {
+                $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
+            } else {
+                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+            }
+			$this->set_version_info_cache( $version_info,"",$timeout );
 			
 		}
 		
@@ -172,8 +177,12 @@ class Plugin_Updater {
 			if ( false === $version_info ) {
 				$version_info = $this->api_request( 'plugin_latest_version',
 					array( 'slug' => $this->slug, 'beta' => $this->beta ) );
-				
-				$this->set_version_info_cache( $version_info );
+                if($this->slug == "pixelyoursite-pinterest") {
+                    $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
+                } else {
+                    $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+                }
+				$this->set_version_info_cache( $version_info,"",$timeout );
 			}
 			
 			if ( ! is_object( $version_info ) ) {
@@ -286,7 +295,12 @@ class Plugin_Updater {
 			$api_response = $this->api_request( 'plugin_information', $to_send );
 			
 			// Expires in 3 hours
-			$this->set_version_info_cache( $api_response, $cache_key );
+            if($this->slug == "pixelyoursite-pinterest") {
+                $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
+            } else {
+                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+            }
+			$this->set_version_info_cache( $api_response, $cache_key,$timeout );
 			
 			if ( false !== $api_response ) {
 				$_data = $api_response;
@@ -461,8 +475,12 @@ class Plugin_Updater {
 					$version_info->$key = (array) $section;
 				}
 			}
-			
-			$this->set_version_info_cache( $version_info, $cache_key );
+            if($slag == "pixelyoursite-pinterest") {
+                $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
+            } else {
+                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+            }
+			$this->set_version_info_cache( $version_info, $cache_key,$timeout );
 			
 		}
 		
@@ -489,14 +507,16 @@ class Plugin_Updater {
 		
 	}
 	
-	public function set_version_info_cache( $value = '', $cache_key = '' ) {
+	public function set_version_info_cache( $value = '', $cache_key = '',$timeout = null ) {
 		
 		if ( empty( $cache_key ) ) {
 			$cache_key = $this->cache_key;
 		}
-		
+		if($timeout == null) {
+            $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+        }
 		$data = array(
-			'timeout' => strtotime( '+3 hours', current_time( 'timestamp' ) ),
+			'timeout' => $timeout,
 			'value'   => json_encode( $value )
 		);
 		

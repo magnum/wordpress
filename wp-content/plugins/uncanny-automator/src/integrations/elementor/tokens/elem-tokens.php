@@ -2,6 +2,8 @@
 
 namespace Uncanny_Automator;
 
+use function Sodium\compare;
+
 /**
  * Class Elem_Tokens
  *
@@ -12,57 +14,104 @@ class Elem_Tokens {
 
 	public function __construct() {
 
-		add_filter( 'automator_maybe_trigger_elem_elemform_tokens', [ $this, 'elem_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_parse_token', [ $this, 'elem_token' ], 20, 6 );
+		add_filter( 'automator_maybe_trigger_elem_elemform_tokens', array( $this, 'elem_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'elem_token' ), 20, 6 );
 
 		// Save latest form entry in trigger meta for tokens.
-		add_action( 'automator_save_elementor_form_entry', [ $this, 'elem_save_form_entry' ], 10, 3 );
+		add_action( 'automator_save_elementor_form_entry', array( $this, 'elem_save_form_entry' ), 10, 3 );
 	}
 
 	/**
 	 * Prepare tokens.
 	 *
 	 * @param array $tokens .
-	 * @param array $args   .
+	 * @param array $args .
 	 *
 	 * @return array
 	 */
 	public function elem_possible_tokens( $tokens = array(), $args = array() ) {
-		$form_id      = $args['value'];
-		$trigger_meta = $args['meta'];
 
-		if ( ! empty( $form_id ) ) {
-			global $wpdb;
-			$query      = "SELECT ms.meta_value  FROM {$wpdb->postmeta} ms JOIN {$wpdb->posts} p on p.ID = ms.post_id WHERE ms.meta_key LIKE '_elementor_data' AND ms.meta_value LIKE '%form_fields%' AND p.post_status = 'publish' ";
-			$post_metas = $wpdb->get_results( $query );
-			$fields     = array();
-			if ( ! empty( $post_metas ) ) {
-				foreach ( $post_metas as $post_meta ) {
-
-					$inner_forms = Automator()->helpers->recipe->elementor->get_all_inner_forms( json_decode( $post_meta->meta_value ) );
-					if ( ! empty( $inner_forms ) ) {
-						foreach ( $inner_forms as $form ) {
-							if ( $form->id == $form_id ) {
-								if ( isset( $form->settings ) && ! empty( isset( $form->settings->form_fields ) ) ) {
-									foreach ( $form->settings->form_fields as $field ) {
-										$input_id = $field->custom_id;
-										$token_id = "$form_id|$input_id";
-										$fields[] = [
-											'tokenId'         => $token_id,
-											'tokenName'       => isset( $field->field_label ) ? $field->field_label : 'Unknown',
-											'tokenType'       => isset( $field->field_type ) ? $field->field_type : 'text',
-											'tokenIdentifier' => $trigger_meta,
-										];
-									}
-								}
-								$tokens = array_merge( $tokens, $fields );
-							}
-						}
-					}
-				}
-			}
+		if ( isset( $_REQUEST['action'] ) && ( 'heartbeat' === (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) || 'wp-remove-post-lock' === (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// if it's heartbeat, post lock actions bail
+			return $tokens;
 		}
 
+		$form_id      = $args['value'];
+		$trigger_meta = $args['meta'];
+		if ( empty( $form_id ) ) {
+			return $tokens;
+		}
+
+		if ( ! Automator()->helpers->recipe->is_edit_page() && ! Automator()->helpers->recipe->is_rest() ) {
+			// If not automator edit page or rest call, bail
+			return $tokens;
+		}
+
+		// Check for cached tokens
+		$cached_tokens = Automator()->cache->get( 'automator_elementor_form_' . $form_id );
+		if ( ! empty( $cached_tokens ) ) {
+			return $cached_tokens;
+		}
+		// Check if query is cached too
+		$post_metas = Automator()->cache->get( 'automator_elementor_qry_results' );
+		if ( 'empty' === $post_metas ) {
+			// Iterated before and the results were empty, bail early
+			return $tokens;
+		}
+		if ( empty( $post_metas ) ) {
+			global $wpdb;
+
+			$post_metas = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT pm.meta_value
+FROM $wpdb->postmeta pm
+    LEFT JOIN $wpdb->posts p
+        ON p.ID = pm.post_id
+WHERE p.post_type IS NOT NULL
+  AND p.post_status = %s
+  AND pm.meta_key = %s
+  AND pm.`meta_value` LIKE %s",
+					'publish',
+					'_elementor_data',
+					'%%form_fields%%'
+				)
+			);
+			if ( empty( $post_metas ) ) {
+				// No Elementor forms found! Adding `empty` string
+				Automator()->cache->set( 'automator_elementor_qry_results', 'empty', 'automator', 60 );
+
+				return $tokens;
+			}
+			// Save cached query results
+			Automator()->cache->set( 'automator_elementor_qry_results', $post_metas, 'automator', 60 );
+		}
+		$fields = array();
+		foreach ( $post_metas as $post_meta ) {
+			$inner_forms = Automator()->helpers->recipe->elementor->get_all_inner_forms( json_decode( $post_meta->meta_value ) );
+			if ( empty( $inner_forms ) ) {
+				continue;
+			}
+			foreach ( $inner_forms as $form ) {
+				if ( (string) $form->id !== (string) $form_id ) {
+					continue;
+				}
+				if ( ! isset( $form->settings ) || empty( isset( $form->settings->form_fields ) ) ) {
+					continue;
+				}
+				foreach ( $form->settings->form_fields as $field ) {
+					$input_id = $field->custom_id;
+					$token_id = "$form_id|$input_id";
+					$fields[] = array(
+						'tokenId'         => $token_id,
+						'tokenName'       => isset( $field->field_label ) ? $field->field_label : 'Unknown',
+						'tokenType'       => isset( $field->field_type ) ? $field->field_type : 'text',
+						'tokenIdentifier' => $trigger_meta,
+					);
+				}
+				$tokens = array_merge( $tokens, $fields );
+			}
+		}//end foreach
+		Automator()->cache->set( 'automator_elementor_form_' . $form_id, $tokens, 'automator', 60 );
 
 		return $tokens;
 	}
@@ -80,37 +129,38 @@ class Elem_Tokens {
 	 * @return null|string
 	 */
 	public function elem_token( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
-
+		if ( empty( $pieces ) ) {
+			return $value;
+		}
+		if ( empty( $trigger_data ) ) {
+			return $value;
+		}
 		$piece = 'ELEMFORM';
-		if ( $pieces ) {
-			if ( in_array( $piece, $pieces ) ) {
+		if ( ! in_array( $piece, $pieces, false ) ) {
+			return $value;
+		}
 
-				$recipe_log_id = isset( $replace_args['recipe_log_id'] ) ? (int) $replace_args['recipe_log_id'] : Automator()->maybe_create_recipe_log_entry( $recipe_id, $user_id )['recipe_log_id'];
-				if ( $trigger_data && $recipe_log_id ) {
-					foreach ( $trigger_data as $trigger ) {
-						if ( key_exists( $piece, $trigger['meta'] ) ) {
-							$trigger_id     = $trigger['ID'];
-							$trigger_log_id = $replace_args['trigger_log_id'];
-							$token_info     = explode( '|', $pieces[2] );
-							$form_id        = $token_info[0];
-							$meta_key       = isset( $token_info[1] ) ? $token_info[1] : '';
-							$meta_field     = $piece . '_' . $form_id;
-							$entry          = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_field, $trigger_id, $trigger_log_id, $user_id );
-							if ( ! empty( $entry ) ) {
-								if ( is_array( $entry ) && ! empty( $meta_key ) ) {
-									$value = isset( $entry[ $meta_key ] ) ? $entry[ $meta_key ] : '';
-									if ( is_array( $value ) ) {
-										$value = implode( ', ', $value );
-									}
-								} else {
-									$value = $entry;
-								}
-							}
+		foreach ( $trigger_data as $trigger ) {
+			if ( key_exists( $piece, $trigger['meta'] ) ) {
+				$trigger_id     = $trigger['ID'];
+				$trigger_log_id = $replace_args['trigger_log_id'];
+				$token_info     = explode( '|', $pieces[2] );
+				$form_id        = $token_info[0];
+				$meta_key       = isset( $token_info[1] ) ? $token_info[1] : '';
+				$meta_field     = $piece . '_' . $form_id;
+				$entry          = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_field, $trigger_id, $trigger_log_id, $user_id );
+				if ( ! empty( $entry ) ) {
+					if ( is_array( $entry ) && ! empty( $meta_key ) ) {
+						$value = isset( $entry[ $meta_key ] ) ? $entry[ $meta_key ] : '';
+						if ( is_array( $value ) ) {
+							$value = implode( ', ', $value );
 						}
+					} else {
+						$value = $entry;
 					}
 				}
 			}
-		}
+		}//end foreach
 
 		return $value;
 	}
@@ -128,9 +178,19 @@ class Elem_Tokens {
 		$form_id   = $record->get_form_settings( 'id' );
 		$form_name = $record->get_form_settings( 'form_name' );
 		$data      = $record->get( 'sent_data' );
+		$fields    = $record->get( 'fields' );
+
 		if ( ! empty( $data ) ) {
+			if ( ! empty( $fields ) ) {
+				foreach ( $fields as $field_name => $field_data ) {
+					if ( ! isset( $data[ $field_name ] ) ) {
+						$data[ $field_name ] = $field_data['value'];
+					}
+				}
+			}
 			$data = serialize( $data );
 		}
+
 		if ( is_array( $args ) ) {
 			foreach ( $args as $trigger_result ) {
 				if ( true === $trigger_result['result'] ) {
@@ -150,35 +210,37 @@ class Elem_Tokens {
 										if ( $recipe_log_id_raw ) {
 											$trigger_log_id = (int) $trigger_result['args']['get_trigger_id'];
 											$run_number     = (int) $trigger_result['args']['run_number'];
-											$args           = [
+											$args           = array(
 												'user_id'        => $user_id,
 												'trigger_id'     => $trigger_id,
 												'meta_key'       => 'ELEMFORM_' . $form_id,
 												'meta_value'     => $data,
-												'run_number'     => $run_number, //get run number
+												'run_number'     => $run_number,
+												// get run number
 												'trigger_log_id' => $trigger_log_id,
-											];
+											);
 											Automator()->insert_trigger_meta( $args );
 											// For form name
-											$args = [
+											$args = array(
 												'user_id'        => $user_id,
 												'trigger_id'     => $trigger_id,
 												'meta_key'       => 'ELEMFORM_ELEMFORM',
 												'meta_value'     => $form_name,
-												'run_number'     => $run_number, //get run number
+												'run_number'     => $run_number,
+												// get run number
 												'trigger_log_id' => $trigger_log_id,
-											];
+											);
 
 											Automator()->insert_trigger_meta( $args );
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+										}//end if
+									}//end if
+								}//end foreach
+							}//end if
+						}//end foreach
+					}//end if
+				}//end if
+			}//end foreach
+		}//end if
 	}
 
 }

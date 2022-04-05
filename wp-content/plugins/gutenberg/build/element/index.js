@@ -260,7 +260,7 @@ function proceed(conversionMap) {
         output.push(conversionMap[name]);
         offset = startOffset + tokenLength;
         return true;
-      } // otherwise we found an inner element
+      } // Otherwise we found an inner element.
 
 
       addChild(createFrame(conversionMap[name], startOffset, tokenLength));
@@ -273,13 +273,13 @@ function proceed(conversionMap) {
       return true;
 
     case 'closer':
-      // if we're not nesting then this is easy - close the block
+      // If we're not nesting then this is easy - close the block.
       if (1 === stackDepth) {
         closeOuterElement(startOffset);
         offset = startOffset + tokenLength;
         return true;
-      } // otherwise we're nested and we have to close out the current
-      // block and add it as a innerBlock to the parent
+      } // Otherwise we're nested and we have to close out the current
+      // block and add it as a innerBlock to the parent.
 
 
       const stackTop = stack.pop();
@@ -307,7 +307,7 @@ function proceed(conversionMap) {
 
 
 function nextToken() {
-  const matches = tokenizer.exec(indoc); // we have no more tokens
+  const matches = tokenizer.exec(indoc); // We have no more tokens.
 
   if (null === matches) {
     return ['no-more-tokens'];
@@ -410,14 +410,14 @@ function closeOuterElement(endOffset) {
 }
 
 /* harmony default export */ var create_interpolate_element = (createInterpolateElement);
-//# sourceMappingURL=create-interpolate-element.js.map
+
 ;// CONCATENATED MODULE: external "lodash"
 var external_lodash_namespaceObject = window["lodash"];
 ;// CONCATENATED MODULE: ./packages/element/build-module/react.js
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 
 
 /**
@@ -595,7 +595,11 @@ var external_lodash_namespaceObject = window["lodash"];
  * @return {Array} The concatenated value.
  */
 
-function concatChildren(...childrenArguments) {
+function concatChildren() {
+  for (var _len = arguments.length, childrenArguments = new Array(_len), _key = 0; _key < _len; _key++) {
+    childrenArguments[_key] = arguments[_key];
+  }
+
   return childrenArguments.reduce((accumulator, children, i) => {
     external_React_namespaceObject.Children.forEach(children, (child, j) => {
       if (child && 'string' !== typeof child) {
@@ -636,7 +640,7 @@ function switchChildrenNodeName(children, nodeName) {
     }, childrenProp);
   });
 }
-//# sourceMappingURL=react.js.map
+
 ;// CONCATENATED MODULE: external "ReactDOM"
 var external_ReactDOM_namespaceObject = window["ReactDOM"];
 ;// CONCATENATED MODULE: ./packages/element/build-module/react-platform.js
@@ -677,7 +681,7 @@ var external_ReactDOM_namespaceObject = window["ReactDOM"];
  */
 
 
-//# sourceMappingURL=react-platform.js.map
+
 ;// CONCATENATED MODULE: ./packages/element/build-module/utils.js
 /**
  * External dependencies
@@ -701,7 +705,7 @@ const isEmptyElement = element => {
 
   return !element;
 };
-//# sourceMappingURL=utils.js.map
+
 ;// CONCATENATED MODULE: ./packages/element/build-module/platform.js
 /**
  * Parts of this source were derived and modified from react-native-web,
@@ -737,7 +741,7 @@ const Platform = {
  */
 
 /* harmony default export */ var platform = (Platform);
-//# sourceMappingURL=platform.js.map
+
 ;// CONCATENATED MODULE: external ["wp","escapeHtml"]
 var external_wp_escapeHtml_namespaceObject = window["wp"]["escapeHtml"];
 ;// CONCATENATED MODULE: ./packages/element/build-module/raw-html.js
@@ -761,10 +765,11 @@ var external_wp_escapeHtml_namespaceObject = window["wp"]["escapeHtml"];
  * @return {JSX.Element} Dangerously-rendering component.
  */
 
-function RawHTML({
-  children,
-  ...props
-}) {
+function RawHTML(_ref) {
+  let {
+    children,
+    ...props
+  } = _ref;
   let rawHtml = ''; // Cast children as an array, and concatenate each element if it is a string.
 
   external_React_namespaceObject.Children.toArray(children).forEach(child => {
@@ -781,7 +786,7 @@ function RawHTML({
     ...props
   });
 }
-//# sourceMappingURL=raw-html.js.map
+
 ;// CONCATENATED MODULE: ./packages/element/build-module/serialize.js
 /**
  * Parts of this source were derived and modified from fast-react-render,
@@ -951,13 +956,46 @@ function getNormalAttributeValue(attribute, value) {
   return value;
 }
 /**
+ * This is a map of all SVG attributes that have dashes. Map(lower case prop => dashed lower case attribute).
+ * We need this to render e.g strokeWidth as stroke-width.
+ *
+ * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
+ */
+
+
+const SVG_ATTRIBUTE_WITH_DASHES_LIST = ['accentHeight', 'alignmentBaseline', 'arabicForm', 'baselineShift', 'capHeight', 'clipPath', 'clipRule', 'colorInterpolation', 'colorInterpolationFilters', 'colorProfile', 'colorRendering', 'dominantBaseline', 'enableBackground', 'fillOpacity', 'fillRule', 'floodColor', 'floodOpacity', 'fontFamily', 'fontSize', 'fontSizeAdjust', 'fontStretch', 'fontStyle', 'fontVariant', 'fontWeight', 'glyphName', 'glyphOrientationHorizontal', 'glyphOrientationVertical', 'horizAdvX', 'horizOriginX', 'imageRendering', 'letterSpacing', 'lightingColor', 'markerEnd', 'markerMid', 'markerStart', 'overlinePosition', 'overlineThickness', 'paintOrder', 'panose1', 'pointerEvents', 'renderingIntent', 'shapeRendering', 'stopColor', 'stopOpacity', 'strikethroughPosition', 'strikethroughThickness', 'strokeDasharray', 'strokeDashoffset', 'strokeLinecap', 'strokeLinejoin', 'strokeMiterlimit', 'strokeOpacity', 'strokeWidth', 'textAnchor', 'textDecoration', 'textRendering', 'underlinePosition', 'underlineThickness', 'unicodeBidi', 'unicodeRange', 'unitsPerEm', 'vAlphabetic', 'vHanging', 'vIdeographic', 'vMathematical', 'vectorEffect', 'vertAdvY', 'vertOriginX', 'vertOriginY', 'wordSpacing', 'writingMode', 'xmlnsXlink', 'xHeight'].reduce((map, attribute) => {
+  // The keys are lower-cased for more robust lookup.
+  map[attribute.toLowerCase()] = attribute;
+  return map;
+}, {});
+/**
+ * This is a map of all case-sensitive SVG attributes. Map(lowercase key => proper case attribute).
+ * The keys are lower-cased for more robust lookup.
+ * Note that this list only contains attributes that contain at least one capital letter.
+ * Lowercase attributes don't need mapping, since we lowercase all attributes by default.
+ */
+
+const CASE_SENSITIVE_SVG_ATTRIBUTES = ['allowReorder', 'attributeName', 'attributeType', 'autoReverse', 'baseFrequency', 'baseProfile', 'calcMode', 'clipPathUnits', 'contentScriptType', 'contentStyleType', 'diffuseConstant', 'edgeMode', 'externalResourcesRequired', 'filterRes', 'filterUnits', 'glyphRef', 'gradientTransform', 'gradientUnits', 'kernelMatrix', 'kernelUnitLength', 'keyPoints', 'keySplines', 'keyTimes', 'lengthAdjust', 'limitingConeAngle', 'markerHeight', 'markerUnits', 'markerWidth', 'maskContentUnits', 'maskUnits', 'numOctaves', 'pathLength', 'patternContentUnits', 'patternTransform', 'patternUnits', 'pointsAtX', 'pointsAtY', 'pointsAtZ', 'preserveAlpha', 'preserveAspectRatio', 'primitiveUnits', 'refX', 'refY', 'repeatCount', 'repeatDur', 'requiredExtensions', 'requiredFeatures', 'specularConstant', 'specularExponent', 'spreadMethod', 'startOffset', 'stdDeviation', 'stitchTiles', 'suppressContentEditableWarning', 'suppressHydrationWarning', 'surfaceScale', 'systemLanguage', 'tableValues', 'targetX', 'targetY', 'textLength', 'viewBox', 'viewTarget', 'xChannelSelector', 'yChannelSelector'].reduce((map, attribute) => {
+  // The keys are lower-cased for more robust lookup.
+  map[attribute.toLowerCase()] = attribute;
+  return map;
+}, {});
+/**
+ * This is a map of all SVG attributes that have colons.
+ * Keys are lower-cased and stripped of their colons for more robust lookup.
+ */
+
+const SVG_ATTRIBUTES_WITH_COLONS = ['xlink:actuate', 'xlink:arcrole', 'xlink:href', 'xlink:role', 'xlink:show', 'xlink:title', 'xlink:type', 'xml:base', 'xml:lang', 'xml:space', 'xmlns:xlink'].reduce((map, attribute) => {
+  map[attribute.replace(':', '').toLowerCase()] = attribute;
+  return map;
+}, {});
+/**
  * Returns the normal form of the element's attribute name for HTML.
  *
  * @param {string} attribute Non-normalized attribute name.
  *
  * @return {string} Normalized attribute name.
  */
-
 
 function getNormalAttributeName(attribute) {
   switch (attribute) {
@@ -968,7 +1006,17 @@ function getNormalAttributeName(attribute) {
       return 'class';
   }
 
-  return attribute.toLowerCase();
+  const attributeLowerCase = attribute.toLowerCase();
+
+  if (CASE_SENSITIVE_SVG_ATTRIBUTES[attributeLowerCase]) {
+    return CASE_SENSITIVE_SVG_ATTRIBUTES[attributeLowerCase];
+  } else if (SVG_ATTRIBUTE_WITH_DASHES_LIST[attributeLowerCase]) {
+    return (0,external_lodash_namespaceObject.kebabCase)(SVG_ATTRIBUTE_WITH_DASHES_LIST[attributeLowerCase]);
+  } else if (SVG_ATTRIBUTES_WITH_COLONS[attributeLowerCase]) {
+    return SVG_ATTRIBUTES_WITH_COLONS[attributeLowerCase];
+  }
+
+  return attributeLowerCase;
 }
 /**
  * Returns the normal form of the style property name for HTML.
@@ -1023,7 +1071,9 @@ function getNormalStylePropertyValue(property, value) {
  */
 
 
-function renderElement(element, context, legacyContext = {}) {
+function renderElement(element, context) {
+  let legacyContext = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
   if (null === element || undefined === element || false === element) {
     return '';
   }
@@ -1101,7 +1151,8 @@ function renderElement(element, context, legacyContext = {}) {
  * @return {string} Serialized element.
  */
 
-function renderNativeComponent(type, props, context, legacyContext = {}) {
+function renderNativeComponent(type, props, context) {
+  let legacyContext = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
   let content = '';
 
   if (type === 'textarea' && props.hasOwnProperty('value')) {
@@ -1142,7 +1193,8 @@ function renderNativeComponent(type, props, context, legacyContext = {}) {
  * @return {string} Serialized element
  */
 
-function renderComponent(Component, props, context, legacyContext = {}) {
+function renderComponent(Component, props, context) {
+  let legacyContext = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
   const instance = new
   /** @type {import('react').ComponentClass} */
   Component(props, legacyContext);
@@ -1170,7 +1222,8 @@ function renderComponent(Component, props, context, legacyContext = {}) {
  * @return {string} Serialized children.
  */
 
-function renderChildren(children, context, legacyContext = {}) {
+function renderChildren(children, context) {
+  let legacyContext = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   let result = '';
   children = (0,external_lodash_namespaceObject.castArray)(children);
 
@@ -1276,7 +1329,7 @@ function renderStyle(style) {
   return result;
 }
 /* harmony default export */ var serialize = (renderElement);
-//# sourceMappingURL=serialize.js.map
+
 ;// CONCATENATED MODULE: ./packages/element/build-module/index.js
 
 
@@ -1285,7 +1338,7 @@ function renderStyle(style) {
 
 
 
-//# sourceMappingURL=index.js.map
+
 (window.wp = window.wp || {}).element = __webpack_exports__;
 /******/ })()
 ;

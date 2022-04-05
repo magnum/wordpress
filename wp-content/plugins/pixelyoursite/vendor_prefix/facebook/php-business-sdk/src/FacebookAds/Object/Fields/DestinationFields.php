@@ -49,9 +49,10 @@ class DestinationFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const PRICE_CHANGE = 'price_change';
     const SANITIZED_IMAGES = 'sanitized_images';
     const TYPES = 'types';
+    const UNIT_PRICE = 'unit_price';
     const URL = 'url';
     public function getFieldTypes()
     {
-        return array('address' => 'string', 'applinks' => 'CatalogItemAppLinks', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'description' => 'string', 'destination_id' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'name' => 'string', 'price' => 'string', 'price_change' => 'string', 'sanitized_images' => 'list<string>', 'types' => 'list<string>', 'url' => 'string');
+        return array('address' => 'string', 'applinks' => 'CatalogItemAppLinks', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'description' => 'string', 'destination_id' => 'string', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'name' => 'string', 'price' => 'string', 'price_change' => 'string', 'sanitized_images' => 'list<string>', 'types' => 'list<string>', 'unit_price' => 'Object', 'url' => 'string');
     }
 }

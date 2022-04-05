@@ -49,7 +49,7 @@ class Mo_OpenIDConnect_Widget extends WP_Widget {
 						$logo_class='fa fa-paypal ';
 					}
 					elseif( $item['appId']=='azure') {
-						$logo_class='fa fa-windows ';
+						$logo_class='fa fa-windowslive';
 					}
 					elseif( $item['appId']=='amazon') {
 						$logo_class='fa fa-amazon ';
@@ -72,7 +72,7 @@ class Mo_OpenIDConnect_Widget extends WP_Widget {
 					elseif( $item['appId']=='adfs') {
 						$logo_class='fa fa-windows';
 					}
-					echo '<a style="text-decoration:none" href="javascript:void(0)" onClick="moOAuthLoginNew(\''.$key.'\');"><div class="mo_oauth_login_button"><i class="'.$logo_class.' mo_oauth_login_button_icon"></i><h3 class="mo_oauth_login_button_text">Login with '.ucwords($key).'</h3></div></a>';	
+					echo '<a style="text-decoration:none" href="javascript:void(0)" onClick="moOAuthLoginNew(\''.$key.'\');"><div class="mo_oauth_login_button"><i class="'.$logo_class.' mo_oauth_login_button_icon"></i><h4 class="mo_oauth_login_button_text">Login with '.ucwords($key).'</h4></div></a>';	
 					echo '</div><br><br>';
 				}
 			}
@@ -182,7 +182,7 @@ class Mo_OpenIDConnect_Widget extends WP_Widget {
 								$logo_class='fa fa-paypal ';
 							}
 							elseif( $app['appId']=='azure') {
-								$logo_class='fa fa-windows ';
+								$logo_class='fa fa-windowslive ';
 							}
 							elseif( $app['appId']=='amazon') {
 								$logo_class='fa fa-amazon ';

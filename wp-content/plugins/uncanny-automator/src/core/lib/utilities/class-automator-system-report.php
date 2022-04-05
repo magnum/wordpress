@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class System_Report
+ *
  * @package Uncanny_Automator
  */
 class Automator_System_Report {
@@ -109,7 +110,7 @@ class Automator_System_Report {
 			$curl_version = curl_version();
 			$curl_version = $curl_version['version'] . ', ' . $curl_version['ssl_version'];
 		} elseif ( extension_loaded( 'curl' ) ) {
-			$curl_version = __( 'cURL installed but unable to retrieve version.', 'uncanny-automator' );
+			$curl_version = esc_html__( 'cURL installed but unable to retrieve version.', 'uncanny-automator' );
 		}
 
 		// WP memory limit.
@@ -394,8 +395,10 @@ class Automator_System_Report {
 		$active_plugins_data = array();
 
 		foreach ( $active_plugins as $plugin ) {
-			$data                  = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-			$active_plugins_data[] = $this->format_plugin_data( $plugin, $data );
+			if( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ){
+				$data                  = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
+				$active_plugins_data[] = $this->format_plugin_data( $plugin, $data );
+			}
 		}
 
 		return $active_plugins_data;

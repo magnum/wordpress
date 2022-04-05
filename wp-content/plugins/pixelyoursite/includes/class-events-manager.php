@@ -19,10 +19,10 @@ class EventsManager {
 
 
     public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueScripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueScripts' ),10 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'setupEventsParams' ),14 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'outputData' ),15 );
 
-		add_action( 'wp_head', array( $this, 'setupEventsParams' ), 3 );
-		add_action( 'wp_head', array( $this, 'outputData' ), 4 );
 		add_action( 'wp_footer', array( $this, 'outputNoScriptData' ), 10 );
 
 	}
@@ -124,37 +124,33 @@ class EventsManager {
         $this->facebookServerEvents = array();
 
 		// initial event
+        $initEvent = new SingleEvent('init_event',EventTypes::$STATIC,'');
+        if(get_post_type() == "post") {
+            global $post;
+            $catIds = wp_get_object_terms( $post->ID, 'category', array( 'fields' => 'names' ) );
+            $initEvent->addParams([
+                'post_category' => implode(", ",$catIds)
+            ]);
+        }
+
         foreach ( PYS()->getRegisteredPixels() as $pixel ) {
 
-            $event = new SingleEvent('init_event',EventTypes::$STATIC);
-            $params = array();
-            if(get_post_type() == "post") {
-                global $post;
-                $catIds = wp_get_object_terms( $post->ID, 'category', array( 'fields' => 'names' ) );
-                $params['post_category'] = implode(", ",$catIds) ;
-            }
-            $event->addParams($params);
-            $isSuccess = $pixel->addParamsToEvent( $event );
-            if ( !$isSuccess ) {
-                continue; // event is disabled or not supported for the pixel
-            }
-            if($pixel->getSlug() != "ga" || $pixel->isUse4Version()) {
+            $events = $pixel->generateEvents( $initEvent );
+            foreach ($events as $event) {
                 $event->addParams($this->standardParams);
+                $this->addStaticEvent( $event,$pixel,"" );
             }
-            $this->addStaticEvent( $event,$pixel,"" );
         }
         // search event
         if ( PYS()->getOption('search_event_enabled' ) && is_search() ) {
+            $searchEvent = new SingleEvent('search_event', EventTypes::$STATIC,'');
+
             foreach (PYS()->getRegisteredPixels() as $pixel) {
-                $event = new SingleEvent('search_event', EventTypes::$STATIC);
-                $isSuccess = $pixel->addParamsToEvent( $event );
-                if ( !$isSuccess ) {
-                    continue; // event is disabled or not supported for the pixel
-                }
-                if($pixel->getSlug() != "ga" || $pixel->isUse4Version()) {
+                $events = $pixel->generateEvents( $searchEvent );
+                foreach ($events as $event) {
                     $event->addParams($this->standardParams);
+                    $this->addStaticEvent( $event,$pixel,"" );
                 }
-                $this->addStaticEvent( $event,$pixel,"" );
             }
         }
 
@@ -184,33 +180,17 @@ class EventsManager {
                     && PYS()->getOption( 'woo_add_to_cart_on_button_click' )
             ) {
                 add_action( 'woocommerce_after_shop_loop_item', array( $this, 'setupWooLoopProductData' ) );
-                add_action( 'woocommerce_after_add_to_cart_button', array( $this, 'setupWooSingleProductData' ) );
+                add_action( 'woocommerce_after_add_to_cart_button', 'PixelYourSite\EventsManager::setupWooSingleProductData' );
                 add_filter( 'woocommerce_blocks_product_grid_item_html', array( $this, 'setupWooBlocksProductData' ), 10, 3 );
                 add_filter('jet-woo-builder/elementor-views/frontend/archive-item-content', array( $this, 'setupWooBlocksProductData' ),10, 3);
             }
         }
 
 
-
-
         if(count($this->facebookServerEvents)>0 && Facebook()->enabled()) {
-            FacebookServer()->addAsyncEvents($this->facebookServerEvents);
+            FacebookServer()->sendEventsAsync($this->facebookServerEvents);
         }
 	}
-
-    /**
-     * Always returns empty customer LTV-related values to make plugin compatible with PRO version.
-     * Used by Pinterest add-on.
-     *
-     * @return array
-     */
-    public function getWooCustomerTotals() {
-        return [
-            'ltv' => null,
-            'avg_order_value' => null,
-            'orders_count' => null,
-        ];
-    }
 
 	public function getStaticEvents( $context ) {
 	    return isset( $this->staticEvents[ $context ] ) ? $this->staticEvents[ $context ] : array();
@@ -223,17 +203,7 @@ class EventsManager {
             $pixel = PYS()->getRegisteredPixels()[$pixelSlug];
             foreach ($events as $event) {
                 // add standard params
-                if(is_a($event,GroupedEvent::class)) {
-                    foreach ($event->getEvents() as $child) {
-                        if($pixel->getSlug() != "ga" || $pixel->isUse4Version()) {
-                            $child->addParams($this->standardParams);
-                        }
-                    }
-                } else {
-                    if($pixel->getSlug() != "ga" || $pixel->isUse4Version()) {
-                        $event->addParams($this->standardParams);
-                    }
-                }
+                $event->addParams($this->standardParams);
                 //save different types of events
                 if($event->getType() == EventTypes::$STATIC) {
                     $this->addStaticEvent( $event,$pixel,$slug );
@@ -251,18 +221,12 @@ class EventsManager {
 
     function addDynamicEvent($event,$pixel,$slug) {
 
-        if(is_a($event,GroupedEvent::class)) {
-            foreach ($event->getEvents() as $child) {
-                $eventData = $child->getData();
-                $eventData = $this->filterEventParams($eventData,$slug);
-                //save static event data
-                $this->dynamicEvents[ $event->getId() ][ $child->getId() ][ $pixel->getSlug() ] = $eventData;
-            }
-        } else {
+        $eventData = $event->getData();
+        $eventData = $this::filterEventParams($eventData,$slug);
 
-            $eventData = $event->getData();
-            $eventData = $this->filterEventParams($eventData,$slug);
-            //save static event data
+        if($event->getId() == 'edd_remove_from_cart' || $event->getId() == 'woo_remove_from_cart')  {
+            $this->dynamicEvents[ $event->getId() ][ $event->args['key'] ][ $pixel->getSlug() ] = $eventData;
+        } else  {
             $this->dynamicEvents[ $event->getId() ][ $pixel->getSlug() ] = $eventData;
         }
     }
@@ -287,58 +251,27 @@ class EventsManager {
      */
     function addStaticEvent($event,$pixel,$slug) {
 
-        if(is_a($event,GroupedEvent::class)) {
-            foreach ($event->getEvents() as $child) {
-
-                $eventData = $child->getData();
-                $eventData = $this->filterEventParams($eventData,$slug);
-                 // send only for FB Server events
-                if($pixel->getSlug() == "facebook" &&
-                    ($event->getId() == "woo_complete_registration") &&
-                    Facebook()->isServerApiEnabled() &&
-                    Facebook()->getOption("woo_complete_registration_send_from_server") &&
-                    !$this->isGdprPluginEnabled() )
-                {
-                    if($eventData['delay'] == 0) {
-                        $this->addEventToFacebookServerApi($child->payload["pixelIds"],null,$eventData);
-                    }
-                    continue;
-                }
-
-
-                //save static event data
-                $this->staticEvents[ $pixel->getSlug() ][ $eventData['name'] ][] = $eventData;
-                // fire fb server api event
-                if($pixel->getSlug() == "facebook") {
-                    if( $eventData['delay'] == 0 && !Facebook()->getOption( "server_event_use_ajax" )) {
-                        $this->addEventToFacebookServerApi($child->payload["pixelIds"],$child,$eventData);
-                    }
-                }
+        $eventData = $event->getData();
+        $eventData = $this::filterEventParams($eventData,$slug);
+        // send only for FB Server events
+        if($pixel->getSlug() == "facebook" &&
+            ($event->getId() == "woo_complete_registration") &&
+            Facebook()->isServerApiEnabled() &&
+            Facebook()->getOption("woo_complete_registration_send_from_server") &&
+            !$this->isGdprPluginEnabled() )
+        {
+            if($eventData['delay'] == 0) {
+                $this->facebookServerEvents[] = $event;
             }
-        } else {
-            $eventData = $event->getData();
-            $eventData = $this->filterEventParams($eventData,$slug);
+            return;
+        }
 
-            // send only for FB Server events
-            if($pixel->getSlug() == "facebook" &&
-                ($event->getId() == "woo_complete_registration") &&
-                Facebook()->isServerApiEnabled() &&
-                Facebook()->getOption("woo_complete_registration_send_from_server") &&
-                !$this->isGdprPluginEnabled() )
-            {
-                if($eventData['delay'] == 0) {
-                    $this->addEventToFacebookServerApi($event->payload["pixelIds"],null,$eventData);
-                }
-                return;
-            }
-
-            //save static event data
-            $this->staticEvents[ $pixel->getSlug() ][ $eventData['name'] ][] = $eventData;
-            // fire fb server api event
-            if($pixel->getSlug() == "facebook") {
-                if( $eventData['delay'] == 0 && !Facebook()->getOption( "server_event_use_ajax" )) {
-                    $this->addEventToFacebookServerApi($event->payload["pixelIds"],$event,$eventData);
-                }
+        //save static event data
+        $this->staticEvents[ $pixel->getSlug() ][ $event->getId() ][] = $eventData;
+        // fire fb server api event
+        if($pixel->getSlug() == "facebook") {
+            if( $eventData['delay'] == 0 && !Facebook()->getOption( "server_event_use_ajax" )) {
+                $this->facebookServerEvents[] = $event;
             }
         }
 
@@ -397,66 +330,47 @@ class EventsManager {
             isCookieLawInfoPluginActivated() && PYS()->getOption( 'gdpr_cookie_law_info_integration_enabled' );
     }
 
-    function addEventToFacebookServerApi($pixelIds,$eventType,$eventData) {
-
-        if(!Facebook()->isServerApiEnabled()) return;
-        $isDisabled = $this->isGdprPluginEnabled();
-
-        if( !$isDisabled ) {
-            $name = $eventData['name'];
-            $data = $eventData['params'];
-            $eventID = isset($eventData['eventID']) ? $eventData['eventID'] : false;
-            $serverEvent = FacebookServer()->createEvent($eventID,$name,$data);
-            $this->facebookServerEvents[] = array("pixelIds" => $pixelIds, "event" => $serverEvent );
-        }
-    }
-
 
     public function setupWooLoopProductData()
     {
         global $product;
+
         $this->setupWooProductData($product);
     }
 
     public function setupWooBlocksProductData($html, $data, $product)
     {
+
         $this->setupWooProductData($product);
         return $html;
     }
 
     public function setupWooProductData($product) {
 
-		if ( wooProductIsType( $product, 'variable' ) || wooProductIsType( $product, 'grouped' ) ) {
+		if (  !is_a($product,"WC_Product")
+            || wooProductIsType( $product, 'variable' )
+            || wooProductIsType( $product, 'grouped' )
+        ) {
 			return; // skip variable products
 		}
 
         $product_id = $product->get_id();
 
 		$params = array();
+        $event = new SingleEvent('woo_add_to_cart_on_button_click',EventTypes::$STATIC,'woo');
+        $event->args = ['productId' => $product_id,'quantity' => 1];
 
 		foreach ( PYS()->getRegisteredPixels() as $pixel ) {
 			/** @var Pixel|Settings $pixel */
-            $event = new SingleEvent('woo_add_to_cart_on_button_click',EventTypes::$STATIC);
-            $event->args = ['productId' => $product_id,'quantity' => 1];
-            $isSuccess = $pixel->addParamsToEvent( $event );
-            if ( !$isSuccess ) {
-                continue; // event is disabled or not supported for the pixel
-            }
-            if(count($event->params) == 0) {
-                // add product params
-                // use for not update bing and pinterest, need remove in next updates
-                $eventData = $pixel->getEventData( 'woo_add_to_cart_on_button_click', $product_id );
-                if ( false === $eventData ) {
-                    continue; // event is disabled or not supported for the pixel
-                }
-                $event->addParams($eventData['params']);
-            }
 
-            // prepare event data
-            $eventData = $event->getData();
-            $eventData = EventsManager::filterEventParams($eventData,"woo");
+            $events = $pixel->generateEvents( $event );
+            foreach ($events as $event) {
+                // prepare event data
+                $eventData = $event->getData();
+                $eventData = EventsManager::filterEventParams($eventData,"woo");
 
-            $params[$pixel->getSlug()] = $eventData;
+                $params[$pixel->getSlug()] = $eventData; // replace data!!(now use only one event)
+            }
         }
 
 		if ( empty( $params ) ) {
@@ -478,10 +392,10 @@ class EventsManager {
 
 	}
 
-	public function setupWooSingleProductData() {
+	public static function setupWooSingleProductData() {
 		global $product;
 
-        if($product == null) return;
+        if($product == null || !is_a($product,"WC_Product")) return;
 
 		/** @var \WC_Product $product */
 		if ( isWooCommerceVersionGte( '2.6' ) ) {
@@ -513,32 +427,22 @@ class EventsManager {
 
 		$params = array();
         $eventType = 'woo_add_to_cart_on_button_click';
+        $event = new SingleEvent($eventType,EventTypes::$STATIC,'woo');
+        $event->args = ['productId' => $product_id,'quantity' => 1];
+
 		foreach ( $product_ids as $product_id ) {
 			foreach ( PYS()->getRegisteredPixels() as $pixel ) {
 				/** @var Pixel|Settings $pixel */
 
-                $event = new SingleEvent($eventType,EventTypes::$STATIC);
-                $event->args = ['productId' => $product_id,'quantity' => 1];
-                $isSuccess = $pixel->addParamsToEvent( $event );
-                if ( !$isSuccess ) {
-                    continue; // event is disabled or not supported for the pixel
+
+                $events = $pixel->generateEvents( $event );
+                foreach ($events as $event) {
+                    // prepare event data
+                    $eventData = $event->getData();
+                    $eventData = EventsManager::filterEventParams($eventData,"woo");
+
+                    $params[ $product_id ][ $pixel->getSlug() ] = $eventData; // replace (use only one event for product)
                 }
-                if(count($event->params) == 0) {
-                    // add product params
-                    // use for not update bing and pinterest, need remove in next updates
-                    $eventData = $pixel->getEventData( $eventType, $product_id );
-                    if ( false === $eventData ) {
-                        continue; // event is disabled or not supported for the pixel
-                    }
-                    $event->addParams($eventData['params']);
-                }
-
-                // prepare event data
-                $eventData = $event->getData();
-                $eventData = EventsManager::filterEventParams($eventData,"woo");
-
-                $params[ $product_id ][ $pixel->getSlug() ] = $eventData;
-
 			}
 		}
 
@@ -581,31 +485,24 @@ class EventsManager {
         }
 
         $params = array();
-
         foreach ( $download_ids as $download_id ) {
+            $event = EventsEdd()->getEvent('edd_add_to_cart_on_button_click');
+            $event->args = $download_id;
             foreach ( PYS()->getRegisteredPixels() as $pixel ) {
                 /** @var Pixel|Settings $pixel */
-
-                $eventData = $pixel->getEventData( 'edd_add_to_cart_on_button_click', $download_id );
-
-                if ( false === $eventData ) {
-                    continue; // event is disabled or not supported for the pixel
+                $events = $pixel->generateEvents( $event );
+                foreach ($events as $singleEvent) {
+                    $eventData = $singleEvent->getData();
+                    $eventData = EventsManager::filterEventParams($eventData,"edd");
+                    /**
+                     * Format is pysEddProductData[ id ][ id ] or pysEddProductData[ id ] [ id_1, id_2, ... ]
+                     */
+                    $params[ $download_id ][ $pixel->getSlug() ] = [ // replace data there use only one event
+                            'params' => $eventData['params']
+                    ];
                 }
-                if(isset($eventData['params']))
-                    $eventData['params'] = sanitizeParams($eventData['params']);
-                else $eventData['params'] = sanitizeParams($eventData['data']);
-
-                $params[ $download_id ][ $pixel->getSlug() ] = $eventData;
             }
         }
-
-        if ( empty( $params ) ) {
-            return;
-        }
-
-        /**
-         * Format is pysEddProductData[ id ][ id ] or pysEddProductData[ id ] [ id_1, id_2, ... ]
-         */
 
         ?>
 

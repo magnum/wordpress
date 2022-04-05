@@ -1,14 +1,36 @@
 <?php
 namespace PixelYourSite;
 
+use PixelYourSite;
 use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Event;
 use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\UserData;
-use PixelYourSite;
-
+use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\CustomData;
+use PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Content;
 defined('ABSPATH') or die('Direct access not allowed');
 
+
 class ServerEventHelper {
-    public static function newEvent($event_name,$eventId,$wooOrder = null,$eddOrder = null) {
+
+    /**
+     * @param SingleEvent $event
+     * @return Event | null
+     */
+    public static function mapEventToServerEvent($event) {
+
+        $eventData = $event->getData();
+        $eventData = EventsManager::filterEventParams($eventData,$event->getCategory(),[
+            'event_id'=>$event->getId(),
+            'pixel'=>Facebook()->getSlug()
+        ]);
+
+        $eventName = $eventData['name'];
+        $eventParams = $eventData['params'];
+        $eventId = $event->payload['eventID'];
+        $wooOrder = isset($event->payload['woo_order']) ? $event->payload['woo_order'] : null;
+        $eddOrder = isset($event->payload['edd_order']) ? $event->payload['edd_order'] : null;
+
+        if(!$eventId) return null;
+
         $user_data = ServerEventHelper::getUserData($wooOrder,$eddOrder)
             ->setClientIpAddress(self::getIpAddress())
             ->setClientUserAgent(self::getHttpUserAgent());
@@ -16,21 +38,42 @@ class ServerEventHelper {
         $fbp = self::getFbp();
         $fbc = self::getFbc();
         if($fbp) {
-            $user_data ->setFbp($fbp);
+            $user_data->setFbp($fbp);
         }
         if($fbc) {
-            $user_data ->setFbc($fbc);
+            $user_data->setFbc($fbc);
+        }
+
+        $customData = self::paramsToCustomData($eventParams);
+        $uri = self::getRequestUri(PYS()->getOption('enable_remove_source_url_params'));
+
+        // set custom uri use in ajax request
+        if(isset($_POST['url'])) {
+            if(PYS()->getOption('enable_remove_source_url_params')) {
+                $list = explode("?",$_POST['url']);
+                if(is_array($list) && count($list) > 0) {
+                    $uri = $list[0];
+                } else {
+                    $uri = $_POST['url'];
+                }
+            } else {
+                $uri = $_POST['url'];
+            }
         }
 
         $event = (new Event())
-            ->setEventName($event_name)
+            ->setEventName($eventName)
             ->setEventTime(time())
             ->setEventId($eventId)
-            ->setEventSourceUrl(self::getRequestUri(PYS()->getOption("enable_remove_source_url_params")))
+            ->setEventSourceUrl($uri)
+            ->setActionSource("website")
+            ->setCustomData($customData)
             ->setUserData($user_data);
+
 
         return $event;
     }
+
 
     private static function getIpAddress() {
         $HEADERS_TO_SCAN = array(
@@ -77,7 +120,7 @@ class ServerEventHelper {
         return $user_agent;
     }
 
-    private static function getRequestUri($removeQuery) {
+    private static function getRequestUri($removeQuery = false) {
         $request_uri = null;
 
         if (!empty($_SERVER['REQUEST_URI'])) {
@@ -87,6 +130,7 @@ class ServerEventHelper {
         if($removeQuery && isset($_SERVER['QUERY_STRING'])) {
             $request_uri = str_replace("?".$_SERVER['QUERY_STRING'],"",$request_uri);
         }
+
 
         return $request_uri;
     }
@@ -118,11 +162,10 @@ class ServerEventHelper {
          * Add purchase WooCommerce Advanced Matching params
          */
         if ( PixelYourSite\isWooCommerceActive() && isEventEnabled( 'woo_purchase_enabled' ) &&
-            ($wooOrder || (is_order_received_page() && isset( $_REQUEST['key']) && $_REQUEST['key'] != "" )) ) {
-
-            if(isset( $_REQUEST['key']) && $_REQUEST['key'] != "") {
-                $order_key = sanitize_key($_REQUEST['key']);
-                $order_id = wc_get_order_id_by_order_key( $order_key );
+            ($wooOrder || ( is_order_received_page() && wooIsRequestContainOrderId() ))
+        ) {
+            if(wooIsRequestContainOrderId()) {
+                $order_id = wooGetOrderIdFromRequest();
             } else {
                 $order_id = $wooOrder;
             }
@@ -230,6 +273,43 @@ class ServerEventHelper {
             // $userData->setEmail("undefined");
         }
         return $userData;
+    }
+
+    static function paramsToCustomData($data) {
+
+        if(isset($data['contents']) && is_array($data['contents'])) {
+            $contents = array();
+            foreach ($data['contents'] as $c) {
+                $contents[] = new Content([
+                    'product_id' => $c['id'],
+                    'quantity'  => $c['quantity']
+                ]);
+            }
+            $data['contents'] = $contents;
+        } else {
+            $data['contents'] = array();
+        }
+
+        $customData = new CustomData($data);
+        $customProperties = array();
+
+
+        if(isset($data['category_name'])) {
+            $customData->setContentCategory($data['category_name']);
+        }
+
+        $custom_values = ['event_action','download_type','download_name','download_url','target_url','text','trigger','traffic_source','plugin','user_role','event_url','page_title',"post_type",'post_id','categories','tags','video_type',
+            'video_id','video_title','event_trigger','link_type','tag_text',"URL",
+            'form_id','form_class','form_submit_label','transactions_count','average_order',
+            'shipping_cost','tax','total','shipping','coupon_used','post_category','landing_page'];
+        foreach ($custom_values as $val) {
+            if(isset($data[$val])){
+                $customProperties[$val] = $data[$val];
+            }
+        }
+
+        $customData->setCustomProperties($customProperties);
+        return $customData;
     }
 
 }

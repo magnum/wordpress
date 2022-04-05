@@ -4,15 +4,17 @@ namespace Uncanny_Automator;
 
 /**
  * Class Add_Slack_Integration
+ *
  * @package Uncanny_Automator
  */
 class Add_Slack_Integration {
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'SLACK';
-	
+
 	/**
 	 * connected
 	 *
@@ -71,7 +73,7 @@ class Add_Slack_Integration {
 	 */
 	public function add_integration_directory_func( $directory ) {
 
-		$directory[]  = dirname( __FILE__ ) . '/helpers';
+		$directory[] = dirname( __FILE__ ) . '/helpers';
 		$directory[] = dirname( __FILE__ ) . '/actions';
 
 		return $directory;
@@ -93,10 +95,10 @@ class Add_Slack_Integration {
 		$uncanny_automator->register->integration(
 			self::$integration,
 			array(
-				'name'     => 'Slack',
-				'icon_svg' => Utilities::automator_get_integration_icon( __DIR__ . '/img/slack-icon.svg' ),
-				'connected' => $this->connected,
-				'settings_url' => admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-settings&tab=slack_api'
+				'name'         => 'Slack',
+				'icon_svg'     => Utilities::automator_get_integration_icon( __DIR__ . '/img/slack-icon.svg' ),
+				'connected'    => $this->connected,
+				'settings_url' => automator_get_premium_integrations_settings_url( 'slack_api' )
 			)
 		);
 

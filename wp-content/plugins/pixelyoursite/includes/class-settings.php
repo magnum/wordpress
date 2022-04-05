@@ -488,11 +488,11 @@ abstract class Settings {
 	/**
 	 * Output number input
 	 *
-	 * @param      $key
-	 * @param null $placeholder
+	 * @param  string    $key
+	 * @param string $placeholder
 	 * @param bool $disabled
 	 */
-	public function render_number_input( $key, $placeholder = null, $disabled = false ) {
+	public function render_number_input( $key, $placeholder = '', $disabled = false ) {
 
 		$attr_name  = "pys[$this->slug][$key]";
 		$attr_id    = 'pys_' . $this->slug . '_' . $key;

@@ -40,7 +40,19 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
         </div>
     </div>
 </div>
-
+<div class="card card-static">
+    <div class="card-header">
+        Recommeded videos
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <p><a href="https://www.youtube.com/watch?v=kEp5BDg7dP0" target="_blank">How to fire EVENTS with PixelYourSite (22:28) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=PcXYYGOvahc" target="_blank">Track URL tags as event parameters (8:15) - watch now</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card card-static">
     <div class="card-header">
         About Parameters
@@ -89,17 +101,17 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                     </tr>
                     </thead>
                     <tbody>
-        
+
                     <?php foreach ( CustomEventFactory::get() as $event ) : ?>
-        
+
                         <?php
-        
+
                         /** @var CustomEvent $event */
-        
+
                         $event_edit_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit', array(
                             'id' => $event->getPostId()
                         ) );
-        
+
                         $event_enable_url = buildAdminUrl( 'pixelyoursite', 'events', 'enable', array(
                             'pys'      => array(
                                 'event' => array(
@@ -108,7 +120,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                             ),
                             '_wpnonce' => wp_create_nonce( 'pys_enable_event' ),
                         ) );
-        
+
                         $event_disable_url = buildAdminUrl( 'pixelyoursite', 'events', 'disable', array(
                             'pys'      => array(
                                 'event' => array(
@@ -117,7 +129,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                             ),
                             '_wpnonce' => wp_create_nonce( 'pys_disable_event' ),
                         ) );
-        
+
                         $event_remove_url = buildAdminUrl( 'pixelyoursite', 'events', 'remove', array(
                             'pys'      => array(
                                 'event' => array(
@@ -126,9 +138,9 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                             ),
                             '_wpnonce' => wp_create_nonce( 'pys_remove_event' ),
                         ) );
-                        
+
                         ?>
-        
+
                         <tr data-post_id="<?php esc_attr_e( $event->getPostId() ); ?>"
                             class="<?php echo $event->isEnabled() ? '' : 'disabled'; ?>">
                             <td>
@@ -159,7 +171,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                 <?php else : ?>
                                     <i class="fa fa-facebook-square" style="opacity: .25;"></i>
                                 <?php endif; ?>
-                                
+
                                 <?php if ( GA()->enabled() && $event->isGoogleAnalyticsEnabled() ) : ?>
                                     <i class="fa fa-area-chart"></i>
                                 <?php else : ?>
@@ -167,7 +179,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                 <?php endif; ?>
 
                                 <i class="fa fa-google" style="opacity: .25;"></i>
-                             
+
                                 <?php if ( Pinterest()->enabled() && $event->isPinterestEnabled() ) : ?>
                                     <i class="fa fa-pinterest-square"></i>
                                 <?php else : ?>
@@ -175,9 +187,9 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                 <?php endif; ?>
                             </td>
                         </tr>
-        
+
                     <?php endforeach; ?>
-        
+
                     </tbody>
                 </table>
             </div>

@@ -3,8 +3,8 @@ Contributors: woocommerce, automattic, woothemes, allendav, kellychoffman, jkudi
 Tags: shipping, stamps, usps, woocommerce, taxes, payment, dhl, labels
 Requires at least: 4.6
 Requires PHP: 5.3
-Tested up to: 5.8
-Stable tag: 1.25.19
+Tested up to: 5.9
+Stable tag: 1.25.25
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,36 @@ The source code is freely available [in GitHub](https://github.com/Automattic/wo
 6. Checking and exporting the label purchase reports
 
 == Changelog ==
+
+= 1.25.25 - 2022-03-29 =
+* Fix   - TaxJar does not get the tax if the cart has non-taxable on the first item.
+* Tweak - Use regex to check on WC Rest API route for WooCommerce Blocks compatibility.
+
+= 1.25.24 - 2022-03-17 =
+* Fix - Empty document is opened when Firefox is set to open PDF file using another program.
+* Fix - Label purchase modal sections getting cut off.
+
+= 1.25.23 - 2022-02-10 =
+* Tweak - Make "Name" field optional if "Company" field is not empty.
+* Fix   - Added "Delete California tax rates" tool.
+* Fix   - Extract WC_Connect_TaxJar_Integration::backup_existing_tax_rates() for re-usability.
+
+= 1.25.22 - 2022-02-02 =
+* Fix   - TaxJar does not get the tax if the cart has non-taxable item.
+* Tweak - Bump WP tested version to 5.9 and WC tested version to 6.1.
+
+= 1.25.21 - 2022-01-26 =
+* Fix - Use 'native' pdf support feature for Firefox version 94 or later.
+* Fix - Only call WC Subscriptions API when "access_token_secret" value is saved in database.
+* Fix - Add name field to fields sent for EasyPost API address verification.
+* Fix - Display company name under origin and destination address when create shipping label.
+* Fix - Don't override general "Enable Tax" setting with WC Services Automated Taxes setting.
+
+= 1.25.20 - 2021-11-15 =
+* Fix - Hide "Shipping Label" and "Shipment Tracking" metabox when the label setting is disabled.
+* Fix - Wrap TaxJar API zipcodes with wc_normalize_postcode() before inserting into the database.
+* Fix - Update shipping label to only show non-refunded order line items.
+* Fix - Added 3 digits currency code on shipping label price for non USD.
 
 = 1.25.19 - 2021-10-14 =
 * Add - Notice about tax nexus in settings.
@@ -186,28 +216,3 @@ The source code is freely available [in GitHub](https://github.com/Automattic/wo
 * Fix   - Correct validation for UPS fields in Carrier Account connect form.
 * Tweak - Add message to explain automated tax requires tax-exclusive product pricing.
 * Fix   - Disable USPS refunds for untracked labels only.
-
-= 1.25.2 - 2020-11-10 =
-* Tweak - Add ZIP code validation to UPS(beta) signup form.
-* Fix   - Issue with printing labels in some iOS devices through Safari.
-* Fix   - Prevents warning when using PHP 5.5 or lesser
-* Add   - Add new API end point to retrieve carrier registration requirements.
-* Add   - Add composer command to run PHPUnit.
-* Tweak - Update readme with DHL information.
-
-= 1.25.1 - 2020-10-28 =
-* Tweak - DHL refund days copy adjustment
-* Tweak - Stop using deprecated Jetpack method is_development_mode().
-* Fix   - Update carrier name in tracking notification email
-* Add   - Add pre-commit and pre-push git hooks for linting and unit tests.
-* Add   - Disable refunds for USPS letters.
-
-= 1.25.0 - 2020-10-13 =
-* Fix   - UPS connect redirect prompt
-* Fix   - Allow UPS label purchase without payment method
-* Fix   - PHP implode arguments order
-* Fix   - Validate insurance value as both string and number
-* Tweak - Adjusted messaging on label pointers
-* Tweak - Update carrier logo
-* Tweak - Plugin rename
-* Add   - Link to print the customs form for all shipments that need it

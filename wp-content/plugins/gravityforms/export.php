@@ -46,6 +46,12 @@ class GFExport {
 		header( 'Content-Description: File Transfer' );
 		header( "Content-Disposition: attachment; filename=$filename" );
 		header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ), true );
+
+		$buffer_length = ob_get_length(); // length or false if no buffer.
+		if ( $buffer_length > 1 ) {
+			ob_clean();
+		}
+
 		echo $forms_json;
 		die();
 	}
@@ -99,14 +105,7 @@ class GFExport {
 
 	public static function import_json( $forms_json, &$forms = null ) {
 
-		// Remove any whitespace from before and after the JSON.
-		$forms_json = trim( $forms_json );
-
-		// Remove any extra characters from before the JSON.
-		$json_start_position = strpos( $forms_json, '{' );
-		if ( $json_start_position !== 0 ) {
-			$forms_json = substr( $forms_json, $json_start_position );
-		}
+		$forms_json = self::sanitize_forms_json( $forms_json );
 
 		$forms = json_decode( $forms_json, true );
 
@@ -159,6 +158,29 @@ class GFExport {
 
 		return sizeof( $form_ids );
 	}
+
+	/**
+	 * Removes any extraneous strings from the begining of the JSON file to be imported.
+	 *
+	 * @since 2.5.16
+	 *
+	 * @param string $forms_json Exported form JSON to be sanitized.
+	 *
+	 * @return string Sanitized JSON string.
+	 */
+	public static function sanitize_forms_json( $forms_json ) {
+
+		// Remove any whitespace from before and after the JSON.
+		$forms_json = trim( $forms_json );
+
+		// Remove any characters before the beginning of the JSON string.
+		if ( preg_match( '/{\s*"\d"\s*:\s*{/', $forms_json, $matches, PREG_OFFSET_CAPTURE ) ) {
+			$forms_json = substr( $forms_json, $matches[0][1] );
+		}
+
+		return $forms_json;
+	}
+
 
 	// This function is not deprecated as of 1.9 because it will still be needed for a while to import legacy XML files without generating deprecation notices.
 	// However, XML is not used to export Forms so this function will soon be deprecated.
@@ -470,7 +492,7 @@ class GFExport {
 				if (!formId)
 					return;
 
-				gfSpinner = new gfAjaxSpinner(jQuery('select#export_form'), gf_vars.baseUrl + '/images/spinner.svg', 'position: relative; top: 2px; left: 5px;');
+				gform.utils.trigger( { event: 'gform/page_loader/show' } );
 
 				var mysack = new sack("<?php echo admin_url( 'admin-ajax.php' )?>");
 				mysack.execute = 1;
@@ -487,8 +509,7 @@ class GFExport {
 			}
 
 			function EndSelectExportForm(aryFields, filterSettings) {
-
-				gfSpinner.destroy();
+				gform.utils.trigger( { event: 'gform/page_loader/hide' } );
 
 				if (aryFields.length == 0) {
 					jQuery("#export_field_container, #export_date_container, #export_submit_container").hide()
@@ -571,7 +592,7 @@ class GFExport {
 		</script>
 
         <div class="gform-settings__content">
-            <form method="post" id="gform_export" class="gform_settings_form">
+            <form method="post" id="gform_export" class="gform_settings_form" data-js="page-loader">
 	            <?php echo wp_nonce_field( 'rg_start_export', 'rg_start_export_nonce' ); ?>
                 <div class="gform-settings-panel gform-settings-panel--full">
                     <header class="gform-settings-panel__header"><legend class="gform-settings-panel__title"><?php esc_html_e( 'Export Entries', 'gravityforms' ) ;?></legend></header>
@@ -1331,4 +1352,3 @@ deny from all';
 		return $forms;
 	}
 }
-

@@ -105,7 +105,7 @@ class EventsSignal extends EventsFactory {
             case "signal_download": {
                 $params['event_action'] = 'Download';
                 $payload["extensions"] = PYS()->getOption( 'download_event_extensions' );
-                $item =  new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item =  new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
@@ -114,7 +114,7 @@ class EventsSignal extends EventsFactory {
 
                 $payload["scroll_percent"] = PYS()->getOption( 'signal_page_scroll_value' );
                 $params['event_action'] = 'Scroll '. $payload["scroll_percent"]."%";
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
@@ -122,14 +122,14 @@ class EventsSignal extends EventsFactory {
             case "signal_time_on_page": {
                 $payload["time_on_page"] = PYS()->getOption( 'signal_time_on_page_value' );
                 $params['event_action'] = 'Time on page '.$payload["time_on_page"]." seconds";
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_user_signup": {
                 $params['event_action'] = 'User Signup';
-                $item = new SingleEvent($event,EventTypes::$STATIC);
+                $item = new SingleEvent($event,EventTypes::$STATIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
@@ -137,42 +137,42 @@ class EventsSignal extends EventsFactory {
 
             case "signal_watch_video": {
                 $params['event_action'] = 'Video ';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_adsense": {
                 $params['event_action'] = 'Adsense';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_tel": {
                 $params['event_action'] = 'Tel';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_email": {
                 $params['event_action'] = 'Email';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_form": {
                 $params['event_action'] = 'Form';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
             }
             case "signal_comment": {
                 $params['event_action'] = 'Comment';
-                $item = new SingleEvent($event,EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event,EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 $item->addParams($params);
                 return $item;
@@ -180,7 +180,7 @@ class EventsSignal extends EventsFactory {
 
             default:
             {
-                $item = new SingleEvent($event, EventTypes::$DYNAMIC);
+                $item = new SingleEvent($event, EventTypes::$DYNAMIC,'signal');
                 $item->addPayload($payload);
                 return $item;
             }

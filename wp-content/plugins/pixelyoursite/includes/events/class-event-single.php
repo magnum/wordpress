@@ -8,8 +8,8 @@ class SingleEvent extends PYSEvent{
         'delay' => 0
     );
 
-    public function __construct($id,$type){
-        parent::__construct($id,$type);
+    public function __construct($id,$type,$category=''){
+        parent::__construct($id,$type,$category);
         $this->payload['type'] = $type;
     }
 

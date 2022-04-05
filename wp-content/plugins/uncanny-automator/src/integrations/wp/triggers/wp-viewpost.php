@@ -2,15 +2,16 @@
 
 namespace Uncanny_Automator;
 
-
 /**
  * Class WP_VIEWPOST
+ *
  * @package Uncanny_Automator
  */
 class WP_VIEWPOST {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'WP';
@@ -32,7 +33,6 @@ class WP_VIEWPOST {
 	 */
 	public function define_trigger() {
 
-
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/wordpress-core/' ),
@@ -47,15 +47,13 @@ class WP_VIEWPOST {
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'view_post' ),
 			// very last call in WP, we need to make sure they viewed the post and didn't skip before is was fully viewable
-			'options'             => [
+			'options'             => array(
 				Automator()->helpers->recipe->wp->options->all_posts(),
 				Automator()->helpers->recipe->options->number_of_times(),
-			],
+			),
 		);
 
 		Automator()->register->trigger( $trigger );
-
-		return;
 	}
 
 	/**
@@ -63,29 +61,32 @@ class WP_VIEWPOST {
 	 */
 	public function view_post() {
 		global $post;
-		$user_id = get_current_user_id();
-
-		if ( ! is_single() ) {
+		if ( ! $post instanceof \WP_Post ) {
 			return;
 		}
 
-		$pass_args = [
+		if ( ! is_singular( $post->post_type ) && ! is_post_type_viewable( $post->post_type ) ) {
+			return;
+		}
+
+		$user_id   = get_current_user_id();
+		$pass_args = array(
 			'code'    => $this->trigger_code,
 			'meta'    => $this->trigger_meta,
 			'post_id' => $post->ID,
 			'user_id' => $user_id,
-		];
+		);
 
 		$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
 		if ( $args ) {
 			foreach ( $args as $result ) {
 				if ( true === $result['result'] ) {
-					$trigger_meta = [
+					$trigger_meta = array(
 						'user_id'        => (int) $user_id,
 						'trigger_id'     => $result['args']['trigger_id'],
 						'trigger_log_id' => $result['args']['get_trigger_id'],
 						'run_number'     => $result['args']['run_number'],
-					];
+					);
 
 					$trigger_meta['meta_key']   = 'WPPOST';
 					$trigger_meta['meta_value'] = maybe_serialize( $post->post_title );
@@ -96,7 +97,7 @@ class WP_VIEWPOST {
 					Automator()->insert_trigger_meta( $trigger_meta );
 
 					$trigger_meta['meta_key']   = 'WPPOST_URL';
-					$trigger_meta['meta_value'] = maybe_serialize( get_post_permalink( $post->ID ) );
+					$trigger_meta['meta_value'] = maybe_serialize( get_permalink( $post->ID ) );
 					Automator()->insert_trigger_meta( $trigger_meta );
 
 					Automator()->maybe_trigger_complete( $result['args'] );

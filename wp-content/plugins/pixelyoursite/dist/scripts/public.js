@@ -406,6 +406,7 @@ if (!Array.prototype.includes) {
             /**
              * Events
              */
+
             fireTriggerEvent: function (eventId) {
 
                 if (!options.triggerEvents.hasOwnProperty(eventId)) {
@@ -417,30 +418,22 @@ if (!Array.prototype.includes) {
 
                 if (events.hasOwnProperty('facebook')) {
                     event = events.facebook;
-                    if(Utils.isEventInTimeWindow(event.name,event,"dyn_facebook_"+eventId)) {
-                        Facebook.fireEvent(event.name, event);
-                    }
+                    Facebook.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('ga')) {
                     event = events.ga;
-                    if(Utils.isEventInTimeWindow(event.name,event,"dyn_ga_"+eventId)) {
-                        Analytics.fireEvent(event.name, event);
-                    }
+                    Analytics.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('pinterest')) {
                     event = events.pinterest;
-                    if(Utils.isEventInTimeWindow(event.name,event,"dyn_pinterest_"+eventId)) {
-                        Pinterest.fireEvent(event.name, event);
-                    }
+                    Pinterest.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('bing')) {
                     event = events.bing;
-                    if(Utils.isEventInTimeWindow(event.name,event,"dyn_bing_"+eventId)) {
-                        Bing.fireEvent(event.name, event);
-                    }
+                    Bing.fireEvent(event.name, event);
                 }
             },
 
@@ -459,13 +452,13 @@ if (!Array.prototype.includes) {
 
                                 // fire event
                                 if ('facebook' === pixel) {
-                                    fired = Facebook.fireEvent(eventName, eventData);
+                                    fired = Facebook.fireEvent(eventData.name, eventData);
                                 } else if ('ga' === pixel) {
-                                    fired = Analytics.fireEvent(eventName, eventData);
+                                    fired = Analytics.fireEvent(eventData.name, eventData);
                                 } else if ('pinterest' === pixel) {
-                                    fired = Pinterest.fireEvent(eventName, eventData);
+                                    fired = Pinterest.fireEvent(eventData.name, eventData);
                                 } else if ('bing' === pixel) {
-                                    fired = Bing.fireEvent(eventName, eventData);
+                                    fired = Bing.fireEvent(eventData.name, eventData);
                                 }
 
                                 // prevent event double event firing
@@ -682,21 +675,33 @@ if (!Array.prototype.includes) {
                                 if(cs_cookie_val == 'yes') {
                                     if (categoryCookie === CS_Data.cs_script_cat.facebook) {
                                         Facebook.loadPixel();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.bing) {
+                                    } 
+                                    
+                                    if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.loadPixel();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.analytics) {
+                                    } 
+                                    
+                                    if (categoryCookie === CS_Data.cs_script_cat.analytics) {
                                         Analytics.loadPixel();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
+                                    } 
+                                    
+                                     if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.loadPixel();
                                     }
                                 } else {
                                     if (categoryCookie === CS_Data.cs_script_cat.facebook) {
                                         Facebook.disable();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.bing) {
+                                    } 
+                                    
+                                     if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.disable();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.analytics) {
+                                    } 
+                                    
+                                     if (categoryCookie === CS_Data.cs_script_cat.analytics) {
                                         Analytics.disable();
-                                    } else if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
+                                    } 
+                                    
+                                     if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.disable();
                                     }
                                 }
@@ -909,7 +914,7 @@ if (!Array.prototype.includes) {
                 var isAddToCartFromJs =  options.woo.hasOwnProperty("addToCartCatchMethod")
                     && options.woo.addToCartCatchMethod === "add_cart_js";
 
-                if(allData.name === "RemoveFromCart"
+                if(allData.e_id === "woo_remove_from_cart"
                     || (isAddToCartFromJs && allData.e_id === "woo_add_to_cart_on_button_click"))
                 {
                     Facebook.updateEventId(allData.name);
@@ -1176,7 +1181,7 @@ if (!Array.prototype.includes) {
                             } else if(product_type === Utils.PRODUCT_BUNDLE) {
                                 var data = $(".bundle_form .bundle_data").data("bundle_form_data");
                                 var items_sum = getBundlePriceOnSingleProduct(data);
-                                event.params.value = (data.base_price+items_sum )* qty;
+                                event.params.value = (parseInt(data.base_price) + items_sum )* qty;
                             } else {
                                 event.params.value = event.params.value * qty;
                             }
@@ -1247,16 +1252,15 @@ if (!Array.prototype.includes) {
             onTime: function (event) {
                 this.fireEvent(event.name, event);
             },
-            initEventIdCookies: function () {
-                var ids = {
-                    'AddToCart':pys_generate_token(36)
-                };
+            initEventIdCookies: function (key) {
+                var ids = {};
+                ids[key] = pys_generate_token(36)
                 Cookies.set('pys_fb_event_id', JSON.stringify(ids));
             },
             updateEventId:function(key) {
                 var cooData = Cookies.get("pys_fb_event_id")
                 if(data === undefined) {
-                    this.initEventIdCookies();
+                    this.initEventIdCookies(key);
                 } else {
                     var data = JSON.parse(cooData);
                     data[key] = pys_generate_token(36);
@@ -1267,7 +1271,7 @@ if (!Array.prototype.includes) {
             getEventId:function (key) {
                 var data = Cookies.get("pys_fb_event_id");
                 if(data === undefined) {
-                    this.initEventIdCookies();
+                    this.initEventIdCookies(key);
                     data = Cookies.get("pys_fb_event_id");
                 }
                 return JSON.parse(data)[key];
@@ -1301,9 +1305,9 @@ if (!Array.prototype.includes) {
 
             var eventParams = Utils.copyProperties(data, {});
 
-            var _fireEvent = function (tracking_id) {
+            var _fireEvent = function (tracking_id,name,params) {
 
-                var params = Utils.copyProperties(eventParams, {send_to: tracking_id});
+                params['send_to'] = tracking_id;
 
                 if (options.debug) {
                     console.log('[Google Analytics #' + tracking_id + '] ' + name, params);
@@ -1314,9 +1318,146 @@ if (!Array.prototype.includes) {
             };
 
             options.ga.trackingIds.forEach(function (tracking_id) {
-                _fireEvent(tracking_id);
+                var copyParams = Utils.copyProperties(eventParams, {}); // copy params because mapParamsTov4 can modify it
+                var params = mapParamsTov4(tracking_id,name,copyParams)
+                _fireEvent(tracking_id,name,params);
             });
 
+        }
+        function mapParamsTov4(tag,name,param) {
+            if(isv4(tag)) {
+                delete param.traffic_source;
+                delete param.event_category;
+                delete param.event_label;
+                delete param.ecomm_prodid;
+                delete param.ecomm_pagetype;
+                delete param.ecomm_totalvalue;
+                if(name === 'search') {
+                    param['search'] = param.search_term;
+                    delete param.search_term;
+                    delete param.non_interaction;
+                    delete param.dynx_itemid;
+                    delete param.dynx_pagetype;
+                    delete param.dynx_totalvalue;
+                }
+            } else {
+                //delete standard params
+                delete param.page_title;
+                delete param.post_type;
+                delete param.post_id;
+                delete param.plugin;
+                delete param.page_title;
+                delete param.event_url;
+                delete param.user_role;
+                delete param.cartlows;
+                delete param.cartflows_flow;
+                delete param.cartflows_step;
+
+                if(name === 'Signal') {
+                    switch (param.event_action) {
+                        case 'External Click':
+                        case 'Internal Click':
+                        case 'Tel':
+                        case 'Email': {
+                            let params = {
+                                event_category: name,
+                                event_action: param.event_action,
+                                non_interaction: param.non_interaction,
+                            }
+                            if(options.trackTrafficSource) {
+                                params['traffic_source'] = param.traffic_source
+                            }
+                            return params;
+                        }break;
+                        case 'Video': {
+                            let params = {
+                                event_category: name,
+                                event_action: param.event_action,
+                                event_label: param.video_title,
+                                non_interaction: param.non_interaction,
+                            }
+                            if(options.trackTrafficSource) {
+                                params['traffic_source'] = param.traffic_source
+                            }
+                            return params;
+                        }break;
+                        case 'Comment': {
+                            let params = {
+                                event_category: name,
+                                event_action: param.event_action,
+                                event_label: document.location.href,
+                                non_interaction: param.non_interaction,
+                            }
+                            if(options.trackTrafficSource) {
+                                params['traffic_source'] = param.traffic_source
+                            }
+                            return params;
+                        }break;
+                        case 'Form': {
+                            var params = {
+                                event_category: name,
+                                event_action: param.event_action,
+                                non_interaction: param.non_interaction,
+                            };
+                            if(options.trackTrafficSource) {
+                                params['traffic_source'] = param.traffic_source
+                            }
+                            var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
+                            if(formClass != "") {
+                                params["event_label"] = formClass;
+                            }
+                            return params;
+                        }break;
+                        case 'Download': {
+                            return {
+                                event_category: name,
+                                event_action: param.event_action,
+                                event_label: param.download_name,
+                                non_interaction: param.non_interaction,
+                            }
+                        }break;
+                    }
+                    if(param.event_action.indexOf('Scroll') === 0){
+                        var scroll_percent = param.event_action.substring(
+                            param.event_action.indexOf(' ')+1,
+                            param.event_action.indexOf('%')
+                        );
+                        let params =  {
+                            event_category: name,
+                            event_action: param.event_action,
+                            event_label: scroll_percent,
+                            non_interaction: param.non_interaction,
+                        }
+                        if(options.trackTrafficSource) {
+                            params['traffic_source'] = param.traffic_source
+                        }
+                        return params;
+                    }
+                    if(param.event_action.indexOf('Time on page') === 0) {
+                        let time_on_page = param.event_action.substring(
+                            14,
+                            param.event_action.indexOf(' seconds')
+                        );
+                        let params = {
+                            event_category: name,
+                            event_action: param.event_action,
+                            event_label: time_on_page,
+                            non_interaction: param.non_interaction,
+
+                        };
+                        if(options.trackTrafficSource) {
+                            params['traffic_source'] = param.traffic_source
+                        }
+                        return params
+                    }
+                }
+
+            }
+            return param;
+        }
+
+        function isv4(tag) {
+            return tag.indexOf('G') === 0;
         }
 
         /**
@@ -1355,14 +1496,7 @@ if (!Array.prototype.includes) {
                     };
                 }
 
-                if(options.ga.isUse4Version) {
-                    if(options.ga.disableAdvertisingFeatures) {
-                        config.allow_google_signals = false
-                    }
-                    if(options.ga.disableAdvertisingPersonalization) {
-                        config.allow_ad_personalization_signals = false
-                    }
-                }
+
 
                 // configure tracking ids
                 options.ga.trackingIds.forEach(function (trackingId,index) {
@@ -1370,6 +1504,14 @@ if (!Array.prototype.includes) {
                         config.debug_mode = true;
                     } else {
                         config.debug_mode = false;
+                    }
+                    if(isv4(trackingId)) {
+                        if(options.ga.disableAdvertisingFeatures) {
+                            config.allow_google_signals = false
+                        }
+                        if(options.ga.disableAdvertisingPersonalization) {
+                            config.allow_ad_personalization_signals = false
+                        }
                     }
                     gtag('config', trackingId, config);
                 });
@@ -1406,75 +1548,15 @@ if (!Array.prototype.includes) {
             },
 
             onCommentEvent: function (event) {
-
-                if (initialized && this.isEnabled() ) {
-                    if(options.ga.isUse4Version) {
-                        this.fireEvent(event.name, event);
-                    } else {
-                        this.fireEvent(event.name, {
-                            params: {
-                                event_category: event.name,
-                                event_action: event.params.event_action,
-                                event_label: document.location.href,
-                                non_interaction: event.params.non_interaction,
-                                event_day:event.params.event_day,
-                                event_hour:event.params.event_hour,
-                                event_month:event.params.event_month,
-                                traffic_source:event.params.traffic_source,
-                            }
-                        });
-                    }
-                }
-
-
+                this.fireEvent(event.name, event);
             },
 
             onDownloadEvent: function (event) {
-
-                if (initialized && this.isEnabled() ) {
-                    if(options.ga.isUse4Version) {
-                        this.fireEvent(event.name, event);
-                    } else {
-                        var params = {
-                            event_category: event.name,
-                            event_action: event.params.event_action,
-                            event_label:event.params.download_name,
-                            non_interaction: event.params.non_interaction,
-                        };
-                        this.fireEvent(event.name, {
-                            params: params
-                        });
-                    }
-                }
+                this.fireEvent(event.name, event);
             },
 
             onFormEvent: function (event) {
-
-                if (initialized && this.isEnabled() ) {
-
-                    if(options.ga.isUse4Version) {
-                        this.fireEvent(event.name, event);
-                    } else {
-                        var params = {
-                            event_category: event.name,
-                            event_action: event.params.event_action,
-                            non_interaction: event.params.non_interaction,
-                            event_day:event.params.event_day,
-                            event_hour:event.params.event_hour,
-                            event_month:event.params.event_month,
-                            traffic_source:event.params.traffic_source,
-                        };
-                        var formClass = (typeof event.params.form_class != 'undefined') ? 'class: ' + event.params.form_class : '';
-                        if(formClass != "") {
-                            params["event_label"] = formClass;
-                        }
-                        this.fireEvent(event.name, {
-                            params: params
-                        });
-                    }
-                }
-
-
+                this.fireEvent(event.name, event);
             },
 
             onWooAddToCartOnButtonEvent: function (product_id) {
@@ -1518,24 +1600,23 @@ if (!Array.prototype.includes) {
                                     quantity = 0;
                                 }
                                 var childItem = window.pysWooProductData[product_id]['ga'].grouped[childId];
-
-                                if(options.woo.addToCartOnButtonValueEnabled &&
-                                    options.woo.addToCartOnButtonValueOption !== 'global') {
-
-                                    event.params.items.forEach(function(el,index,array) {
-                                        if(el.id == childItem.content_id) {
-                                            if(quantity > 0){
-                                                el.quantity = quantity;
-                                                el.price = childItem.price * quantity;
-                                            } else {
-                                                array.splice(index, 1);
-                                            }
+                                // update quantity
+                                event.params.items.forEach(function(el,index,array) {
+                                    if(el.id == childItem.content_id) {
+                                        if(quantity > 0){
+                                            el.quantity = quantity;
+                                        } else {
+                                            array.splice(index, 1);
                                         }
-                                    });
-
-                                }
+                                    }
+                                });
                                 groupValue += childItem.price * quantity;
                             });
+                            if(options.woo.addToCartOnButtonValueEnabled &&
+                                options.woo.addToCartOnButtonValueOption !== 'global' &&
+                                event.params.hasOwnProperty('ecomm_totalvalue')) {
+                                event.params.ecomm_totalvalue = groupValue;
+                            }
 
                             if(groupValue == 0) return; // skip if no items selected
                         } else {
@@ -1548,12 +1629,8 @@ if (!Array.prototype.includes) {
                             options.woo.addToCartOnButtonValueOption !== 'global' &&
                             product_type !== Utils.PRODUCT_GROUPED)
                         {
-                            if(product_type === Utils.PRODUCT_BUNDLE) {
-                                var data = $(".bundle_form .bundle_data").data("bundle_form_data");
-                                var items_sum = getBundlePriceOnSingleProduct(data);
-                                event.params.items[0].price = (data.base_price+items_sum )* qty;
-                            } else {
-                                event.params.items[0].price = event.params.items[0].price * qty;
+                            if(event.params.hasOwnProperty('ecomm_totalvalue')) {
+                                event.params.ecomm_totalvalue = event.params.items[0].price * qty;
                             }
 
                         }
@@ -1628,6 +1705,20 @@ if (!Array.prototype.includes) {
 
 
     $(document).ready(function () {
+
+        if($("#pys_late_event").length > 0) {
+            var events =  JSON.parse($("#pys_late_event").attr("dir"));
+            for(var key in events) {
+                var event = {};
+                event[events[key].e_id] = [events[key]];
+                if(options.staticEvents.hasOwnProperty(key)) {
+                    Object.assign(options.staticEvents[key], event);
+                } else {
+                    options.staticEvents[key] = event;
+                }
+
+            }
+        }
 
         var Pinterest = Utils.setupPinterestObject();
         var Bing = Utils.setupBingObject();
@@ -1772,7 +1863,8 @@ if (!Array.prototype.includes) {
 
                 // Single Product
                 // tap try to https://stackoverflow.com/questions/30990967/on-tap-click-event-firing-twice-how-to-avoid-it
-                $(document).onFirst('click','button.single_add_to_cart_button,.single_add_to_cart_button',function (e) {
+                //  $(document) not work
+                $('body').onFirst('click','button.single_add_to_cart_button,.single_add_to_cart_button',function (e) {
 
                     var $button = $(this);
 

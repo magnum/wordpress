@@ -52,6 +52,8 @@ if(!(get_option('mo_saml_keep_settings_on_deletion')==='true')) {
 	    delete_option('mo_saml_encoding_enabled');
         delete_option('mo_saml_show_upgrade_notice');
 	    delete_option('mo_saml_show_addons_notice');
+        delete_option('mo_is_new_user');
+        delete_option('mo_saml_test_config_attrs');
         $users = get_users(array());
         foreach ($users as $user) {
             delete_user_meta($user->ID, 'mo_saml_session_index');
@@ -108,6 +110,8 @@ if(!(get_option('mo_saml_keep_settings_on_deletion')==='true')) {
 	        delete_option('MO_SAML_RESPONSE');
 	        delete_option('MO_SAML_TEST');
             delete_option('mo_saml_encoding_enabled');
+            delete_option('mo_is_new_user');
+            delete_option('mo_saml_test_config_attrs');
             $users = get_users(array());
             foreach ($users as $user) {
                 delete_user_meta($user->ID, 'mo_saml_session_index');

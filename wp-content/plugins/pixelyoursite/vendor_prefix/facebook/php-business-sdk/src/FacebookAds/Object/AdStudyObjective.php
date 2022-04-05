@@ -116,7 +116,7 @@ class AdStudyObjective extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudOb
     public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('adspixels' => 'list<Object>', 'applications' => 'list<Object>', 'customconversions' => 'list<Object>', 'is_primary' => 'bool', 'name' => 'string', 'offline_conversion_data_sets' => 'list<Object>', 'product_catalogs' => 'list<Object>', 'product_sets' => 'list<Object>', 'type' => 'type_enum');
+        $param_types = array('adspixels' => 'list<Object>', 'applications' => 'list<Object>', 'customconversions' => 'list<Object>', 'is_primary' => 'bool', 'name' => 'string', 'offline_conversion_data_sets' => 'list<Object>', 'offsite_datasets' => 'list<Object>', 'product_catalogs' => 'list<Object>', 'product_sets' => 'list<Object>', 'type' => 'type_enum');
         $enums = array('type_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdStudyObjectiveTypeValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdStudyObjective(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdStudyObjective::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

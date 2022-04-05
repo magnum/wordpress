@@ -116,7 +116,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
         <div class="row mt-3">
             <div class="col-4">
-                <label class="label-inline">Facebook Pixel consent category:</label>
+                <label class="label-inline">Meta Pixel (formerly Facebook Pixel) consent category:</label>
             </div>
             <div class="col-4">
                 <?php PYS()->render_text_input( 'gdpr_cookiebot_facebook_consent_category',

@@ -81,14 +81,14 @@ class Customersaml {
 		$args = array(
 			'method' => 'POST',
 			'body' => $field_string,
-			'timeout' => '5',
+			'timeout' => '10',
 			'redirection' => '5',
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => $headers
 		);
 		$response = Utilities::mo_saml_wp_remote_post($url, $args);
-		return $response['body'];
+		return $response;
 
 	}
 
@@ -109,14 +109,14 @@ class Customersaml {
 		$args = array(
 			'method' => 'POST',
 			'body' => $field_string,
-			'timeout' => '5',
+			'timeout' => '10',
 			'redirection' => '5',
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => $headers
 		);
 		$response = Utilities::mo_saml_wp_remote_post($url, $args);
-		return $response['body'];
+		return $response;
 
 	}
 	function check_customer() {
@@ -133,14 +133,14 @@ class Customersaml {
 		$args = array(
 			'method' => 'POST',
 			'body' => $field_string,
-			'timeout' => '5',
+			'timeout' => '10',
 			'redirection' => '5',
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => $headers
 		);
 		$response = Utilities::mo_saml_wp_remote_post($url, $args);
-		return $response['body'];
+		return $response;
 
 	}
 
@@ -169,14 +169,14 @@ class Customersaml {
         $args = array(
             'method' => 'POST',
             'body' => $field_string,
-            'timeout' => '5',
+            'timeout' => '10',
             'redirection' => '5',
             'httpversion' => '1.0',
             'blocking' => true,
             'headers' => $headers
         );
         $response = Utilities::mo_saml_wp_remote_post($url, $args);
-        return $response['body'];
+        return $response;
 
     }
 
@@ -233,14 +233,14 @@ class Customersaml {
 		$args = array(
 			'method' => 'POST',
 			'body' => $field_string,
-			'timeout' => '5',
+			'timeout' => '10',
 			'redirection' => '5',
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => $headers
 		);
 		$response = Utilities::mo_saml_wp_remote_post($url, $args);
-		return $response['body'];
+		return $response;
 
 	}
 	function mo_saml_forgot_password($email) {
@@ -276,20 +276,20 @@ class Customersaml {
 		$args = array(
 			'method' => 'POST',
 			'body' => $field_string,
-			'timeout' => '5',
+			'timeout' => '10',
 			'redirection' => '5',
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => $headers
 		);
 		$response = Utilities::mo_saml_wp_remote_post($url, $args);
-		return $response['body'];
+		return $response;
 
 	}
 	function get_timestamp() {
 		$url = mo_saml_options_plugin_constants::HOSTNAME . '/moas/rest/mobile/get-timestamp';
 		$response = Utilities::mo_saml_wp_remote_post($url);
-		return $response['body'];
+		return $response;
 
 	}
 

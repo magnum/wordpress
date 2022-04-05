@@ -67,11 +67,12 @@ class VehicleOfferFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const TERM_QUALIFIER = 'term_qualifier';
     const TITLE = 'title';
     const TRIM = 'trim';
+    const UNIT_PRICE = 'unit_price';
     const URL = 'url';
     const VEHICLE_OFFER_ID = 'vehicle_offer_id';
     const YEAR = 'year';
     public function getFieldTypes()
     {
-        return array('amount_currency' => 'string', 'amount_percentage' => 'float', 'amount_price' => 'string', 'amount_qualifier' => 'string', 'applinks' => 'CatalogItemAppLinks', 'body_style' => 'string', 'cashback_currency' => 'string', 'cashback_price' => 'string', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'dma_codes' => 'list<string>', 'downpayment_currency' => 'string', 'downpayment_price' => 'string', 'downpayment_qualifier' => 'string', 'end_date' => 'string', 'end_time' => 'int', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'make' => 'string', 'model' => 'string', 'offer_description' => 'string', 'offer_disclaimer' => 'string', 'offer_type' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'start_date' => 'string', 'start_time' => 'int', 'term_length' => 'unsigned int', 'term_qualifier' => 'string', 'title' => 'string', 'trim' => 'string', 'url' => 'string', 'vehicle_offer_id' => 'string', 'year' => 'int');
+        return array('amount_currency' => 'string', 'amount_percentage' => 'float', 'amount_price' => 'string', 'amount_qualifier' => 'string', 'applinks' => 'CatalogItemAppLinks', 'body_style' => 'string', 'cashback_currency' => 'string', 'cashback_price' => 'string', 'category_specific_fields' => 'CatalogSubVerticalList', 'currency' => 'string', 'dma_codes' => 'list<string>', 'downpayment_currency' => 'string', 'downpayment_price' => 'string', 'downpayment_qualifier' => 'string', 'end_date' => 'string', 'end_time' => 'int', 'id' => 'string', 'image_fetch_status' => 'ImageFetchStatus', 'images' => 'list<string>', 'make' => 'string', 'model' => 'string', 'offer_description' => 'string', 'offer_disclaimer' => 'string', 'offer_type' => 'string', 'price' => 'string', 'sanitized_images' => 'list<string>', 'start_date' => 'string', 'start_time' => 'int', 'term_length' => 'unsigned int', 'term_qualifier' => 'string', 'title' => 'string', 'trim' => 'string', 'unit_price' => 'Object', 'url' => 'string', 'vehicle_offer_id' => 'string', 'year' => 'int');
     }
 }

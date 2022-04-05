@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Automator_Get_Data
+ *
  * @package Uncanny_Automator
  */
 class Automator_Get_Data {
@@ -42,6 +43,7 @@ class Automator_Get_Data {
 		$item_code = null;
 
 		$recipes_data = Automator()->get_recipes_data( true );
+
 		if ( empty( $recipes_data ) ) {
 			return null;
 		}
@@ -521,7 +523,7 @@ class Automator_Get_Data {
 	 * @return mixed|string|null
 	 */
 	public function value_from_action_meta( $action_code = null, $meta = null ) {
-		
+
 		if ( null === $action_code || ! is_string( $action_code ) ) {
 			Automator()->error->add_error( 'value_from_action_meta', 'ERROR: You are trying to get a action meta from an action code without providing an $action_code', $this );
 
@@ -534,7 +536,7 @@ class Automator_Get_Data {
 		}
 
 		// Load all default trigger settings
-		$meta_value      = null;
+		$meta_value     = null;
 		$system_actions = Automator()->get_actions();
 
 		if ( empty( $system_actions ) ) {
@@ -969,7 +971,12 @@ class Automator_Get_Data {
 		if ( null === $check_trigger_code ) {
 			return array();
 		}
-		$key    = 'automator_recipes_of_' . $check_trigger_code;
+		$key = 'automator_recipes_of_' . $check_trigger_code;
+		// If recipe id is set then only specific recipe data needed instead of all recipes by code
+		if ( ! empty( $recipe_id ) ) {
+			$key .= '_' . $recipe_id;
+		}
+
 		$return = Automator()->cache->get( $key );
 		if ( ! empty( $return ) ) {
 			return $return;
@@ -1026,7 +1033,14 @@ class Automator_Get_Data {
 			foreach ( $recipe['triggers'] as $trigger ) {
 				$recipe_id = $recipe['ID'];
 				if ( array_key_exists( $trigger_meta, $trigger['meta'] ) ) {
-					$metas[ $recipe_id ][ $trigger['ID'] ] = $trigger['meta'][ $trigger_meta ];
+					$value = $trigger['meta'][ $trigger_meta ];
+
+					// If the meta is a custom value
+					if ( 'automator_custom_value' === $value ) {
+						$value = $trigger['meta'][ $trigger_meta . '_custom' ];
+					}
+					
+					$metas[ $recipe_id ][ $trigger['ID'] ] = $value;
 				}
 			}
 		}
@@ -1211,12 +1225,12 @@ class Automator_Get_Data {
 	 */
 	public function mayabe_get_token_meta_value_from_trigger_log( $trigger_id, $run_number, $recipe_id, $meta_key, $user_id, $recipe_log_id ) {
 		global $wpdb;
-		$tm_table = $wpdb->prefix . Automator()->db->tables->trigger_meta;
-		$t_table  = $wpdb->prefix . Automator()->db->tables->trigger;
-		$qry      = $wpdb->prepare(
-			"SELECT tm.meta_value
-FROM $tm_table tm
-LEFT JOIN $t_table t
+
+		return $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT tm.meta_value
+FROM {$wpdb->prefix}uap_trigger_log_meta tm
+LEFT JOIN {$wpdb->prefix}uap_trigger_log t
 ON tm.automator_trigger_log_id = t.ID
 WHERE t.automator_trigger_id = %d
   AND t.automator_recipe_log_id = %d
@@ -1224,15 +1238,14 @@ WHERE t.automator_trigger_id = %d
   AND t.user_id = %d
   AND tm.run_number = %d
   AND tm.meta_key = %s",
-			$trigger_id,
-			$recipe_log_id,
-			$recipe_id,
-			$user_id,
-			$run_number,
-			$meta_key
+				$trigger_id,
+				$recipe_log_id,
+				$recipe_id,
+				$user_id,
+				$run_number,
+				$meta_key
+			)
 		);
-
-		return $wpdb->get_var( $qry );
 	}
 
 	/**
@@ -1247,14 +1260,12 @@ WHERE t.automator_trigger_id = %d
 	 */
 	public function mayabe_get_real_trigger_log_id( $trigger_id, $run_number, $recipe_id, $user_id, $recipe_log_id ) {
 		global $wpdb;
-		$tm_table = $wpdb->prefix . Automator()->db->tables->trigger_meta;
-		$t_table  = $wpdb->prefix . Automator()->db->tables->trigger;
 
 		return $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT tm.automator_trigger_log_id
-FROM $tm_table tm
-LEFT JOIN $t_table t
+FROM {$wpdb->prefix}uap_trigger_log_meta tm
+LEFT JOIN {$wpdb->prefix}uap_trigger_log t
 ON tm.automator_trigger_log_id = t.ID
 WHERE t.automator_trigger_id = %d
   AND t.automator_recipe_log_id = %d
@@ -1283,5 +1294,59 @@ WHERE t.automator_trigger_id = %d
 		$results = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}{$tbl} WHERE completed=1" ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return apply_filters( 'automator_total_completed_runs', absint( $results ) );
+	}
+
+	/**
+	 * completed_runs
+	 *
+	 * @param mixed $seconds_to_include
+	 *
+	 * @return void
+	 */
+	public function completed_runs( $seconds_to_include = null ) {
+		global $wpdb;
+
+		$tbl   = Automator()->db->tables->recipe;
+		$query = "SELECT COUNT(*) FROM {$wpdb->prefix}{$tbl} WHERE completed=1";
+
+		if ( null !== $seconds_to_include ) {
+			$timestamp = current_time( 'timestamp' );
+			$time_ago  = strtotime( "-$seconds_to_include Seconds", $timestamp );
+			$date      = date_i18n( 'Y-m-d H:i:s', $time_ago );
+			$query     .= " AND date_time >= '$date'";
+		}
+
+		$results = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		return apply_filters( 'automator_completed_runs', absint( $results ) );
+	}
+
+	/**
+	 * Return the number of times recipe is completed successfully
+	 *
+	 * @param $recipe_id
+	 *
+	 * @return string|null
+	 */
+	public function recipe_completed_times( $recipe_id ) {
+		global $wpdb;
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed = %d", $recipe_id, 1 ) );
+
+		return is_numeric( $count ) ? $count : 0;
+	}
+
+	/**
+	 * Return the number of times recipe is completed successfully by a user
+	 *
+	 * @param $recipe_id
+	 * @param $user_id
+	 *
+	 * @return string|null
+	 */
+	public function recipe_completed_times_by_user( $recipe_id, $user_id ) {
+		global $wpdb;
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed=%d AND user_id=%d", $recipe_id, 1, $user_id ) );
+
+		return is_numeric( $count ) ? $count : 0;
 	}
 }

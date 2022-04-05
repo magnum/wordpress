@@ -4,6 +4,7 @@ namespace Uncanny_Automator;
 
 /**
  * Class Recipe_Post_Functions
+ *
  * @package Uncanny_Automator
  */
 class Recipe_Post_Utilities {
@@ -91,11 +92,6 @@ class Recipe_Post_Utilities {
 		// Update the post into the database
 		wp_update_post( $args );
 
-		//Save "user" recipe type as the default IF pro is not active
-//		if ( ! defined( 'AUTOMATOR_PRO_FILE' ) ) {
-//			update_post_meta( $post_ID, 'uap_recipe_type', 'user' );
-//		}
-
 		// Save automator version for future use in case
 		// something has to be changed for older recipes
 		update_post_meta( $post_ID, 'uap_recipe_version', Utilities::automator_get_version() );
@@ -110,7 +106,7 @@ class Recipe_Post_Utilities {
 	 */
 	public function automator_recipe_scripts( $hook ) {
 		// Add global assets. Load in all admin pages
-		Utilities::automator_enqueue_global_assets();
+		// Utilities::legacy_automator_enqueue_global_assets();
 
 		// Add scripts ONLY to recipe custom post type
 		if ( 'post-new.php' !== $hook && 'post.php' !== $hook ) {
@@ -132,6 +128,7 @@ class Recipe_Post_Utilities {
 			Utilities::automator_get_recipe_dist( 'bundle.min.js' ),
 			array(
 				'jquery',
+				'uap-admin',
 				'uap-codemirror',
 				'uap-codemirror-autorefresh',
 				'uap-codemirror-no-newlines',
@@ -155,6 +152,7 @@ class Recipe_Post_Utilities {
 			'uncanny-automator-ui',
 			Utilities::automator_get_recipe_dist( 'bundle.min.css' ),
 			array(
+				'uap-admin',
 				'uap-codemirror',
 			),
 			Utilities::automator_get_version()
@@ -282,8 +280,7 @@ class Recipe_Post_Utilities {
 
 		// Remove any cached extra options
 		delete_post_meta( $post_id, 'extra_options' );
-		global $wpdb;
-		$count     = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed = %d", $post_id, 1 ) );
+		$count     = Automator()->get->recipe_completed_times( $post_id );
 		$url       = add_query_arg(
 			array(
 				'post_type' => 'uo-recipe',
@@ -298,9 +295,12 @@ class Recipe_Post_Utilities {
 			'siteURL'             => get_site_url(),
 			'nonce'               => \wp_create_nonce( 'wp_rest' ),
 			'dev'                 => array(
-				'developerMode' => (bool) AUTOMATOR_DEBUG_MODE,
-				'recipesUrl'    => admin_url( 'edit.php?post_type=uo-recipe' ),
-				'debuggingURL'  => 'https://automatorplugin.com/knowledge-base/troubleshooting-plugin-errors/?utm_source=uncanny_automator&utm_medium=recipe-wizard-error-modal&utm_content=learn-more-debugging',
+				'developerMode'  => (bool) AUTOMATOR_DEBUG_MODE,
+				'recipesUrl'     => admin_url( 'edit.php?post_type=uo-recipe' ),
+				'debuggingURL'   => 'https://automatorplugin.com/knowledge-base/troubleshooting-plugin-errors/?utm_source=uncanny_automator&utm_medium=recipe-wizard-error-modal&utm_content=learn-more-debugging',
+				'supportPage'    => 'https://automatorplugin.com/automator-support/',
+				'permalinksURL'  => esc_url( admin_url( 'options-permalink.php' ) ),
+				'automatorTools' => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-tools' ),
 			),
 			'integrations'        => Automator()->get_integrations(),
 			'triggers'            => Automator()->get_triggers(),
@@ -363,7 +363,6 @@ class Recipe_Post_Utilities {
 		);
 
 		$api_setup = apply_filters_deprecated( 'uap_api_setup', array( $api_setup ), '3.0', 'automator_api_setup' ); // deprecate
-
 		return apply_filters( 'automator_api_setup', $api_setup );
 	}
 

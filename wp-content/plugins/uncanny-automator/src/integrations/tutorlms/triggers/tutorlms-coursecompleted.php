@@ -2,8 +2,8 @@
 /**
  * Contains Course Completion Trigger.
  *
- * @version 2.4.0
  * @since 2.4.0
+ * @version 2.4.0
  */
 
 namespace Uncanny_Automator;
@@ -46,7 +46,6 @@ class TUTORLMS_COURSECOMPLETED {
 
 		// global automator object.
 
-
 		// setup trigger configuration.
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
@@ -62,10 +61,10 @@ class TUTORLMS_COURSECOMPLETED {
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'complete' ),
 			// very last call in WP, we need to make sure they viewed the page and didn't skip before is was fully viewable
-			'options'             => [
+			'options'             => array(
 				Automator()->helpers->recipe->tutorlms->options->all_tutorlms_courses( null, $this->trigger_meta, true, true ),
 				Automator()->helpers->recipe->options->number_of_times(),
-			],
+			),
 		);
 
 		Automator()->register->trigger( $trigger );
@@ -81,6 +80,19 @@ class TUTORLMS_COURSECOMPLETED {
 		// global post object.
 		global $post;
 
+		// Is valid post?
+		if ( ! is_object( $post ) ) {
+			if ( isset( $_POST['course_id'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$course_id = (int) $_POST['course_id']; //phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$post      = get_post( $course_id ); //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			}
+		}
+
+		// Is valid post?
+		if ( ! is_object( $post ) ) {
+			return;
+		}
+
 		// Is this the registered lesson post type
 		if ( tutor()->course_post_type !== $post->post_type ) {
 			return;
@@ -90,14 +102,12 @@ class TUTORLMS_COURSECOMPLETED {
 		$user_id = get_current_user_id();
 
 		// trigger entry args.
-		$args = [
+		$args = array(
 			'code'    => $this->trigger_code,
 			'meta'    => $this->trigger_meta,
 			'post_id' => $post->ID,
 			'user_id' => $user_id,
-		];
-
-
+		);
 
 		// run trigger.
 		Automator()->maybe_add_trigger_entry( $args );

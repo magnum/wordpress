@@ -41,10 +41,9 @@ class AdPlacePageSetFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const NAME = 'name';
     const PAGES_COUNT = 'pages_count';
     const PARENT_PAGE = 'parent_page';
-    const CATEGORY = 'category';
     const TARGETED_AREA_TYPE = 'targeted_area_type';
     public function getFieldTypes()
     {
-        return array('account_id' => 'string', 'id' => 'string', 'location_types' => 'list<string>', 'name' => 'string', 'pages_count' => 'int', 'parent_page' => 'Page', 'category' => 'Category', 'targeted_area_type' => 'TargetedAreaType');
+        return array('account_id' => 'string', 'id' => 'string', 'location_types' => 'list<string>', 'name' => 'string', 'pages_count' => 'int', 'parent_page' => 'Page', 'targeted_area_type' => 'TargetedAreaType');
     }
 }

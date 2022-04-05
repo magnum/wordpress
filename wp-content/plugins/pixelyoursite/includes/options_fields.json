@@ -108,6 +108,6 @@
   "enable_edd_num_items_param": "checkbox",
   "enable_edd_product_price_param": "checkbox",
   "enable_remove_download_url_param":  "checkbox",
-  "logs_enable": "checkbox",
+  "pys_logs_enable": "checkbox",
   "woo_add_to_cart_catch_method": "select"
 }

@@ -14,6 +14,25 @@ use PixelYourSite\Facebook\Helpers;
 
 <!-- Enable WooCommerce -->
 <div class="card card-static">
+    <div class="card-body">
+        <div  class="row">
+            <div class="col">
+                <?php renderDummySwitcher( false); ?>
+                <h4 class="switcher-label">Facebook Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+        <div  class="row">
+            <div class="col">
+                <?php renderDummySwitcher( false); ?>
+                <h4 class="switcher-label">Google Analytics Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+        <p class="small">
+            If the Purchase event doesn't fire for a transaction when the order is placed by your client, the plugin will send it to Facebook and Google Analytics Universal (not yet supported for GA4) when the order's status changes to Complete.
+        </p>
+    </div>
+</div>
+<div class="card card-static">
     <div class="card-header">
         General
     </div>
@@ -62,7 +81,40 @@ use PixelYourSite\Facebook\Helpers;
     </div>
 </div>
 
+<!-- video -->
+<div class="card card-static">
+    <div class="card-header">
+        Recommended Videos:
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <p>WooCommerce AddToCart Event FIX (4:46 min) - <a href="https://www.youtube.com/watch?v=oZoAu8a0PNg" target="_blank">watch now</a></p>
+                <p>Improve WooCommerce Facebook Ads performance with OFFLINE CONVERSIONS (11:38) - <a href="https://www.youtube.com/watch?v=vNsiWh0cakA" target="_blank">watch now</a></p>
 
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  Transaction ID -->
+<div class="card ">
+    <div class="card-header">
+        Transaction ID <?php renderProBadge(); ?> <?php cardCollapseBtn(); ?>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-5 form-inline">
+                <label>Prefix: </label><?php renderDummyTextInput("Prefix");?>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <p>Consider adding a prefix for transactions IDs if you use the same tags on multiple websites.</p>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- AddToCart -->
 <div class="card">
     <div class="card-header">
@@ -104,8 +156,8 @@ use PixelYourSite\Facebook\Helpers;
                     <p><strong>It looks like you're using both PixelYourSite and Facebook for WooCommerce Extension. Good, because
                             they can do a great job together!</strong></p>
                     <p>Facebook for WooCommerce Extension is a useful free tool that lets you import your products to a Facebook
-                        shop and adds a very basic Facebook pixel on your site. PixelYourSite is a dedicated plugin that
-                        supercharges your Facebook Pixel with extremely useful features.</p>
+                        shop and adds a very basic Meta Pixel (formerly Facebook Pixel) on your site. PixelYourSite is a dedicated plugin that
+                        supercharges your Meta Pixel (formerly Facebook Pixel) with extremely useful features.</p>
                     <p>We made it possible to use both plugins together. You just have to decide what ID to use for your events.</p>
                 </div>
             </div>
@@ -264,7 +316,7 @@ e&utm_campaign=pro-feature' ); ?>
         <div class="card-header">
             Pinterest Tag ID setting
             <?php renderProBadge( 'https://www.pixelyoursite.com/pinterest-tag?utm_source=pys-free-plugin&utm_medium=pinterest-badge&utm_campaign=requiere-free-add-on',
-                "Requires free add-on"); ?>
+                "Requires paid add-on"); ?>
         </div>
     </div>
 <?php endif; ?>
@@ -981,7 +1033,7 @@ e&utm_campaign=pro-feature' ); ?>
 
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_complete_registration_enabled');?> CompleteRegistration for the Facebook Pixel<?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_complete_registration_enabled');?> CompleteRegistration for the Meta Pixel (formerly Facebook Pixel)<?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
         <?php if ( Facebook()->enabled() ) : ?>
@@ -1391,7 +1443,7 @@ e&utm_campaign=pro-feature' ); ?>
                 </p>
                 <br><br>
 
-                <p>The Facebook Pixel events are Dynamic Ads ready.</p>
+                <p>The Meta Pixel (formerly Facebook Pixel) events are Dynamic Ads ready.</p>
                 <p>The Google Analytics events track the data Enhanced Ecommerce or Monetization (GA4).</p>
                 <p>The Pinterest events have the required data for Dynamic Remarketing.</p>
 
@@ -1533,6 +1585,57 @@ e&utm_campaign=pro-feature' ); ?>
     </div>
 </div>
 
+<div class="card">
+    <div class="card-header">
+        Export transactions as offline conversions - Facebook (Meta)
+        <?php renderProBadge( 'https://www.pixelyoursite.com/google-analytics?utm_source=pys-free-plugin&utm_medium=pro-badge&utm_campaign=pro-feature' ); ?>
+        <?php cardCollapseBtn(); ?>
+    </div>
+    <div class="card-body">
+        <div class="row mb-1">
+            <div class="col">
+                <p>Learn how to use it: <a href="https://www.youtube.com/watch?v=vNsiWh0cakA" target="_blank">watch video</a></p>
+            </div>
+        </div>
+        <div  class="row mb-4">
+            <div class="col  form-inline">
+
+                <label style="margin-bottom: 10px;margin-right: 5px">Order status:</label>
+                <?php
+                $allStatus = wc_get_order_statuses();
+                foreach ($allStatus as $key => $label) :
+                    $checked = "";
+                    if($key == "wc-completed") {
+                        $checked = "checked";
+                    } ?>
+                    <label style="margin-bottom: 5px;margin-right: 5px">
+                        <input style="margin-right: 5px"  type="checkbox" <?=$checked?> class="order_status" value="<?=$key?>" name="order_status[]">
+                        <?=$label?></label>
+
+                <?php  endforeach; ?>
+            </div>
+        </div>
+
+        <div  class="row">
+            <div class="col  form-inline">
+                <label>Select</label>
+
+                <select class="form-control-sm" id="woo_export_purchase" >
+                    <option value="export_last_time" selected="selected">Export from last time</option>
+                    <option value="export_by_date">Export by dates</option>
+                    <option value="export_all" >Export all orders</option>
+                </select>
+
+            </div>
+        </div>
+
+        <div  class="row mt-4">
+            <div class="col-3">
+                <a href="#" target="_blank" class="btn btn-sm btn-block btn-primary disabled" disabled id="woo_generate_export">Create export</a>
+            </div>
+        </div>
+    </div>
+</div>
 <hr>
 <div class="row justify-content-center">
 	<div class="col-4">

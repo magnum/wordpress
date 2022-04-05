@@ -18,9 +18,8 @@ class Bp_Tokens {
 	public static $integration = 'BP';
 
 	public function __construct() {
-		add_filter( 'automator_maybe_trigger_bp_tokens', [ $this, 'bp_possible_tokens' ], 20, 2 );
-		add_filter( 'automator_maybe_parse_token', [ $this, 'parse_bp_token' ], 20, 6 );
-
+		add_filter( 'automator_maybe_trigger_bp_tokens', array( $this, 'bp_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'parse_bp_token' ), 20, 6 );
 	}
 
 	/**
@@ -55,77 +54,116 @@ class Bp_Tokens {
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];
 
-		$fields = [
-			[
+		$fields = array(
+			array(
 				'tokenId'         => 'BPUSER',
 				'tokenName'       => 'Avatar URL',
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BPUSERAVATAR',
-			],
-		];
+			),
+		);
 		// Get BP xprofile fields from DB.
 		global $wpdb;
-		$fields_table    = $wpdb->prefix . "bp_xprofile_fields";
-		$xprofile_fields = $wpdb->get_results( "SELECT * FROM {$fields_table} WHERE parent_id = 0  ORDER BY field_order ASC" );
+		$fields_table = $wpdb->prefix . 'bp_xprofile_fields';
+
+		$xprofile_fields = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}bp_xprofile_fields WHERE parent_id = %d  ORDER BY group_id ASC",
+				0
+			)
+		);
 
 		if ( ! empty( $xprofile_fields ) ) {
 			foreach ( $xprofile_fields as $field ) {
 				if ( 'socialnetworks' === $field->type ) {
-					$child_fields = $wpdb->get_results( "SELECT * FROM {$fields_table} WHERE parent_id = {$field->id} ORDER BY field_order ASC" );
+					$child_fields = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT * FROM {$wpdb->prefix}bp_xprofile_fields WHERE parent_id = %d ORDER BY group_id ASC",
+							$field->id
+						)
+					);
 					if ( ! empty( $child_fields ) ) {
 						foreach ( $child_fields as $child_field ) {
-							$fields[] = [
+							$fields[] = array(
 								'tokenId'         => 'BPUSER',
 								'tokenName'       => $field->name . ' - ' . $child_field->name,
 								'tokenType'       => 'text',
 								'tokenIdentifier' => 'BPXPROFILE:' . $field->id . '|' . $child_field->name,
-							];
+							);
 						}
 					}
 				} elseif ( 'membertypes' === $field->type ) {
-					$fields[] = [
+					$fields[] = array(
 						'tokenId'         => 'BPUSER',
 						'tokenName'       => $field->name,
 						'tokenType'       => 'text',
 						'tokenIdentifier' => 'BPXPROFILE:' . $field->id . '|membertypes',
-					];
+					);
 				} else {
-					$fields[] = [
+					$fields[] = array(
 						'tokenId'         => 'BPUSER',
 						'tokenName'       => $field->name,
 						'tokenType'       => 'text',
 						'tokenIdentifier' => 'BPXPROFILE:' . $field->id,
-					];
-				}
-			}
-		}
+					);
+				}//end if
+			}//end foreach
+		}//end if
 
 		if ( isset( $args['triggers_meta']['code'] ) && 'BPACTIVITYSTRM' === $args['triggers_meta']['code'] ) {
 
-			$fields[] = [
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_ID',
 				'tokenName'       => __( 'Activity ID', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BPUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_URL',
 				'tokenName'       => __( 'Activity URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BPUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_STREAM_URL',
 				'tokenName'       => __( 'Activity stream URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BPUSERACTIVITY',
-			];
-			$fields[] = [
+			);
+			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_CONTENT',
 				'tokenName'       => __( 'Activity content', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => 'BPUSERACTIVITY',
-			];
+			);
+		}//end if
+
+		if ( isset( $args['triggers_meta']['code'] ) && ( 'BPUSERSENDSFRIENDREQUEST' === $args['triggers_meta']['code'] || 'BPUSERACCEPTFRIENDREQUEST' === $args['triggers_meta']['code'] ) ) {
+			$trigger_code = $args['triggers_meta']['code'];
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_ID',
+				'tokenName'       => __( 'Friend ID', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_FIRSTNAME',
+				'tokenName'       => __( 'Friend first name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_LASTNAME',
+				'tokenName'       => __( 'Friend last name', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			);
+			$fields[]     = array(
+				'tokenId'         => 'FRIEND_EMAIL',
+				'tokenName'       => __( 'Friend email', 'uncanny-automator' ),
+				'tokenType'       => 'email',
+				'tokenIdentifier' => $trigger_code,
+			);
 		}
 
 		$tokens = array_merge( $tokens, $fields );
@@ -160,6 +198,9 @@ class Bp_Tokens {
 
 				if ( isset( $pieces[2] ) && ! empty( $pieces[2] ) ) {
 					$value = $this->get_xprofile_data( $user_id, $pieces[2] );
+					if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $value ) !== false ) {
+						$value = date( 'Y-m-d', $value );
+					}
 				}
 			} elseif ( in_array( 'BPUSERACTIVITY', $pieces ) ) {
 
@@ -174,8 +215,21 @@ class Bp_Tokens {
 						}
 					}
 				}
-			}
-		}
+			} elseif ( in_array( 'BPUSERSENDSFRIENDREQUEST', $pieces ) || in_array( 'BPUSERACCEPTFRIENDREQUEST', $pieces ) ) {
+
+				if ( $trigger_data ) {
+					foreach ( $trigger_data as $trigger ) {
+						$trigger_id     = $trigger['ID'];
+						$trigger_log_id = $replace_args['trigger_log_id'];
+						$meta_key       = $pieces[2];
+						$meta_value     = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_key, $trigger_id, $trigger_log_id, $user_id );
+						if ( ! empty( $meta_value ) ) {
+							$value = maybe_unserialize( $meta_value );
+						}
+					}
+				}
+			}//end if
+		}//end if
 
 		return $value;
 	}

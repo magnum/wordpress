@@ -15,8 +15,6 @@ class WC_Connect_TaxJar_Integration {
 	public $wc_connect_base_url;
 
 	private $expected_options = array(
-		// If automated taxes are enabled and user disables taxes we re-enable them
-		'woocommerce_calc_taxes'            => 'yes',
 		// Users can set either billing or shipping address for tax rates but not shop
 		'woocommerce_tax_based_on'          => 'shipping',
 		// Rate calculations assume tax not included
@@ -714,6 +712,9 @@ class WC_Connect_TaxJar_Integration {
 						WC_Subscriptions_Synchroniser::maybe_set_free_trial();
 					}
 					$unit_price = WC_Subscriptions_Cart::set_subscription_prices_for_calculation( $unit_price, $product );
+					if ( class_exists( 'WC_Subscriptions_Synchroniser' ) ) {
+						WC_Subscriptions_Synchroniser::maybe_unset_free_trial();
+					}
 				}
 			}
 
@@ -955,11 +956,22 @@ class WC_Connect_TaxJar_Integration {
 			'plugin'       => 'woo',
 		);
 
+		// Filter the line items to find the taxable items and use empty array if line items is NULL.
+		$taxable_line_items = array();
+
+		if ( ! empty( $line_items ) ) {
+			foreach ( $line_items as $line_item ) {
+				if ( isset( $line_item['product_tax_code'] ) && '99999' !== $line_item['product_tax_code'] ) {
+					$taxable_line_items[] = $line_item;
+				}
+			}
+		}
+
 		// Either `amount` or `line_items` parameters are required to perform tax calculations.
-		if ( empty( $line_items ) ) {
+		if ( empty( $taxable_line_items ) ) {
 			$body['amount'] = 0.0;
 		} else {
-			$body['line_items'] = $line_items;
+			$body['line_items'] = $taxable_line_items;
 		}
 
 		$response = $this->smartcalcs_cache_request( wp_json_encode( $body ) );
@@ -1094,7 +1106,7 @@ class WC_Connect_TaxJar_Integration {
 			$this->_log( ':: Adding New Tax Rate ::' );
 			$this->_log( $tax_rate );
 			$rate_id = WC_Tax::_insert_tax_rate( $tax_rate );
-			WC_Tax::_update_tax_rate_postcodes( $rate_id, wc_clean( $location['to_zip'] ) );
+			WC_Tax::_update_tax_rate_postcodes( $rate_id, wc_normalize_postcode( wc_clean( $location['to_zip'] ) ) );
 			WC_Tax::_update_tax_rate_cities( $rate_id, wc_clean( $location['to_city'] ) );
 		}
 
@@ -1169,118 +1181,15 @@ class WC_Connect_TaxJar_Integration {
 	 * See: https://github.com/taxjar/taxjar-woocommerce-plugin/blob/42cd4cd0/taxjar-woocommerce.php#L75
 	 */
 	public function backup_existing_tax_rates() {
+
+		// Back up all tax rates to a csv file
+		$backed_up = WC_Connect_Functions::backup_existing_tax_rates();
+
+		if ( ! $backed_up ) {
+			return;
+		}
+
 		global $wpdb;
-
-		// Export Tax Rates
-		$rates = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates
-			ORDER BY tax_rate_order
-			LIMIT %d, %d
-			",
-				0,
-				10000
-			)
-		);
-
-		ob_start();
-		$header =
-			__( 'Country Code', 'woocommerce' ) . ',' .
-			__( 'State Code', 'woocommerce' ) . ',' .
-			__( 'ZIP/Postcode', 'woocommerce' ) . ',' .
-			__( 'City', 'woocommerce' ) . ',' .
-			__( 'Rate %', 'woocommerce' ) . ',' .
-			__( 'Tax Name', 'woocommerce' ) . ',' .
-			__( 'Priority', 'woocommerce' ) . ',' .
-			__( 'Compound', 'woocommerce' ) . ',' .
-			__( 'Shipping', 'woocommerce' ) . ',' .
-			__( 'Tax Class', 'woocommerce' ) . "\n";
-
-		echo $header;
-
-		foreach ( $rates as $rate ) {
-			if ( $rate->tax_rate_country ) {
-				echo esc_attr( $rate->tax_rate_country );
-			} else {
-				echo '*';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate_state ) {
-				echo esc_attr( $rate->tax_rate_state );
-			} else {
-				echo '*';
-			}
-
-			echo ',';
-
-			$locations = $wpdb->get_col( $wpdb->prepare( "SELECT location_code FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE location_type='postcode' AND tax_rate_id = %d ORDER BY location_code", $rate->tax_rate_id ) );
-
-			if ( $locations ) {
-				echo esc_attr( implode( '; ', $locations ) );
-			} else {
-				echo '*';
-			}
-
-			echo ',';
-
-			$locations = $wpdb->get_col( $wpdb->prepare( "SELECT location_code FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE location_type='city' AND tax_rate_id = %d ORDER BY location_code", $rate->tax_rate_id ) );
-			if ( $locations ) {
-				echo esc_attr( implode( '; ', $locations ) );
-			} else {
-				echo '*';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate ) {
-				echo esc_attr( $rate->tax_rate );
-			} else {
-				echo '0';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate_name ) {
-				echo esc_attr( $rate->tax_rate_name );
-			} else {
-				echo '*';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate_priority ) {
-				echo esc_attr( $rate->tax_rate_priority );
-			} else {
-				echo '1';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate_compound ) {
-				echo esc_attr( $rate->tax_rate_compound );
-			} else {
-				echo '0';
-			}
-
-			echo ',';
-
-			if ( $rate->tax_rate_shipping ) {
-				echo esc_attr( $rate->tax_rate_shipping );
-			} else {
-				echo '0';
-			}
-
-			echo ',';
-
-			echo "\n";
-		} // End foreach().
-
-		$csv = ob_get_contents();
-		ob_end_clean();
-		$upload_dir = wp_upload_dir();
-		file_put_contents( $upload_dir['basedir'] . '/taxjar-wc_tax_rates-' . date( 'm-d-Y' ) . '-' . time() . '.csv', $csv );
 
 		// Delete all tax rates
 		$wpdb->query( 'TRUNCATE ' . $wpdb->prefix . 'woocommerce_tax_rates' );
