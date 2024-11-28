@@ -29,6 +29,9 @@ class Wpf_Tokens {
 		add_filter( 'automator_maybe_parse_token', array( $this, 'wpf_token' ), 20, 6 );
 		add_action( 'automator_save_wp_form', array( $this, 'wpf_form_save_entry' ), 20, 4 );
 		add_action( 'automator_save_anon_wp_form', array( $this, 'wpf_form_save_entry' ), 20, 4 );
+		// Entry tokens
+		add_filter( 'automator_maybe_trigger_wpf_tokens', array( $this, 'wpf_entry_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'wpf_entry_tokens' ), 20, 6 );
 	}
 
 	/**
@@ -38,6 +41,9 @@ class Wpf_Tokens {
 	 * @return array
 	 */
 	public function wpf_possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 		$form_id      = $args['value'];
 		$trigger_meta = $args['meta'];
 		$form_ids     = array();
@@ -97,6 +103,18 @@ class Wpf_Tokens {
 					'tokenType'       => in_array( $field['type'], $allowed_token_types, true ) ? $field['type'] : 'text',
 					'tokenIdentifier' => $trigger_meta,
 				);
+
+				// Added support for multiple option (label).
+				if ( in_array( $field['type'], array( 'select', 'checkbox', 'radio' ), true ) ) {
+
+					$fields[] = array(
+						'tokenId'         => $token_id . '|label',
+						'tokenName'       => sprintf( '%s %s', $input_title, esc_attr__( '(label)', 'uncanny-automator' ) ),
+						'tokenType'       => in_array( $field['type'], $allowed_token_types, true ) ? $field['type'] : 'text',
+						'tokenIdentifier' => $trigger_meta,
+					);
+
+				}
 			}
 
 			$tokens = array_merge( $tokens, $fields );
@@ -120,7 +138,7 @@ class Wpf_Tokens {
 			return $value;
 		}
 		if ( ! in_array( 'WPFFORMS', $pieces, true ) && ! in_array( 'ANONWPFFORMS', $pieces, true )
-		     && ! in_array( 'ANONWPFSUBFORM', $pieces, true ) ) {
+			 && ! in_array( 'ANONWPFSUBFORM', $pieces, true ) ) {
 			return $value;
 		}
 
@@ -172,13 +190,23 @@ class Wpf_Tokens {
 		if ( empty( $entry ) ) {
 			return $value;
 		}
+
 		$to_match = "{$trigger_id}:{$trigger_meta}:{$field}";
+
 		if ( is_array( $entry ) && key_exists( $to_match, $entry ) ) {
 			$value = $entry[ $to_match ];
+		}
+
+		$token_info = explode( '|', $pieces[2] );
+
+		if ( $this->should_fetch_label( $token_info ) ) {
+
+			$value = $this->get_field_label( $token_info, $entry, $to_match );
 
 		}
 
 		return $value;
+
 	}
 
 	/**
@@ -190,7 +218,7 @@ class Wpf_Tokens {
 	 * @return void
 	 */
 	public function wpf_form_save_entry( $fields, $form_data, $recipes, $args ) {
-		if ( ! is_array( $args ) ) {
+		if ( ! is_array( $args ) || empty( $fields ) ) {
 			return;
 		}
 		foreach ( $args as $trigger_result ) {
@@ -215,10 +243,22 @@ class Wpf_Tokens {
 					$meta_key     = sprintf( '%d:%s', $trigger_id, $trigger_args['meta'] );
 					$form_id      = $form_data['id'];
 					$data         = array();
+
 					foreach ( $fields as $field ) {
+						if ( ! is_array( $field ) ) {
+							continue;
+						}
 						$field_id     = $field['id'];
 						$key          = "{$meta_key}:{$form_id}|{$field_id}";
 						$data[ $key ] = $field['value'];
+
+						// Separate checkbox and select.
+						if ( in_array( $field['type'], array( 'checkbox', 'select' ), true ) ) {
+							$choices = explode( PHP_EOL, $field['value'] );
+							if ( is_array( $choices ) ) {
+								$data[ $key ] = implode( ', ', $choices );
+							}
+						}
 					}
 
 					$user_id        = (int) $trigger_result['args']['user_id'];
@@ -238,5 +278,155 @@ class Wpf_Tokens {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param $tokens
+	 * @param $args
+	 *
+	 * @return array|mixed|\string[][]
+	 */
+	public function wpf_entry_possible_tokens( $tokens = array(), $args = array() ) {
+		$fields = array(
+			array(
+				'tokenId'         => 'WPFENTRYID',
+				'tokenName'       => __( 'Entry ID', 'uncanny-automator' ),
+				'tokenType'       => 'int',
+				'tokenIdentifier' => 'WPFENTRYTOKENS',
+			),
+			array(
+				'tokenId'         => 'WPFENTRYIP',
+				'tokenName'       => __( 'User IP', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => 'WPFENTRYTOKENS',
+			),
+			array(
+				'tokenId'         => 'WPFENTRYDATE',
+				'tokenName'       => __( 'Entry submission date', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => 'WPFENTRYTOKENS',
+			),
+		);
+
+		$tokens = array_merge( $tokens, $fields );
+
+		return $tokens;
+	}
+
+	/**
+	 * @param $value
+	 * @param $pieces
+	 * @param $recipe_id
+	 * @param $trigger_data
+	 * @param $user_id
+	 *
+	 * @return string|null
+	 */
+	public function wpf_entry_tokens( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
+		if ( in_array( 'WPFENTRYTOKENS', $pieces, true ) ) {
+			if ( $trigger_data ) {
+				foreach ( $trigger_data as $trigger ) {
+					$trigger_id     = $trigger['ID'];
+					$trigger_log_id = $replace_args['trigger_log_id'];
+					$meta_key       = $pieces[2];
+					$meta_value     = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_key, $trigger_id, $trigger_log_id, $user_id );
+					if ( class_exists( 'WPForms_Lite' ) ) {
+						$meta_value = __( 'This token requires WPForms Pro', 'uncanny-automator' );
+					}
+					if ( ! empty( $meta_value ) ) {
+						$value = maybe_unserialize( $meta_value );
+					}
+				}
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Retrieves the field choice label.
+	 *
+	 * @param array $token_info
+	 * @param array $entry
+	 * @param string $to_match
+	 *
+	 * @return string
+	 */
+	private function get_field_label( $token_info = array(), $entry = array(), $to_match = '' ) {
+
+		// Get the enry.
+		$entry_choice = $entry[ str_replace( '|label', '', $to_match ) ];
+
+		// Bail if no selection.
+		if ( empty( $entry_choice ) ) {
+			return '';
+		}
+
+		// Get the form.
+		$form = $this->get_wpforms_form( absint( $token_info[0] ) );
+
+		// Get the field type.
+		$field_type = $form['fields'][ $token_info[1] ]['type'];
+
+		// Check if there are choices.
+		if ( ! empty( $form['fields'][ $token_info[1] ]['choices'] ) ) {
+
+			$choices = $form['fields'][ $token_info[1] ]['choices'];
+
+			foreach ( $choices as $choice ) {
+
+				// Handle checkbox selections.
+				if ( in_array( $field_type, array( 'checkbox' ), true ) ) {
+
+					$entry_choice_arr = explode( ', ', $entry_choice );
+
+					$choices_column = array_column( $choices, 'label' );
+
+					$selections = array();
+
+					foreach ( $choices_column as $index => $choice_column ) {
+
+						if ( in_array( $choice_column, $entry_choice_arr, true ) ) {
+
+							$selections[] = $choices_column[ $index ];
+
+						}
+					}
+
+					if ( ! empty( $selections ) ) {
+						return implode( ', ', $selections );
+					}
+				}
+
+				if ( $entry_choice === $choice['label'] || $entry_choice === $choice['value'] ) {
+
+					return $choice['label'];
+
+				}
+			}
+		}
+
+		return '';
+
+	}
+
+	private function should_fetch_label( $token_info = array() ) {
+		return 3 === count( $token_info ) && 'label' === $token_info[2];
+	}
+
+	private function get_wpforms_form( $form_id = 0 ) {
+
+		global $wpdb;
+
+		return json_decode(
+			$wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT post_content FROM $wpdb->posts WHERE id = %d",
+					$form_id
+				)
+			),
+			true
+		);
+
 	}
 }

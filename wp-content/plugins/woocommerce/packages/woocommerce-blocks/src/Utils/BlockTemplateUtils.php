@@ -1,14 +1,18 @@
 <?php
 namespace Automattic\WooCommerce\Blocks\Utils;
 
+use Automattic\WooCommerce\Blocks\Templates\ProductAttributeTemplate;
+use Automattic\WooCommerce\Blocks\Templates\ProductSearchResultsTemplate;
 use Automattic\WooCommerce\Blocks\Domain\Services\FeatureGating;
-
+use Automattic\WooCommerce\Blocks\Options;
+use Automattic\WooCommerce\Blocks\Templates\MiniCartTemplate;
 
 /**
- * BlockTemplateUtils class used for serving block templates from Woo Blocks.
- * IMPORTANT: These methods have been duplicated from Gutenberg/lib/full-site-editing/block-templates.php as those functions are not for public usage.
+ * Utility methods used for serving block templates from WooCommerce Blocks.
+ * {@internal This class and its methods should only be used within the BlockTemplateController.php and is not intended for public use.}
  */
 class BlockTemplateUtils {
+	const ELIGIBLE_FOR_ARCHIVE_PRODUCT_FALLBACK = array( 'taxonomy-product_cat', 'taxonomy-product_tag', ProductAttributeTemplate::SLUG );
 	/**
 	 * Directory names for block templates
 	 *
@@ -40,6 +44,16 @@ class BlockTemplateUtils {
 	const PLUGIN_SLUG = 'woocommerce/woocommerce';
 
 	/**
+	 * Deprecated WooCommerce plugin slug
+	 *
+	 * For supporting users who have customized templates under the incorrect plugin slug during the first release.
+	 * More context found here: https://github.com/woocommerce/woocommerce-gutenberg-products-block/issues/5423.
+	 *
+	 * @var string
+	 */
+	const DEPRECATED_PLUGIN_SLUG = 'woocommerce';
+
+	/**
 	 * Returns an array containing the references of
 	 * the passed blocks and their inner blocks.
 	 *
@@ -47,7 +61,7 @@ class BlockTemplateUtils {
 	 *
 	 * @return array block references to the passed blocks and their inner blocks.
 	 */
-	public static function gutenberg_flatten_blocks( &$blocks ) {
+	public static function flatten_blocks( &$blocks ) {
 		$all_blocks = array();
 		$queue      = array();
 		foreach ( $blocks as &$block ) {
@@ -80,12 +94,12 @@ class BlockTemplateUtils {
 	 *
 	 * @return string Updated wp_template content.
 	 */
-	public static function gutenberg_inject_theme_attribute_in_content( $template_content ) {
+	public static function inject_theme_attribute_in_content( $template_content ) {
 		$has_updated_content = false;
 		$new_content         = '';
 		$template_blocks     = parse_blocks( $template_content );
 
-		$blocks = self::gutenberg_flatten_blocks( $template_blocks );
+		$blocks = self::flatten_blocks( $template_blocks );
 		foreach ( $blocks as &$block ) {
 			if (
 				'core/template-part' === $block['blockName'] &&
@@ -109,12 +123,13 @@ class BlockTemplateUtils {
 
 	/**
 	 * Build a unified template object based a post Object.
+	 * Important: This method is an almost identical duplicate from wp-includes/block-template-utils.php as it was not intended for public use. It has been modified to build templates from plugins rather than themes.
 	 *
 	 * @param \WP_Post $post Template post.
 	 *
 	 * @return \WP_Block_Template|\WP_Error Template.
 	 */
-	public static function gutenberg_build_template_result_from_post( $post ) {
+	public static function build_template_result_from_post( $post ) {
 		$terms = get_the_terms( $post, 'wp_theme' );
 
 		if ( is_wp_error( $terms ) ) {
@@ -150,10 +165,10 @@ class BlockTemplateUtils {
 			}
 		}
 
-		// We are checking 'woocommerce' to maintain legacy templates which are saved to the DB,
+		// We are checking 'woocommerce' to maintain classic templates which are saved to the DB,
 		// prior to updating to use the correct slug.
 		// More information found here: https://github.com/woocommerce/woocommerce-gutenberg-products-block/issues/5423.
-		if ( self::PLUGIN_SLUG === $theme || 'woocommerce' === strtolower( $theme ) ) {
+		if ( self::PLUGIN_SLUG === $theme || self::DEPRECATED_PLUGIN_SLUG === strtolower( $theme ) ) {
 			$template->origin = 'plugin';
 		}
 
@@ -162,13 +177,14 @@ class BlockTemplateUtils {
 
 	/**
 	 * Build a unified template object based on a theme file.
+	 * Important: This method is an almost identical duplicate from wp-includes/block-template-utils.php as it was not intended for public use. It has been modified to build templates from plugins rather than themes.
 	 *
-	 * @param array $template_file Theme file.
-	 * @param array $template_type wp_template or wp_template_part.
+	 * @param array|object $template_file Theme file.
+	 * @param string       $template_type wp_template or wp_template_part.
 	 *
 	 * @return \WP_Block_Template Template.
 	 */
-	public static function gutenberg_build_template_result_from_file( $template_file, $template_type ) {
+	public static function build_template_result_from_file( $template_file, $template_type ) {
 		$template_file = (object) $template_file;
 
 		// If the theme has an archive-products.html template but does not have product taxonomy templates
@@ -181,12 +197,13 @@ class BlockTemplateUtils {
 		$template          = new \WP_Block_Template();
 		$template->id      = $template_is_from_theme ? $theme_name . '//' . $template_file->slug : self::PLUGIN_SLUG . '//' . $template_file->slug;
 		$template->theme   = $template_is_from_theme ? $theme_name : self::PLUGIN_SLUG;
-		$template->content = self::gutenberg_inject_theme_attribute_in_content( $template_content );
+		$template->content = self::inject_theme_attribute_in_content( $template_content );
 		// Plugin was agreed as a valid source value despite existing inline docs at the time of creating: https://github.com/WordPress/gutenberg/issues/36597#issuecomment-976232909.
 		$template->source         = $template_file->source ? $template_file->source : 'plugin';
 		$template->slug           = $template_file->slug;
 		$template->type           = $template_type;
-		$template->title          = ! empty( $template_file->title ) ? $template_file->title : self::convert_slug_to_title( $template_file->slug );
+		$template->title          = ! empty( $template_file->title ) ? $template_file->title : self::get_block_template_title( $template_file->slug );
+		$template->description    = ! empty( $template_file->description ) ? $template_file->description : self::get_block_template_description( $template_file->slug );
 		$template->status         = 'publish';
 		$template->has_theme_file = true;
 		$template->origin         = $template_file->source;
@@ -217,8 +234,8 @@ class BlockTemplateUtils {
 			'theme'       => $template_is_from_theme ? $theme_name : self::PLUGIN_SLUG,
 			// Plugin was agreed as a valid source value despite existing inline docs at the time of creating: https://github.com/WordPress/gutenberg/issues/36597#issuecomment-976232909.
 			'source'      => $template_is_from_theme ? 'theme' : 'plugin',
-			'title'       => self::convert_slug_to_title( $template_slug ),
-			'description' => '',
+			'title'       => self::get_block_template_title( $template_slug ),
+			'description' => self::get_block_template_description( $template_slug ),
 			'post_types'  => array(), // Don't appear in any Edit Post template selector dropdown.
 		);
 
@@ -231,7 +248,7 @@ class BlockTemplateUtils {
 	 * @param string $base_directory The theme's file path.
 	 * @return array $path_list A list of paths to all template part files.
 	 */
-	public static function gutenberg_get_template_paths( $base_directory ) {
+	public static function get_template_paths( $base_directory ) {
 		$path_list = array();
 		if ( file_exists( $base_directory ) ) {
 			$nested_files      = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $base_directory ) );
@@ -244,25 +261,74 @@ class BlockTemplateUtils {
 	}
 
 	/**
-	 * Converts template slugs into readable titles.
+	 * Returns template titles.
 	 *
 	 * @param string $template_slug The templates slug (e.g. single-product).
-	 * @return string Human friendly title converted from the slug.
+	 * @return string Human friendly title.
 	 */
-	public static function convert_slug_to_title( $template_slug ) {
-		switch ( $template_slug ) {
-			case 'single-product':
-				return __( 'Single Product', 'woocommerce' );
-			case 'archive-product':
-				return __( 'Product Archive', 'woocommerce' );
-			case 'taxonomy-product_cat':
-				return __( 'Product Category', 'woocommerce' );
-			case 'taxonomy-product_tag':
-				return __( 'Product Tag', 'woocommerce' );
-			default:
-				// Replace all hyphens and underscores with spaces.
-				return ucwords( preg_replace( '/[\-_]/', ' ', $template_slug ) );
+	public static function get_block_template_title( $template_slug ) {
+		$plugin_template_types = self::get_plugin_block_template_types();
+		if ( isset( $plugin_template_types[ $template_slug ] ) ) {
+			return $plugin_template_types[ $template_slug ]['title'];
+		} else {
+			// Human friendly title converted from the slug.
+			return ucwords( preg_replace( '/[\-_]/', ' ', $template_slug ) );
 		}
+	}
+
+	/**
+	 * Returns template descriptions.
+	 *
+	 * @param string $template_slug The templates slug (e.g. single-product).
+	 * @return string Template description.
+	 */
+	public static function get_block_template_description( $template_slug ) {
+		$plugin_template_types = self::get_plugin_block_template_types();
+		if ( isset( $plugin_template_types[ $template_slug ] ) ) {
+			return $plugin_template_types[ $template_slug ]['description'];
+		}
+		return '';
+	}
+
+	/**
+	 * Returns a filtered list of plugin template types, containing their
+	 * localized titles and descriptions.
+	 *
+	 * @return array The plugin template types.
+	 */
+	public static function get_plugin_block_template_types() {
+		$plugin_template_types = array(
+			'single-product'                   => array(
+				'title'       => _x( 'Single Product', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays a single product.', 'woocommerce' ),
+			),
+			'archive-product'                  => array(
+				'title'       => _x( 'Product Catalog', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays your products.', 'woocommerce' ),
+			),
+			'taxonomy-product_cat'             => array(
+				'title'       => _x( 'Products by Category', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays products filtered by a category.', 'woocommerce' ),
+			),
+			'taxonomy-product_tag'             => array(
+				'title'       => _x( 'Products by Tag', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays products filtered by a tag.', 'woocommerce' ),
+			),
+			ProductAttributeTemplate::SLUG     => array(
+				'title'       => _x( 'Products by Attribute', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays products filtered by an attribute.', 'woocommerce' ),
+			),
+			ProductSearchResultsTemplate::SLUG => array(
+				'title'       => _x( 'Product Search Results', 'Template name', 'woocommerce' ),
+				'description' => __( 'Displays search results for your store.', 'woocommerce' ),
+			),
+			MiniCartTemplate::SLUG             => array(
+				'title'       => _x( 'Mini Cart', 'Template name', 'woocommerce' ),
+				'description' => __( 'Template used to display the Mini Cart drawer.', 'woocommerce' ),
+			),
+		);
+
+		return $plugin_template_types;
 	}
 
 	/**
@@ -355,7 +421,7 @@ class BlockTemplateUtils {
 	 */
 	public static function supports_block_templates() {
 		if (
-			( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) &&
+			! wc_current_theme_is_fse_theme() &&
 			( ! function_exists( 'gutenberg_supports_block_templates' ) || ! gutenberg_supports_block_templates() )
 		) {
 			return false;
@@ -387,18 +453,74 @@ class BlockTemplateUtils {
 	}
 
 	/**
-	 * Checks if we can fallback to the `archive-product` template for a given slug
+	 * Checks if we can fall back to the `archive-product` template for a given slug.
 	 *
-	 * `taxonomy-product_cat` and `taxonomy-product_tag` templates can generally use the
-	 * `archive-product` as a fallback if there are no specific overrides.
+	 * `taxonomy-product_cat`, `taxonomy-product_tag`, `taxonomy-product_attribute` templates can
+	 *  generally use the `archive-product` as a fallback if there are no specific overrides.
 	 *
 	 * @param string $template_slug Slug to check for fallbacks.
 	 * @return boolean
 	 */
 	public static function template_is_eligible_for_product_archive_fallback( $template_slug ) {
-		$eligible_for_fallbacks = array( 'taxonomy-product_cat', 'taxonomy-product_tag' );
+		return in_array( $template_slug, self::ELIGIBLE_FOR_ARCHIVE_PRODUCT_FALLBACK, true );
+	}
 
-		return in_array( $template_slug, $eligible_for_fallbacks, true )
+	/**
+	 * Checks if we can fall back to an `archive-product` template stored on the db for a given slug.
+	 *
+	 * @param string $template_slug Slug to check for fallbacks.
+	 * @param array  $db_templates Templates that have already been found on the db.
+	 * @return boolean
+	 */
+	public static function template_is_eligible_for_product_archive_fallback_from_db( $template_slug, $db_templates ) {
+		$eligible_for_fallback = self::template_is_eligible_for_product_archive_fallback( $template_slug );
+		if ( ! $eligible_for_fallback ) {
+			return false;
+		}
+
+		$array_filter = array_filter(
+			$db_templates,
+			function ( $template ) use ( $template_slug ) {
+				return 'archive-product' === $template->slug;
+			}
+		);
+
+		return count( $array_filter ) > 0;
+	}
+
+	/**
+	 * Gets the `archive-product` fallback template stored on the db for a given slug.
+	 *
+	 * @param string $template_slug Slug to check for fallbacks.
+	 * @param array  $db_templates Templates that have already been found on the db.
+	 * @return boolean|object
+	 */
+	public static function get_fallback_template_from_db( $template_slug, $db_templates ) {
+		$eligible_for_fallback = self::template_is_eligible_for_product_archive_fallback( $template_slug );
+		if ( ! $eligible_for_fallback ) {
+			return false;
+		}
+
+		foreach ( $db_templates as $template ) {
+			if ( 'archive-product' === $template->slug ) {
+				return $template;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if we can fall back to the `archive-product` file template for a given slug in the current theme.
+	 *
+	 * `taxonomy-product_cat`, `taxonomy-product_tag`, `taxonomy-attribute` templates can
+	 *  generally use the `archive-product` as a fallback if there are no specific overrides.
+	 *
+	 * @param string $template_slug Slug to check for fallbacks.
+	 * @return boolean
+	 */
+	public static function template_is_eligible_for_product_archive_fallback_from_theme( $template_slug ) {
+		return self::template_is_eligible_for_product_archive_fallback( $template_slug )
 			&& ! self::theme_has_template( $template_slug )
 			&& self::theme_has_template( 'archive-product' );
 	}
@@ -406,7 +528,7 @@ class BlockTemplateUtils {
 	/**
 	 * Sets the `has_theme_file` to `true` for templates with fallbacks
 	 *
-	 * There are cases (such as tags and categories) in which fallback templates
+	 * There are cases (such as tags, categories and attributes) in which fallback templates
 	 * can be used; so, while *technically* the theme doesn't have a specific file
 	 * for them, it is important that we tell Gutenberg that we do, in fact,
 	 * have a theme file (i.e. the fallback one).
@@ -426,7 +548,7 @@ class BlockTemplateUtils {
 				$query_result_template->slug === $template->slug
 				&& $query_result_template->theme === $template->theme
 			) {
-				if ( self::template_is_eligible_for_product_archive_fallback( $template->slug ) ) {
+				if ( self::template_is_eligible_for_product_archive_fallback_from_theme( $template->slug ) ) {
 					$query_result_template->has_theme_file = true;
 				}
 
@@ -453,9 +575,7 @@ class BlockTemplateUtils {
 		 *
 		 * @var array
 		*/
-		$block_templates_with_feature_gate = array(
-			'mini-cart' => $feature_gating->get_experimental_flag(),
-		);
+		$block_templates_with_feature_gate = array();
 
 		return array_filter(
 			$block_templates,
@@ -468,4 +588,69 @@ class BlockTemplateUtils {
 		);
 	}
 
+	/**
+	 * Removes templates that were added to a theme's block-templates directory, but already had a customised version saved in the database.
+	 *
+	 * @param \WP_Block_Template[]|\stdClass[] $templates List of templates to run the filter on.
+	 *
+	 * @return array List of templates with duplicates removed. The customised alternative is preferred over the theme default.
+	 */
+	public static function remove_theme_templates_with_custom_alternative( $templates ) {
+
+		// Get the slugs of all templates that have been customised and saved in the database.
+		$customised_template_slugs = array_map(
+			function( $template ) {
+				return $template->slug;
+			},
+			array_values(
+				array_filter(
+					$templates,
+					function( $template ) {
+						// This template has been customised and saved as a post.
+						return 'custom' === $template->source;
+					}
+				)
+			)
+		);
+
+		// Remove theme (i.e. filesystem) templates that have the same slug as a customised one. We don't need to check
+		// for `woocommerce` in $template->source here because woocommerce templates won't have been added to $templates
+		// if a saved version was found in the db. This only affects saved templates that were saved BEFORE a theme
+		// template with the same slug was added.
+		return array_values(
+			array_filter(
+				$templates,
+				function( $template ) use ( $customised_template_slugs ) {
+					// This template has been customised and saved as a post, so return it.
+					return ! ( 'theme' === $template->source && in_array( $template->slug, $customised_template_slugs, true ) );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Returns whether the blockified templates should be used or not.
+	 * If the option is not stored on the db, we need to check if the current theme is a block one or not.
+	 *
+	 * @return boolean
+	 */
+	public static function should_use_blockified_product_grid_templates() {
+		$use_blockified_templates = get_option( Options::WC_BLOCK_USE_BLOCKIFIED_PRODUCT_GRID_BLOCK_AS_TEMPLATE );
+
+		if ( false === $use_blockified_templates ) {
+			return wc_current_theme_is_fse_theme();
+		}
+
+		return wc_string_to_bool( $use_blockified_templates );
+	}
+
+	/**
+	 * Returns whether the passed `$template` has a title, and it's different from the slug.
+	 *
+	 * @param object $template The template object.
+	 * @return boolean
+	 */
+	public static function template_has_title( $template ) {
+		return ! empty( $template->title ) && $template->title !== $template->slug;
+	}
 }

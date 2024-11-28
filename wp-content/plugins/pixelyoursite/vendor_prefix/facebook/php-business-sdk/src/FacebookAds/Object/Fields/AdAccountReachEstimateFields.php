@@ -36,11 +36,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 class AdAccountReachEstimateFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const ESTIMATE_READY = 'estimate_ready';
-    const USERS = 'users';
     const USERS_LOWER_BOUND = 'users_lower_bound';
     const USERS_UPPER_BOUND = 'users_upper_bound';
     public function getFieldTypes()
     {
-        return array('estimate_ready' => 'bool', 'users' => 'int', 'users_lower_bound' => 'int', 'users_upper_bound' => 'int');
+        return array('estimate_ready' => 'bool', 'users_lower_bound' => 'int', 'users_upper_bound' => 'int');
     }
 }

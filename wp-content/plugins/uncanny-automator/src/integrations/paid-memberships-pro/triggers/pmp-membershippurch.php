@@ -41,10 +41,6 @@ class PMP_MEMBERSHIPPURCH {
 	 */
 	public function define_trigger() {
 
-		$options = Automator()->helpers->recipe->paid_memberships_pro->options->all_memberships( esc_attr__( 'Membership', 'uncanny-automator' ) );
-
-		$options['options'] = array( '-1' => esc_attr__( 'Any membership', 'uncanny-automator' ) ) + $options['options'];
-
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/paid-memberships-pro/' ),
@@ -58,19 +54,33 @@ class PMP_MEMBERSHIPPURCH {
 			'priority'            => 99,
 			'accepted_args'       => 2,
 			'validation_function' => array( $this, 'pmpro_payment_completed' ),
-			'options'             => array(
-				$options,
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+
+		$options            = Automator()->helpers->recipe->paid_memberships_pro->options->all_memberships( esc_attr__( 'Membership', 'uncanny-automator' ) );
+		$options['options'] = array( '-1' => esc_attr__( 'Any membership', 'uncanny-automator' ) ) + $options['options'];
+
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					$options,
+				),
+			)
+		);
 	}
 
 	/**
 	 * Validation function when the trigger action is hit
 	 *
+	 * @param $user_id
 	 * @param MemberOrder $morder
 	 */
 	public function pmpro_payment_completed( $user_id, MemberOrder $morder ) {
@@ -91,13 +101,11 @@ class PMP_MEMBERSHIPPURCH {
 		foreach ( $recipes as $recipe_id => $recipe ) {
 			foreach ( $recipe['triggers'] as $trigger ) {
 				$trigger_id = $trigger['ID'];//return early for all memberships
-				if ( - 1 === intval( $required_membership[ $recipe_id ][ $trigger_id ] ) ) {
+				if ( intval( '-1' ) === intval( $required_membership[ $recipe_id ][ $trigger_id ] ) ) {
 					$matched_recipe_ids[] = array(
 						'recipe_id'  => $recipe_id,
 						'trigger_id' => $trigger_id,
 					);
-
-					break;
 				}
 			}
 		}
@@ -106,7 +114,7 @@ class PMP_MEMBERSHIPPURCH {
 		foreach ( $recipes as $recipe_id => $recipe ) {
 			foreach ( $recipe['triggers'] as $trigger ) {
 				$trigger_id = $trigger['ID'];//return early for all memberships
-				if ( $required_membership[ $recipe_id ][ $trigger_id ] == $membership_id ) {
+				if ( (int) $required_membership[ $recipe_id ][ $trigger_id ] === (int) $membership_id ) {
 					$matched_recipe_ids[] = array(
 						'recipe_id'  => $recipe_id,
 						'trigger_id' => $trigger_id,
@@ -115,30 +123,29 @@ class PMP_MEMBERSHIPPURCH {
 			}
 		}
 
-		if ( ! empty( $matched_recipe_ids ) ) {
-			foreach ( $matched_recipe_ids as $matched_recipe_id ) {
-				$args = array(
-					'code'             => $this->trigger_code,
-					'meta'             => $this->trigger_meta,
-					'user_id'          => $user_id,
-					'recipe_to_match'  => $matched_recipe_id['recipe_id'],
-					'trigger_to_match' => $matched_recipe_id['trigger_id'],
-					'ignore_post_id'   => true,
-				);
+		if ( empty( $matched_recipe_ids ) ) {
+			return;
+		}
+		foreach ( $matched_recipe_ids as $matched_recipe_id ) {
+			$args = array(
+				'code'             => $this->trigger_code,
+				'meta'             => $this->trigger_meta,
+				'user_id'          => $user_id,
+				'recipe_to_match'  => $matched_recipe_id['recipe_id'],
+				'trigger_to_match' => $matched_recipe_id['trigger_id'],
+				'ignore_post_id'   => true,
+			);
 
-				$result = Automator()->maybe_add_trigger_entry( $args, false );
+			$result = Automator()->maybe_add_trigger_entry( $args, false );
 
-				if ( $result ) {
-					foreach ( $result as $r ) {
-						if ( true === $r['result'] ) {
-							do_action( 'uap_save_pmp_membership_level', $membership_id, $r['args'], $user_id, $this->trigger_meta );
-							Automator()->maybe_trigger_complete( $r['args'] );
-						}
+			if ( $result ) {
+				foreach ( $result as $r ) {
+					if ( true === $r['result'] ) {
+						do_action( 'uap_save_pmp_membership_level', $membership_id, $r['args'], $user_id, $this->trigger_meta );
+						Automator()->maybe_trigger_complete( $r['args'] );
 					}
 				}
 			}
 		}
-
-		return;
 	}
 }

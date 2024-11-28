@@ -2,7 +2,7 @@
 require_once UA_ABSPATH . 'src/core/views/admin-tools-header.php';
 if ( ( filter_has_var( INPUT_GET, 'delete_log' ) && 'yes' === filter_input( INPUT_GET, 'delete_log' ) ) && ( filter_has_var( INPUT_GET, '_wpnonce' ) && wp_verify_nonce( filter_input( INPUT_GET, '_wpnonce' ), 'Aut0mAt0r' ) ) ) {
 	$file = filter_input( INPUT_GET, 'delete' );
-	if ( file_exists( UA_DEBUG_LOGS_DIR . $file ) ) {
+	if ( is_file( UA_DEBUG_LOGS_DIR . $file ) ) {
 		if ( unlink( UA_DEBUG_LOGS_DIR . $file ) ) {
 			$url = add_query_arg(
 				array(
@@ -48,11 +48,12 @@ if ( filter_has_var( INPUT_GET, 'file_removed' ) ) {
 // Read logs directory
 $log_directory = UA_DEBUG_LOGS_DIR;
 $log_files     = array();
-if ( ! file_exists( $log_directory ) ) {
-	printf( '<h3>%s</h3>', esc_html__( 'No logs found.', 'uncanny-automator' ) );
 
+if ( ! is_dir( $log_directory ) ) {
+	printf( '<h3>%s</h3>', esc_html__( 'No logs found.', 'uncanny-automator' ) );
 	return;
 }
+
 $handle = opendir( $log_directory );
 if ( $handle ) {
 	$entry = readdir( $handle );
@@ -80,8 +81,8 @@ if ( empty( $log_files ) ) {
 			<ul class="nav-tab-wrapper uap-nav-tab-wrapper">
 				<?php if ( $log_files ) { ?>
 					<?php foreach ( $log_files as $log ) { ?>
-						<li><a class="nav-tab"
-							   href="#<?php echo esc_attr( $log ); ?>"><?php echo esc_attr( $log ); ?></a>
+						<li>
+							<a class="nav-tab" href="#<?php echo esc_attr( $log ); ?>"><?php echo esc_html( $log ); ?></a>
 						</li>
 					<?php } ?>
 				<?php } ?>
@@ -105,14 +106,15 @@ if ( empty( $log_files ) ) {
 										admin_url( 'edit.php' )
 									);
 									?>
-									<a style="float:right; display:inline-block"
-									   class="button button-secondary button-small"
-									   onclick="javascript: return confirm('<?php echo esc_html__( 'Are you sure you want to delete this log?', 'uncanny-automator' ); ?>');"
-									   href="<?php echo esc_url_raw( $url ); ?>"><?php echo esc_html__( 'Delete log', 'uncanny-automator' ); ?></a>
+									<a style="float:right; display:inline-block" class="button button-secondary button-small"
+									onclick="javascript: return confirm('<?php echo esc_html__( 'Are you sure you want to delete this log?', 'uncanny-automator' ); ?>');"
+									href="<?php echo esc_url_raw( $url ); ?>">
+									<?php echo esc_html__( 'Delete log', 'uncanny-automator' ); ?>
+									</a>
 								</h2>
 								<textarea rows="50" style="width:100%;font-family: monospace; font-size:12px;">
-								<?php echo esc_textarea( file_get_contents( $log_directory . $log ) ); ?>
-									</textarea>
+									<?php echo esc_textarea( file_get_contents( $log_directory . $log ) ); ?>
+								</textarea>
 							</section>
 						<?php } ?>
 					<?php } ?>

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:           AutomatorWP - WooCommerce integration
- * Plugin URI:            https://wordpress.org/plugins/automatorwp-woocommerce-integration/
+ * Plugin URI:            https://automatorwp.com/add-ons/woocommerce/
  * Description:           Connect AutomatorWP with WooCommerce.
  * Version:               1.1.0
  * Author:                AutomatorWP
@@ -84,6 +84,7 @@ final class AutomatorWP_Integration_WooCommerce {
         if( $this->meets_requirements() ) {
 
             // Includes
+            require_once AUTOMATORWP_WOOCOMMERCE_DIR . 'includes/filters.php';
             require_once AUTOMATORWP_WOOCOMMERCE_DIR . 'includes/functions.php';
             require_once AUTOMATORWP_WOOCOMMERCE_DIR . 'includes/tags.php';
 

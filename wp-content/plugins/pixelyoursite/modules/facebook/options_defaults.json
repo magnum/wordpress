@@ -5,7 +5,6 @@
   "remove_metadata": false,
 
   "general_event_enabled": true,
-  "search_event_enabled": true,
   "comment_event_enabled": true,
   "download_event_enabled": true,
   "form_event_enabled": true,
@@ -53,6 +52,7 @@
   "server_event_use_ajax": true,
   "server_access_api_token": "",
   "test_api_event_code": "",
+  "test_api_event_code_expiration_at": "",
 
   "complete_registration_event_enabled" : true,
   "woo_complete_registration_fire_every_time": false,
@@ -63,6 +63,14 @@
   "woo_complete_registration_custom_value_old": "",
   "woo_complete_registration_send_from_server": true,
 
-  "signal_events_enabled": true,
-  "verify_meta_tag": ""
+  "verify_meta_tag": "",
+
+  "automatic_event_form_enabled": true,
+  "automatic_event_signup_enabled": true,
+  "automatic_event_login_enabled": true,
+  "automatic_event_download_enabled": true,
+  "automatic_event_comment_enabled": true,
+  "automatic_event_scroll_enabled": true,
+  "automatic_event_time_on_page_enabled": true,
+  "automatic_event_search_enabled": true
 }

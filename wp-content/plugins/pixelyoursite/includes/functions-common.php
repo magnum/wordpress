@@ -104,7 +104,7 @@ function isBingVersionIncompatible() {
  * @return bool
  */
 function isWooCommerceActive() {
-    return function_exists( 'WC' );
+    return class_exists( 'woocommerce' );
 }
 
 /**

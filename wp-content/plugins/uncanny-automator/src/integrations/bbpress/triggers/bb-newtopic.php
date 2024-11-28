@@ -46,15 +46,24 @@ class BB_NEWTOPIC {
 			'priority'            => 10,
 			'accepted_args'       => 4,
 			'validation_function' => array( $this, 'bbp_new_topic' ),
-			'options'             => array(
-				Automator()->helpers->recipe->bbpress->options->list_bbpress_forums( null, $this->trigger_meta, true ),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->bbpress->options->list_bbpress_forums( null, $this->trigger_meta, true ),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -76,6 +85,27 @@ class BB_NEWTOPIC {
 			'user_id' => $user_id,
 		);
 
-		Automator()->maybe_add_trigger_entry( $args );
+		$result = Automator()->maybe_add_trigger_entry( $args, false );
+
+		if ( $result ) {
+			foreach ( $result as $r ) {
+				if ( true === $r['result'] ) {
+					if ( isset( $r['args'] ) && isset( $r['args']['get_trigger_id'] ) ) {
+						$trigger_meta = array(
+							'trigger_id'     => (int) $r['args']['trigger_id'],
+							'user_id'        => $user_id,
+							'trigger_log_id' => $r['args']['get_trigger_id'],
+							'run_number'     => $r['args']['run_number'],
+						);
+
+						$trigger_meta['meta_key']   = 'BBTOPIC_ID';
+						$trigger_meta['meta_value'] = maybe_serialize( $topic_id );
+						Automator()->insert_trigger_meta( $trigger_meta );
+
+					}
+					Automator()->maybe_trigger_complete( $r['args'] );
+				}
+			}
+		}
 	}
 }

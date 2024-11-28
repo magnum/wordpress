@@ -75,9 +75,18 @@ use PixelYourSite\GA\Helpers;
                 <h4 class="switcher-label">Enable Google Optimize</h4>
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col">
                 <?php renderDummyTextInput('Enter Optimize ID'); ?>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col">
+                <p>
+                    Learn how to configure Google Optimize:
+                    <a href="https://www.youtube.com/watch?v=a5jPcLbdgy0" target="_blank">watch
+                        video</a>
+                </p>
             </div>
         </div>
     </div>

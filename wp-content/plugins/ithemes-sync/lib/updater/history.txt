@@ -36,22 +36,3 @@
 	Compatibility Fix: Updated plugin and theme update data format to match changes in WordPress 4.2.
 1.4.2 - 2015-07-14 - Chris Jean
 	Enhancement: Updated link to iThemes support.
-1.5.0 - 2018-05-02 - Chris Jean
-	Bug Fix: Fixed the "View details" link failing to work properly after updating.
-	Bug Fix: Fixed an issue that could cause data changes to not save properly on specific background page requests.
-	Bug Fix: Added a compatibility fix to avoid conflicts with plugins that change the plugin_action_links filter value from an array to a string.
-	Compatibility Fix: Updated handing of wp_remote_get() response due to changes documented in https://core.trac.wordpress.org/ticket/33055.
-	Enhancement: Added ability to manage licensing from WP-CLI.
-1.5.1 - 2018-05-03 - Chris Jean
-	Bug Fix: Fixed fatal error that could occur when clicking the "View details" link for an available plugin update.
-1.5.2 - 2018-05-25 - Chris Jean
-	Bug Fix: Fixed error in error handler for cases where requests for changelog updates fail.
-1.6.0 - 2020-08-06 - Chris Jean
-	Enhancement: Added the ability for the user to manage the licensed site URL.
-1.6.1 - 2020-08-06 - Chris Jean
-	Bug Fix: Fixed bug that can cause licensed site URL management from working properly on some sites on https connections.
-1.6.2 - 2020-08-07 - Chris Jean
-	Bug Fix: Fixed fatal error that can happen when upgrading to the 1.6.1 version of this code:
-	Ithemes_Updater_Settings::get_licensed_site_url() in server.php:199".
-1.6.4 - 2020-08-11 - Chris Jean
-	Enhancement: Added support for the auto-update feature introduced in WordPress 5.5.

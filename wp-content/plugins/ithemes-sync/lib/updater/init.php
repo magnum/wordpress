@@ -19,12 +19,6 @@ Version History
 */
 
 
-if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'WP_CLI_Command' ) && ! class_exists( 'Ithemes_Updater_WP_CLI_Ithemes_Licensing' ) ) {
-	require( dirname( __FILE__ ) . '/wp-cli.php' );
-	WP_CLI::add_command( 'ithemes-licensing', 'Ithemes_Updater_WP_CLI_Ithemes_Licensing' );
-}
-
-
 if ( defined( 'ITHEMES_UPDATER_DISABLE' ) && ITHEMES_UPDATER_DISABLE ) {
 	return;
 }
@@ -42,7 +36,7 @@ function ithemes_updater_filter_update_plugins( $update_plugins ) {
 	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
 		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
 	}
-
+	
 	return $GLOBALS['ithemes-updater-settings']->filter_update_plugins( $update_plugins );
 }
 add_filter( 'site_transient_update_plugins', 'ithemes_updater_filter_update_plugins' );
@@ -53,50 +47,8 @@ function ithemes_updater_filter_update_themes( $update_themes ) {
 	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
 		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
 	}
-
+	
 	return $GLOBALS['ithemes-updater-settings']->filter_update_themes( $update_themes );
 }
 add_filter( 'site_transient_update_themes', 'ithemes_updater_filter_update_themes' );
 add_filter( 'transient_update_themes', 'ithemes_updater_filter_update_themes' );
-
-
-function ithemes_updater_get_licensed_site_url() {
-	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
-		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
-	}
-
-	return $GLOBALS['ithemes-updater-settings']->get_licensed_site_url();
-}
-
-function ithemes_updater_get_seen_hostnames() {
-	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
-		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
-	}
-
-	return $GLOBALS['ithemes-updater-settings']->get_hostname_history();
-}
-
-function ithemes_updater_is_request_on_licensed_site_url() {
-	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
-		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
-	}
-
-	return $GLOBALS['ithemes-updater-settings']->is_request_on_licensed_site_url();
-}
-
-function ithemes_updater_get_change_licensed_site_url( $redirect = '' ) {
-	return admin_url( 'options-general.php?page=ithemes-licensing&action=change_licensed_site_url&redirect=' . urlencode( $redirect ) );
-}
-
-function ithemes_updater_change_licensed_site_url( $redirect = '' ) {
-	wp_redirect( ithemes_updater_get_change_licensed_site_url( $redirect ) );
-	exit();
-}
-
-function ithemes_updater_is_licensed_site_url_confirmed() {
-	if ( ! class_exists( 'Ithemes_Updater_Settings' ) ) {
-		require( $GLOBALS['ithemes_updater_path'] . '/settings.php' );
-	}
-
-	return $GLOBALS['ithemes-updater-settings']->is_licensed_site_url_confirmed();
-}

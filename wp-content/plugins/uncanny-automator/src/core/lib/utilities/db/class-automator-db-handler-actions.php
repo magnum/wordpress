@@ -9,6 +9,7 @@ namespace Uncanny_Automator;
  * @package Uncanny_Automator
  */
 class Automator_DB_Handler_Actions {
+
 	/**
 	 * @var
 	 */
@@ -37,7 +38,22 @@ class Automator_DB_Handler_Actions {
 		$recipe_id     = absint( $args['recipe_id'] );
 		$recipe_log_id = absint( $args['recipe_log_id'] );
 		$completed     = esc_attr( $args['completed'] );
-		$error_message = sanitize_text_field( $args['error_message'] );
+		$error_message = wp_kses(
+			$args['error_message'],
+			array(
+				'a' => array(
+					'href'   => array(),
+					'title'  => array(),
+					'target' => array(),
+				),
+				'br',
+				array(
+					'data'  => array(),
+					'http'  => array(),
+					'https' => array(),
+				),
+			)
+		);
 		$date_time     = $args['date_time'];
 
 		global $wpdb;
@@ -125,6 +141,24 @@ class Automator_DB_Handler_Actions {
 		global $wpdb;
 		$table_name = $wpdb->prefix . Automator()->db->tables->action_meta;
 		$result     = $wpdb->get_row( $wpdb->prepare( "SELECT meta_value FROM $table_name WHERE meta_key =%s AND automator_action_log_id =%d", $meta_key, $action_log_id ) ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		if ( ! $result ) {
+			return $result;
+		}
+
+		return $result->meta_value;
+	}
+
+	/**
+	 * @param $action_log_id
+	 * @param $meta_key
+	 *
+	 * @return string
+	 */
+	public function get_meta_by_id( $meta_id ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . Automator()->db->tables->action_meta;
+		$result     = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE ID =%s", $meta_id ) ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( ! $result ) {
 			return $result;
@@ -260,4 +294,5 @@ class Automator_DB_Handler_Actions {
 			)
 		);
 	}
+
 }

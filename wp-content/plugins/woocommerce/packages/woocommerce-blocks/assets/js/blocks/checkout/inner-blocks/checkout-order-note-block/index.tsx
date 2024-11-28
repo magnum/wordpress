@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-import { Icon, notes } from '@woocommerce/icons';
-import { registerFeaturePluginBlockType } from '@woocommerce/block-settings';
+import { Icon, page } from '@wordpress/icons';
+import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Edit, Save } from './edit';
-import metadata from './block.json';
 
-registerFeaturePluginBlockType( metadata, {
+registerBlockType( 'woocommerce/checkout-order-note-block', {
 	icon: {
 		src: (
 			<Icon
-				srcElement={ notes }
+				icon={ page }
 				className="wc-block-editor-components-block-icon"
 			/>
 		),

@@ -34,7 +34,7 @@ class Admin_Settings_General_License {
 				$tabs['license'] = (object) array(
 					'name'     => esc_html__( 'License', 'uncanny-automator' ),
 					'function' => array( $this, 'tab_output' ),
-					'preload'  => true, // Determines if the content should be loaded even if the tab is not selected
+					'preload'  => false, // Determines if the content should be loaded even if the tab is not selected
 					'icon'     => 'badge-check',
 				);
 
@@ -77,7 +77,7 @@ class Admin_Settings_General_License {
 			function() {
 
 				// Get data of the connected site
-				$site_data = Admin_Menu::is_automator_connected();
+				$site_data = Api_Server::is_automator_connected();
 
 				// Check if the user connected their site to automatorplugin.com
 				$site_is_connected = isset( $site_data ) && isset( $site_data['license'] );

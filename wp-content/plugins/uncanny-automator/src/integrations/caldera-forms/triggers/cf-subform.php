@@ -51,13 +51,24 @@ class CF_SUBFORM {
 			'priority'            => 99,
 			'accepted_args'       => 4,
 			'validation_function' => array( $this, 'caldera_forms_submit' ),
-			'options'             => array(
-				Automator()->helpers->recipe->caldera_forms->options->list_caldera_forms_forms(),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->caldera_forms->options->list_caldera_forms_forms(),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -79,7 +90,7 @@ class CF_SUBFORM {
 		if ( ! empty( $conditions ) ) {
 			foreach ( $conditions['recipe_ids'] as $recipe_id ) {
 				if ( ! Automator()->is_recipe_completed( $recipe_id, $user_id ) ) {
-					$args = array(
+					$pass_args = array(
 						'code'            => $this->trigger_code,
 						'meta'            => $this->trigger_meta,
 						'recipe_to_match' => $recipe_id,
@@ -87,7 +98,31 @@ class CF_SUBFORM {
 						'user_id'         => $user_id,
 					);
 
-					Automator()->maybe_add_trigger_entry( $args );
+					$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
+
+					if ( ! empty( $args ) ) {
+						foreach ( $args as $result ) {
+							if ( true === $result['result'] ) {
+								$submission   = \Caldera_Forms::get_entry( $entryid, $form );
+								$trigger_meta = array(
+									'user_id'        => $user_id,
+									'trigger_id'     => $result['args']['trigger_id'],
+									'trigger_log_id' => $result['args']['get_trigger_id'],
+									'run_number'     => $result['args']['run_number'],
+								);
+
+								$trigger_meta['meta_key']   = 'CFENTRYID';
+								$trigger_meta['meta_value'] = $entryid;
+								Automator()->insert_trigger_meta( $trigger_meta );
+
+								$trigger_meta['meta_key']   = 'CFENTRYDATE';
+								$trigger_meta['meta_value'] = maybe_serialize( $submission['date'] );
+								Automator()->insert_trigger_meta( $trigger_meta );
+
+								Automator()->maybe_trigger_complete( $result['args'] );
+							}
+						}
+					}
 				}
 			}
 		}
@@ -130,4 +165,5 @@ class CF_SUBFORM {
 
 		return false;
 	}
+
 }

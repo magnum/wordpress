@@ -63,6 +63,86 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 }());
 
 
+/***/ }),
+
+/***/ 5619:
+/***/ (function(module) {
+
+"use strict";
+
+
+// do not edit .js files directly - edit src/index.jst
+
+
+  var envHasBigInt64Array = typeof BigInt64Array !== 'undefined';
+
+
+module.exports = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+
+    if ((a instanceof Map) && (b instanceof Map)) {
+      if (a.size !== b.size) return false;
+      for (i of a.entries())
+        if (!b.has(i[0])) return false;
+      for (i of a.entries())
+        if (!equal(i[1], b.get(i[0]))) return false;
+      return true;
+    }
+
+    if ((a instanceof Set) && (b instanceof Set)) {
+      if (a.size !== b.size) return false;
+      for (i of a.entries())
+        if (!b.has(i[0])) return false;
+      return true;
+    }
+
+    if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (a[i] !== b[i]) return false;
+      return true;
+    }
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
+
 /***/ })
 
 /******/ 	});
@@ -167,6 +247,7 @@ __webpack_require__.d(store_actions_namespaceObject, {
   "disableComplementaryArea": function() { return disableComplementaryArea; },
   "enableComplementaryArea": function() { return enableComplementaryArea; },
   "pinItem": function() { return pinItem; },
+  "setDefaultComplementaryArea": function() { return setDefaultComplementaryArea; },
   "setFeatureDefaults": function() { return setFeatureDefaults; },
   "setFeatureValue": function() { return setFeatureValue; },
   "toggleFeature": function() { return toggleFeature; },
@@ -204,12 +285,15 @@ var external_wp_i18n_namespaceObject = window["wp"]["i18n"];
 var external_wp_blockEditor_namespaceObject = window["wp"]["blockEditor"];
 ;// CONCATENATED MODULE: external ["wp","compose"]
 var external_wp_compose_namespaceObject = window["wp"]["compose"];
+;// CONCATENATED MODULE: external ["wp","hooks"]
+var external_wp_hooks_namespaceObject = window["wp"]["hooks"];
 ;// CONCATENATED MODULE: ./packages/customize-widgets/build-module/components/error-boundary/index.js
 
 
 /**
  * WordPress dependencies
  */
+
 
 
 
@@ -240,6 +324,7 @@ class ErrorBoundary extends external_wp_element_namespaceObject.Component {
     this.setState({
       error
     });
+    (0,external_wp_hooks_namespaceObject.doAction)('editor.ErrorBoundary.errorLogged', error);
   }
 
   render() {
@@ -262,8 +347,6 @@ class ErrorBoundary extends external_wp_element_namespaceObject.Component {
 
 }
 
-;// CONCATENATED MODULE: external "lodash"
-var external_lodash_namespaceObject = window["lodash"];
 ;// CONCATENATED MODULE: external ["wp","coreData"]
 var external_wp_coreData_namespaceObject = window["wp"]["coreData"];
 ;// CONCATENATED MODULE: external ["wp","mediaUtils"]
@@ -618,7 +701,7 @@ function MoreMenuDropdown(_ref) {
     icon: more_vertical,
     label: label,
     popoverProps: {
-      position: 'bottom left',
+      placement: 'bottom-end',
       ...popoverProps,
       className: classnames_default()('interface-more-menu-dropdown__content', popoverProps === null || popoverProps === void 0 ? void 0 : popoverProps.className)
     },
@@ -643,93 +726,6 @@ function MoreMenuDropdown(_ref) {
 
 
 
-;// CONCATENATED MODULE: ./packages/interface/build-module/store/reducer.js
-/**
- * External dependencies
- */
-
-/**
- * WordPress dependencies
- */
-
-
-/**
- * Reducer to keep tract of the active area per scope.
- *
- * @param {boolean} state           Previous state.
- * @param {Object}  action          Action object.
- * @param {string}  action.type     Action type.
- * @param {string}  action.itemType Type of item.
- * @param {string}  action.scope    Item scope.
- * @param {string}  action.item     Item name.
- *
- * @return {Object} Updated state.
- */
-
-function singleEnableItems() {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  let {
-    type,
-    itemType,
-    scope,
-    item
-  } = arguments.length > 1 ? arguments[1] : undefined;
-
-  if (type !== 'SET_SINGLE_ENABLE_ITEM' || !itemType || !scope) {
-    return state;
-  }
-
-  return { ...state,
-    [itemType]: { ...state[itemType],
-      [scope]: item || null
-    }
-  };
-}
-/**
- * Reducer keeping track of the "pinned" items per scope.
- *
- * @param {boolean} state           Previous state.
- * @param {Object}  action          Action object.
- * @param {string}  action.type     Action type.
- * @param {string}  action.itemType Type of item.
- * @param {string}  action.scope    Item scope.
- * @param {string}  action.item     Item name.
- * @param {boolean} action.isEnable Whether the item is pinned.
- *
- * @return {Object} Updated state.
- */
-
-function multipleEnableItems() {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  let {
-    type,
-    itemType,
-    scope,
-    item,
-    isEnable
-  } = arguments.length > 1 ? arguments[1] : undefined;
-
-  if (type !== 'SET_MULTIPLE_ENABLE_ITEM' || !itemType || !scope || !item || (0,external_lodash_namespaceObject.get)(state, [itemType, scope, item]) === isEnable) {
-    return state;
-  }
-
-  const currentTypeState = state[itemType] || {};
-  const currentScopeState = currentTypeState[scope] || {};
-  return { ...state,
-    [itemType]: { ...currentTypeState,
-      [scope]: { ...currentScopeState,
-        [item]: isEnable || false
-      }
-    }
-  };
-}
-const enableItems = (0,external_wp_data_namespaceObject.combineReducers)({
-  singleEnableItems,
-  multipleEnableItems
-});
-/* harmony default export */ var store_reducer = ((0,external_wp_data_namespaceObject.combineReducers)({
-  enableItems
-}));
 
 ;// CONCATENATED MODULE: external ["wp","deprecated"]
 var external_wp_deprecated_namespaceObject = window["wp"]["deprecated"];
@@ -741,25 +737,7 @@ var external_wp_deprecated_default = /*#__PURE__*/__webpack_require__.n(external
 
 
 /**
- * Returns an action object used in signalling that an active area should be changed.
- *
- * @param {string} itemType Type of item.
- * @param {string} scope    Item scope.
- * @param {string} item     Item identifier.
- *
- * @return {Object} Action object.
- */
-
-function setSingleEnableItem(itemType, scope, item) {
-  return {
-    type: 'SET_SINGLE_ENABLE_ITEM',
-    itemType,
-    scope,
-    item
-  };
-}
-/**
- * Returns an action object used in signalling that a complementary item should be enabled.
+ * Set a default complementary area.
  *
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
@@ -767,66 +745,108 @@ function setSingleEnableItem(itemType, scope, item) {
  * @return {Object} Action object.
  */
 
-
-function enableComplementaryArea(scope, area) {
-  return setSingleEnableItem('complementaryArea', scope, area);
-}
+const setDefaultComplementaryArea = (scope, area) => ({
+  type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+  scope,
+  area
+});
 /**
- * Returns an action object used in signalling that the complementary area of a given scope should be disabled.
+ * Enable the complementary area.
  *
  * @param {string} scope Complementary area scope.
- *
- * @return {Object} Action object.
+ * @param {string} area  Area identifier.
  */
 
-function disableComplementaryArea(scope) {
-  return setSingleEnableItem('complementaryArea', scope, undefined);
-}
-/**
- * Returns an action object to make an area enabled/disabled.
- *
- * @param {string}  itemType Type of item.
- * @param {string}  scope    Item scope.
- * @param {string}  item     Item identifier.
- * @param {boolean} isEnable Boolean indicating if an area should be pinned or not.
- *
- * @return {Object} Action object.
- */
+const enableComplementaryArea = (scope, area) => _ref => {
+  let {
+    registry,
+    dispatch
+  } = _ref;
 
-function setMultipleEnableItem(itemType, scope, item, isEnable) {
-  return {
-    type: 'SET_MULTIPLE_ENABLE_ITEM',
-    itemType,
+  // Return early if there's no area.
+  if (!area) {
+    return;
+  }
+
+  const isComplementaryAreaVisible = registry.select(external_wp_preferences_namespaceObject.store).get(scope, 'isComplementaryAreaVisible');
+
+  if (!isComplementaryAreaVisible) {
+    registry.dispatch(external_wp_preferences_namespaceObject.store).set(scope, 'isComplementaryAreaVisible', true);
+  }
+
+  dispatch({
+    type: 'ENABLE_COMPLEMENTARY_AREA',
     scope,
-    item,
-    isEnable
-  };
-}
+    area
+  });
+};
 /**
- * Returns an action object used in signalling that an item should be pinned.
+ * Disable the complementary area.
  *
- * @param {string} scope  Item scope.
- * @param {string} itemId Item identifier.
+ * @param {string} scope Complementary area scope.
+ */
+
+const disableComplementaryArea = scope => _ref2 => {
+  let {
+    registry
+  } = _ref2;
+  const isComplementaryAreaVisible = registry.select(external_wp_preferences_namespaceObject.store).get(scope, 'isComplementaryAreaVisible');
+
+  if (isComplementaryAreaVisible) {
+    registry.dispatch(external_wp_preferences_namespaceObject.store).set(scope, 'isComplementaryAreaVisible', false);
+  }
+};
+/**
+ * Pins an item.
+ *
+ * @param {string} scope Item scope.
+ * @param {string} item  Item identifier.
  *
  * @return {Object} Action object.
  */
 
+const pinItem = (scope, item) => _ref3 => {
+  let {
+    registry
+  } = _ref3;
 
-function pinItem(scope, itemId) {
-  return setMultipleEnableItem('pinnedItems', scope, itemId, true);
-}
+  // Return early if there's no item.
+  if (!item) {
+    return;
+  }
+
+  const pinnedItems = registry.select(external_wp_preferences_namespaceObject.store).get(scope, 'pinnedItems'); // The item is already pinned, there's nothing to do.
+
+  if ((pinnedItems === null || pinnedItems === void 0 ? void 0 : pinnedItems[item]) === true) {
+    return;
+  }
+
+  registry.dispatch(external_wp_preferences_namespaceObject.store).set(scope, 'pinnedItems', { ...pinnedItems,
+    [item]: true
+  });
+};
 /**
- * Returns an action object used in signalling that an item should be unpinned.
+ * Unpins an item.
  *
- * @param {string} scope  Item scope.
- * @param {string} itemId Item identifier.
- *
- * @return {Object} Action object.
+ * @param {string} scope Item scope.
+ * @param {string} item  Item identifier.
  */
 
-function unpinItem(scope, itemId) {
-  return setMultipleEnableItem('pinnedItems', scope, itemId, false);
-}
+const unpinItem = (scope, item) => _ref4 => {
+  let {
+    registry
+  } = _ref4;
+
+  // Return early if there's no item.
+  if (!item) {
+    return;
+  }
+
+  const pinnedItems = registry.select(external_wp_preferences_namespaceObject.store).get(scope, 'pinnedItems');
+  registry.dispatch(external_wp_preferences_namespaceObject.store).set(scope, 'pinnedItems', { ...pinnedItems,
+    [item]: false
+  });
+};
 /**
  * Returns an action object used in signalling that a feature should be toggled.
  *
@@ -835,13 +855,13 @@ function unpinItem(scope, itemId) {
  */
 
 function toggleFeature(scope, featureName) {
-  return function (_ref) {
+  return function (_ref5) {
     let {
       registry
-    } = _ref;
-    external_wp_deprecated_default()(`wp.dispatch( 'core/interface' ).toggleFeature`, {
+    } = _ref5;
+    external_wp_deprecated_default()(`dispatch( 'core/interface' ).toggleFeature`, {
       since: '6.0',
-      alternative: `wp.dispatch( 'core/preferences' ).toggle`
+      alternative: `dispatch( 'core/preferences' ).toggle`
     });
     registry.dispatch(external_wp_preferences_namespaceObject.store).toggle(scope, featureName);
   };
@@ -858,13 +878,13 @@ function toggleFeature(scope, featureName) {
  */
 
 function setFeatureValue(scope, featureName, value) {
-  return function (_ref2) {
+  return function (_ref6) {
     let {
       registry
-    } = _ref2;
-    external_wp_deprecated_default()(`wp.dispatch( 'core/interface' ).setFeatureValue`, {
+    } = _ref6;
+    external_wp_deprecated_default()(`dispatch( 'core/interface' ).setFeatureValue`, {
       since: '6.0',
-      alternative: `wp.dispatch( 'core/preferences' ).set`
+      alternative: `dispatch( 'core/preferences' ).set`
     });
     registry.dispatch(external_wp_preferences_namespaceObject.store).set(scope, featureName, !!value);
   };
@@ -879,13 +899,13 @@ function setFeatureValue(scope, featureName, value) {
  */
 
 function setFeatureDefaults(scope, defaults) {
-  return function (_ref3) {
+  return function (_ref7) {
     let {
       registry
-    } = _ref3;
-    external_wp_deprecated_default()(`wp.dispatch( 'core/interface' ).setFeatureDefaults`, {
+    } = _ref7;
+    external_wp_deprecated_default()(`dispatch( 'core/interface' ).setFeatureDefaults`, {
       since: '6.0',
-      alternative: `wp.dispatch( 'core/preferences' ).setDefaults`
+      alternative: `dispatch( 'core/preferences' ).setDefaults`
     });
     registry.dispatch(external_wp_preferences_namespaceObject.store).setDefaults(scope, defaults);
   };
@@ -893,56 +913,38 @@ function setFeatureDefaults(scope, defaults) {
 
 ;// CONCATENATED MODULE: ./packages/interface/build-module/store/selectors.js
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 
 
 
-
-/**
- * Returns the item that is enabled in a given scope.
- *
- * @param {Object} state    Global application state.
- * @param {string} itemType Type of item.
- * @param {string} scope    Item scope.
- *
- * @return {?string|null} The item that is enabled in the passed scope and type.
- */
-
-function getSingleEnableItem(state, itemType, scope) {
-  return (0,external_lodash_namespaceObject.get)(state.enableItems.singleEnableItems, [itemType, scope]);
-}
 /**
  * Returns the complementary area that is active in a given scope.
  *
  * @param {Object} state Global application state.
  * @param {string} scope Item scope.
  *
- * @return {string} The complementary area that is active in the given scope.
+ * @return {string | null | undefined} The complementary area that is active in the given scope.
  */
 
+const getActiveComplementaryArea = (0,external_wp_data_namespaceObject.createRegistrySelector)(select => (state, scope) => {
+  var _state$complementaryA;
 
-function getActiveComplementaryArea(state, scope) {
-  return getSingleEnableItem(state, 'complementaryArea', scope);
-}
-/**
- * Returns a boolean indicating if an item is enabled or not in a given scope.
- *
- * @param {Object} state    Global application state.
- * @param {string} itemType Type of item.
- * @param {string} scope    Scope.
- * @param {string} item     Item to check.
- *
- * @return {boolean|undefined} True if the item is enabled, false otherwise if the item is explicitly disabled, and undefined if there is no information for that item.
- */
+  const isComplementaryAreaVisible = select(external_wp_preferences_namespaceObject.store).get(scope, 'isComplementaryAreaVisible'); // Return `undefined` to indicate that the user has never toggled
+  // visibility, this is the vanilla default. Other code relies on this
+  // nuance in the return value.
 
-function isMultipleEnabledItemEnabled(state, itemType, scope, item) {
-  return (0,external_lodash_namespaceObject.get)(state.enableItems.multipleEnableItems, [itemType, scope, item]);
-}
+  if (isComplementaryAreaVisible === undefined) {
+    return undefined;
+  } // Return `null` to indicate the user hid the complementary area.
+
+
+  if (!isComplementaryAreaVisible) {
+    return null;
+  }
+
+  return state === null || state === void 0 ? void 0 : (_state$complementaryA = state.complementaryAreas) === null || _state$complementaryA === void 0 ? void 0 : _state$complementaryA[scope];
+});
 /**
  * Returns a boolean indicating if an item is pinned or not.
  *
@@ -953,10 +955,12 @@ function isMultipleEnabledItemEnabled(state, itemType, scope, item) {
  * @return {boolean} True if the item is pinned and false otherwise.
  */
 
+const isItemPinned = (0,external_wp_data_namespaceObject.createRegistrySelector)(select => (state, scope, item) => {
+  var _pinnedItems$item;
 
-function isItemPinned(state, scope, item) {
-  return isMultipleEnabledItemEnabled(state, 'pinnedItems', scope, item) !== false;
-}
+  const pinnedItems = select(external_wp_preferences_namespaceObject.store).get(scope, 'pinnedItems');
+  return (_pinnedItems$item = pinnedItems === null || pinnedItems === void 0 ? void 0 : pinnedItems[item]) !== null && _pinnedItems$item !== void 0 ? _pinnedItems$item : true;
+});
 /**
  * Returns a boolean indicating whether a feature is active for a particular
  * scope.
@@ -969,12 +973,56 @@ function isItemPinned(state, scope, item) {
  */
 
 const isFeatureActive = (0,external_wp_data_namespaceObject.createRegistrySelector)(select => (state, scope, featureName) => {
-  external_wp_deprecated_default()(`wp.select( 'core/interface' ).isFeatureActive( scope, featureName )`, {
+  external_wp_deprecated_default()(`select( 'core/interface' ).isFeatureActive( scope, featureName )`, {
     since: '6.0',
-    alternative: `!! wp.select( 'core/preferences' ).isFeatureActive( scope, featureName )`
+    alternative: `select( 'core/preferences' ).get( scope, featureName )`
   });
   return !!select(external_wp_preferences_namespaceObject.store).get(scope, featureName);
 });
+
+;// CONCATENATED MODULE: ./packages/interface/build-module/store/reducer.js
+/**
+ * WordPress dependencies
+ */
+
+function complementaryAreas() {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  let action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case 'SET_DEFAULT_COMPLEMENTARY_AREA':
+      {
+        const {
+          scope,
+          area
+        } = action; // If there's already an area, don't overwrite it.
+
+        if (state[scope]) {
+          return state;
+        }
+
+        return { ...state,
+          [scope]: area
+        };
+      }
+
+    case 'ENABLE_COMPLEMENTARY_AREA':
+      {
+        const {
+          scope,
+          area
+        } = action;
+        return { ...state,
+          [scope]: area
+        };
+      }
+  }
+
+  return state;
+}
+/* harmony default export */ var store_reducer = ((0,external_wp_data_namespaceObject.combineReducers)({
+  complementaryAreas
+}));
 
 ;// CONCATENATED MODULE: ./packages/interface/build-module/store/constants.js
 /**
@@ -997,12 +1045,6 @@ const constants_STORE_NAME = 'core/interface';
 
 
 
-const store_storeConfig = {
-  reducer: store_reducer,
-  actions: store_actions_namespaceObject,
-  selectors: store_selectors_namespaceObject,
-  persist: ['enableItems']
-};
 /**
  * Store definition for the interface namespace.
  *
@@ -1011,10 +1053,14 @@ const store_storeConfig = {
  * @type {Object}
  */
 
-const store_store = (0,external_wp_data_namespaceObject.createReduxStore)(constants_STORE_NAME, store_storeConfig); // Once we build a more generic persistence plugin that works across types of stores
+const store_store = (0,external_wp_data_namespaceObject.createReduxStore)(constants_STORE_NAME, {
+  reducer: store_reducer,
+  actions: store_actions_namespaceObject,
+  selectors: store_selectors_namespaceObject
+}); // Once we build a more generic persistence plugin that works across types of stores
 // we'd be able to replace this with a register call.
 
-(0,external_wp_data_namespaceObject.registerStore)(constants_STORE_NAME, store_storeConfig);
+(0,external_wp_data_namespaceObject.register)(store_store);
 
 ;// CONCATENATED MODULE: ./packages/interface/build-module/index.js
 
@@ -1051,23 +1097,35 @@ const textFormattingShortcuts = [{
   description: (0,external_wp_i18n_namespaceObject.__)('Remove a link.')
 }, {
   keyCombination: {
+    character: '[['
+  },
+  description: (0,external_wp_i18n_namespaceObject.__)('Insert a link to a post or page')
+}, {
+  keyCombination: {
     modifier: 'primary',
     character: 'u'
   },
   description: (0,external_wp_i18n_namespaceObject.__)('Underline the selected text.')
+}, {
+  keyCombination: {
+    modifier: 'access',
+    character: 'd'
+  },
+  description: (0,external_wp_i18n_namespaceObject.__)('Strikethrough the selected text.')
+}, {
+  keyCombination: {
+    modifier: 'access',
+    character: 'x'
+  },
+  description: (0,external_wp_i18n_namespaceObject.__)('Make the selected text inline code.')
 }];
 
 ;// CONCATENATED MODULE: ./packages/customize-widgets/build-module/components/keyboard-shortcut-help-modal/shortcut.js
 
 
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
-
 
 
 
@@ -1081,7 +1139,7 @@ function KeyCombination(_ref) {
   return (0,external_wp_element_namespaceObject.createElement)("kbd", {
     className: "customize-widgets-keyboard-shortcut-help-modal__shortcut-key-combination",
     "aria-label": forceAriaLabel || ariaLabel
-  }, (0,external_lodash_namespaceObject.castArray)(shortcut).map((character, index) => {
+  }, (Array.isArray(shortcut) ? shortcut : [shortcut]).map((character, index) => {
     if (character === '+') {
       return (0,external_wp_element_namespaceObject.createElement)(external_wp_element_namespaceObject.Fragment, {
         key: index
@@ -1173,7 +1231,6 @@ function DynamicShortcut(_ref) {
  * External dependencies
  */
 
-
 /**
  * WordPress dependencies
  */
@@ -1207,7 +1264,7 @@ const ShortcutList = _ref => {
     }, shortcuts.map((shortcut, index) => (0,external_wp_element_namespaceObject.createElement)("li", {
       className: "customize-widgets-keyboard-shortcut-help-modal__shortcut",
       key: index
-    }, (0,external_lodash_namespaceObject.isString)(shortcut) ? (0,external_wp_element_namespaceObject.createElement)(dynamic_shortcut, {
+    }, typeof shortcut === 'string' ? (0,external_wp_element_namespaceObject.createElement)(dynamic_shortcut, {
       name: shortcut
     }) : (0,external_wp_element_namespaceObject.createElement)(keyboard_shortcut_help_modal_shortcut, shortcut))))
     /* eslint-enable jsx-a11y/no-redundant-roles */
@@ -1271,7 +1328,6 @@ function KeyboardShortcutHelpModal(_ref4) {
   return (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Modal, {
     className: "customize-widgets-keyboard-shortcut-help-modal",
     title: (0,external_wp_i18n_namespaceObject.__)('Keyboard shortcuts'),
-    closeLabel: (0,external_wp_i18n_namespaceObject.__)('Close'),
     onRequestClose: toggleModal
   }, (0,external_wp_element_namespaceObject.createElement)(ShortcutSection, {
     className: "customize-widgets-keyboard-shortcut-help-modal__main-shortcuts",
@@ -1405,6 +1461,7 @@ function Header(_ref) {
     isFixedToolbarActive
   } = _ref;
   const [[hasUndo, hasRedo], setUndoRedo] = (0,external_wp_element_namespaceObject.useState)([sidebar.hasUndo(), sidebar.hasRedo()]);
+  const shortcut = (0,external_wp_keycodes_namespaceObject.isAppleOS)() ? external_wp_keycodes_namespaceObject.displayShortcut.primaryShift('z') : external_wp_keycodes_namespaceObject.displayShortcut.primary('y');
   (0,external_wp_element_namespaceObject.useEffect)(() => {
     return sidebar.subscribeHistory(() => {
       setUndoRedo([sidebar.hasUndo(), sidebar.hasRedo()]);
@@ -1434,7 +1491,7 @@ function Header(_ref) {
     /* translators: button label text should, if possible, be under 16 characters. */
     ,
     label: (0,external_wp_i18n_namespaceObject.__)('Redo'),
-    shortcut: external_wp_keycodes_namespaceObject.displayShortcut.primaryShift('z') // If there are no undo levels we don't want to actually disable this
+    shortcut: shortcut // If there are no undo levels we don't want to actually disable this
     // button, because it will remove focus for keyboard users.
     // See: https://github.com/WordPress/gutenberg/issues/3486
     ,
@@ -1491,6 +1548,9 @@ function useInserter(inserter) {
   }, [setIsInserterOpened])];
 }
 
+// EXTERNAL MODULE: ./node_modules/fast-deep-equal/es6/index.js
+var es6 = __webpack_require__(5619);
+var es6_default = /*#__PURE__*/__webpack_require__.n(es6);
 ;// CONCATENATED MODULE: external ["wp","isShallowEqual"]
 var external_wp_isShallowEqual_namespaceObject = window["wp"]["isShallowEqual"];
 var external_wp_isShallowEqual_default = /*#__PURE__*/__webpack_require__.n(external_wp_isShallowEqual_namespaceObject);
@@ -1499,11 +1559,6 @@ var external_wp_isShallowEqual_default = /*#__PURE__*/__webpack_require__.n(exte
 
 /**
  * WordPress dependencies
- */
-
-
-/**
- * External dependencies
  */
 
 
@@ -1577,7 +1632,12 @@ function blockToWidget(block) {
     };
   }
 
-  return { ...(0,external_lodash_namespaceObject.omit)(existingWidget, ['form', 'rendered']),
+  const {
+    form,
+    rendered,
+    ...restExistingWidget
+  } = existingWidget || {};
+  return { ...restExistingWidget,
     ...widget
   };
 }
@@ -1608,7 +1668,11 @@ function widgetToBlock(_ref) {
   } = instance;
 
   if (idBase === 'block') {
-    const parsedBlocks = (0,external_wp_blocks_namespaceObject.parse)(raw.content);
+    var _raw$content;
+
+    const parsedBlocks = (0,external_wp_blocks_namespaceObject.parse)((_raw$content = raw.content) !== null && _raw$content !== void 0 ? _raw$content : '', {
+      __unstableSkipAutop: true
+    });
     block = parsedBlocks.length ? parsedBlocks[0] : (0,external_wp_blocks_namespaceObject.createBlock)('core/paragraph', {});
   } else if (number) {
     // Widget that extends WP_Widget.
@@ -1693,7 +1757,7 @@ function useSidebarBlockEditor(sidebar) {
           const prevWidget = sidebar.getWidget(widgetId); // Bail out updates by returning the previous widgets.
           // Deep equality is necessary until the block editor's internals changes.
 
-          if ((0,external_lodash_namespaceObject.isEqual)(nextBlock, prevBlock) && prevWidget) {
+          if (es6_default()(nextBlock, prevBlock) && prevWidget) {
             return prevWidget;
           }
 
@@ -1833,6 +1897,18 @@ function useBlocksFocusControl(blocks) {
   }, [focusedWidgetIdRef, selectBlock]);
 }
 
+;// CONCATENATED MODULE: external ["wp","experiments"]
+var external_wp_experiments_namespaceObject = window["wp"]["experiments"];
+;// CONCATENATED MODULE: ./packages/customize-widgets/build-module/experiments.js
+/**
+ * WordPress dependencies
+ */
+
+const {
+  lock,
+  unlock
+} = (0,external_wp_experiments_namespaceObject.__dangerousOptInToUnstableAPIsOnlyForCoreModules)('I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.', '@wordpress/customize-widgets');
+
 ;// CONCATENATED MODULE: ./packages/customize-widgets/build-module/components/sidebar-block-editor/sidebar-editor-provider.js
 
 
@@ -1846,6 +1922,10 @@ function useBlocksFocusControl(blocks) {
 
 
 
+
+const {
+  ExperimentalBlockEditorProvider
+} = unlock(external_wp_blockEditor_namespaceObject.experiments);
 function SidebarEditorProvider(_ref) {
   let {
     sidebar,
@@ -1854,7 +1934,7 @@ function SidebarEditorProvider(_ref) {
   } = _ref;
   const [blocks, onInput, onChange] = useSidebarBlockEditor(sidebar);
   useBlocksFocusControl(blocks);
-  return (0,external_wp_element_namespaceObject.createElement)(external_wp_blockEditor_namespaceObject.BlockEditorProvider, {
+  return (0,external_wp_element_namespaceObject.createElement)(ExperimentalBlockEditorProvider, {
     value: blocks,
     onInput: onInput,
     onChange: onChange,
@@ -1924,6 +2004,7 @@ function WelcomeGuide(_ref) {
 
 
 
+
 function KeyboardShortcuts(_ref) {
   let {
     undo,
@@ -1967,7 +2048,15 @@ function KeyboardShortcutsRegister() {
       keyCombination: {
         modifier: 'primaryShift',
         character: 'z'
-      }
+      },
+      // Disable on Apple OS because it conflicts with the browser's
+      // history shortcut. It's a fine alias for both Windows and Linux.
+      // Since there's no conflict for Ctrl+Shift+Z on both Windows and
+      // Linux, we keep it as the default for consistency.
+      aliases: (0,external_wp_keycodes_namespaceObject.isAppleOS)() ? [] : [{
+        modifier: 'primary',
+        character: 'y'
+      }]
     });
     registerShortcut({
       name: 'core/customize-widgets/save',
@@ -2025,13 +2114,8 @@ function BlockAppender(props) {
 
 
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
-
 
 
 
@@ -2063,11 +2147,13 @@ function SidebarBlockEditor(_ref) {
     keepCaretInsideBlock,
     isWelcomeGuideActive
   } = (0,external_wp_data_namespaceObject.useSelect)(select => {
+    var _select$canUser;
+
     const {
       get
     } = select(external_wp_preferences_namespaceObject.store);
     return {
-      hasUploadPermissions: (0,external_lodash_namespaceObject.defaultTo)(select(external_wp_coreData_namespaceObject.store).canUser('create', 'media'), true),
+      hasUploadPermissions: (_select$canUser = select(external_wp_coreData_namespaceObject.store).canUser('create', 'media')) !== null && _select$canUser !== void 0 ? _select$canUser : true,
       isFixedToolbarActive: !!get('core/customize-widgets', 'fixedToolbar'),
       keepCaretInsideBlock: !!get('core/customize-widgets', 'keepCaretInsideBlock'),
       isWelcomeGuideActive: !!get('core/customize-widgets', 'welcomeGuide')
@@ -2431,6 +2517,11 @@ function getSidebarSection() {
       customize
     }
   } = window;
+  const reduceMotionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let isReducedMotion = reduceMotionMediaQuery.matches;
+  reduceMotionMediaQuery.addEventListener('change', event => {
+    isReducedMotion = event.matches;
+  });
   return class SidebarSection extends customize.Section {
     ready() {
       const InspectorSection = getInspectorSection();
@@ -2469,18 +2560,21 @@ function getSidebarSection() {
           this.contentContainer.addClass(['busy', 'open']);
           this.contentContainer.removeClass('is-sub-section-open');
           this.contentContainer.closest('.wp-full-overlay').addClass('section-open');
-          this.contentContainer.one('transitionend', () => {
-            this.contentContainer.removeClass('busy');
-            args.completeCallback();
-          });
         } else {
           this.contentContainer.addClass(['busy', 'is-sub-section-open']);
           this.contentContainer.closest('.wp-full-overlay').addClass('section-open');
           this.contentContainer.removeClass('open');
-          this.contentContainer.one('transitionend', () => {
-            this.contentContainer.removeClass('busy');
-            args.completeCallback();
-          });
+        }
+
+        const handleTransitionEnd = () => {
+          this.contentContainer.removeClass('busy');
+          args.completeCallback();
+        };
+
+        if (isReducedMotion) {
+          handleTransitionEnd();
+        } else {
+          this.contentContainer.one('transitionend', handleTransitionEnd);
         }
       } else {
         super.onChangeExpanded(expanded, args);
@@ -2996,19 +3090,12 @@ function getSidebarControl() {
   };
 }
 
-;// CONCATENATED MODULE: external ["wp","hooks"]
-var external_wp_hooks_namespaceObject = window["wp"]["hooks"];
 ;// CONCATENATED MODULE: ./packages/customize-widgets/build-module/filters/move-to-sidebar.js
 
 
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
-
 
 
 
@@ -3048,7 +3135,7 @@ const withMoveToSidebarToolbarItem = (0,external_wp_compose_namespaceObject.crea
        */
       const oldSetting = activeSidebarControl.setting;
       const newSetting = newSidebarControl.setting;
-      oldSetting((0,external_lodash_namespaceObject.without)(oldSetting(), widgetId));
+      oldSetting(oldSetting().filter(id => id !== widgetId));
       newSetting([...newSetting(), widgetId]);
     } else {
       /**

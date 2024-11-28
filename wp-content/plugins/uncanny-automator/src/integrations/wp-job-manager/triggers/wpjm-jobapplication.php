@@ -52,12 +52,23 @@ class WPJM_JOBAPPLICATION {
 			'priority'            => 20,
 			'accepted_args'       => 2,
 			'validation_function' => array( $this, 'new_job_application' ),
-			'options'             => array(
-				Automator()->helpers->recipe->wp_job_manager->options->list_wpjm_jobs( null, $this->trigger_meta ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->wp_job_manager->options->list_wpjm_jobs( null, $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -117,6 +128,7 @@ class WPJM_JOBAPPLICATION {
 							$trigger_meta['meta_key']   = 'WPJMJOBAPPLICATIONID';
 							$trigger_meta['meta_value'] = $application_id;
 							Automator()->insert_trigger_meta( $trigger_meta );
+
 							Automator()->maybe_trigger_complete( $result['args'] );
 							break;
 						}
@@ -161,4 +173,5 @@ class WPJM_JOBAPPLICATION {
 
 		return false;
 	}
+
 }

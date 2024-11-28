@@ -27,12 +27,15 @@ class TWITTER_POSTSTATUS {
 	 */
 	private $action_meta;
 
+	public $functions;
+
 	/**
 	 * Set up Automator action constructor.
 	 */
 	public function __construct() {
 		$this->action_code = 'TWITTERPOSTSTATUS';
-		$this->action_meta = 'TWITTERSTATUS';
+		$this->action_meta = 'TWITTERSTATUSCONTENT';
+		$this->functions   = new Twitter_Functions();
 		$this->define_action();
 
 	}
@@ -43,20 +46,20 @@ class TWITTER_POSTSTATUS {
 	public function define_action() {
 
 		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/twitter/' ),
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
-			'sentence'           => sprintf( __( 'Post {{a tweet:%1$s}} to Twitter', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( 'Post {{a tweet}} to Twitter', 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'is_deprecated'      => true,
-			'requires_user'      => false,
-			'execution_function' => array( $this, 'post_status' ),
-			'options_group'      => array(
+			'author'                => Automator()->get_author_name( $this->action_code ),
+			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/twitter/' ),
+			'integration'           => self::$integration,
+			'code'                  => $this->action_code,
+			'sentence'              => sprintf( __( 'Post {{a tweet:%1$s}} to Twitter', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( 'Post {{a tweet}} to Twitter', 'uncanny-automator' ),
+			'priority'              => 10,
+			'accepted_args'         => 1,
+			'is_deprecated'         => true,
+			'requires_user'         => false,
+			'execution_function'    => array( $this, 'post_status' ),
+			'options_group'         => array(
 				$this->action_meta => array(
-					Automator()->helpers->recipe->twitter->textarea_field(
+					$this->functions->textarea_field(
 						'TWITTERSTATUSCONTENT',
 						esc_attr__( 'Status', 'uncanny-automator' ),
 						true,
@@ -69,6 +72,7 @@ class TWITTER_POSTSTATUS {
 					),
 				),
 			),
+			'background_processing' => true,
 		);
 
 		Automator()->register->action( $action );
@@ -82,7 +86,6 @@ class TWITTER_POSTSTATUS {
 	public function post_status( $user_id, $action_data, $recipe_id, $args ) {
 
 		$status = Automator()->parse->text( $action_data['meta']['TWITTERSTATUSCONTENT'], $recipe_id, $user_id, $args );
-		$media  = trim( Automator()->parse->text( $action_data['meta']['TWITTERSTATUSIMAGE'], $recipe_id, $user_id, $args ) );
 
 		try {
 
@@ -112,9 +115,9 @@ class TWITTER_POSTSTATUS {
 	public function statuses_update( $status, $media_id = '' ) {
 
 		// Get twitter credentials.
-		$request_body = Automator()->helpers->recipe->twitter->get_client();
+		$request_body = $this->functions->get_client();
 
-		$url = AUTOMATOR_API_URL . 'twitter/';
+		$url = AUTOMATOR_API_URL . 'v2/twitter';
 
 		$request_body['action']    = 'twitter_statuses_update';
 		$request_body['status']    = $status;

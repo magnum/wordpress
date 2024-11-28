@@ -2,15 +2,25 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo, useEffect, Fragment } from '@wordpress/element';
+import { useMemo, useEffect, Fragment, useState } from '@wordpress/element';
 import { AddressForm } from '@woocommerce/base-components/cart-checkout';
 import {
 	useCheckoutAddress,
 	useStoreEvents,
 	useEditorContext,
+	noticeContexts,
 } from '@woocommerce/base-context';
-import { CheckboxControl } from '@woocommerce/blocks-checkout';
+import {
+	CheckboxControl,
+	StoreNoticesContainer,
+} from '@woocommerce/blocks-checkout';
 import Noninteractive from '@woocommerce/base-components/noninteractive';
+import type {
+	BillingAddress,
+	ShippingAddress,
+	AddressField,
+	AddressFields,
+} from '@woocommerce/settings';
 
 /**
  * Internal dependencies
@@ -32,14 +42,19 @@ const Block = ( {
 } ): JSX.Element => {
 	const {
 		defaultAddressFields,
-		setShippingFields,
-		shippingFields,
-		setShippingAsBilling,
-		shippingAsBilling,
+		setShippingAddress,
+		setBillingAddress,
+		shippingAddress,
 		setShippingPhone,
+		useShippingAsBilling,
+		setUseShippingAsBilling,
 	} = useCheckoutAddress();
 	const { dispatchCheckoutEvent } = useStoreEvents();
 	const { isEditor } = useEditorContext();
+
+	// This is used to track whether the "Use shipping as billing" checkbox was checked on first load and if we synced
+	// the shipping address to the billing address if it was. This is not used on further toggles of the checkbox.
+	const [ addressesSynced, setAddressesSynced ] = useState( false );
 
 	// Clears data if fields are hidden.
 	useEffect( () => {
@@ -47,6 +62,23 @@ const Block = ( {
 			setShippingPhone( '' );
 		}
 	}, [ showPhoneField, setShippingPhone ] );
+
+	// Run this on first render to ensure addresses sync if needed, there is no need to re-run this when toggling the
+	// checkbox.
+	useEffect( () => {
+		if ( addressesSynced ) {
+			return;
+		}
+		if ( useShippingAsBilling ) {
+			setBillingAddress( shippingAddress );
+		}
+		setAddressesSynced( true );
+	}, [
+		addressesSynced,
+		setBillingAddress,
+		shippingAddress,
+		useShippingAsBilling,
+	] );
 
 	const addressFieldsConfig = useMemo( () => {
 		return {
@@ -58,29 +90,43 @@ const Block = ( {
 				hidden: ! showApartmentField,
 			},
 		};
-	}, [ showCompanyField, requireCompanyField, showApartmentField ] );
+	}, [
+		showCompanyField,
+		requireCompanyField,
+		showApartmentField,
+	] ) as Record< keyof AddressFields, Partial< AddressField > >;
 
 	const AddressFormWrapperComponent = isEditor ? Noninteractive : Fragment;
 
 	return (
 		<>
 			<AddressFormWrapperComponent>
+				<StoreNoticesContainer
+					context={ noticeContexts.SHIPPING_ADDRESS }
+				/>
 				<AddressForm
 					id="shipping"
 					type="shipping"
-					onChange={ ( values: Record< string, unknown > ) => {
-						setShippingFields( values );
+					onChange={ ( values: Partial< ShippingAddress > ) => {
+						setShippingAddress( values );
+						if ( useShippingAsBilling ) {
+							setBillingAddress( values );
+						}
 						dispatchCheckoutEvent( 'set-shipping-address' );
 					} }
-					values={ shippingFields }
-					fields={ Object.keys( defaultAddressFields ) }
+					values={ shippingAddress }
+					fields={
+						Object.keys(
+							defaultAddressFields
+						) as ( keyof AddressFields )[]
+					}
 					fieldConfig={ addressFieldsConfig }
 				/>
 				{ showPhoneField && (
 					<PhoneNumber
 						id="shipping-phone"
 						isRequired={ requirePhoneField }
-						value={ shippingFields.phone }
+						value={ shippingAddress.phone }
 						onChange={ ( value ) => {
 							setShippingPhone( value );
 							dispatchCheckoutEvent( 'set-phone-number', {
@@ -96,10 +142,13 @@ const Block = ( {
 					'Use same address for billing',
 					'woo-gutenberg-products-block'
 				) }
-				checked={ shippingAsBilling }
-				onChange={ ( checked: boolean ) =>
-					setShippingAsBilling( checked )
-				}
+				checked={ useShippingAsBilling }
+				onChange={ ( checked: boolean ) => {
+					setUseShippingAsBilling( checked );
+					if ( checked ) {
+						setBillingAddress( shippingAddress as BillingAddress );
+					}
+				} }
 			/>
 		</>
 	);

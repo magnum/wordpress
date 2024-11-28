@@ -35,14 +35,6 @@ class Add_Instagram_Integration {
 	public $connected = false;
 
 	/**
-	 * Constructs the class.
-	 *
-	 * @since 2.4.0
-	 */
-	public function __construct() {
-	}
-
-	/**
 	 * Registers Integration.
 	 *
 	 * @since 2.4.0
@@ -52,7 +44,9 @@ class Add_Instagram_Integration {
 		$ig_account_connected_count = $this->get_total_ig_accounts_connected();
 
 		if ( $ig_account_connected_count >= 1 ) {
+
 			$this->connected = true;
+
 		}
 
 		// Set up integration configuration.
@@ -93,11 +87,13 @@ class Add_Instagram_Integration {
 	 * @return bool
 	 */
 	public function plugin_active( $status, $code ) {
+
 		return true;
+
 	}
 
 	/**
-	 * Check if there pages contains an instagram account.
+	 * Check if pages contains an instagram account.
 	 *
 	 * @return integer The total number of instagram account connected.
 	 */
@@ -109,10 +105,30 @@ class Add_Instagram_Integration {
 
 		foreach ( $options_facebook_pages as $page ) {
 
-			$ig_account = isset( $page['ig_account']->data ) ? $page['ig_account']->data : '';
+			$ig_account = isset( $page['ig_account'] ) ? $page['ig_account'] : '';
 
+			//$has_ig_connection = isset( $page['ig_connection']['is_connected'] ) ? $page['ig_connection']['is_connected'] : 'COMPAT_ALLOW_NULL';
+
+			$has_connection_key = array_key_exists( 'ig_connection', $page );
+
+			// Handle backwards compatibility.
 			if ( ! empty( $ig_account ) ) {
-				$total ++;
+
+				// Allow connection with [ig_account] but with out connection key for backwards compatibility.
+				if ( ! $has_connection_key ) {
+
+					$total ++;
+
+					continue; // Proceed.
+
+				}
+
+				// Otherwise newer version should have connection key and [is_connected] must be true.
+				if ( $has_connection_key && true === $page['ig_connection']['is_connected'] ) {
+
+					$total ++;
+
+				}
 			}
 		}
 

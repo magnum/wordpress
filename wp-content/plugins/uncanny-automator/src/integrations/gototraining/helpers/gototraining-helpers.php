@@ -11,6 +11,15 @@ namespace Uncanny_Automator;
 class Gototraining_Helpers {
 
 	/**
+	 * The API endpoint address.
+	 *
+	 * @var API_ENDPOINT The endpoint adress.
+	 */
+	const API_ENDPOINT = 'v2/goto';
+
+	const TRANSIENT = 'automator_gtt_settings';
+
+	/**
 	 * Options.
 	 *
 	 * @var mixed $options
@@ -42,13 +51,6 @@ class Gototraining_Helpers {
 	public function __construct() {
 
 		$this->setting_tab = 'gtt_api';
-
-		// Selectively load options
-		if ( method_exists( '\Uncanny_Automator\Automator_Helpers_Recipe', 'maybe_load_trigger_options' ) ) {
-			$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
-		} else {
-			$this->load_options = true;
-		}
 
 		add_action( 'update_option_uap_automator_gtt_api_consumer_secret', array( $this, 'gtt_oauth_update' ), 100, 3 );
 		add_action( 'add_option_uap_automator_gtt_api_consumer_secret', array( $this, 'gtt_oauth_new' ), 100, 2 );
@@ -94,44 +96,43 @@ class Gototraining_Helpers {
 		$this->pro = $pro;
 	}
 
+	/**
+	 * get_trainings
+	 *
+	 * @return void
+	 */
 	public function get_trainings() {
 
 		$trainings = array();
 
-		list( $access_token, $organizer_key ) = self::get_training_token();
+		try {
 
-		$current_time = current_time( 'Y-m-d\TH:i:s\Z' );
+			$body['action'] = 'get_trainings';
 
-		$current_time_plus_years = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( '+2 year', strtotime( $current_time ) ) );
+			$response = $this->remote_request( $body );
 
-		// get trainings
-		$json_feed = wp_remote_get(
-			'https://api.getgo.com/G2T/rest/organizers/' . $organizer_key . '/trainings',
-			array(
-				'headers' => array(
-					'Authorization' => $access_token,
-				),
-			)
-		);
-
-		$json_response = wp_remote_retrieve_response_code( $json_feed );
-
-		// prepare training lists
-		if ( 200 === (int) $json_response ) {
-
-			$jsondata = json_decode( wp_remote_retrieve_body( $json_feed ), true );
-
-			if ( count( $jsondata ) > 0 ) {
-
-				foreach ( $jsondata as $key1 => $training ) {
-
-					$trainings[] = array(
-						'text'  => $training['name'],
-						'value' => (string) $training['trainingKey'] . '-objectkey',
-					);
-
-				}
+			if ( 200 !== $response['statusCode'] ) {
+				throw new \Exception( __( 'Unable to fetch trainings from this account', 'uncanny-automator' ) );
 			}
+
+			if ( count( $response['data'] ) < 1 ) {
+				throw new \Exception( __( 'No trainings were found in this account', 'uncanny-automator' ) );
+			}
+
+			foreach ( $response['data'] as $training ) {
+
+				$trainings[] = array(
+					'text'  => $training['name'],
+					'value' => (string) $training['trainingKey'] . '-objectkey',
+				);
+
+			}
+		} catch ( \Exception $e ) {
+
+			$trainings[] = array(
+				'text'  => $e->getMessage(),
+				'value' => '',
+			);
 		}
 
 		return $trainings;
@@ -146,16 +147,14 @@ class Gototraining_Helpers {
 	 *
 	 * @return array
 	 */
-	public static function gtt_register_user( $user_id, $training_key ) {
+	public function gtt_register_user( $user_id, $training_key, $action_data = null ) {
 
 		$user = get_userdata( $user_id );
 
 		if ( is_wp_error( $user ) ) {
-			return array(
-				'result'  => false,
-				'message' => __( 'GoTo Training user not found.', 'uncanny-automator' ),
-			);
+			throw new \Exception( __( 'GoTo Training user not found.', 'uncanny-automator' ) );
 		}
+
 		$customer_first_name = $user->first_name;
 		$customer_last_name  = $user->last_name;
 		$customer_email      = $user->user_email;
@@ -166,64 +165,33 @@ class Gototraining_Helpers {
 			$customer_last_name   = empty( $customer_last_name ) ? $customer_email_parts[0] : $customer_last_name;
 		}
 
-		list( $access_token, $organizer_key ) = self::get_training_token();
-
-		if ( empty( $access_token ) ) {
-			return array(
-				'result'  => false,
-				'message' => __( 'GoTo Training credentails has expired.', 'uncanny-automator' ),
-			);
-		}
-		// API register call
-		$response = wp_remote_post(
-			"https://api.getgo.com/G2T/rest/organizers/{$organizer_key}/trainings/{$training_key}/registrants?resendConfirmation=true",
+		$body['action']       = 'gtt_register_user';
+		$body['training_key'] = $training_key;
+		$body['user']         = wp_json_encode(
 			array(
-				'method'      => 'POST',
-				'timeout'     => 45,
-				'redirection' => 5,
-				'httpversion' => '1.0',
-				'blocking'    => true,
-				'headers'     => array(
-					'Authorization' => $access_token,
-					'Content-type'  => 'application/json',
-				),
-				'body'        => wp_json_encode(
-					array(
-						'givenName' => $customer_first_name,
-						'surname'   => $customer_last_name,
-						'email'     => $customer_email,
-					)
-				),
+				'givenName' => $customer_first_name,
+				'surname'   => $customer_last_name,
+				'email'     => $customer_email,
 			)
 		);
 
-		if ( ! is_wp_error( $response ) ) {
-			if ( 201 === wp_remote_retrieve_response_code( $response ) ) {
-				$jsondata = json_decode( $response['body'], true, 512, JSON_BIGINT_AS_STRING );
-				if ( isset( $jsondata['joinUrl'] ) ) {
-					update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_registrantKey', $jsondata['registrantKey'] );
-					update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_joinUrl', $jsondata['joinUrl'] );
-					update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_confirmationUrl', $jsondata['confirmationUrl'] );
+		$response = $this->remote_request( $body, $action_data );
 
-					return array(
-						'result'  => true,
-						'message' => __( 'Successfully registered', 'uncanny-automator' ),
-					);
-				}
-			} else {
-				$jsondata = json_decode( $response['body'], true, 512, JSON_BIGINT_AS_STRING );
+		$jsondata = $response['data'];
+		$code     = $response['statusCode'];
 
-				return array(
-					'result'  => false,
-					'message' => esc_html( $jsondata['description'] ),
-				);
-			}
-		} else {
-			return array(
-				'result'  => false,
-				'message' => __( 'The GoTo Training API returned an error.', 'uncanny-automator' ),
-			);
+		if ( 201 !== $code ) {
+			throw new \Exception( $jsondata['description'], $code );
 		}
+
+		if ( ! isset( $jsondata['joinUrl'] ) ) {
+			throw new \Exception( __( 'Error adding user to GoTo Training', 'uncanny-automator' ) );
+		}
+
+		update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_registrantKey', $jsondata['registrantKey'] );
+		update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_joinUrl', $jsondata['joinUrl'] );
+		update_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_confirmationUrl', $jsondata['confirmationUrl'] );
+
 	}
 
 	/**
@@ -234,66 +202,31 @@ class Gototraining_Helpers {
 	 *
 	 * @return array
 	 */
-	public static function gtt_unregister_user( $user_id, $training_key ) {
-
-		list( $access_token, $organizer_key ) = self::get_training_token();
-
-		if ( empty( $access_token ) ) {
-			return array(
-				'result'  => false,
-				'message' => __( 'GoTo Training credentails has expired.', 'uncanny-automator' ),
-			);
-		}
+	public function gtt_unregister_user( $user_id, $training_key, $action_data = null ) {
 
 		$user_registrant_key = get_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_registrantKey', true );
 
 		if ( empty( $user_registrant_key ) ) {
-			return array(
-				'result'  => false,
-				'message' => __( 'User was not registered for training session.', 'uncanny-automator' ),
-			);
+			throw new \Exception( __( 'User was not registered for training session.', 'uncanny-automator' ) );
 		}
 
-		// API register call
-		$response = wp_remote_post(
-			"https://api.getgo.com/G2T/rest/organizers/{$organizer_key}/trainings/{$training_key}/registrants/{$user_registrant_key}",
-			array(
-				'method'      => 'DELETE',
-				'timeout'     => 45,
-				'redirection' => 5,
-				'httpversion' => '1.0',
-				'blocking'    => true,
-				'headers'     => array(
-					'Authorization' => $access_token,
-					'Content-type'  => 'application/json',
-				),
-			)
-		);
+		$body['action']              = 'gtt_unregister_user';
+		$body['training_key']        = $training_key;
+		$body['user_registrant_key'] = $user_registrant_key;
 
-		if ( ! is_wp_error( $response ) ) {
-			if ( 201 === wp_remote_retrieve_response_code( $response ) || 204 === wp_remote_retrieve_response_code( $response ) ) {
-				delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_registrantKey' );
-				delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_joinUrl' );
-				delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_confirmationUrl' );
+		$response = $this->remote_request( $body, $action_data );
 
-				return array(
-					'result'  => true,
-					'message' => __( 'Successfully registered', 'uncanny-automator' ),
-				);
-			} else {
-				$jsondata = json_decode( $response['body'], true, 512, JSON_BIGINT_AS_STRING );
+		$jsondata = $response['data'];
+		$code     = $response['statusCode'];
 
-				return array(
-					'result'  => false,
-					'message' => esc_html( $jsondata['description'] ),
-				);
-			}
-		} else {
-			return array(
-				'result'  => false,
-				'message' => __( 'The GoTo Training API returned an error.', 'uncanny-automator' ),
-			);
+		if ( 201 !== $code && 204 !== $code ) {
+			throw new \Exception( esc_html( $jsondata['description'] ) );
 		}
+
+		delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_registrantKey' );
+		delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_joinUrl' );
+		delete_user_meta( $user_id, '_uncannyowl_gtt_training_' . $training_key . '_confirmationUrl' );
+
 	}
 
 	/**
@@ -301,74 +234,60 @@ class Gototraining_Helpers {
 	 *
 	 * @return array
 	 */
-	public static function get_training_token() {
+	public function get_training_token() {
 
-		$get_transient = get_transient( '_uncannyowl_gtt_settings' );
+		$get_transient = get_transient( self::TRANSIENT );
 
 		if ( false !== $get_transient ) {
 
-			$tokens = explode( '|', $get_transient );
+			return $get_transient;
 
-			return array( $tokens[0], $tokens[1] );
-
-		} else {
-
-			$oauth_settings        = get_option( '_uncannyowl_gtt_settings' );
-			$current_refresh_token = isset( $oauth_settings['refresh_token'] ) ? $oauth_settings['refresh_token'] : '';
-			if ( empty( $current_refresh_token ) ) {
-				update_option( '_uncannyowl_gtt_settings_expired', true );
-
-				return array( '', '' );
-			}
-
-			$consumer_key    = trim( get_option( 'uap_automator_gtt_api_consumer_key', '' ) );
-			$consumer_secret = trim( get_option( 'uap_automator_gtt_api_consumer_secret', '' ) );
-			//do response
-			$response = wp_remote_post(
-				'https://api.getgo.com/oauth/v2/token',
-				array(
-					'headers' => array(
-						'Authorization' => 'Basic ' . base64_encode( $consumer_key . ':' . $consumer_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-						'Content-Type'  => 'application/x-www-form-urlencoded; charset=utf-8',
-					),
-					'body'    => array(
-						'refresh_token' => $current_refresh_token,
-						'grant_type'    => 'refresh_token',
-					),
-				)
-			);
-
-			if ( ! is_wp_error( $response ) ) {
-
-				$jsondata = array();
-
-				if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
-
-					//get new access token and refresh token
-					$jsondata = json_decode( $response['body'], true );
-
-					update_option( '_uncannyowl_gtt_settings', $jsondata );
-					set_transient( '_uncannyowl_gtt_settings', $jsondata['access_token'] . '|' . $jsondata['organizer_key'], 60 * 50 );
-					delete_option( '_uncannyowl_gtt_settings_expired' );
-
-					//return the array
-					return array( $jsondata['access_token'], $jsondata['organizer_key'] );
-
-				} else {
-					// Empty settings
-					update_option( '_uncannyowl_gtt_settings', array() );
-					update_option( '_uncannyowl_gtt_settings_expired', true );
-
-					return array( '', '' );
-				}
-			} else {
-				// Empty settings
-				update_option( '_uncannyowl_gtt_settings', array() );
-				update_option( '_uncannyowl_gtt_settings_expired', true );
-
-				return array( '', '' );
-			}
 		}
+
+		$oauth_settings        = get_option( '_uncannyowl_gtt_settings' );
+		$current_refresh_token = isset( $oauth_settings['refresh_token'] ) ? $oauth_settings['refresh_token'] : '';
+
+		if ( empty( $current_refresh_token ) ) {
+			update_option( '_uncannyowl_gtt_settings_expired', true );
+			throw new \Exception( __( 'GoTo Training credentails have expired.', 'uncanny-automator' ) );
+		}
+
+		$consumer_key    = trim( get_option( 'uap_automator_gtt_api_consumer_key', '' ) );
+		$consumer_secret = trim( get_option( 'uap_automator_gtt_api_consumer_secret', '' ) );
+
+		$params = array(
+			'method'  => 'POST',
+			'url'     => 'https://api.getgo.com/oauth/v2/token',
+			'headers' => array(
+				'Authorization' => 'Basic ' . base64_encode( $consumer_key . ':' . $consumer_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+				'Content-Type'  => 'application/x-www-form-urlencoded; charset=utf-8',
+			),
+			'body'    => array(
+				'refresh_token' => $current_refresh_token,
+				'grant_type'    => 'refresh_token',
+			),
+		);
+
+		$response = Api_Server::call( $params );
+
+		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			update_option( '_uncannyowl_gtt_settings', array() );
+			update_option( '_uncannyowl_gtt_settings_expired', true );
+			throw new \Exception( __( 'GoTo Training credentails have expired.', 'uncanny-automator' ) );
+		}
+
+		$jsondata = array();
+
+		//get new access token and refresh token
+		$jsondata = json_decode( $response['body'], true );
+
+		update_option( '_uncannyowl_gtt_settings', $jsondata );
+		set_transient( self::TRANSIENT, $jsondata, 60 * 50 );
+		delete_option( '_uncannyowl_gtt_settings_expired' );
+
+		//return the array
+		return $jsondata;
+
 	}
 
 	/**
@@ -439,67 +358,65 @@ class Gototraining_Helpers {
 	 */
 	public function validate_oauth_tokens() {
 
-		if ( isset( $_REQUEST['code'] ) && ! empty( $_REQUEST['code'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			&& isset( $_REQUEST['state'] ) && $_REQUEST['state'] === $this->setting_tab // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			) {
-
-			$consumer_key    = trim( get_option( 'uap_automator_gtt_api_consumer_key', '' ) );
-			$consumer_secret = trim( get_option( 'uap_automator_gtt_api_consumer_secret', '' ) );
-
-			$code = wp_unslash( $_REQUEST['code'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-			$tab_url = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-config&tab=' . $this->setting_tab;
-
-			$response = wp_remote_post(
-				'https://api.getgo.com/oauth/v2/token',
-				array(
-					'headers' => array(
-						'Content-Type'  => 'application/x-www-form-urlencoded; charset=utf-8',
-						'Authorization' => 'Basic ' . base64_encode( $consumer_key . ':' . $consumer_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-						'Accept'        => 'application/json',
-					),
-					'body'    => array(
-						'code'       => $code,
-						'grant_type' => 'authorization_code',
-						//'redirect_uri' => urlencode( $tab_url ),
-					),
-				)
-			);
-
-			if ( ! is_wp_error( $response ) ) {
-
-				$jsondata = array();
-
-				// On success
-				if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
-
-					//lets get the response and decode it
-					$jsondata = json_decode( $response['body'], true );
-
-					// Update the options.
-					update_option( '_uncannyowl_gtt_settings', $jsondata );
-					delete_option( '_uncannyowl_gtt_settings_expired' );
-
-					// Set the transient.
-					set_transient( '_uncannyowl_gtt_settings', $jsondata['access_token'] . '|' . $jsondata['organizer_key'], 60 * 50 );
-
-					wp_safe_redirect( automator_get_premium_integrations_settings_url( 'go-to-training' ) . '&connect=1' );
-
-					die;
-
-				} else {
-
-					// On Error
-					wp_safe_redirect( automator_get_premium_integrations_settings_url( 'go-to-training' ) . '&connect=2' );
-
-					die;
-				}
-			} else {
-				// On Error
-				wp_safe_redirect( automator_get_premium_integrations_settings_url( 'go-to-training' ) . '&connect=2' );
-				die;
-			}
+		if ( ! automator_filter_has_var( 'state' ) || $this->setting_tab !== automator_filter_input( 'state' ) ) {
+			return;
 		}
+
+		if ( ! automator_filter_has_var( 'code' ) ) {
+			return;
+		}
+
+		$consumer_key    = trim( get_option( 'uap_automator_gtt_api_consumer_key', '' ) );
+		$consumer_secret = trim( get_option( 'uap_automator_gtt_api_consumer_secret', '' ) );
+
+		$code = wp_unslash( automator_filter_input( 'code' ) );
+
+		$params = array(
+			'method'  => 'POST',
+			'url'     => 'https://api.getgo.com/oauth/v2/token',
+			'headers' => array(
+				'Content-Type'  => 'application/x-www-form-urlencoded; charset=utf-8',
+				'Authorization' => 'Basic ' . base64_encode( $consumer_key . ':' . $consumer_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+				'Accept'        => 'application/json',
+			),
+			'body'    => array(
+				'code'       => $code,
+				'grant_type' => 'authorization_code',
+				//'redirect_uri' => urlencode( $tab_url ),
+			),
+		);
+
+		$connect = 2;
+
+		try {
+
+			$response = Api_Server::call( $params );
+
+			if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				throw new \Exception( __( 'Error validating Oauth tokens', 'uncanny-automator' ) );
+			}
+
+			$jsondata = array();
+
+			//lets get the response and decode it
+			$jsondata = json_decode( $response['body'], true );
+
+			// Update the options.
+			update_option( '_uncannyowl_gtt_settings', $jsondata );
+			delete_option( '_uncannyowl_gtt_settings_expired' );
+
+			// Set the transient.
+			set_transient( self::TRANSIENT, $jsondata, 60 * 50 );
+
+			$connect = 1;
+
+		} catch ( \Exception $e ) {
+			automator_log( $e->getMessage() );
+		}
+
+		wp_safe_redirect( automator_get_premium_integrations_settings_url( 'go-to-training' ) . '&connect=' . $connect );
+		die;
+
 	}
 
 	/**
@@ -527,7 +444,7 @@ class Gototraining_Helpers {
 				'uap_automator_gtt_api_consumer_secret',
 			),
 			'transients' => array(
-				'_uncannyowl_gtt_settings',
+				self::TRANSIENT,
 			),
 		);
 
@@ -547,6 +464,11 @@ class Gototraining_Helpers {
 
 	}
 
+	/**
+	 * get_disconnect_url
+	 *
+	 * @return void
+	 */
 	public function get_disconnect_url() {
 
 		return add_query_arg(
@@ -557,5 +479,28 @@ class Gototraining_Helpers {
 			admin_url( 'admin-ajax.php' )
 		);
 
+	}
+
+	/**
+	 * remote_request
+	 *
+	 * @param  mixed $params
+	 * @param  mixed $action_data
+	 * @return void
+	 */
+	public function remote_request( $body, $action_data = null ) {
+
+		$body['client'] = $this->get_training_token();
+
+		$params = array(
+			'endpoint' => self::API_ENDPOINT,
+			'body'     => $body,
+			'action'   => $action_data,
+			'timeout'  => 30,
+		);
+
+		$response = Api_Server::api_call( $params );
+
+		return $response;
 	}
 }

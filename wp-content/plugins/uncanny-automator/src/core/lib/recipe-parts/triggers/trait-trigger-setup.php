@@ -7,12 +7,14 @@
  * @class   Trigger_Setup
  * @since   3.0
  * @version 3.0
- * @package Uncanny_Automator
  * @author  Saad S.
+ * @package Uncanny_Automator
  */
 
 
 namespace Uncanny_Automator\Recipe;
+
+use Uncanny_Automator\Automator_Exception;
 
 /**
  * Trait Trigger_Setup
@@ -108,11 +110,39 @@ trait Trigger_Setup {
 	/**
 	 * @var
 	 */
-	protected $trigger_tokens = array();
+
+	//protected $trigger_tokens = array();
+
 	/**
 	 * @var
 	 */
 	protected $token_parser;
+
+	/**
+	 * Stores the Helper class
+	 * @var
+	 */
+	protected $helper;
+
+	/**
+	 * Stores Token class
+	 * @var
+	 */
+	protected $tokens_class;
+
+	/**
+	 * @var bool
+	 */
+	protected $uses_api = false;
+
+	/**
+	 * Set up Automator trigger constructor.
+	 */
+	public function __construct() {
+
+		$this->setup_trigger();
+
+	}
 
 	/**
 	 * @return mixed
@@ -164,7 +194,7 @@ trait Trigger_Setup {
 	/**
 	 * @param $author
 	 */
-	protected function set_author( $author ) {
+	public function set_author( $author ) {
 		if ( empty( $author ) ) {
 			$this->author = Automator()->get_author_name( $this->trigger_code );
 		} else {
@@ -175,7 +205,7 @@ trait Trigger_Setup {
 	/**
 	 * @param $link
 	 */
-	protected function set_support_link( $link ) {
+	public function set_support_link( $link ) {
 		if ( empty( $link ) ) {
 			$this->support_link = Automator()->get_author_support_link( $this->trigger_code );
 		} else {
@@ -221,7 +251,7 @@ trait Trigger_Setup {
 	/**
 	 * @param $arg_count
 	 */
-	protected function set_action_args_count( $arg_count = 1 ) {
+	public function set_action_args_count( $arg_count = 1 ) {
 		$this->action_args_count = $arg_count;
 	}
 
@@ -237,6 +267,13 @@ trait Trigger_Setup {
 	 */
 	public function set_options_callback( $callback ) {
 		$this->options_callback = $callback;
+	}
+
+	/**
+	 * @param bool
+	 */
+	protected function set_uses_api( $uses_api ) {
+		$this->uses_api = $uses_api;
 	}
 
 	/**
@@ -260,49 +297,49 @@ trait Trigger_Setup {
 	/**
 	 * @return mixed
 	 */
-	protected function get_action() {
+	public function get_action() {
 		return $this->action_hook;
 	}
 
 	/**
 	 * @return int
 	 */
-	protected function get_action_priority() {
+	public function get_action_priority() {
 		return $this->action_priority;
 	}
 
 	/**
 	 * @return int
 	 */
-	protected function get_action_args_count() {
+	public function get_action_args_count() {
 		return $this->action_args_count;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	protected function get_integration() {
+	public function get_integration() {
 		return $this->integration;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	protected function get_code() {
+	public function get_code() {
 		return $this->trigger_code;
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function get_author() {
+	public function get_author() {
 		return $this->author;
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function get_support_link() {
+	public function get_support_link() {
 		return $this->support_link;
 	}
 
@@ -358,7 +395,7 @@ trait Trigger_Setup {
 	/**
 	 * @return mixed
 	 */
-	protected function get_readable_sentence() {
+	public function get_readable_sentence() {
 		return $this->readable_sentence;
 	}
 
@@ -379,16 +416,16 @@ trait Trigger_Setup {
 	/**
 	 * @return mixed
 	 */
-	public function get_trigger_tokens() {
-		return $this->trigger_tokens;
-	}
+	//  public function get_trigger_tokens() {
+	//      return $this->trigger_tokens;
+	//  }
 
 	/**
 	 * @param mixed $trigger_tokens
 	 */
-	public function set_trigger_tokens( $trigger_tokens ) {
-		$this->trigger_tokens = $trigger_tokens;
-	}
+	//  public function set_trigger_tokens( $trigger_tokens ) {
+	//      $this->trigger_tokens = $trigger_tokens;
+	//  }
 
 	/**
 	 * @return mixed
@@ -420,7 +457,46 @@ trait Trigger_Setup {
 
 
 	/**
+	 * @param bool
+	 *
+	 * @return bool
+	 *
+	 */
+	public function get_uses_api() {
+		return $this->uses_api;
+	}
+
+
+	/**
+	 * @return mixed
+	 */
+	public function get_helper() {
+		return $this->helper;
+	}
+
+	/**
+	 * @param mixed $helper
+	 */
+	public function set_helper( $helper ) {
+		$this->helper = $helper;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_tokens_class() {
+		return $this->tokens_class;
+	}
+
+	/**
+	 * @param mixed $tokens_class
+	 */
+	public function set_tokens_class( $tokens_class ) {
+		$this->tokens_class = $tokens_class;
+	}
+	/**
 	 * Define and register the trigger by pushing it into the Automator object
+	 * @throws Automator_Exception|\Exception
 	 */
 	protected function register_trigger() {
 
@@ -440,6 +516,7 @@ trait Trigger_Setup {
 			'tokens'              => $this->get_trigger_tokens(), // all the linked tokens of the trigger.
 			'token_parser'        => $this->get_token_parser(), // v3.0, Pass a function to parse tokens.
 			'validation_function' => array( $this, 'validate' ), // function to call for add_action().
+			'uses_api'            => $this->get_uses_api(),
 		);
 
 		if ( ! empty( $this->get_options() ) ) {
@@ -456,6 +533,10 @@ trait Trigger_Setup {
 
 		$trigger = apply_filters( 'automator_register_trigger', $trigger );
 
+		// $this->trigger_tokens_filter returns false if trigger has no token.
+		$this->add_trigger_tokens_filter( $this->get_trigger_code(), $this->get_integration() );
+
 		Automator()->register->trigger( $trigger );
+
 	}
 }

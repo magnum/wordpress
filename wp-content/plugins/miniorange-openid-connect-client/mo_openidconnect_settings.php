@@ -3,7 +3,7 @@
 * Plugin Name: OpenID Connect Login ( OpenID Connect Client)
 * Plugin URI: http://miniorange.com
 * Description: OpenID Connect Client plugin allows login (Single Sign On) with any OpenID provider that conforms to the OpenID Connect 1.0 standard.
-* Version: 2.1.6
+* Version: 2.1.9
 * Author: miniOrange
 * Author URI: https://www.miniorange.com
 * License: MIT/Expat

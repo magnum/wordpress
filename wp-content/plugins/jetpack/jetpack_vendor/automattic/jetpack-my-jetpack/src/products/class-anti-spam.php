@@ -49,7 +49,7 @@ class Anti_Spam extends Product {
 	 * @return string
 	 */
 	public static function get_name() {
-		return __( 'Anti-Spam', 'jetpack-my-jetpack' );
+		return __( 'Akismet Anti-spam', 'jetpack-my-jetpack' );
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Anti_Spam extends Product {
 	 * @return string
 	 */
 	public static function get_title() {
-		return __( 'Jetpack Anti-Spam', 'jetpack-my-jetpack' );
+		return __( 'Jetpack Akismet Anti-spam', 'jetpack-my-jetpack' );
 	}
 
 	/**
@@ -103,7 +103,6 @@ class Anti_Spam extends Product {
 			array(
 				'available'          => true,
 				'wpcom_product_slug' => static::get_wpcom_product_slug(),
-				'discount'           => 50, // hardcoded - it could be overwritten by the wpcom product.
 			),
 			Wpcom_Products::get_product_pricing( static::get_wpcom_product_slug() )
 		);

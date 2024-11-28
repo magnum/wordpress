@@ -1,5 +1,359 @@
 == Changelog ==
 
+= 2.4.9 =
+
+* **Bug Fixes**
+* WP Simple Pay: Fixed display of form titles.
+
+= 2.4.8 =
+
+* **New Features**
+* New tag: {date:FORMAT:VALUE} to place relative dates like {date:d/m/Y:+1 month}
+* New tag: {timestamp:VALUE} to place relative timestamps like {timestamp:+1 month}
+
+= 2.4.7 =
+
+* **New Features**
+* New integration: Meta Box.
+* Meta Box: New trigger: User updates post field with a value.
+* Meta Box: New action: Update post field with a value.
+
+= 2.4.6 =
+
+* **Improvements**
+* Advanced Custom Fields (ACF): Custom option on post selection for "Update post field with a value" action.
+* wpDiscuz: Improved checking to detect if it is configured the option "Use guest email to detect registered account".
+* wpForo: Updated forums and topic selections to adapt triggers to version 2.0.0.
+* **Bug Fixes**
+* BuddyPress: Fixed group ID type in action "Add user to group".
+
+= 2.4.5 =
+
+* **Improvements**
+* Updated add-ons API.
+
+= 2.4.4 =
+
+* **Bug fixes**
+* Presto Player: Fixed tags to get data from logged automations.
+
+= 2.4.3 =
+
+* **Improvements**
+* Skip some checks for automations with 1 trigger to allow run the automation even if there are invalid logs from previous tests.
+* **Bug Fixes**
+* Fixed date calculation for recurring automations.
+
+= 2.4.2 =
+
+* **Improvements**
+* Prevent to check for redirects if user is not logged in.
+
+= 2.4.1 =
+
+* **Bug Fixes**
+* Adding property checks to response object to prevent TypeError warnings in redirect Javascript.
+
+= 2.4.0 =
+
+* **Improvements**
+* Tested with WordPress 6.1.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
+= 2.3.9 =
+
+* **Bug Fixes**
+The Events Calendar: Fixed warning when confirming RSVP since Events Tickets has 2 different ways to launch the same hook with different parameters.
+
+= 2.3.8 =
+
+* **Improvements**
+* Added more sanitization and escaping checks (thanks Shahjahan Jewel).
+
+= 2.3.7 =
+
+* **Bug Fixes**
+* AmeliaBooking: Fixed anonymous triggers checking user logged.
+
+= 2.3.6 =
+
+* **Improvements**
+* Improved URL sanity checks to prevent duplicated ampersands in "Redirect user to URL" action.
+* **Bug Fixes**
+* Fixed incorrect check to meet if a plugin integration should be loaded.
+
+= 2.3.5 =
+
+* **Bug Fixes**
+* Fixed typo when including JetFormBuilder integration files.
+
+= 2.3.4 =
+
+* **Improvements**
+* Improved URL sanity checks to keep its parameters in "Redirect user to URL" action.
+
+= 2.3.3 =
+
+* **New Features**
+* New integration: Download Manager.
+* New integration: JetFormBuilder.
+* New integration: StudioCart.
+* JetFormBuilder: New trigger: User submits a form.
+* JetFormBuilder: New anonymous trigger: Guest submits a form.
+* StudioCart: New trigger: User purchases a product.
+* **Improvements**
+* LearnDash: Added name of groups in "Make user the leader of a group" action label.
+
+= 2.3.2 =
+
+* **Bug Fixes**
+* Fixed user ID assigned on "Delete user" action.
+
+= 2.3.1 =
+
+* **New Features**
+* New integration: Google Calendar.
+* **Developer Notes**
+* Fixed wrong options in number condition fields (thanks @alexstewartja).
+* Improved automatorwp_get_array_key_value() function bringing support to search by multiples keys (thanks @alexstewartja).
+
+= 2.3.0 =
+
+* **Improvements**
+* Ensure to load all required script files in the automation edit screen.
+* **Bug Fixes**
+* Fixed custom options replacement on filters.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
+= 2.2.9 =
+
+* **New Features**
+* BuddyBoss: New tags: Invitation tags to get the inviter and invited IDs.
+* **Bug Fixes**
+* MailPoet: Fixed variable type error in "Add subscriber to list" action due to MailPoet new version.
+
+= 2.2.8 =
+
+* **Bug Fixes**
+* BuddyPress: Fixed the add user to group action to prevent to work with strings as group ID.
+* BuddyBoss: Fixed the add user to group action to prevent to work with strings as group ID.
+* Fixed a PHP notice in AutomatorWP settings screen.
+
+= 2.2.7 =
+
+* **Bug Fixes**
+* Fixed incorrect function in the Advanced Custom Fields (ACF) integration.
+
+= 2.2.6 =
+
+* **New Features**
+* New integration: Advanced Custom Fields (ACF).
+* Advanced Custom Fields: New trigger: User updates post field with a value.
+* Advanced Custom Fields: New action: Update post field with a value.
+* **Bug Fixes**
+* Fixed some incorrect text domain names.
+
+= 2.2.5 =
+
+* **Improvements**
+* ActiveMember360: All actions adapted to last version of ActiveMember360.
+* **Bug Fixes**
+* wpForo: Updated wpForo install check to meet wpForo main class change in 2.0.0.
+* Fixed parameters check when excluding URLs.
+
+= 2.2.4 =
+
+* **Bug Fixes**
+* ActiveCampaign: Fixed a bug that causes contact is not detected in ActiveCampaign if email contains special characters.
+
+= 2.2.3 =
+
+* **New Features**
+* Added the "All posts" automation, an automation to run actions on all or on a filtered group of posts manually, on a specific date or on a recurring basis (Ideal for automate maintenance tasks on your site posts like clean up the older posts or email administrators about pending ones).
+* **Improvements**
+* Improved the redirect URL Javascript checks.
+
+= 2.2.2 =
+
+* **New Features**
+* Added the "All users" automation, an automation to run actions on all or on a filtered group of users manually, on a specific date or on a recurring basis.
+* **Improvements**
+* Improved the redirect URL action to work even when other plugins do a redirect.
+* Removed a non required check of a Javascript file exists in AutomatorWP > Settings screen.
+* Prevent PHP warnings during activation caused by CMB2 library.
+
+= 2.2.1 =
+
+* **New Features**
+* New integration: Autonami.
+* Autonami: New trigger: User added to list.
+* Autonami: New trigger: Tag added to user.
+* Autonami: New anonymous trigger: Contact added to list.
+* Autonami: New anonymous trigger: Tag added to contact.
+* Autonami: New action: Add a tag to the user.
+* Autonami: New action: Add a tag to a contact.
+* **Improvements**
+* Style improvements to table fields display.
+
+= 2.2.0 =
+
+* **Bug Fixes**
+* ActiveCampaign: Fixed a bug that causes tags are not getting loaded correctly.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
+= 2.1.9 =
+
+* **Bug Fixes**
+* Prevent PHP warnings during activation caused by checking the existent database tables during activation.
+
+= 2.1.8 =
+
+* New integration: Jetpack CRM.
+* Jetpack CRM: New trigger: New company added.
+* Jetpack CRM: New trigger: New contact added.
+* Jetpack CRM: New trigger: Tag added to company.
+* Jetpack CRM: New trigger: Tag added to contact.
+
+= 2.1.7 =
+
+* **Improvements**
+* Performance improvement reducing the database queries to check if a table exists.
+* FluentCRM: Performance improvement reducing the database queries to build the contact tags.
+
+= 2.1.6 =
+
+* **Bug Fixes**
+* Tutor LMS: Fixed a bug on the "Enroll user to course" action for paid courses.
+
+= 2.1.5 =
+
+* **New Features**
+* New integration: Thrive Quiz Builder.
+* Thrive Quiz Builder: New trigger: User completes a quiz.
+* BuddyBoss: Added the ability to add a link preview to the "Add an activity to user" action.
+* WooCommerce: New tag: Order Currency.
+* WooCommerce: New tag: Order Currency Symbol.
+* **Bug Fixes**
+* LearnPress: Fixed hidden button "Continue" in lessons.
+
+= 2.1.4 =
+
+* **New Features**
+* WordPress: Added the ability to select a different user in the action "Add, change or remove role to user".
+* **Improvements**
+* GamiPress: Check if user to reward on actions exists.
+* Tested with WordPress 6.0.
+
+= 2.1.3 =
+
+* **New Features**
+* WordPress: New trigger: User updates a post.
+* WordPress: New trigger: User updates a post of a type.
+* WordPress: New trigger: User updates a post of a taxonomy.
+* WordPress: New trigger: User updates a field of a post.
+* **Improvements**
+* Prevent to display revisions from on post selector fields.
+
+= 2.1.2 =
+
+* **New Features**
+* New integration: Thrive Apprentice.
+* Thrive Apprentice: New trigger: User completes a course.
+* Thrive Apprentice: New action: Enroll user to a product.
+
+= 2.1.1 =
+
+* **Improvements**
+* Mailchimp: Make tags selector be able to query all tags in the account.
+
+= 2.1.0 =
+
+* **New Features**
+* BuddyBoss: Added the activity author ID tag.
+* BuddyPress: Added the activity author ID tag.
+* **Improvements**
+* WooCommerce: Added a link to the order on logs entries where an order is assigned.
+* **Bug Fixes**
+* Mailchimp: Fixed a small bug that caused credentials not getting saved correctly.
+
+= 2.0.9 =
+
+* **New Features**
+* Added the "Post Type Label" tag to display the post type label.
+* **Improvements**
+* Mailchimp: Only load Mailchimp libraries when needed.
+
+= 2.0.8 =
+
+* **New Features**
+* Mailchimp: New action: New Integration: Mailchimp.
+* Mailchimp: New action: Add tag to user.
+* Mailchimp: New action: Subscribe user to an audience.
+* Mailchimp: New action: Add note to user.
+
+= 2.0.7 =
+
+* **New Features**
+* New Integration: Amelia.
+* Amelia: New trigger: User books an appointment.
+* Amelia: New anonymous trigger: Guest books an appointment.
+* **Improvements**
+* Added support for datetime fields.
+
+= 2.0.6 =
+
+* **New Features**
+* New integration: ActiveCampaign.
+* ActiveCampaign: New trigger: User added to ActiveCampaign.
+* ActiveCampaign: New trigger: Tag added to user.
+* ActiveCampaign: New action: Add user to ActiveCampaign.
+* ActiveCampaign: New action: Add tag to user.
+* **Improvements**
+* Update code to prevent PHP warnings caused by old PHP versions.
+* TutorLMS: Updated code to match with TutorLMS 2.0.
+
+= 2.0.5 =
+
+* **Developer Notes**
+* Added the object_id parameter when parsing the automation item label.
+
+= 2.0.4 =
+
+* **Improvements**
+* Added support to render options with multiples values in triggers or actions labels.
+
+= 2.0.3 =
+
+* **Improvements**
+* LearnPress: Updated enroll user to course action to match with the latest LearnPress version.
+* WPLMS: Updated check to meet if WPLMS is installed to match latest WPLMS v4.3.
+
+= 2.0.2 =
+
+* **Developer Notes**
+* Updated CMB2 library to 2.10.1.
+
+= 2.0.1 =
+
+* **Improvements**
+* Dashboard updated with new links to documentation.
+* **Bug Fixes**
+* Fixed issue with the reset password link and URL replacement.
+
+= 2.0.0 =
+
+* **New Features**
+* Added the "Dashboard" page.
+* New tag: Added the {date} tag to render the current date & time with support for custom formats using the is as {date:FORMAT}.
+* New tag: Added the {timestamp} tag to render the current timestamp.
+* **Improvements**
+* WooCommerce: Added support to detect manual memberships assignations.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
 = 1.9.9 =
 
 * **New Features**

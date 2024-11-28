@@ -171,15 +171,6 @@ include "html-popovers.php";
 
                         </nav>
 
-                        <div class="card card-static card-primary">
-                            <div class="card-body">
-                                <h4 class="card-title">Meta Pixel (formerly Facebook Pixel) Essential Guide</h4>
-                                <p class="card-text">Learn how to use Meta Pixel (formerly Facebook Pixel) like a genuine expert. Download this Facebook
-                                    Pixel Essential Guide:</p>
-                                <a href="https://www.pixelyoursite.com/facebook-pixel-pdf-guide?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-facebook-guide" target="_blank" class="btn btn-sm btn-block btn-save">Click to get the free
-                                    guide</a>
-                            </div>
-                        </div>
 
                         <?php if ( 'woo' == getCurrentAdminTab() ) : ?>
                             <div class="card card-static border-disabled mb-5">
@@ -187,7 +178,7 @@ include "html-popovers.php";
                                     <h4 class="card-title">Custom Audience File Export</h4>
                                     <p class="card-text">Export a customer file with lifetime value. Use it to create a
                                         Custom Audience and a Value-Based Lookalike Audience. More details
-                                        <a href="https://www.pixelyoursite.com/value-based-facebook-lookalike-audiences"
+                                        <a href="https://www.pixelyoursite.com/value-based-facebook-lookalike-audiences?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free"
                                            target="_blank">here</a>.</p>
                                     <p style="text-align: center;"><?php renderProBadge(); ?></p>
                                     <button type="submit" disabled="disabled" class="btn btn-sm btn-block btn-disabled">
@@ -204,7 +195,7 @@ include "html-popovers.php";
                                     <h4 class="card-title">Custom Audience File Export</h4>
                                     <p class="card-text">Export a customer file with lifetime value. Use it to create a
                                         Custom Audience and a Value-Based Lookalike Audience. More details
-                                        <a href="https://www.pixelyoursite.com/value-based-facebook-lookalike-audiences"
+                                        <a href="https://www.pixelyoursite.com/value-based-facebook-lookalike-audiences?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free"
                                            target="_blank">here</a>.</p>
                                     <p style="text-align: center;"><?php renderProBadge(); ?></p>
                                     <button type="submit" disabled="disabled" class="btn btn-sm btn-block btn-disabled">
@@ -220,7 +211,7 @@ include "html-popovers.php";
                                     <h4 class="card-title">WooCommerce Product Catalog Feeds</h4>
                                     <p class="card-text">Generate auto-updating WooCommerce XML feeds for Facebook Product
                                         Catalog, Google Merchant, and Google Ads (custom type).</p>
-                                    <a href="https://www.pixelyoursite.com/product-catalog-facebook?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-right-column-plugins" target="_blank"
+                                    <a href="https://www.pixelyoursite.com/product-catalog-facebook?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free" target="_blank"
                                        class="btn btn-sm btn-block btn-primary">Click for details</a>
                                 </div>
                             </div>
@@ -231,36 +222,27 @@ include "html-popovers.php";
                                 <div class="card-body">
                                     <h4 class="card-title">Easy Digital Downloads Product Catalog Feeds</h4>
                                     <p class="card-text">Generate auto-updating EDD XML feeds for Facebook Product Catalog.</p>
-                                    <a href="https://www.pixelyoursite.com/easy-digital-downloads-product-catalog?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-right-column-plugins"
+                                    <a href="https://www.pixelyoursite.com/easy-digital-downloads-product-catalog?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free"
                                        target="_blank" class="btn btn-sm btn-block btn-primary">Click for details</a>
                                 </div>
                             </div>
                         <?php endif; ?>
-
-                        <?php if ( ! isBoostActive() ) : ?>
+                        <?php if ( !isConsentMagicPluginActivated() ) : ?>
                             <div class="card card-static border-primary">
                                 <div class="card-body">
-                                    <h4 class="card-title">Boost your conversion with social proof</h4>
-                                    <p class="card-text">Automatically capture and show recent visitors’ activity as nice,
-                                        auto-vanishing pop-ups.</p>
-                                    <a href="https://www.boostplugin.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-right-column-plugins"
-                                       target="_blank" class="btn btn-sm btn-block btn-primary">Click for details</a>
+                                    <h4 class="card-title">ConsentMagic</h4>
+                                    <p class="card-text">Persuade your visitors to agree to tracking, while respecting the legal requirements. Inform, opt-out, or block tracking when needed.</p>
+                                    <a href="https://www.pixelyoursite.com/plugins/consentmagic?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free" target="_blank"
+                                       class="btn btn-sm btn-block btn-primary">Click for details</a>
                                 </div>
                             </div>
                         <?php endif; ?>
-
-                        <?php if ( ! isSmartOpenGraphActive() ) : ?>
+                        <?php if ( !isPixelCogActive() ) : ?>
                             <div class="card card-static border-primary">
                                 <div class="card-body">
-                                    <h4 class="card-title">Smart OpenGraph</h4>
-                                    <?php if ( isWooCommerceActive() ) : ?>
-                                        <p class="card-text">Automatically add your WooCommerce products to a Facebook
-                                            Product Catalog when someone visits them.</p>
-                                    <?php else : ?>
-                                        <p class="card-text">Improve the way your content is shared on Facebook and other
-                                            social networks with the right OpenGraph tags.</p>
-                                    <?php endif; ?>
-                                    <a href="https://www.pixelyoursite.com/opengraph-plugin?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-right-column-plugins" target="_blank"
+                                    <h4 class="card-title">WooCommerce Cost of Goods</h4>
+                                    <p class="card-text">Add the cost of your products, calculate profit for each order, track the profit with PixelYourSite WooCommerce first-party reports.</p>
+                                    <a href="https://www.pixelyoursite.com/plugins/woocommerce-cost-of-goods?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free" target="_blank"
                                        class="btn btn-sm btn-block btn-primary">Click for details</a>
                                 </div>
                             </div>

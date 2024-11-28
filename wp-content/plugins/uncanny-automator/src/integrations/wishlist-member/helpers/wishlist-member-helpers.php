@@ -30,7 +30,7 @@ class Wishlist_Member_Helpers {
 	 */
 	public function __construct() {
 
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
+		$this->load_options = true;
 	}
 
 	/**
@@ -48,7 +48,7 @@ class Wishlist_Member_Helpers {
 	}
 
 	/**
-	 * @param null   $label
+	 * @param null $label
 	 * @param string $option_code
 	 * @param string $type
 	 *
@@ -98,7 +98,7 @@ class Wishlist_Member_Helpers {
 			'endpoint'        => $end_point,
 			'options'         => $options,
 			'relevant_tokens' => array(
-				$option_code => esc_attr__( 'Membership Level', 'uncanny-automator' ),
+				$option_code => esc_attr__( 'Membership level', 'uncanny-automator' ),
 			),
 		);
 

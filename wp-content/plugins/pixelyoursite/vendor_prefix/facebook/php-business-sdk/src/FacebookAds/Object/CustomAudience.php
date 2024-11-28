@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceActionSourceValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceClaimObjectiveValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceContentTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceCustomerFileSourceValues;
@@ -80,6 +81,7 @@ class CustomAudience extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
         $ref_enums['ContentType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceContentTypeValues::getInstance()->getValues();
         $ref_enums['CustomerFileSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceCustomerFileSourceValues::getInstance()->getValues();
         $ref_enums['Subtype'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceSubtypeValues::getInstance()->getValues();
+        $ref_enums['ActionSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceActionSourceValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function deleteAdAccounts(array $fields = array(), array $params = array(), $pending = \false)

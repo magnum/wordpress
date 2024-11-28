@@ -41,7 +41,6 @@ class OmegaCustomerTrxFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEn
     const AMOUNT_DUE = 'amount_due';
     const BILLED_AMOUNT_DETAILS = 'billed_amount_details';
     const BILLING_PERIOD = 'billing_period';
-    const CAMPAIGN = 'campaign';
     const CDN_DOWNLOAD_URI = 'cdn_download_uri';
     const CURRENCY = 'currency';
     const DOWNLOAD_URI = 'download_uri';
@@ -57,6 +56,6 @@ class OmegaCustomerTrxFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEn
     const TYPE = 'type';
     public function getFieldTypes()
     {
-        return array('ad_account_ids' => 'list<string>', 'advertiser_name' => 'string', 'amount' => 'string', 'amount_due' => 'CurrencyAmount', 'billed_amount_details' => 'BilledAmountDetails', 'billing_period' => 'string', 'campaign' => 'AtlasCampaign', 'cdn_download_uri' => 'string', 'currency' => 'string', 'download_uri' => 'string', 'due_date' => 'datetime', 'entity' => 'string', 'id' => 'string', 'invoice_date' => 'datetime', 'invoice_id' => 'string', 'invoice_type' => 'string', 'liability_type' => 'string', 'payment_status' => 'string', 'payment_term' => 'string', 'type' => 'string');
+        return array('ad_account_ids' => 'list<string>', 'advertiser_name' => 'string', 'amount' => 'string', 'amount_due' => 'CurrencyAmount', 'billed_amount_details' => 'Object', 'billing_period' => 'string', 'cdn_download_uri' => 'string', 'currency' => 'string', 'download_uri' => 'string', 'due_date' => 'datetime', 'entity' => 'string', 'id' => 'string', 'invoice_date' => 'datetime', 'invoice_id' => 'string', 'invoice_type' => 'string', 'liability_type' => 'string', 'payment_status' => 'string', 'payment_term' => 'string', 'type' => 'string');
     }
 }

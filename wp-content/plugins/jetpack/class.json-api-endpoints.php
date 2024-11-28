@@ -6,6 +6,7 @@
  */
 
 use Automattic\Jetpack\Connection\Client;
+use Automattic\Jetpack\Status;
 
 require_once __DIR__ . '/json-api-config.php';
 require_once __DIR__ . '/sal/class.json-api-links.php';
@@ -78,6 +79,34 @@ abstract class WPCOM_JSON_API_Endpoint {
 	 * @var string
 	 */
 	public $max_version = WPCOM_JSON_API__CURRENT_VERSION;
+
+	/**
+	 * Forced endpoint environment when running on WPCOM
+	 *
+	 * @var string '', 'wpcom', 'secure', or 'jetpack'
+	 */
+	public $force = '';
+
+	/**
+	 * Whether the endpoint is deprecated
+	 *
+	 * @var bool
+	 */
+	public $deprecated = false;
+
+	/**
+	 * Version of the endpoint this endpoint is deprecated in favor of.
+	 *
+	 * @var string
+	 */
+	protected $new_version = WPCOM_JSON_API__CURRENT_VERSION;
+
+	/**
+	 * Whether the endpoint is only available on WordPress.com hosted blogs
+	 *
+	 * @var bool
+	 */
+	public $jp_disabled = false;
 
 	/**
 	 * Path at which to serve this endpoint: sprintf() format.
@@ -189,6 +218,13 @@ abstract class WPCOM_JSON_API_Endpoint {
 	 * @var string
 	 */
 	public $example_response = '';
+
+	/**
+	 * OAuth2 scope required when running on WPCOM
+	 *
+	 * @var string
+	 */
+	public $required_scope = '';
 
 	/**
 	 * Set to true if the endpoint implements its own filtering instead of the standard `fields` query method
@@ -394,10 +430,8 @@ abstract class WPCOM_JSON_API_Endpoint {
 					if ( JSON_ERROR_NONE !== json_last_error() ) { // phpcs:ignore PHPCompatibility
 						return null;
 					}
-				} else {
-					if ( is_null( $return ) && wp_json_encode( null ) !== $input ) {
-						return null;
-					}
+				} elseif ( $return === null && wp_json_encode( null ) !== $input ) {
+					return null;
 				}
 
 				break;
@@ -409,7 +443,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 				// attempt JSON first, since probably a curl command.
 				$return = json_decode( $input, true );
 
-				if ( is_null( $return ) ) {
+				if ( $return === null ) {
 					wp_parse_str( $input, $return );
 				}
 
@@ -648,7 +682,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 				break;
 			case 'object':
 				// Fallback object -> false.
-				if ( is_scalar( $value ) || is_null( $value ) ) {
+				if ( is_scalar( $value ) || $value === null ) {
 					if ( ! empty( $types[0] ) && 'false' === $types[0]['type'] ) {
 						return $this->cast_and_filter_item( $return, 'false', $key, $value, $types, $for_output );
 					}
@@ -903,7 +937,6 @@ abstract class WPCOM_JSON_API_Endpoint {
 				);
 				$return[ $key ] = (array) $this->cast_and_filter( $value, $docs, false, $for_output );
 				break;
-
 			case 'visibility':
 				// This is needed to fix a bug in WPAndroid where `public: "PUBLIC"` is sent in place of `public: 1`.
 				if ( 'public' === strtolower( $value ) ) {
@@ -914,7 +947,9 @@ abstract class WPCOM_JSON_API_Endpoint {
 					$return[ $key ] = (int) $value;
 				}
 				break;
-
+			case 'dropdown_page':
+				$return[ $key ] = (array) $this->cast_and_filter( $value, $this->dropdown_page_object_format, false, $for_output );
+				break;
 			default:
 				$method_name = $type['type'] . '_docs';
 				if ( method_exists( 'WPCOM_JSON_API_Jetpack_Overrides', $method_name ) ) {
@@ -1280,7 +1315,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 		}
 
 		if (
-			-1 === (int) get_option( 'blog_public' ) &&
+			( new Status() )->is_private_site() &&
 			/**
 			 * Filter access to a specific post.
 			 *
@@ -1644,6 +1679,23 @@ abstract class WPCOM_JSON_API_Endpoint {
 					$response['allow_download'] = (string) (int) $metadata['videopress']['allow_download'];
 				}
 
+				if ( isset( $info->thumbnail_generating ) ) {
+					$response['thumbnail_generating'] = (bool) intval( $info->thumbnail_generating );
+				} elseif ( isset( $metadata['videopress']['thumbnail_generating'] ) ) {
+					$response['thumbnail_generating'] = (bool) intval( $metadata['videopress']['thumbnail_generating'] );
+				}
+
+				if ( isset( $info->privacy_setting ) ) {
+					$response['privacy_setting'] = (int) $info->privacy_setting;
+				} elseif ( isset( $metadata['videopress']['privacy_setting'] ) ) {
+					$response['privacy_setting'] = (int) $metadata['videopress']['privacy_setting'];
+				}
+
+				$thumbnail_query_data = array();
+				if ( function_exists( 'video_is_private' ) && video_is_private( $info ) ) {
+					$thumbnail_query_data['metadata_token'] = video_generate_auth_token( $info );
+				}
+
 				// Thumbnails.
 				if ( function_exists( 'video_format_done' ) && function_exists( 'video_image_url_by_guid' ) ) {
 					$response['thumbnails'] = array(
@@ -1653,11 +1705,15 @@ abstract class WPCOM_JSON_API_Endpoint {
 					);
 					foreach ( $response['thumbnails'] as $size => $thumbnail_url ) {
 						if ( video_format_done( $info, $size ) ) {
-							$response['thumbnails'][ $size ] = video_image_url_by_guid( $info->guid, $size );
+							$response['thumbnails'][ $size ] = \add_query_arg( $thumbnail_query_data, \video_image_url_by_guid( $info->guid, $size ) );
 						} else {
 							unset( $response['thumbnails'][ $size ] );
 						}
 					}
+				}
+
+				if ( isset( $info->title ) ) {
+					$response['title'] = $info->title;
 				}
 
 				// If we didn't get VideoPress information (for some reason) then let's
@@ -1733,7 +1789,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 				}
 				break;
 			case 'display':
-				if ( -1 === (int) get_option( 'blog_public' ) && ! current_user_can( 'read' ) ) {
+				if ( ( new Status() )->is_private_site() && ! current_user_can( 'read' ) ) {
 					return new WP_Error( 'unauthorized', 'User cannot view taxonomy', 403 );
 				}
 				break;
@@ -1834,6 +1890,14 @@ abstract class WPCOM_JSON_API_Endpoint {
 		// VIP context loading is handled elsewhere, so bail to prevent
 		// duplicate loading. See `switch_to_blog_and_validate_user()`.
 		if ( defined( 'WPCOM_IS_VIP_ENV' ) && WPCOM_IS_VIP_ENV ) {
+			return;
+		}
+
+		$do_check_theme =
+			defined( 'REST_API_TEST_REQUEST' ) && REST_API_TEST_REQUEST ||
+			defined( 'IS_WPCOM' ) && IS_WPCOM;
+
+		if ( $do_check_theme && ! wpcom_should_load_theme_files_on_rest_api() ) {
 			return;
 		}
 
@@ -2053,6 +2117,62 @@ abstract class WPCOM_JSON_API_Endpoint {
 	}
 
 	/**
+	 * Mobile apps are allowed free video uploads, but limited to 5 minutes in length.
+	 *
+	 * @param array $media_item the media item to evaluate.
+	 *
+	 * @return bool true if the media item is a video that was uploaded via the mobile
+	 * app that is longer than 5 minutes.
+	 */
+	public function media_item_is_free_video_mobile_upload_and_too_long( $media_item ) {
+		if ( ! $media_item ) {
+			return false;
+		}
+
+		// Verify file is a video.
+		$is_video = preg_match( '@^video/@', $media_item['type'] );
+		if ( ! $is_video ) {
+			return false;
+		}
+
+		// Check if the request is from a mobile app, where we allow free video uploads at limited length.
+		if ( ! in_array( $this->api->token_details['client_id'], VIDEOPRESS_ALLOWED_REST_API_CLIENT_IDS, true ) ) {
+			return false;
+		}
+
+		// We're only worried about free sites.
+		require_once WP_CONTENT_DIR . '/admin-plugins/wpcom-billing.php';
+		$current_plan = WPCOM_Store_API::get_current_plan( get_current_blog_id() );
+		if ( ! $current_plan['is_free'] ) {
+			return false;
+		}
+
+		// Check if video is longer than 5 minutes.
+		$video_meta = wp_read_video_metadata( $media_item['tmp_name'] );
+		if (
+			false !== $video_meta &&
+			isset( $video_meta['length'] ) &&
+			5 * MINUTE_IN_SECONDS < $video_meta['length']
+		) {
+			videopress_log(
+				'videopress_app_upload_length_block',
+				'Mobile app upload on free site blocked because length was longer than 5 minutes.',
+				null,
+				null,
+				null,
+				null,
+				array(
+					'blog_id' => get_current_blog_id(),
+					'user_id' => get_current_user_id(),
+				)
+			);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Handle a v1.1 media creation.
 	 *
 	 * Only one of $media_files and $media_urls should be non-empty.
@@ -2079,8 +2199,11 @@ abstract class WPCOM_JSON_API_Endpoint {
 			$this->api->trap_wp_die( 'upload_error' );
 			foreach ( $media_files as $media_item ) {
 				$_FILES['.api.media.item.'] = $media_item;
+
 				if ( ! $user_can_upload_files ) {
 					$media_id = new WP_Error( 'unauthorized', 'User cannot upload media.', 403 );
+				} elseif ( $this->media_item_is_free_video_mobile_upload_and_too_long( $media_item ) ) {
+					$media_id = new WP_Error( 'upload_video_length', 'Video uploads longer than 5 minutes require a paid plan.', 400 );
 				} else {
 					if ( $force_parent_id ) {
 						$parent_id = absint( $force_parent_id );
@@ -2099,7 +2222,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 					$media_ids[ $i ] = $media_id;
 				}
 
-				$i++;
+				++$i;
 			}
 			$this->api->trap_wp_die( null );
 			unset( $_FILES['.api.media.item.'] );
@@ -2129,7 +2252,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 					$media_ids[ $i ] = $media_id;
 				}
 
-				$i++;
+				++$i;
 			}
 		}
 
@@ -2185,6 +2308,11 @@ abstract class WPCOM_JSON_API_Endpoint {
 						wp_update_attachment_metadata( $media_id, $id3_meta );
 					}
 				}
+
+				// Attributes: Meta
+				if ( isset( $attrs['meta'] ) && isset( $attrs['meta']['vertical_id'] ) ) {
+					update_post_meta( $media_id, 'vertical_id', $attrs['meta']['vertical_id'] );
+				}
 			}
 		}
 
@@ -2192,7 +2320,6 @@ abstract class WPCOM_JSON_API_Endpoint {
 			'media_ids' => $media_ids,
 			'errors'    => $errors,
 		);
-
 	}
 
 	/**
@@ -2277,7 +2404,7 @@ abstract class WPCOM_JSON_API_Endpoint {
 		}
 
 		// bail early if they already have the upgrade..
-		if ( (string) get_option( 'video_upgrade' ) === '1' ) {
+		if ( wpcom_site_has_videopress() ) {
 			return $mimes;
 		}
 

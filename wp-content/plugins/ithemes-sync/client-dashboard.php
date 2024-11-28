@@ -273,7 +273,7 @@ class Ithemes_Sync_Client_Dashboard {
 			}
 
 			if ( ! $edit_found  && ( current_user_can( 'edit_published_pages' ) || current_user_can( 'edit_published_posts' ) ) ) {
-				$admin_bar['edit'] = array( 'id' => 'edit', 'title' => '<span class="ab-icon"></span><span class="ab-label">Edit Post/ Page</span>', 'parent' => false, 'type' => 'item', 'children' => false );
+				$admin_bar['edit'] = (object) array( 'id' => 'edit', 'title' => '<span class="ab-icon"></span><span class="ab-label">Edit Post/ Page</span>', 'parent' => false, 'type' => 'item', 'children' => false );
 			}
 
 			/**

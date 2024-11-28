@@ -29,7 +29,7 @@ class Buddyboss_Helpers {
 	 * Buddyboss_Helpers constructor.
 	 */
 	public function __construct() {
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
+		$this->load_options = true;
 	}
 
 	/**
@@ -63,7 +63,7 @@ class Buddyboss_Helpers {
 			array(
 				'uo_include_any' => false,
 				'uo_any_label'   => esc_attr__( 'Any group', 'uncanny-automator' ),
-				'status'         => array( 'public' ),
+				'status'         => array( 'public', 'private', 'hidden' ),
 			)
 		);
 

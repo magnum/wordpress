@@ -21,17 +21,12 @@ class Elementor_Helpers {
 	 */
 	public $pro;
 
-	/**
-	 * @var bool
-	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Elementor_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
 	}
 
 	/**
@@ -56,10 +51,7 @@ class Elementor_Helpers {
 	 * @return mixed
 	 */
 	public function all_elementor_forms( $label = null, $option_code = 'ELEMFORMS', $args = array() ) {
-		if ( ! $this->load_options ) {
 
-			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
-		}
 		if ( ! $label ) {
 			$label = esc_attr__( 'Form', 'uncanny-automator' );
 		}
@@ -122,6 +114,10 @@ WHERE p.post_type IS NOT NULL
 			'fill_values_in'  => $target_field,
 			'endpoint'        => $end_point,
 			'options'         => $options,
+			'relevant_tokens' => array(
+				$option_code         => __( 'Form title', 'uncanny-automator' ),
+				$option_code . '_ID' => __( 'Form ID', 'uncanny-automator' ),
+			),
 		);
 
 		//      Automator()->cache->set( 'uap_option_all_elementor_forms', $option );

@@ -11,7 +11,7 @@ use cybot\cookiebot\widgets\Dashboard_Widget_Cookiebot_Status;
 use RuntimeException;
 
 class Cookiebot_WP {
-	const COOKIEBOT_PLUGIN_VERSION  = '4.0.3';
+	const COOKIEBOT_PLUGIN_VERSION  = '4.2.4';
 	const COOKIEBOT_MIN_PHP_VERSION = '5.6.0';
 
 	/**
@@ -71,7 +71,11 @@ class Cookiebot_WP {
 
 	public function cookiebot_init() {
 		Cookiebot_Addons::instance();
-		load_plugin_textdomain( 'cookiebot', false, dirname( plugin_basename( __FILE__ ) ) . '/langs/' );
+		load_textdomain(
+			'cookiebot',
+			CYBOT_COOKIEBOT_PLUGIN_DIR . 'langs/cookiebot-' . get_locale() . '.mo'
+		);
+		load_plugin_textdomain( 'cookiebot', false, dirname( plugin_basename( __FILE__ ) ) . '/langs' );
 
 		if ( is_admin() ) {
 			( new Menu_Settings() )->add_menu();
@@ -88,6 +92,9 @@ class Cookiebot_WP {
 		( new Widgets() )->register_hooks();
 		( new Cookiebot_Gutenberg_Declaration_Block() )->register_hooks();
 		( new WP_Rocket_Helper() )->register_hooks();
+
+		$this->set_consent_mode_default();
+		add_filter( 'plugin_action_links_cookiebot/cookiebot.php', array( $this, 'set_settings_action_link' ) );
 	}
 
 	/**
@@ -151,5 +158,24 @@ class Cookiebot_WP {
 		}
 
 		return false;
+	}
+
+	private function set_consent_mode_default() {
+		if ( ! get_option( 'cookiebot-gcm' ) && ! get_option( 'cookiebot-gcm-first-run' ) ) {
+			update_option( 'cookiebot-gcm', '1' );
+		}
+
+		if ( get_option( 'cookiebot-gcm' ) && ! get_option( 'cookiebot-gcm-first-run' ) ) {
+			update_option( 'cookiebot-gcm', '1' );
+			update_option( 'cookiebot-gcm-first-run', '1' );
+		}
+	}
+
+	public function set_settings_action_link( $actions ) {
+		$cblinks = array(
+			'<a href="' . admin_url( 'admin.php?page=cookiebot' ) . '">' . esc_html__( 'Dashboard', 'cookiebot' ) . '</a>',
+		);
+		$actions = array_merge( $actions, $cblinks );
+		return $actions;
 	}
 }

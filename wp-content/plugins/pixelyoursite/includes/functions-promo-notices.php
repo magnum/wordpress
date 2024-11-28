@@ -62,19 +62,13 @@ function adminGetCurrentPromoNotice() {
                 // clean installation
                 
                 /** @noinspection PhpIncludeInspection */
-                require_once PYS_FREE_PATH . '/notices/0_clean.php';
-                
-                // remember set name
-                update_user_meta( $user_id, 'pys_free_current_promo_notices_set', '0_clean' );
+
                 
             } else {
                 // update from pre 7.x
                 
                 /** @noinspection PhpIncludeInspection */
-                require_once PYS_FREE_PATH . '/notices/1_from_pre_7x.php';
-        
-                // remember set name
-                update_user_meta( $user_id, 'pys_free_current_promo_notices_set', '1_from_pre_7x' );
+
                 
             }
             

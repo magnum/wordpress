@@ -64,7 +64,7 @@ class Jetpack_SSO {
 	 * @return Jetpack_SSO
 	 **/
 	public static function get_instance() {
-		if ( ! is_null( self::$instance ) ) {
+		if ( self::$instance !== null ) {
 			return self::$instance;
 		}
 
@@ -332,7 +332,7 @@ class Jetpack_SSO {
 		$wants_to_login = false;
 
 		// Cover default WordPress behavior.
-		$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action = isset( $_REQUEST['action'] ) ? filter_var( wp_unslash( $_REQUEST['action'] ) ) : 'login'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// And now the exceptions.
 		$action = isset( $_GET['loggedout'] ) ? 'loggedout' : $action; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -379,19 +379,17 @@ class Jetpack_SSO {
 			if ( isset( $_GET['result'], $_GET['user_id'], $_GET['sso_nonce'] ) && 'success' === $_GET['result'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$this->handle_login();
 				$this->display_sso_login_form();
+			} elseif ( ( new Status() )->is_staging_site() ) {
+				add_filter( 'login_message', array( 'Jetpack_SSO_Notices', 'sso_not_allowed_in_staging' ) );
 			} else {
-				if ( ( new Status() )->is_staging_site() ) {
-					add_filter( 'login_message', array( 'Jetpack_SSO_Notices', 'sso_not_allowed_in_staging' ) );
-				} else {
-					// Is it wiser to just use wp_redirect than do this runaround to wp_safe_redirect?
-					add_filter( 'allowed_redirect_hosts', array( 'Jetpack_SSO_Helpers', 'allowed_redirect_hosts' ) );
-					$reauth  = ! empty( $_GET['force_reauth'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					$sso_url = $this->get_sso_url_or_die( $reauth );
+				// Is it wiser to just use wp_redirect than do this runaround to wp_safe_redirect?
+				add_filter( 'allowed_redirect_hosts', array( 'Jetpack_SSO_Helpers', 'allowed_redirect_hosts' ) );
+				$reauth  = ! empty( $_GET['force_reauth'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$sso_url = $this->get_sso_url_or_die( $reauth );
 
-					$tracking->record_user_event( 'sso_login_redirect_success' );
-					wp_safe_redirect( $sso_url );
-					exit;
-				}
+				$tracking->record_user_event( 'sso_login_redirect_success' );
+				wp_safe_redirect( $sso_url );
+				exit;
 			}
 		} elseif ( Jetpack_SSO_Helpers::display_sso_form_for_action( $action ) ) {
 
@@ -450,7 +448,8 @@ class Jetpack_SSO {
 
 		setcookie(
 			'jetpack_sso_original_request',
-			esc_url_raw( set_url_scheme( $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) ),
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sniff misses the wrapping esc_url_raw().
+			esc_url_raw( set_url_scheme( ( isset( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '' ) . ( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '' ) ) ),
 			time() + HOUR_IN_SECONDS,
 			COOKIEPATH,
 			COOKIE_DOMAIN,
@@ -460,11 +459,11 @@ class Jetpack_SSO {
 
 		if ( ! empty( $_GET['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			// If we have something to redirect to.
-			$url = esc_url_raw( $_GET['redirect_to'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$url = esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			setcookie( 'jetpack_sso_redirect_to', $url, time() + HOUR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 		} elseif ( ! empty( $_COOKIE['jetpack_sso_redirect_to'] ) ) {
 			// Otherwise, if it's already set, purge it.
-			setcookie( 'jetpack_sso_redirect_to', ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+			setcookie( 'jetpack_sso_redirect_to', ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 		}
 	}
 
@@ -479,10 +478,10 @@ class Jetpack_SSO {
 		}
 
 		$display_name = ! empty( $_COOKIE[ 'jetpack_sso_wpcom_name_' . COOKIEHASH ] )
-			? $_COOKIE[ 'jetpack_sso_wpcom_name_' . COOKIEHASH ]
+			? sanitize_text_field( wp_unslash( $_COOKIE[ 'jetpack_sso_wpcom_name_' . COOKIEHASH ] ) )
 			: false;
 		$gravatar     = ! empty( $_COOKIE[ 'jetpack_sso_wpcom_gravatar_' . COOKIEHASH ] )
-			? $_COOKIE[ 'jetpack_sso_wpcom_gravatar_' . COOKIEHASH ]
+			? esc_url_raw( wp_unslash( $_COOKIE[ 'jetpack_sso_wpcom_gravatar_' . COOKIEHASH ] ) )
 			: false;
 
 		?>
@@ -593,7 +592,8 @@ class Jetpack_SSO {
 				time() - YEAR_IN_SECONDS,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 
@@ -604,7 +604,8 @@ class Jetpack_SSO {
 				time() - YEAR_IN_SECONDS,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 	}
@@ -623,7 +624,8 @@ class Jetpack_SSO {
 				time() - YEAR_IN_SECONDS,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 
@@ -634,7 +636,8 @@ class Jetpack_SSO {
 				time() - YEAR_IN_SECONDS,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 
@@ -645,7 +648,8 @@ class Jetpack_SSO {
 				time() - YEAR_IN_SECONDS,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 	}
@@ -696,7 +700,7 @@ class Jetpack_SSO {
 	 */
 	public static function request_initial_nonce() {
 		$nonce = ! empty( $_COOKIE['jetpack_sso_nonce'] )
-			? $_COOKIE['jetpack_sso_nonce']
+			? sanitize_key( wp_unslash( $_COOKIE['jetpack_sso_nonce'] ) )
 			: false;
 
 		if ( ! $nonce ) {
@@ -707,7 +711,7 @@ class Jetpack_SSO {
 				return new WP_Error( $xml->getErrorCode(), $xml->getErrorMessage() );
 			}
 
-			$nonce = $xml->getResponse();
+			$nonce = sanitize_key( $xml->getResponse() );
 
 			setcookie(
 				'jetpack_sso_nonce',
@@ -715,19 +719,20 @@ class Jetpack_SSO {
 				time() + ( 10 * MINUTE_IN_SECONDS ),
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl()
+				is_ssl(),
+				true
 			);
 		}
 
-		return sanitize_key( $nonce );
+		return $nonce;
 	}
 
 	/**
 	 * The function that actually handles the login!
 	 */
 	public function handle_login() {
-		$wpcom_nonce   = sanitize_key( $_GET['sso_nonce'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$wpcom_user_id = (int) $_GET['user_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$wpcom_nonce   = isset( $_GET['sso_nonce'] ) ? sanitize_key( $_GET['sso_nonce'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$wpcom_user_id = isset( $_GET['user_id'] ) ? (int) $_GET['user_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.sso.validateResult', $wpcom_nonce, $wpcom_user_id );
@@ -878,13 +883,13 @@ class Jetpack_SSO {
 
 			wp_set_current_user( $user->ID );
 
-			$_request_redirect_to = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( $_REQUEST['redirect_to'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_request_redirect_to = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$redirect_to          = user_can( $user, 'edit_posts' ) ? admin_url() : self::profile_page_url();
 
 			// If we have a saved redirect to request in a cookie.
 			if ( ! empty( $_COOKIE['jetpack_sso_redirect_to'] ) ) {
 				// Set that as the requested redirect to.
-				$redirect_to          = esc_url_raw( $_COOKIE['jetpack_sso_redirect_to'] );
+				$redirect_to          = esc_url_raw( wp_unslash( $_COOKIE['jetpack_sso_redirect_to'] ) );
 				$_request_redirect_to = $redirect_to;
 			}
 
@@ -991,7 +996,7 @@ class Jetpack_SSO {
 		$args = wp_parse_args( $args, $defaults );
 
 		if ( ! empty( $_GET['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$args['redirect_to'] = rawurlencode( esc_url_raw( $_GET['redirect_to'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['redirect_to'] = rawurlencode( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		return add_query_arg( $args, wp_login_url() );
@@ -1131,8 +1136,8 @@ class Jetpack_SSO {
 			return;
 		}
 
-		$redirect_to         = ! empty( $_GET['redirect_to'] ) ? esc_url_raw( $_GET['redirect_to'] ) : admin_url(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$request_redirect_to = ! empty( $_GET['request_redirect_to'] ) ? esc_url_raw( $_GET['request_redirect_to'] ) : $redirect_to; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$redirect_to         = ! empty( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : admin_url(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$request_redirect_to = ! empty( $_GET['request_redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['request_redirect_to'] ) ) : $redirect_to; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		/** This filter is documented in core/src/wp-login.php */
 		$redirect_after_auth = apply_filters( 'login_redirect', $redirect_to, $request_redirect_to, wp_get_current_user() );
@@ -1178,7 +1183,8 @@ class Jetpack_SSO {
 			time() + WEEK_IN_SECONDS,
 			COOKIEPATH,
 			COOKIE_DOMAIN,
-			is_ssl()
+			is_ssl(),
+			true
 		);
 
 		setcookie(
@@ -1193,7 +1199,8 @@ class Jetpack_SSO {
 			time() + WEEK_IN_SECONDS,
 			COOKIEPATH,
 			COOKIE_DOMAIN,
-			is_ssl()
+			is_ssl(),
+			true
 		);
 	}
 

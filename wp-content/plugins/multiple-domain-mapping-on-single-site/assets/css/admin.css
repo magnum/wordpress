@@ -140,9 +140,57 @@
   background-color: #fff;
 }
 
-/** premium notice **/
+/** sticky save button **/
+.falke_mdm_wrap p.submit{
+  position: sticky;
+  bottom:0;
+}
 
-.premium-survey-notice {
-  color: green;
-  padding:.5em 0;
+/** premium notice **/
+.pro-upgrade-notice {
+  color: rgb(60, 170, 55);
+  padding:.5em 0 .5em 2em;
+}
+
+/** featured tab **/
+a.nav-tab.nav-tab-featured {
+    background-color: rgb(60, 170, 55);
+    color: #ffff;
+    border-color: #999;
+}
+
+/** additional mapping input fields **/
+.falke_mdm_mapping_additional_input{
+  clear: both;
+  padding-left: 2em;
+}
+.falke_mdm_mapping_additional_input .falke_mdm_mapping_additional_input_header{
+  font-weight: bold;
+}
+.falke_mdm_mapping_additional_input textarea{
+  width: 100%;
+}
+
+/** advanced stuff sections **/
+.falke_mdm_advanced_section{
+  display: flex;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #ccc;
+}
+.falke_mdm_advanced_section img{
+  max-width: 100%;
+}
+.falke_mdm_advanced_section > *{
+  margin:5px;
+  width: 50%;
+}
+@media all and (max-width: 599px){
+  .falke_mdm_advanced_section{
+    flex-direction: column;
+  }
+  .falke_mdm_advanced_section > *{
+    margin:0;
+    width: 100%;
+  }
 }

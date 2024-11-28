@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class AdDatePresetValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
+    const DATA_MAXIMUM = 'data_maximum';
     const LAST_14D = 'last_14d';
     const LAST_28D = 'last_28d';
     const LAST_30D = 'last_30d';

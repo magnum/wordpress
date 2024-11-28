@@ -31,19 +31,13 @@ class Elem_Tokens {
 	 */
 	public function elem_possible_tokens( $tokens = array(), $args = array() ) {
 
-		if ( isset( $_REQUEST['action'] ) && ( 'heartbeat' === (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) || 'wp-remove-post-lock' === (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			// if it's heartbeat, post lock actions bail
+		if ( ! automator_do_identify_tokens() ) {
 			return $tokens;
 		}
 
 		$form_id      = $args['value'];
 		$trigger_meta = $args['meta'];
 		if ( empty( $form_id ) ) {
-			return $tokens;
-		}
-
-		if ( ! Automator()->helpers->recipe->is_edit_page() && ! Automator()->helpers->recipe->is_rest() ) {
-			// If not automator edit page or rest call, bail
 			return $tokens;
 		}
 
@@ -68,10 +62,9 @@ FROM $wpdb->postmeta pm
     LEFT JOIN $wpdb->posts p
         ON p.ID = pm.post_id
 WHERE p.post_type IS NOT NULL
-  AND p.post_status = %s
+  AND p.post_status NOT IN('trash', 'inherit', 'auto-draft')
   AND pm.meta_key = %s
   AND pm.`meta_value` LIKE %s",
-					'publish',
 					'_elementor_data',
 					'%%form_fields%%'
 				)
@@ -129,19 +122,35 @@ WHERE p.post_type IS NOT NULL
 	 * @return null|string
 	 */
 	public function elem_token( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
-		if ( empty( $pieces ) ) {
-			return $value;
-		}
-		if ( empty( $trigger_data ) ) {
-			return $value;
-		}
-		$piece = 'ELEMFORM';
-		if ( ! in_array( $piece, $pieces, false ) ) {
+
+		if ( empty( $pieces ) || empty( $trigger_data ) ) {
 			return $value;
 		}
 
+		$piece = 'ELEMFORM';
+
+		if ( ! in_array( $piece, $pieces, true ) && ! in_array( $piece . '_ID', $pieces, true ) ) {
+			return $value;
+		}
+
+		if ( $piece . '_ID' === $pieces[2] ) {
+			foreach ( $trigger_data as $t_d ) {
+				if ( empty( $t_d ) ) {
+					continue;
+				}
+				if ( isset( $t_d['meta'][ $piece ] ) ) {
+					return $t_d['meta'][ $piece ];
+				}
+			}
+		}
+
 		foreach ( $trigger_data as $trigger ) {
+			if ( empty( $trigger['meta'] ) ) {
+				continue;
+			}
+
 			if ( key_exists( $piece, $trigger['meta'] ) ) {
+
 				$trigger_id     = $trigger['ID'];
 				$trigger_log_id = $replace_args['trigger_log_id'];
 				$token_info     = explode( '|', $pieces[2] );
@@ -149,6 +158,7 @@ WHERE p.post_type IS NOT NULL
 				$meta_key       = isset( $token_info[1] ) ? $token_info[1] : '';
 				$meta_field     = $piece . '_' . $form_id;
 				$entry          = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_field, $trigger_id, $trigger_log_id, $user_id );
+
 				if ( ! empty( $entry ) ) {
 					if ( is_array( $entry ) && ! empty( $meta_key ) ) {
 						$value = isset( $entry[ $meta_key ] ) ? $entry[ $meta_key ] : '';
@@ -183,62 +193,62 @@ WHERE p.post_type IS NOT NULL
 		if ( ! empty( $data ) ) {
 			if ( ! empty( $fields ) ) {
 				foreach ( $fields as $field_name => $field_data ) {
-					if ( ! isset( $data[ $field_name ] ) ) {
+					if ( ! isset( $data[ $field_name ] ) || $field_data['value'] !== $field_data['raw_value'] ) {
 						$data[ $field_name ] = $field_data['value'];
 					}
 				}
 			}
-			$data = serialize( $data );
+			$data = maybe_serialize( $data );
 		}
 
-		if ( is_array( $args ) ) {
-			foreach ( $args as $trigger_result ) {
-				if ( true === $trigger_result['result'] ) {
+		if ( ! is_array( $args ) ) {
+			return;
+		}
+		foreach ( $args as $trigger_result ) {
+			if ( true !== $trigger_result['result'] ) {
+				continue;
+			}
 
-					if ( $recipes && ! empty( $form_id ) ) {
-						foreach ( $recipes as $recipe ) {
-							$triggers = $recipe['triggers'];
-							if ( $triggers ) {
-								foreach ( $triggers as $trigger ) {
-									$trigger_id = $trigger['ID'];
-									if ( ! key_exists( 'ELEMFORM', $trigger['meta'] ) ) {
-										continue;
-									} else {
-										// Only form entry id will be saved.
-										$user_id           = (int) $trigger_result['args']['user_id'];
-										$recipe_log_id_raw = isset( $trigger_result['args']['recipe_log_id'] ) ? (int) $trigger_result['args']['recipe_log_id'] : Automator()->maybe_create_recipe_log_entry( $recipe['ID'], $user_id );
-										if ( $recipe_log_id_raw ) {
-											$trigger_log_id = (int) $trigger_result['args']['get_trigger_id'];
-											$run_number     = (int) $trigger_result['args']['run_number'];
-											$args           = array(
-												'user_id'        => $user_id,
-												'trigger_id'     => $trigger_id,
-												'meta_key'       => 'ELEMFORM_' . $form_id,
-												'meta_value'     => $data,
-												'run_number'     => $run_number,
-												// get run number
-												'trigger_log_id' => $trigger_log_id,
-											);
-											Automator()->insert_trigger_meta( $args );
-											// For form name
-											$args = array(
-												'user_id'        => $user_id,
-												'trigger_id'     => $trigger_id,
-												'meta_key'       => 'ELEMFORM_ELEMFORM',
-												'meta_value'     => $form_name,
-												'run_number'     => $run_number,
-												// get run number
-												'trigger_log_id' => $trigger_log_id,
-											);
+			if ( empty( $recipes ) || empty( $form_id ) ) {
+				continue;
+			}
+			foreach ( $recipes as $recipe ) {
+				$triggers = $recipe['triggers'];
+				if ( empty( $triggers ) ) {
+					continue;
+				}
+				foreach ( $triggers as $trigger ) {
+					$trigger_id = $trigger['ID'];
+					if ( ! key_exists( 'ELEMFORM', $trigger['meta'] ) ) {
+						continue;
+					}
+					// Only form entry id will be saved.
+					$user_id        = (int) $trigger_result['args']['user_id'];
+					$trigger_log_id = (int) $trigger_result['args']['get_trigger_id'];
+					$run_number     = (int) $trigger_result['args']['run_number'];
+					$args           = array(
+						'user_id'        => $user_id,
+						'trigger_id'     => $trigger_id,
+						'meta_key'       => 'ELEMFORM_' . $form_id,
+						'meta_value'     => $data,
+						'run_number'     => $run_number,
+						// get run number
+						'trigger_log_id' => $trigger_log_id,
+					);
+					Automator()->insert_trigger_meta( $args );
+					// For form name
+					$args = array(
+						'user_id'        => $user_id,
+						'trigger_id'     => $trigger_id,
+						'meta_key'       => 'ELEMFORM_ELEMFORM',
+						'meta_value'     => $form_name,
+						'run_number'     => $run_number,
+						// get run number
+						'trigger_log_id' => $trigger_log_id,
+					);
 
-											Automator()->insert_trigger_meta( $args );
-										}//end if
-									}//end if
-								}//end foreach
-							}//end if
-						}//end foreach
-					}//end if
-				}//end if
+					Automator()->insert_trigger_meta( $args );
+				}//end foreach
 			}//end foreach
 		}//end if
 	}

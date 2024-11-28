@@ -8,6 +8,7 @@ use PYS_PRO_GLOBAL\Psr\Http\Message\StreamInterface;
  * Lazily reads or writes to a file that is opened only after an IO operation
  * take place on the stream.
  */
+#[\AllowDynamicProperties]
 final class LazyOpenStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamInterface
 {
     use StreamDecoratorTrait;

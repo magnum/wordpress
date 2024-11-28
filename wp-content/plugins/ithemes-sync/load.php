@@ -1,28 +1,15 @@
 <?php
 
 /*
-Load the Sync plugin components.
-Written by Chris Jean for iThemes.com
-Version 1.1.1
-
-Version History
-	1.0.0 - 2014-03-26 - Chris Jean
-		Created from version 1.3.5 of init.php.
-	1.0.1 - 2014-10-13 - Chris Jean
-		Added more robust checking of the $_GET['ithemes-sync-request'] data.
-	1.1.0 - 2014-11-07 - Chris Jean
-		Added a admin-ajax.php handler for sending Sync requests.
-	1.1.1 - 2014-11-21 - Chris Jean
-		Removed call to stripslashes_deep() in AJAX handler.
+ *Load the Sync plugin components.
 */
 
-function ithemes_sync_handle_ajax_request() {
+function ithemes_sync_load_request_handler() {
 	require_once( $GLOBALS['ithemes_sync_path'] . '/request-handler.php' );
 }
-add_action( 'wp_ajax_nopriv_ithemes_sync_request', 'ithemes_sync_handle_ajax_request' );
 
 if ( ! empty( $_GET['ithemes-sync-request'] ) ) {
-	require_once( $GLOBALS['ithemes_sync_path'] . '/request-handler.php' );
+	add_action( 'plugins_loaded', 'ithemes_sync_load_request_handler' );
 }
 
 if ( is_admin() ) {

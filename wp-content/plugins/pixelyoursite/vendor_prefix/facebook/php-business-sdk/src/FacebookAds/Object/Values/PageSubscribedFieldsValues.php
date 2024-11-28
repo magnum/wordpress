@@ -41,7 +41,6 @@ class PageSubscribedFieldsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Abstra
     const AWARDS = 'awards';
     const BIO = 'bio';
     const BIRTHDAY = 'birthday';
-    const BRANDED_CAMERA = 'branded_camera';
     const CATEGORY = 'category';
     const CHECKINS = 'checkins';
     const COMPANY_OVERVIEW = 'company_overview';
@@ -86,7 +85,6 @@ class PageSubscribedFieldsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Abstra
     const MESSAGING_HANDOVERS = 'messaging_handovers';
     const MESSAGING_OPTINS = 'messaging_optins';
     const MESSAGING_OPTOUTS = 'messaging_optouts';
-    const MESSAGING_PAGE_FEEDBACK = 'messaging_page_feedback';
     const MESSAGING_PAYMENTS = 'messaging_payments';
     const MESSAGING_POLICY_ENFORCEMENT = 'messaging_policy_enforcement';
     const MESSAGING_POSTBACKS = 'messaging_postbacks';

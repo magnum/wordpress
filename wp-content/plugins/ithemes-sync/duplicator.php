@@ -1,5 +1,5 @@
 <?php
-	
+
 /**
  * Generates and returns the Duplicate Product URL
  *
@@ -27,8 +27,13 @@ function ithemes_sync_duplicate_post_addon_get_duplicating_url( $post ) {
  * @return array
 */
 function ithemes_sync_duplicate_post_addon_add_duplicate_post_function( $actions, $post ) {
-	$url = ithemes_sync_duplicate_post_addon_get_duplicating_url( $post );
-	$actions['ithemes_sync_duplicate'] =  '<a class="sync_duplicate_post" id="sync-post-' . $post->ID . '" title="' . __( 'Duplicate Post', 'it-l10n-ithemes-sync' ) . '" href="' . $url . '">Duplicate</a>';
+	$sync_show_duplicate = apply_filters('ithemes_sync_show_duplicate', true);
+	$sync_duplicate_excluded_post_types = apply_filters('ithemes_sync_duplicate_post_types', array( 'product' ));
+
+	if( $sync_show_duplicate && !in_array($post->post_type, $sync_duplicate_excluded_post_types ) ){
+		$url = ithemes_sync_duplicate_post_addon_get_duplicating_url( $post );
+		$actions['ithemes_sync_duplicate'] =  '<a class="sync_duplicate_post" id="sync-post-' . $post->ID . '" title="' . __( 'Duplicate Post', 'it-l10n-ithemes-sync' ) . '" href="' . $url . '">Duplicate</a>';
+	}
 
 	return $actions;
 }

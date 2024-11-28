@@ -19,105 +19,119 @@ Version History
 
 class Ithemes_Updater_Settings_Page {
 	private $page_name = 'ithemes-licensing';
-
+	
 	private $path_url = '';
 	private $self_url = '';
 	private $messages = array();
 	private $message_strings = array();
 	private $errors = array();
 	private $soft_errors = array();
-
-
+	
+	
 	public function __construct() {
 		require_once( $GLOBALS['ithemes_updater_path'] . '/functions.php' );
 		require_once( $GLOBALS['ithemes_updater_path'] . '/api.php' );
 		require_once( $GLOBALS['ithemes_updater_path'] . '/keys.php' );
-
-
+		
+		
 		$this->path_url = Ithemes_Updater_Functions::get_url( $GLOBALS['ithemes_updater_path'] );
-
+		
 		list( $this->self_url ) = explode( '?', $_SERVER['REQUEST_URI'] );
 		$this->self_url .= '?page=' . $this->page_name;
-
-
+		
+		
 		add_action( 'ithemes_updater_settings_page_index', array( $this, 'index' ) );
-		add_action( 'admin_print_scripts', array( $this, 'add_scripts' ) );
 		add_action( 'admin_print_styles', array( $this, 'add_styles' ) );
 	}
-
-	public function add_scripts() {
-		wp_enqueue_script( 'ithemes-updater-settings-page-script', "{$this->path_url}/js/settings-page.js", array(), 2 );
-	}
-
+	
 	public function add_styles() {
-		wp_enqueue_style( 'ithemes-updater-settings-page-style', "{$this->path_url}/css/settings-page.css", array(), 2 );
+		wp_enqueue_style( 'ithemes-updater-settings-page-style', "{$this->path_url}/css/settings-page.css" );
 	}
-
+	
 	public function index() {
-		$post_data = Ithemes_Updater_Functions::get_post_data( array( 'it-updater-username', 'it-updater-password', 'packages', 'action', 'site_url', 'redirect', 'relicense_option' ), true );
-
-		if ( empty( $post_data['packages'] ) ) {
+		$post_data = Ithemes_Updater_Functions::get_post_data( array( 'it-updater-username', 'it-updater-password', 'packages', 'action' ), true );
+		
+		if ( empty( $post_data['packages'] ) )
 			$post_data['packages'] = array();
-		}
-
-		if ( ! empty( $post_data['action'] ) ) {
-			$action = $post_data['action'];
-		} else if ( ! empty( $_REQUEST['action'] ) ) {
-			$action = $_REQUEST['action'];
-		} else {
-			$action = 'list_packages';
-		}
-
-		if ( 'save_licensed_site_url' === $action ) {
-			$this->save_licensed_site_url( $post_data );
-		} else if ( 'relicense' === $action ) {
-			$this->relicense( $post_data );
-		} else if ( 'change_licensed_site_url' === $action || ! $GLOBALS['ithemes-updater-settings']->is_licensed_site_url_confirmed() ) {
-			$this->show_licensed_site_url_confirmation_page( $post_data );
-		} else {
-			if ( 'license_packages' === $action ) {
-				$this->license_packages( $post_data );
-			} else if ( 'unlicense_packages' === $action ) {
-				$this->unlicense_packages( $post_data );
-			} else if ( 'save_settings' === $action ) {
-				$this->save_settings();
-			}
-
-			$this->list_packages( $action, $post_data );
-		}
+		
+		
+		$action = $post_data['action'];
+		
+		if ( 'license_packages' == $action )
+			$this->license_packages( $post_data );
+		else if ( 'unlicense_packages' == $action )
+			$this->unlicense_packages( $post_data );
+		else if ( 'save_settings' == $action )
+			$this->save_settings();
+		
+		$this->list_packages( $action, $post_data );
 	}
-
+	
+	private function get_error_explanation( $error, $package = '' ) {
+		$code = $error->get_error_code();
+		$package_name = Ithemes_Updater_Functions::get_package_name( $package );
+		$message = '';
+		
+		switch( $code ) {
+			case 'ITXAPI_Updater_Bad_Login':
+				$message = __( 'Incorrect password. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-ithemes-sync' );
+				break;
+			case 'ITXAPI_Updater_Username_Unknown':
+			case 'ITXAPI_Updater_Username_Invalid':
+				$message = __( 'Invalid username. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-ithemes-sync' );
+				break;
+			case 'ITXAPI_Product_Package_Unknown':
+				$message = sprintf( __( 'The licensing server reports that the %1$s (%2$s) product is unknown. Please contact support for assistance.', 'it-l10n-ithemes-sync' ), $package_name, $package );
+				break;
+			case 'ITXAPI_Updater_Too_Many_Sites':
+				$message = sprintf( __( '%1$s could not be licensed since the membership account is out of available licenses for this product. You can unlicense the product on other sites or upgrade your membership to one with a higher number of licenses in order to increase the amount of available licenses.', 'it-l10n-ithemes-sync' ), $package_name );
+				break;
+			case 'ITXAPI_License_Key_Generate_Failed':
+				$message = sprintf( __( '%s could not be licensed due to an internal error. Please try to license %s again at a later time. If this problem continues, please contact iThemes support.', 'it-l10n-ithemes-sync' ), $package_name );
+				break;
+		}
+		
+		if ( empty( $message ) ) {
+			if ( ! empty( $package ) )
+				$message = sprintf( __( 'An unknown error relating to the %1$s product occurred. Please contact iThemes support. Error details: %2$s', 'it-l10n-ithemes-sync' ), $package_name, $error->get_error_message() . " ($code)" );
+			else
+				$message = sprintf( __( 'An unknown error occurred. Please contact iThemes support. Error details: %s', 'it-l10n-ithemes-sync' ), $error->get_error_message() . " ($code)" );
+		}
+		
+		return $message;
+	}
+	
 	private function save_settings() {
 		check_admin_referer( 'save_settings', 'ithemes_updater_nonce' );
-
-
+		
+		
 		$settings_defaults = array(
 			'quick_releases' => false,
 		);
-
+		
 		$settings = array();
-
+		
 		foreach ( $settings_defaults as $var => $val ) {
 			if ( isset( $_POST[$var] ) )
 				$settings[$var] = $_POST[$var];
 			else
 				$settings[$var] = $val;
 		}
-
+		
 		if ( $settings['quick_releases'] )
 			$settings['quick_releases'] = true;
-
+		
 		$GLOBALS['ithemes-updater-settings']->update_options( $settings );
-
+		
 		$GLOBALS['ithemes-updater-settings']->flush( 'settings saved' );
-
-
+		
+		
 		$this->messages[] = __( 'Settings saved', 'it-l10n-ithemes-sync' );
 	}
-
+	
 	private function license_packages( $data ) {
 		check_admin_referer( 'license_packages', 'ithemes_updater_nonce' );
-
+		
 		if ( empty( $data['username'] ) && empty( $data['password'] ) )
 			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to license products.', 'it-l10n-ithemes-sync' );
 		else if ( empty( $data['username'] ) )
@@ -126,37 +140,37 @@ class Ithemes_Updater_Settings_Page {
 			$this->errors[] = __( 'You must supply an iThemes membership password in order to license products.', 'it-l10n-ithemes-sync' );
 		else if ( empty( $data['packages'] ) )
 			$this->errors[] = __( 'You must select at least one product to license. Ensure that you select the products that you wish to license in the listing below.', 'it-l10n-ithemes-sync' );
-
+		
 		if ( ! empty( $this->errors ) )
 			return;
-
-
+		
+		
 		$response = Ithemes_Updater_API::activate_package( $data['username'], $data['password'], $data['packages'] );
-
+		
 		if ( is_wp_error( $response ) ) {
-			$this->errors[] = Ithemes_Updater_API::get_error_explanation( $response );
-
+			$this->errors[] = $this->get_error_explanation( $response );
+			
 			return;
 		}
-
+		
 		if ( empty( $response['packages'] ) ) {
 			$this->errors[] = __( 'An unknown server error occurred. Please try to license your products again at another time.', 'it-l10n-ithemes-sync' );
 			return;
 		}
-
-
+		
+		
 		uksort( $response['packages'], 'strnatcasecmp' );
-
+		
 		$success = array();
 		$warn = array();
 		$fail = array();
-
+		
 		foreach ( $response['packages'] as $package => $data ) {
 			if ( preg_match( '/ \|\|\| \d+$/', $package ) )
 				continue;
-
+			
 			$name = Ithemes_Updater_Functions::get_package_name( $package );
-
+			
 			if ( ! empty( $data['key'] ) )
 				$success[] = $name;
 			else if ( ! empty( $data['status'] ) && ( 'expired' == $data['status'] ) )
@@ -164,25 +178,25 @@ class Ithemes_Updater_Settings_Page {
 			else
 				$fail[$name] = $data['error']['message'];
 		}
-
-
+		
+		
 		if ( ! empty( $success ) )
 			$this->messages[] = wp_sprintf( __( 'Successfully licensed %l.', 'it-l10n-ithemes-sync' ), $success );
-
+		
 		if ( ! empty( $fail ) ) {
 			foreach ( $fail as $name => $reason )
 				$this->errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-ithemes-sync' ), $name, $reason );
 		}
-
+		
 		if ( ! empty( $warn ) ) {
 			foreach ( $warn as $name => $reason )
 				$this->soft_errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-ithemes-sync' ), $name, $reason );
 		}
 	}
-
+	
 	private function unlicense_packages( $data ) {
 		check_admin_referer( 'unlicense_packages', 'ithemes_updater_nonce' );
-
+		
 		if ( empty( $data['username'] ) && empty( $data['password'] ) )
 			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to remove licenses.', 'it-l10n-ithemes-sync' );
 		else if ( empty( $data['username'] ) )
@@ -191,36 +205,36 @@ class Ithemes_Updater_Settings_Page {
 			$this->errors[] = __( 'You must supply an iThemes membership password in order to remove licenses.', 'it-l10n-ithemes-sync' );
 		else if ( empty( $data['packages'] ) )
 			$this->errors[] = __( 'You must select at least one license to remove. Ensure that you select the licenses that you wish to remove in the listing below.', 'it-l10n-ithemes-sync' );
-
+		
 		if ( ! empty( $this->errors ) )
 			return;
-
-
+		
+		
 		$response = Ithemes_Updater_API::deactivate_package( $data['username'], $data['password'], $data['packages'] );
-
+		
 		if ( is_wp_error( $response ) ) {
-			$this->errors[] = Ithemes_Updater_API::get_error_explanation( $response );
-
+			$this->errors[] = $this->get_error_explanation( $response );
+			
 			return;
 		}
-
+		
 		if ( empty( $response['packages'] ) ) {
 			$this->errors[] = __( 'An unknown server error occurred. Please try to remove licenses from your products again at another time.', 'it-l10n-ithemes-sync' );
 			return;
 		}
-
-
+		
+		
 		uksort( $response['packages'], 'strnatcasecmp' );
-
+		
 		$success = array();
 		$fail = array();
-
+		
 		foreach ( $response['packages'] as $package => $data ) {
 			if ( preg_match( '/ \|\|\| \d+$/', $package ) )
 				continue;
-
+			
 			$name = Ithemes_Updater_Functions::get_package_name( $package );
-
+			
 			if ( isset( $data['status'] ) && ( 'inactive' == $data['status'] ) )
 				$success[] = $name;
 			else if ( isset( $data['error'] ) && isset( $data['error']['message'] ) )
@@ -228,30 +242,30 @@ class Ithemes_Updater_Settings_Page {
 			else
 				$fail[$name] = __( 'Unknown server error.', 'it-l10n-ithemes-sync' );
 		}
-
-
+		
+		
 		if ( ! empty( $success ) )
 			$this->messages[] = wp_sprintf( _n( 'Successfully removed license from %l.', 'Successfully removed licenses from %l.', count( $success ), 'it-l10n-ithemes-sync' ), $success );
-
+		
 		if ( ! empty( $fail ) ) {
 			foreach ( $fail as $name => $reason )
 				$this->errors[] = sprintf( __( 'Unable to remove license from %1$s. Reason: %2$s', 'it-l10n-ithemes-sync' ), $name, $reason );
 		}
 	}
-
-	public function list_packages( $action = 'list_packages', $post_data = array() ) {
+	
+	public function list_packages( $action, $post_data ) {
 		require_once( $GLOBALS['ithemes_updater_path'] . '/packages.php' );
 		$details = Ithemes_Updater_Packages::get_full_details();
 		$packages = $details['packages'];
-
+		
 		$licensed = array();
 		$unlicensed = array();
 		$unrecognized = array();
-
+		
 		foreach ( $packages as $path => $data ) {
 			$name = Ithemes_Updater_Functions::get_package_name( $data['package'] );
 			$data['path'] = $path;
-
+			
 			if ( 'unlicensed' == $data['status'] )
 				$unlicensed[$name] = $data;
 			else if ( in_array( $data['status'], array( 'active', 'expired' ) ) )
@@ -259,78 +273,76 @@ class Ithemes_Updater_Settings_Page {
 			else
 				$unrecognized[$name] = $data;
 		}
-
-
-		if ( ! empty( $_REQUEST['updated_url'] ) ) {
-			$this->messages[] = __( 'Successfully updated the Licensed URL.', 'it-l10n-ithemes-sync' );
+		
+		
+		if ( ! empty( $this->messages ) ) {
+			foreach ( $this->messages as $message )
+				echo "<div class=\"updated fade\"><p><strong>$message</strong></p></div>\n";
 		}
-
-
-		$this->show_notices();
-
-
+		
+		if ( ! empty( $this->errors ) ) {
+			foreach ( $this->errors as $error )
+				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
+		}
+		
+		if ( ! empty( $this->soft_errors ) ) {
+			foreach ( $this->soft_errors as $error )
+				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
+		}
+		
+		
 ?>
 	<div class="wrap">
-		<h2><?php _e( 'iThemes Licensing', 'it-l10n-ithemes-sync' ); ?></h2>
-
 		<?php
-			$this->list_licensed_products( $licensed, $post_data, $action );
-			$this->list_unlicensed_products( $unlicensed, $post_data, $action );
-			$this->list_unrecognized_products( $unrecognized );
-			$this->show_settings();
+			if ( version_compare( $GLOBALS['wp_version'], '3.7.10', '<=' ) ) {
+				screen_icon();
+			}
 		?>
+		
+		<h2><?php _e( 'iThemes Licensing', 'it-l10n-ithemes-sync' ); ?></h2>
+		
+		<?php $this->list_licensed_products( $licensed, $post_data, $action ); ?>
+		
+		<?php $this->list_unlicensed_products( $unlicensed, $post_data, $action ); ?>
+		
+		<?php $this->list_unrecognized_products( $unrecognized ); ?>
+		
+		<?php $this->show_settings(); ?>
 	</div>
 <?php
-
+		
 	}
-
+	
 	private function show_settings() {
 		$quick_releases = $GLOBALS['ithemes-updater-settings']->get_option( 'quick_releases' );
-
+		
 ?>
 	<form id="posts-filter" enctype="multipart/form-data" method="post" action="<?php echo $this->self_url; ?>">
 		<?php wp_nonce_field( 'save_settings', 'ithemes_updater_nonce' ); ?>
-
+		
 		<div id="ithemes-updater-settings">
 			<h3 class="subtitle"><?php _e( 'Settings', 'it-l10n-ithemes-sync' ); ?></h3>
-
+			
 			<table class="form-table">
 				<tbody>
-					<tr valign="top">
-						<th scope="row">
-							<?php _e( 'Licensed URL', 'it-l10n-ithemes-sync' ); ?>
-						</th>
-						<td>
-							<p>
-								<code><?php echo $GLOBALS['ithemes-updater-settings']->get_licensed_site_url(); ?></code>
-								<a href="<?php echo admin_url( 'options-general.php?page=ithemes-licensing&action=change_licensed_site_url' ); ?>" class="button button-primary"><?php _e( 'Change', 'it-l10n-ithemes-sync' ); ?></a>
-							</p>
-
-							<?php if ( is_multisite() ) : ?>
-								<p class="description"><?php _e( 'The Licensed URL should be the primary URL of this WordPress network. If this is not set correctly, some features may not function as expected.', 'it-l10n-ithemes-sync' ); ?></p>
-							<?php else : ?>
-								<p class="description"><?php _e( 'The Licensed URL should be the primary URL of this WordPress site. If this is not set correctly, some features may not function as expected.', 'it-l10n-ithemes-sync' ); ?></p>
-							<?php endif; ?>
-						</td>
-					</tr>
 					<tr valign="top">
 						<th scope="row">
 							<label for="quick_releases"><?php _e( 'Quick Release Updates', 'it-l10n-ithemes-sync' ); ?></label>
 						</th>
 						<td>
 							<?php $checked = ( $quick_releases ) ? ' checked="checked"' : ''; ?>
-
+							
 							<label>
 								<input id="quick_releases" type="checkbox" name="quick_releases" value="1" <?php echo $checked; ?>/>
 								<?php _e( 'Enable quick release updates', 'it-l10n-ithemes-sync' ); ?>
 							</label>
-
+							
 							<p class="description"><?php _e( 'Some products have quick releases that are created to solve specific issues that some users experience. In order to avoid causing users to have updates show up too frequently, automatic updates to these quick releases are disabled by default. Enabling this feature allows quick releases to be available to the automatic update system. Using this option is only recommended if support has requested that you enable it in order to receive a quick release. You should disable this option at a later time after confirming that the quick release solves the issue for you.', 'it-l10n-ithemes-sync' ); ?></p>
 						</td>
 					</tr>
 				</tbody>
 			</table>
-
+			
 			<p class="submit">
 				<input id="save_settings" class="button button-primary" type="submit" value="<?php _e( 'Save Settings', 'it-l10n-ithemes-sync' ); ?>" />
 				<input type="hidden" name="action" value="save_settings" />
@@ -338,25 +350,25 @@ class Ithemes_Updater_Settings_Page {
 		</div>
 	</form>
 <?php
-
+		
 	}
-
-
+	
+	
 	private function list_licensed_products( $products, $post_data, $action ) {
 		if ( empty( $products ) )
 			return;
-
+		
 		uksort( $products, 'strnatcasecmp' );
-
+		
 		$time = time();
-
+		
 		$headings = array(
 			__( 'Product', 'it-l10n-ithemes-sync' ),
 			__( 'Member', 'it-l10n-ithemes-sync' ),
 			__( 'Expiration', 'it-l10n-ithemes-sync' ),
 			__( 'Remaining Licenses', 'it-l10n-ithemes-sync' ),
 		);
-
+		
 		if ( ( 'unlicense_packages' != $action ) || empty( $this->errors ) ) {
 			$post_data = array(
 				'username' => '',
@@ -364,14 +376,14 @@ class Ithemes_Updater_Settings_Page {
 				'packages' => array(),
 			);
 		}
-
+		
 ?>
 	<form id="posts-filter" enctype="multipart/form-data" method="post" action="<?php echo $this->self_url; ?>" autocomplete="off">
 		<?php wp_nonce_field( 'unlicense_packages', 'ithemes_updater_nonce' ); ?>
-
+		
 		<div class="ithemes-updater-products" id="ithemes-updater-licensed">
 			<h3 class="subtitle"><?php _e( 'Licensed Products', 'it-l10n-ithemes-sync' ); ?></h3>
-
+			
 			<table class="ithemes-updater-listing widefat">
 				<thead>
 					<tr>
@@ -398,40 +410,40 @@ class Ithemes_Updater_Settings_Page {
 								$remaining = __( 'unlimited', 'it-l10n-ithemes-sync' );
 							else
 								$remaining = $data['total'] - $data['used'];
-
+							
 //							if ( 0 == $remaining )
 //								$remaining .= ' <a class="button-secondary upgrade">' . __( 'Upgrade', 'it-l10n-ithemes-sync' ) . '</a>';
-
-
+							
+							
 							$expiration = $this->get_expiration_string( $data['expiration'] );
 							$expiration = '<time datetime="' . date( 'Y-m-d\TH:i:s\Z', $data['expiration'] ) . '">' . $expiration . '</time>';
-
-
+							
+							
 							$time_left = $data['expiration'] - $time;
 							$class = 'expiring';
-
+							
 							if ( $time_left > ( 86400 * 30 ) )
 								$class = 'active';
 							else if ( $time_left <= 0 )
 								$class = 'expired';
-
+							
 							if ( 'expired' == $data['status'] ) {
 								$class = 'expired';
 								$remaining = '&nbsp;';
 							}
-
-
+							
+							
 							$status = ucfirst( $class );
-
-
+							
+							
 							if ( ++$count % 2 ) {
 								$class .= ' alt';
 							}
-
-
+							
+							
 							$check_id = "cb-select-{$data['package']}";
-
-
+							
+							
 							$checked = ( in_array( $data['package'], $post_data['packages'] ) ) ? ' checked' : '';
 						?>
 						<tr class="<?php echo $class; ?>">
@@ -465,37 +477,37 @@ class Ithemes_Updater_Settings_Page {
 		</div>
 	</form>
 <?php
-
+		
 	}
-
+	
 	private function list_unlicensed_products( $products, $post_data, $action ) {
 		if ( empty( $products ) )
 			return;
-
+		
 		uksort( $products, 'strnatcasecmp' );
-
+		
 		if ( ( 'license_packages' != $action ) || empty( $this->errors ) ) {
 			$post_data = array(
 				'username' => '',
 				'password' => '',
 				'packages' => array(),
 			);
-
+			
 			foreach ( $products as $name => $data )
 				$post_data['packages'][] = $data['package'];
 		}
-
+		
 ?>
 	<form id="posts-filter" enctype="multipart/form-data" method="post" action="<?php echo $this->self_url; ?>" autocomplete="off">
 		<?php wp_nonce_field( 'license_packages', 'ithemes_updater_nonce' ); ?>
-
+		
 		<div class="ithemes-updater-products" id="ithemes-updater-unlicensed">
 			<h3 class="subtitle"><?php _e( 'Unlicensed Products', 'it-l10n-ithemes-sync' ); ?></h3>
-
+			
 			<p><?php _e( 'The following products have not been licensed. Licensing a product gives you access to automatic updates from within WordPress.', 'it-l10n-ithemes-sync' ); ?></p>
 			<p><?php _e( 'To license products, select the products you wish to license, enter your iThemes membership username and password, and press the License Products button.', 'it-l10n-ithemes-sync' ); ?></p>
 			<p><?php printf( __( 'Need help? <a href="%s">Click here for a quick video tutorial</a>.', 'it-l10n-ithemes-sync' ), 'http://ithemes.com/2013/04/11/introducing-the-new-and-improved-ithemes-licensing-system/' ); ?></p>
-
+			
 			<table class="ithemes-updater-listing widefat">
 				<thead>
 					<tr>
@@ -515,18 +527,18 @@ class Ithemes_Updater_Settings_Page {
 					<?php foreach ( $products as $name => $data ) : ?>
 						<?php
 							$check_id = "cb-select-{$data['package']}";
-
+							
 							if ( 'license_packages' == $action )
 								$checked = ( in_array( $data['package'], $post_data['packages'] ) ) ? ' checked' : '';
 							else
 								$checked = ' checked';
-
+							
 							if ( ++$count % 2 ) {
 								$class = 'alt';
 							} else {
 								$class = '';
 							}
-
+							
 						?>
 						<tr class="<?php echo $class; ?>">
 							<th class="check-column" scope="row">
@@ -555,22 +567,22 @@ class Ithemes_Updater_Settings_Page {
 		</div>
 	</form>
 <?php
-
+		
 	}
-
+	
 	private function list_unrecognized_products( $products ) {
 		if ( empty( $products ) )
 			return;
-
+		
 		uksort( $products, 'strnatcasecmp' );
-
+		
 ?>
 	<div class="ithemes-updater-products" id="ithemes-updater-unrecognized">
 		<h3 class="subtitle"><?php _e( 'Unrecognized Products', 'it-l10n-ithemes-sync' ); ?></h3>
-
+		
 		<p><?php _e( 'The following products were not recognized by the licensing system. This can be due to a bug in the product code, a temporary server issue, or because the product is no longer supported.', 'it-l10n-ithemes-sync' ); ?></p>
 		<p><?php printf( __( 'Please check this page again at a later time to see if the problem resolves itself. If the product remains, please contact <a href="%s">iThemes support</a> and provide them with the details given below.', 'it-l10n-ithemes-sync' ), 'http://ithemes.com/support/' ); ?></p>
-
+		
 		<table class="ithemes-updater-listing widefat">
 			<thead>
 				<tr>
@@ -589,7 +601,7 @@ class Ithemes_Updater_Settings_Page {
 							$response = "{$data['error']['message']} ({$data['error']['code']})";
 						else
 							$response = __( 'Unknown Error', 'it-l10n-ithemes-sync' );
-
+						
 						if ( ++$count % 2 ) {
 							$class = 'alt';
 						} else {
@@ -608,318 +620,21 @@ class Ithemes_Updater_Settings_Page {
 		</table>
 	</div>
 <?php
-
+		
 	}
-
-	public function show_licensed_site_url_confirmation_page( $post_data = array() ) {
-		$this->show_notices();
-
-
-		$site_url = $GLOBALS['ithemes-updater-settings']->get_licensed_site_url();
-
-		if ( empty( $site_url ) ) {
-			$site_url = network_home_url();
-		}
-
-
-		if ( empty( $post_data['username'] ) || empty( $this->errors ) ) {
-			$post_data['username'] = '';
-		}
-		if ( empty( $post_data['password'] ) || empty( $this->errors ) ) {
-			$post_data['password'] = '';
-		}
-		if ( ! empty( $post_data['redirect'] ) ) {
-			$redirect = $post_data['redirect'];
-		} else if ( ! empty( $_GET['redirect'] ) ) {
-			$redirect = $_GET['redirect'];
-		} else {
-			$redirect = '';
-		}
-
-
-?>
-	<div class="wrap" id="ithemes-updater-site-url-confirmation">
-		<span class="ithemes-updater-header"></span>
-		<h2><?php _e( 'Licensing', 'it-l10n-ithemes-sync' ); ?></h2>
-
-		<p><?php _e( "Please confirm this site's licensed URL.", 'it-l10n-ithemes-sync' ); ?></p>
-
-		<form id="posts-filter" enctype="multipart/form-data" method="post" action="<?php echo $this->self_url; ?>">
-			<?php wp_nonce_field( 'save_licensed_site_url', 'ithemes_updater_nonce' ); ?>
-
-			<div id="ithemes-updater-settings">
-				<div id="ithemes-updater-table-wrapper">
-					<table class="form-table">
-						<tbody>
-							<tr valign="top">
-								<th scope="row">
-									<label for="site_url"><?php _e( 'Licensed URL', 'it-l10n-ithemes-sync' ); ?></label>
-
-									<?php if ( is_multisite() ) : ?>
-										<p class="description"><?php _e( 'The Licensed URL should be the primary URL of this WordPress network.', 'it-l10n-ithemes-sync' ); ?></p>
-										<p class="description ithemes-updater-description-warning"><?php _e( 'If not set correctly, some features may not function as expected.', 'it-l10n-ithemes-sync' ); ?></p>
-									<?php else : ?>
-										<p class="description"><?php _e( 'The Licensed URL should be the primary URL of this WordPress site.', 'it-l10n-ithemes-sync' ); ?></p>
-										<p class="description ithemes-updater-description-warning"><?php _e( 'If not set correctly, some features may not function as expected.', 'it-l10n-ithemes-sync' ); ?></p>
-									<?php endif; ?>
-								</th>
-								<td>
-									<label>
-										<input id="site_url" class="regular-text" type="text" name="site_url" value="<?php echo esc_attr( $site_url ); ?>" />
-									</label>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-
-				<p class="submit">
-					<input id="save_licensed_site_url" class="button button-primary" type="submit" value="<?php _e( 'Save', 'it-l10n-ithemes-sync' ); ?>" />
-					<input type="hidden" name="action" value="save_licensed_site_url" />
-					<input type="hidden" name="redirect" value="<?php echo esc_attr( $redirect ); ?>" />
-				</p>
-			</div>
-		</form>
-	</div>
-<?php
-
-	}
-
-	private function save_licensed_site_url( $data ) {
-		check_admin_referer( 'save_licensed_site_url', 'ithemes_updater_nonce' );
-
-		if ( empty( $data['site_url'] ) ) {
-			$this->errors[] = __( 'The licensed URL cannot be blank.', 'it-l10n-ithemes-sync' );
-		} else if ( false === filter_var( $data['site_url'], FILTER_VALIDATE_URL ) ) {
-			$this->errors[] = __( 'The licensed URL must be a valid URL.', 'it-l10n-ithemes-sync' );
-		}
-
-		if ( ! empty( $this->errors ) ) {
-			$this->show_licensed_site_url_confirmation_page( $data );
-			return;
-		}
-
-
-		$site_url = $GLOBALS['ithemes-updater-settings']->get_site_url( $data['site_url'] );
-
-		if ( $this->has_license_keys() ) {
-			$site_url_from_server = $GLOBALS['ithemes-updater-settings']->get_licensed_site_url_from_server();
-
-			if ( $site_url_from_server !== $site_url ) {
-				$data['site_url'] = $site_url;
-				$this->show_relicensing_page( $data );
-				return;
-			}
-		}
-
-
-		$GLOBALS['ithemes-updater-settings']->set_licensed_site_url( $site_url );
-		$this->messages[] = __( 'Successfully set the Licensed URL.', 'it-l10n-ithemes-sync' );
-
-		if ( empty( $data['redirect'] ) ) {
-			$redirect = admin_url( 'options-general.php?page=ithemes-licensing&updated_url=true' );
-		} else {
-			$redirect = $data['redirect'];
-		}
-
-		echo '<input id="ithemes-updater-redirect-to-url" type="hidden" value="' . esc_attr( $redirect ) . '" />' . "\n";
-
-		$this->list_packages();
-	}
-
-	public function show_relicensing_page( $data = array() ) {
-		$this->show_notices();
-
-		$site_url_from_server = $GLOBALS['ithemes-updater-settings']->get_licensed_site_url_from_server();
-
-		if ( empty( $data['relicense_option'] ) ) {
-			$data['relicense_option'] = 'relicense';
-		}
-		if ( empty( $data['username'] ) ) {
-			$data['username'] = '';
-		}
-		if ( empty( $data['password'] ) ) {
-			$data['password'] = '';
-		}
-
-?>
-	<div class="wrap" id="ithemes-updater-relicense">
-		<span class="ithemes-updater-header"></span>
-		<h2><?php _e( 'Licensing', 'it-l10n-ithemes-sync' ); ?></h2>
-
-		<p><?php printf( __( 'The licenses on this site are for <code>%s</code>.', 'it-l10n-ithemes-sync' ), $site_url_from_server ); ?></p>
-
-		<form id="posts-filter" enctype="multipart/form-data" method="post" action="<?php echo $this->self_url; ?>">
-			<?php wp_nonce_field( 'relicense', 'ithemes_updater_nonce' ); ?>
-
-			<div id="ithemes-updater-settings">
-				<div id="ithemes-updater-table-wrapper">
-					<table class="form-table">
-						<tbody>
-							<tr valign="top">
-								<th scope="row">
-									<label for="relicense_option">
-										<?php _e( 'License Option', 'it-l10n-ithemes-sync' ); ?>
-									</label>
-								</th>
-								<td>
-									<p>
-										<label>
-											<input type="radio" name="relicense_option" value="relicense" <?php if ( 'relicense' === $data['relicense_option'] ) echo 'checked="checked"'; ?> />
-											<?php _e( 'Create new licenses for this site.', 'it-l10n-ithemes-sync' ); ?>
-										</label>
-									</p>
-									<p class="description ithemes-updater-description-warning"><?php _e( 'Use this option if this site was cloned from another site and needs to have its own licenses.', 'it-l10n-ithemes-sync' ); ?></p>
-									<br />
-
-									<p>
-										<label>
-											<input type="radio" name="relicense_option" value="update" <?php if ( 'update' === $data['relicense_option'] ) echo 'checked="checked"'; ?> />
-											<?php printf( __( 'Change the existing licenses to be for <code>%s</code>.', 'it-l10n-ithemes-sync' ), $data['site_url'] ); ?>
-										</label>
-									</p>
-									<p class="description ithemes-updater-description-notice">
-										<span class="dashicons dashicons-warning"></span>
-										<?php printf( __( 'Note: If the <code>%s</code> site still exists and is different from this site, you will have to create new licenses on that site.', 'it-l10n-ithemes-sync' ), $data['site_url'], $site_url_from_server ); ?>
-									</p>
-									<p class="description ithemes-updater-description-warning"><?php printf( __( 'Use this option if this site\'s primary URL has changed from <code>%1$s</code> to <code>%2$s</code>.', 'it-l10n-ithemes-sync' ), $site_url_from_server, $data['site_url'] ); ?></p>
-								</td>
-							</tr>
-							<tr valign="top">
-								<th scope="row" colspan="2">
-									<label for="it-updater-username"><?php _e( 'iThemes Username', 'it-l10n-ithemes-sync' ); ?></label>
-									<br />
-									<input id="it-updater-username" type="text" name="it-updater-username" value="<?php echo esc_attr( $data['username'] ); ?>" />
-								</th>
-							</tr>
-							<tr valign="top">
-								<th scope="row" colspan="2">
-									<label for="it-updater-password"><?php _e( 'iThemes Password', 'it-l10n-ithemes-sync' ); ?></label>
-									<br />
-									<input id="it-updater-password" type="password" name="it-updater-password" value="<?php echo esc_attr( $data['password'] ); ?>" />
-								</th>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-
-				<p class="submit">
-					<input id="relicense" class="button button-primary" type="submit" value="<?php _e( 'Save', 'it-l10n-ithemes-sync' ); ?>" />
-					<input type="hidden" name="action" value="relicense" />
-					<input type="hidden" name="site_url" value="<?php echo esc_attr( $data['site_url'] ); ?>" />
-					<input type="hidden" name="redirect" value="<?php echo esc_attr( $data['redirect'] ); ?>" />
-				</p>
-			</div>
-		</form>
-	</div>
-<?php
-
-	}
-
-	private function relicense( $data ) {
-		check_admin_referer( 'relicense', 'ithemes_updater_nonce' );
-
-		if ( empty( $data['username'] ) && empty( $data['password'] ) ) {
-			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to change the licensed URL.', 'it-l10n-ithemes-sync' );
-		} else if ( empty( $data['username'] ) ) {
-			$this->errors[] = __( 'You must supply an iThemes membership username in order to change the licensed URL.', 'it-l10n-ithemes-sync' );
-		} else if ( empty( $data['password'] ) ) {
-			$this->errors[] = __( 'You must supply an iThemes membership password in order to change the licensed URL.', 'it-l10n-ithemes-sync' );
-		} else if ( empty( $data['site_url'] ) ) {
-			$this->errors[] = __( 'The licensed URL cannot be blank.', 'it-l10n-ithemes-sync' );
-		} else if ( false === filter_var( $data['site_url'], FILTER_VALIDATE_URL ) ) {
-			$this->errors[] = __( 'The licensed URL must be a valid URL.', 'it-l10n-ithemes-sync' );
-		} else if ( empty( $data['relicense_option'] ) || ! in_array( $data['relicense_option'], array( 'relicense', 'update' ) ) ) {
-			$this->errors[] = __( 'You must pick one of the License Option options.', 'it-l10n-ithemes-sync' );
-		}
-
-		if ( ! empty( $this->errors ) ) {
-			$this->show_relicensing_page( $data );
-			return;
-		}
-
-
-		if ( 'update' === $data['relicense_option'] ) {
-			$response = Ithemes_Updater_API::set_licensed_site_url( $data['username'], $data['password'], $data['site_url'] );
-
-			if ( is_wp_error( $response ) ) {
-				$this->errors[] = Ithemes_Updater_API::get_error_explanation( $response );
-				$this->show_relicensing_page( $data );
-				return;
-			}
-
-			$GLOBALS['ithemes-updater-settings']->set_licensed_site_url( $data['site_url'] );
-			$this->messages[] = __( 'Successfully updated the Licensed URL.', 'it-l10n-ithemes-sync' );
-		} else {
-			require_once( $GLOBALS['ithemes_updater_path'] . '/keys.php' );
-			$keys = Ithemes_Updater_Keys::get();
-			$packages = array_keys( $keys );
-
-			$response = Ithemes_Updater_API::deactivate_package( $data['username'], $data['password'], $packages );
-
-			if ( is_wp_error( $response ) ) {
-				$this->errors[] = Ithemes_Updater_API::get_error_explanation( $response );
-				$this->show_relicensing_page( $data );
-				return;
-			}
-
-			$GLOBALS['ithemes-updater-settings']->set_licensed_site_url( $data['site_url'] );
-			$this->messages[] = __( 'Successfully updated the Licensed URL.', 'it-l10n-ithemes-sync' );
-
-			$response = Ithemes_Updater_API::activate_package( $data['username'], $data['password'], $packages );
-
-			if ( is_wp_error( $response ) ) {
-				$this->errors[] = Ithemes_Updater_API::get_error_explanation( $response );
-				$this->show_relicensing_page( $data );
-				return;
-			}
-		}
-
-		if ( empty( $data['redirect'] ) ) {
-			$redirect = admin_url( 'options-general.php?page=ithemes-licensing&updated_url=true' );
-		} else {
-			$redirect = $data['redirect'];
-		}
-
-		echo '<input id="ithemes-updater-redirect-to-url" type="hidden" value="' . esc_attr( $redirect ) . '" />' . "\n";
-
-		$this->list_packages();
-		return;
-	}
-
-
-	private function show_notices() {
-		if ( ! empty( $this->messages ) ) {
-			foreach ( $this->messages as $message ) {
-				echo "<div class=\"updated fade\"><p><strong>$message</strong></p></div>\n";
-			}
-		}
-
-		if ( ! empty( $this->errors ) ) {
-			foreach ( $this->errors as $error ) {
-				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
-			}
-		}
-
-		if ( ! empty( $this->soft_errors ) ) {
-			foreach ( $this->soft_errors as $error ) {
-				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
-			}
-		}
-	}
-
+	
 	private function get_expiration_string( $expiration_timestamp ) {
 		$time = time();
-
+		
 		$time_left = $expiration_timestamp - $time;
-
+		
 		$expired = false;
-
+		
 		if ( $time_left < 0 ) {
 			$expired = true;
 			$time_left = abs( $time_left );
 		}
-
+		
 		if ( $time_left > ( 86400 * 30 ) )
 			$expiration = date( 'Y-m-d', $expiration_timestamp );
 		else {
@@ -931,25 +646,12 @@ class Ithemes_Updater_Settings_Page {
 				$expiration = sprintf( _n( '%d minute', '%d minutes', intval( $time_left / 60 ), 'it-l10n-ithemes-sync' ), intval( $time_left / 60 ) );
 			else
 				$expiration = sprintf( _n( '%d second', '%d seconds', $time_left, 'it-l10n-ithemes-sync' ), intval( $time_left / 60 ) );
-
+			
 			if ( $expired )
 				$expiration = sprintf( __( '%s ago', 'it-l10n-ithemes-sync' ), $expiration );
 		}
-
+		
 		return $expiration;
-	}
-
-	private function has_license_keys() {
-		require_once( $GLOBALS['ithemes_updater_path'] . '/keys.php' );
-
-		$keys = Ithemes_Updater_Keys::get();
-		$legacy_keys = Ithemes_Updater_Keys::get_legacy();
-
-		if ( empty( $keys ) && empty( $legacy_keys ) ) {
-			return false;
-		}
-
-		return true;
 	}
 }
 

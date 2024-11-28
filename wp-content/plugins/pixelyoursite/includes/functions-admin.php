@@ -124,8 +124,8 @@ function getAdminSecondaryNavTabs() {
     
 }
 
-function cardCollapseBtn() {
-    echo '<span class="card-collapse"><i class="fa fa-sliders" aria-hidden="true"></i></span>';
+function cardCollapseBtn($attr = "") {
+    echo '<span class="card-collapse" '.$attr.'><i class="fa fa-sliders" aria-hidden="true"></i></span>';
 }
 
 /**
@@ -388,11 +388,11 @@ function adminRenderLicenseExpirationNotice( $plugin ) {
     ?>
 
     <div class="notice notice-error is-dismissible pys_<?php esc_attr_e( $slug ); ?>_expiration_notice">
-        <p>Your <?php echo $plugin->getPluginName(); ?> license key is expired, so you no longer get any
-            updates. Don't miss our latest improvements and make sure that everything works smoothly. <a
-                    target="_blank" href="https://www.pixelyoursite.com/checkout/?edd_license_key=<?php esc_attr_e(
-                $license_key ); ?>&utm_campaign=admin&utm_source=licenses&utm_medium=renew">Click here to update
-                now.</a></p>
+        <p><strong>Your <?php echo $plugin->getPluginName(); ?> license key is expired</strong>, so you no longer get any updates. Don't miss our
+            latest improvements and make sure that everything works smoothly.</p>
+        <p>If you renewed your license but you still see this message, click on the "<a href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite_licenses' ) ); ?>">Reactivate License</a>" button.</p>
+        <p class="mb-0"><a href="https://www.pixelyoursite.com/checkout/?edd_license_key=<?php esc_attr_e(
+                $license_key ); ?>&utm_campaign=admin&utm_source=licenses&utm_medium=renew" target="_blank"><strong>Click here to renew your license now</strong></a></p>
     </div>
 
     <script type="application/javascript">
@@ -584,10 +584,10 @@ function renderDummyTextInput( $placeholder = '' ) {
     <?php
 }
 
-function renderDummyNumberInput() {
+function renderDummyNumberInput($default = 0) {
     ?>
 
-    <input type="number" disabled="disabled" min="0" max="100" class="form-control">
+    <input type="number" disabled="disabled" min="0" max="100" class="form-control" value="<?=$default?>">
     
     <?php
 }

@@ -98,7 +98,28 @@ class Facebook extends Settings implements Pixel {
 		
 	}
 
+    public function updateOptions( $values = null ) {
+        if(isset($_POST['pys'][$this->getSlug()]['test_api_event_code']))
+        {
 
+
+            $api_event_code_expiration_at = array();
+            foreach ($_POST['pys'][$this->getSlug()]['test_api_event_code'] as $key => $test_api)
+            {
+                if(!empty($test_api) && empty($this->getOption('test_api_event_code_expiration_at')[$key]))
+                {
+                    $api_event_code_expiration_at[] = time() + $this->convertTimeToSeconds();
+                }
+                elseif (!empty($this->getOption('test_api_event_code_expiration_at')[$key]))
+                {
+                    $api_event_code_expiration_at[] = $this->getOption('test_api_event_code_expiration_at')[$key];
+                }
+            }
+
+            $_POST['pys'][$this->getSlug()]['test_api_event_code_expiration_at'] = $api_event_code_expiration_at;
+        }
+        parent::updateOptions($values);
+    }
     /**
      * Create pixel event and fill it
      * @param SingleEvent $event
@@ -146,15 +167,35 @@ class Facebook extends Settings implements Pixel {
         $isActive = false;
 
         switch ($event->getId()) {
-            //Signal events
-            case "signal_page_scroll":
-            case "signal_time_on_page":
-            case "signal_form":
-            case "signal_download":
-            case "signal_comment": {
-                $isActive = $this->getOption('signal_events_enabled');
-            }break;
 
+            //Automatic events
+            case 'automatic_event_signup' : {
+                if(isWooCommerceActive() &&  Facebook()->getOption("woo_complete_registration_fire_every_time")) {
+                    $isActive = false;
+                } else {
+                    $event->addPayload(["name" => "CompleteRegistration"]);
+                    $isActive = $this->getOption($event->getId().'_enabled');
+                }
+            } break;
+            case 'automatic_event_login' :{
+                $event->addPayload(["name" => "Login"]);
+                $isActive = $this->getOption($event->getId().'_enabled');
+            } break;
+            case 'automatic_event_search' :{
+                $event->addPayload(["name" => "Search"]);
+                if(!empty( $_GET['s'] )) {
+                    $event->addParams(["search_string" => $_GET['s']]);
+                }
+                $isActive = $this->getOption($event->getId().'_enabled');
+            } break;
+
+            case 'automatic_event_form' :
+            case 'automatic_event_download' :
+            case 'automatic_event_comment' :
+            case 'automatic_event_scroll' :
+            case 'automatic_event_time_on_page' : {
+                $isActive = $this->getOption($event->getId().'_enabled');
+            }break;
 
             case 'init_event':{
                 $eventData = $this->getPageViewEventParams();
@@ -163,13 +204,7 @@ class Facebook extends Settings implements Pixel {
                     $this->addDataToEvent($eventData,$event);
                 }
             } break;
-            case 'search_event':{
-                $eventData =  $this->getSearchEventParams();
-                if ($eventData) {
-                    $isActive = true;
-                    $this->addDataToEvent($eventData, $event);
-                }
-            }break;
+
 
             case 'custom_event':{
                 $eventData =  $this->getCustomEventParams( $event->args );
@@ -409,7 +444,7 @@ class Facebook extends Settings implements Pixel {
                     $src = str_replace("[","%5B",$src); //pass markup validation
                     $src = str_replace("]","%5D",$src);
 					// ALT tag used to pass ADA compliance
-					printf( '<noscript><img height="1" width="1" style="display: none;" src="%s" alt="facebook_pixel"></noscript>',
+					printf( '<noscript><img height="1" width="1" style="display: none;" src="%s" alt=""></noscript>',
                         $src);
 
 					echo "\r\n";
@@ -461,35 +496,7 @@ class Facebook extends Settings implements Pixel {
 
 	}
 
-	private function getSearchEventParams() {
-		global $posts;
 
-		if ( ! $this->getOption( 'search_event_enabled' ) ) {
-			return false;
-		}
-
-		$params['search_string'] = empty( $_GET['s'] ) ? null : $_GET['s'];
-
-		if ( isWooCommerceActive() && isset( $_GET['post_type'] ) && $_GET['post_type'] == 'product' ) {
-
-			$limit = min( count( $posts ), 5 );
-			$post_ids = array();
-
-			for ( $i = 0; $i < $limit; $i ++ ) {
-				$post_ids = array_merge( Helpers\getFacebookWooProductContentId( $posts[ $i ]->ID ), $post_ids );
-			}
-
-			$params['content_type'] = 'product';
-			$params['content_ids']  =  $post_ids ;
-
-		}
-
-		return array(
-			'name'  => 'Search',
-			'data'  => $params,
-		);
-
-	}
 
     public function getFDPEvents() {
         $events = array();

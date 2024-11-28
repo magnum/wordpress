@@ -61,6 +61,7 @@ class AdCreativeLinkDataCallToActionTypeValues extends \PYS_PRO_GLOBAL\FacebookA
     const GET_OFFER_VIEW = 'GET_OFFER_VIEW';
     const GET_QUOTE = 'GET_QUOTE';
     const GET_SHOWTIMES = 'GET_SHOWTIMES';
+    const GET_STARTED = 'GET_STARTED';
     const INSTALL_APP = 'INSTALL_APP';
     const INSTALL_MOBILE_APP = 'INSTALL_MOBILE_APP';
     const LEARN_MORE = 'LEARN_MORE';
@@ -75,6 +76,7 @@ class AdCreativeLinkDataCallToActionTypeValues extends \PYS_PRO_GLOBAL\FacebookA
     const ORDER_NOW = 'ORDER_NOW';
     const PAY_TO_ACCESS = 'PAY_TO_ACCESS';
     const PLAY_GAME = 'PLAY_GAME';
+    const PLAY_GAME_ON_FACEBOOK = 'PLAY_GAME_ON_FACEBOOK';
     const PURCHASE_GIFT_CARDS = 'PURCHASE_GIFT_CARDS';
     const RECORD_NOW = 'RECORD_NOW';
     const REFER_FRIENDS = 'REFER_FRIENDS';

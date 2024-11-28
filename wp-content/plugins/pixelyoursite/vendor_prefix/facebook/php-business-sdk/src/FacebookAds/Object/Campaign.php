@@ -214,7 +214,7 @@ class Campaign extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractArchivableCrud
     {
         $this->assureId();
         $param_types = array('am_call_tags' => 'map', 'date_preset' => 'date_preset_enum', 'from_adtable' => 'bool', 'time_range' => 'Object');
-        $enums = array('date_preset_enum' => array('last_14d', 'last_28d', 'last_30d', 'last_3d', 'last_7d', 'last_90d', 'last_month', 'last_quarter', 'last_week_mon_sun', 'last_week_sun_sat', 'last_year', 'maximum', 'this_month', 'this_quarter', 'this_week_mon_today', 'this_week_sun_today', 'this_year', 'today', 'yesterday'));
+        $enums = array('date_preset_enum' => array('data_maximum', 'last_14d', 'last_28d', 'last_30d', 'last_3d', 'last_7d', 'last_90d', 'last_month', 'last_quarter', 'last_week_mon_sun', 'last_week_sun_sat', 'last_year', 'maximum', 'this_month', 'this_quarter', 'this_week_mon_today', 'this_week_sun_today', 'this_year', 'today', 'yesterday'));
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\Campaign(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\Campaign::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);

@@ -45,12 +45,23 @@ class EDD_PRODUCTPURCHASE {
 			'priority'            => 10,
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'edd_product_purchase' ),
-			'options'             => array(
-				Automator()->helpers->recipe->edd->options->all_edd_downloads( esc_attr__( 'Product', 'uncanny-automator' ), $this->trigger_meta ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->edd->options->all_edd_downloads( esc_attr__( 'Product', 'uncanny-automator' ), $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**

@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadInputMethodValues;
 /**
  * This class is auto-generated.
@@ -73,8 +74,8 @@ class ProductFeedUpload extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudO
     public function getErrors(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array();
-        $enums = array();
+        $param_types = array('error_priority' => 'error_priority_enum');
+        $enums = array('error_priority_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/errors', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadError(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadError::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);

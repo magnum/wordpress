@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { getSetting } from '@woocommerce/settings';
 import type { Currency } from '@woocommerce/price-format';
-import type { CartFeeItem } from '@woocommerce/type-defs/cart';
+import type { CartFeeItem } from '@woocommerce/types';
 import type { ReactElement } from 'react';
 
 /**
@@ -14,8 +14,19 @@ import type { ReactElement } from 'react';
 import TotalsItem from '../item';
 
 export interface TotalsFeesProps {
+	/**
+	 * Currency
+	 */
 	currency: Currency;
+	/**
+	 * Cart fees
+	 */
 	cartFees: CartFeeItem[];
+	/**
+	 * Component wrapper classname
+	 *
+	 * @default 'wc-block-components-totals-fees'
+	 */
 	className?: string;
 }
 

@@ -51,13 +51,19 @@ trait Actions {
 	 * @param $action_data
 	 * @param $recipe_id
 	 * @param $args
+	 *
+	 * @throws \Exception
 	 */
 	public function do_action( $user_id, $action_data, $recipe_id, $args ) {
+
+		do_action( 'automator_before_process_action', $user_id, $action_data, $recipe_id, $args );
 
 		$maybe_parsed                = $this->maybe_parse_tokens( $user_id, $action_data, $recipe_id, $args );
 		$action_data['maybe_parsed'] = $maybe_parsed;
 
 		$this->process_action( $user_id, $action_data, $recipe_id, $args, $maybe_parsed );
+
+		do_action( 'automator_after_process_action', $user_id, $action_data, $recipe_id, $args, $maybe_parsed );
 	}
 
 	/**

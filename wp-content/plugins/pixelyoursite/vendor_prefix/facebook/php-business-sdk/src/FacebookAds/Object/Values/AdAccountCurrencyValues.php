@@ -65,6 +65,7 @@ class AdAccountCurrencyValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractE
     const JPY = 'JPY';
     const KES = 'KES';
     const KRW = 'KRW';
+    const LKR = 'LKR';
     const MOP = 'MOP';
     const MXN = 'MXN';
     const MYR = 'MYR';
@@ -79,7 +80,6 @@ class AdAccountCurrencyValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractE
     const PYG = 'PYG';
     const QAR = 'QAR';
     const RON = 'RON';
-    const RUB = 'RUB';
     const SAR = 'SAR';
     const SEK = 'SEK';
     const SGD = 'SGD';

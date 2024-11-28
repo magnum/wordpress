@@ -58,6 +58,6 @@ class OfflineConversionDataSetFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Ab
     const AUTO_ASSIGN_TO_NEW_ACCOUNTS_ONLY = 'auto_assign_to_new_accounts_only';
     public function getFieldTypes()
     {
-        return array('business' => 'Business', 'config' => 'string', 'creation_time' => 'datetime', 'description' => 'string', 'duplicate_entries' => 'int', 'enable_auto_assign_to_accounts' => 'bool', 'event_stats' => 'string', 'event_time_max' => 'int', 'event_time_min' => 'int', 'id' => 'string', 'is_mta_use' => 'bool', 'is_restricted_use' => 'bool', 'is_unavailable' => 'bool', 'last_upload_app' => 'string', 'last_upload_app_changed_time' => 'int', 'match_rate_approx' => 'int', 'matched_entries' => 'int', 'name' => 'string', 'usage' => 'Object', 'valid_entries' => 'int', 'auto_assign_to_new_accounts_only' => 'bool');
+        return array('business' => 'Business', 'config' => 'string', 'creation_time' => 'datetime', 'description' => 'string', 'duplicate_entries' => 'int', 'enable_auto_assign_to_accounts' => 'bool', 'event_stats' => 'string', 'event_time_max' => 'int', 'event_time_min' => 'int', 'id' => 'string', 'is_mta_use' => 'bool', 'is_restricted_use' => 'bool', 'is_unavailable' => 'bool', 'last_upload_app' => 'string', 'last_upload_app_changed_time' => 'int', 'match_rate_approx' => 'int', 'matched_entries' => 'int', 'name' => 'string', 'usage' => 'OfflineConversionDataSetUsage', 'valid_entries' => 'int', 'auto_assign_to_new_accounts_only' => 'bool');
     }
 }

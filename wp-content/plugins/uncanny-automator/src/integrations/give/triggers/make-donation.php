@@ -52,12 +52,31 @@ class MAKE_DONATION {
 			'priority'            => 10,
 			'accepted_args'       => 3,
 			'validation_function' => array( $this, 'givewp_make_donation' ),
-			'options'             => array(
-				Automator()->helpers->recipe->give->options->list_all_give_forms( __( 'Form', 'uncanny-automator' ), $this->trigger_meta ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->give->options->list_all_give_forms(
+						__( 'Form', 'uncanny-automator' ),
+						$this->trigger_meta,
+						array(),
+						array(
+							'DONATION_ID' => esc_attr__( 'Donation ID', 'uncanny-automator' ),
+							'PAYMENT_ID'  => esc_attr__( 'Payment ID', 'uncanny-automator' ),
+						)
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -95,10 +114,17 @@ class MAKE_DONATION {
 		$payment_data                    = json_decode( wp_json_encode( $payment ), true );
 		$payment_data['give_form_id']    = $give_form_id;
 		$payment_data['give_form_title'] = $payment->form_title;
+		$payment_data['currency']        = $payment->currency;
 		$payment_data['give_price_id']   = $payment->price_id;
 		$payment_data['price']           = $payment->total;
 		$payment_data['user_info']       = give_get_payment_meta_user_info( $payment_id );
 		$payment_data['user_email']      = $payment_data['user_info']['email'];
+		$payment_data['give_comment']    = __( '-', 'uncanny-automator' );
+
+		if ( give_is_donor_comment_field_enabled( $give_form_id ) ) {
+			global $wpdb;
+			$payment_data['give_comment'] = $wpdb->get_var( $wpdb->prepare( "SELECT comment_content  FROM {$wpdb->prefix}give_comments WHERE comment_type LIKE %s AND comment_parent=%d", '%%donor_donation%%', $payment_id ) );
+		}
 
 		$form_fields       = Automator()->helpers->recipe->give->get_form_fields_and_ffm( $give_form_id );
 		$custom_field_data = give_get_meta( $payment_id, '_give_payment_meta', true );
@@ -154,6 +180,10 @@ class MAKE_DONATION {
 							'run_number'     => $result['args']['run_number'],
 						);
 
+						$trigger_meta['meta_key']   = $this->trigger_meta . '_ID';
+						$trigger_meta['meta_value'] = maybe_serialize( $give_form_id );
+						Automator()->insert_trigger_meta( $trigger_meta );
+
 						$trigger_meta['meta_key']   = $this->trigger_meta;
 						$trigger_meta['meta_value'] = maybe_serialize( $payment_data['give_form_title'] );
 						Automator()->insert_trigger_meta( $trigger_meta );
@@ -165,6 +195,9 @@ class MAKE_DONATION {
 						$trigger_meta['meta_key']   = 'payment_data';
 						$trigger_meta['meta_value'] = maybe_serialize( $payment_data );
 						Automator()->insert_trigger_meta( $trigger_meta );
+
+						Automator()->db->token->save( 'DONATION_ID', $payment->number, $trigger_meta );
+						Automator()->db->token->save( 'PAYMENT_ID', $payment_id, $trigger_meta );
 
 						Automator()->maybe_trigger_complete( $result['args'] );
 					}

@@ -47,14 +47,24 @@ class FCRM_TAG_TO_USER {
 			'priority'           => 10,
 			'accepted_args'      => 1,
 			'execution_function' => array( $this, 'tag_to_user' ),
-			'options'            => array(
-				Automator()->helpers->recipe->fluent_crm->options->fluent_crm_tags( null, $this->action_meta, array( 'supports_multiple_values' => true ) ),
-			),
+			'options_callback'   => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->action( $action );
 	}
 
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->fluent_crm->options->fluent_crm_tags( null, $this->action_meta, array( 'supports_multiple_values' => true ) ),
+				),
+			)
+		);
+	}
 
 	/**
 	 * Validation function when the trigger action is hit
@@ -71,11 +81,13 @@ class FCRM_TAG_TO_USER {
 
 		if ( $user_info ) {
 
-			$subscriber = Subscriber::where( 'email', $user_info->user_email )->first();
+			$subscriber = Subscriber::where( 'email', $user_info->user_email )
+									->first();
 
+			// User exists but is not a FluentCRM contact.
 			if ( false === $subscriber || is_null( $subscriber ) ) {
 
-				// User exists but is not a FluentCRM contact.
+				// Add the user as a contact.
 				$subscriber = Automator()->helpers->recipe->fluent_crm->add_user_as_contact( $user_info );
 
 				// Did not create new contact successfully.
@@ -97,53 +109,16 @@ class FCRM_TAG_TO_USER {
 				}
 			}
 
+			// If already a subscriber.
 			if ( $subscriber ) {
 
-				$existing_tags = $subscriber->tags;
-
-				$existing_tag_ids = array();
-
-				foreach ( $existing_tags as $tag ) {
-					if ( in_array( $tag->id, $tags, true ) ) {
-						$existing_tag_ids[] = $tag->title;
-					}
-				}
-
+				// Attach the tags.
 				$subscriber->attachTags( $tags );
 
-				if ( empty( $existing_tag_ids ) ) {
+				// Complete the action even if tags already exists.
+				Automator()->complete_action( $user_id, $action_data, $recipe_id );
 
-					Automator()->complete_action( $user_id, $action_data, $recipe_id );
-
-					return;
-
-				} else {
-
-					if ( count( $existing_tag_ids ) === count( $tags ) ) {
-
-						// ALL tags were already assigned
-						$action_data['do-nothing']           = true;
-						$action_data['complete_with_errors'] = true;
-						$message                             = sprintf(
-						/* translators: 1. List of lists the user is in. */
-							_x( 'User already has tag(s): %1$s', 'FluentCRM', 'uncanny-automator' ),
-							implode(
-							/* translators: Character to separate items */
-								__( ',', 'uncanny-automator' ) . ' ',
-								$existing_tag_ids
-							)
-						);
-
-						Automator()->complete_action( $user_id, $action_data, $recipe_id, $message );
-
-						return;
-					}
-
-					// SOME tags were already assigned
-					Automator()->complete_action( $user_id, $action_data, $recipe_id );
-
-					return;
-				}
+				return;
 			}
 		} else {
 

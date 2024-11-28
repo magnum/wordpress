@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:           AutomatorWP - WP Ulike integration
- * Plugin URI:            https://wordpress.org/plugins/automatorwp-wp-ulike-integration/
+ * Plugin URI:            https://automatorwp.com/add-ons/wp-ulike/
  * Description:           Connect AutomatorWP with WP Ulike.
  * Version:               1.0.1
  * Author:                AutomatorWP

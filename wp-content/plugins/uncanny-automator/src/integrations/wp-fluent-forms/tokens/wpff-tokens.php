@@ -25,6 +25,9 @@ class Wpff_Tokens {
 
 		add_filter( 'automator_maybe_trigger_wpff_wpffforms_tokens', array( $this, 'wpff_possible_tokens' ), 20, 2 );
 		add_filter( 'automator_maybe_parse_token', array( $this, 'wpff_token' ), 20, 6 );
+
+		add_filter( 'automator_maybe_trigger_wpff_tokens', array( $this, 'wpff_entry_possible_tokens' ), 20, 2 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'wpff_entry_tokens' ), 20, 6 );
 	}
 
 
@@ -38,6 +41,9 @@ class Wpff_Tokens {
 	 * @throws \WpFluent\Exception
 	 */
 	public function wpff_possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		$form_id      = $args['value'];
 		$trigger_meta = $args['meta'];
@@ -53,9 +59,9 @@ class Wpff_Tokens {
 		if ( true === $fluent_active && ! empty( $form_id ) && 0 !== $form_id && is_numeric( $form_id ) ) {
 
 			$form = wpFluent()->table( 'fluentform_forms' )->where( 'id', '=', $form_id )
-			                  ->select( array( 'id', 'title', 'form_fields' ) )
-			                  ->orderBy( 'id', 'DESC' )
-			                  ->get();
+							  ->select( array( 'id', 'title', 'form_fields' ) )
+							  ->orderBy( 'id', 'DESC' )
+							  ->get();
 
 			if ( $form ) {
 				$form               = array_pop( $form );
@@ -73,15 +79,15 @@ class Wpff_Tokens {
 							// Fields are in a column
 							foreach ( $raw_field['columns'] as $columns ) {
 								foreach ( $columns as $fields_or_multi_inputs ) {
+
+									if ( ! is_array( $fields_or_multi_inputs ) ) {
+										continue;
+									}
+
 									foreach ( $fields_or_multi_inputs as $field_or_multi_input ) {
 
 										// Skip html only feilds that are not actual form inputs
 										if ( isset( $fields_or_multi_inputs['element'] ) && 'custom_html' === $fields_or_multi_inputs['element'] ) {
-											continue;
-										}
-
-										// Skip file upload fields. Not supported
-										if ( isset( $fields_or_multi_inputs['element'] ) && 'input_file' === $fields_or_multi_inputs['element'] ) {
 											continue;
 										}
 
@@ -95,11 +101,6 @@ class Wpff_Tokens {
 
 												// Skip html only feilds that are not actual form inputs
 												if ( isset( $field['element'] ) && 'custom_html' === $field['element'] ) {
-													continue;
-												}
-
-												// Skip file upload fields. Not supported
-												if ( isset( $field['element'] ) && 'input_file' === $field['element'] ) {
 													continue;
 												}
 
@@ -119,11 +120,6 @@ class Wpff_Tokens {
 
 											// Skip html only feilds that are not actual form inputs
 											if ( isset( $field['element'] ) && 'custom_html' === $field['element'] ) {
-												continue;
-											}
-
-											// Skip file upload fields. Not supported
-											if ( isset( $field['element'] ) && 'input_file' === $field['element'] ) {
 												continue;
 											}
 
@@ -153,9 +149,9 @@ class Wpff_Tokens {
 											}
 										}
 										$fields_tokens[] = array(
-											'tokenId'         => $token_id,
-											'tokenName'       => $input_title,
-											'tokenType'       => $type,
+											'tokenId'   => $token_id,
+											'tokenName' => $input_title,
+											'tokenType' => $type,
 											'tokenIdentifier' => $trigger_meta,
 										);
 									} else {
@@ -172,17 +168,11 @@ class Wpff_Tokens {
 								continue;
 							}
 
-							// Skip file upload fields. Not supported
-							if ( isset( $raw_field['element'] ) && 'input_file' === $raw_field['element'] ) {
-								continue;
-							}
-
 							$field = $raw_field;
 
 							if ( isset( $field['attributes']['name'] ) ) {
 								$fields_tokens[] = $this->create_token( $form_id, $field, $trigger_meta );
 							}
-
 						}
 					}
 				}
@@ -304,6 +294,72 @@ class Wpff_Tokens {
 					}
 				} else {
 					$value = '';
+				}
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param $tokens
+	 * @param $args
+	 *
+	 * @return array|mixed|\string[][]
+	 */
+	public function wpff_entry_possible_tokens( $tokens = array(), $args = array() ) {
+		$fields = array(
+			array(
+				'tokenId'         => 'WPFFENTRYID',
+				'tokenName'       => __( 'Entry ID', 'uncanny-automator' ),
+				'tokenType'       => 'int',
+				'tokenIdentifier' => 'WPFFENTRYTOKENS',
+			),
+			array(
+				'tokenId'         => 'WPFFENTRYIP',
+				'tokenName'       => __( 'User IP', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => 'WPFFENTRYTOKENS',
+			),
+			array(
+				'tokenId'         => 'WPFFENTRYSOURCEURL',
+				'tokenName'       => __( 'Entry source URL', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => 'WPFFENTRYTOKENS',
+			),
+			array(
+				'tokenId'         => 'WPFFENTRYDATE',
+				'tokenName'       => __( 'Entry submission date', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => 'WPFFENTRYTOKENS',
+			),
+		);
+
+		$tokens = array_merge( $tokens, $fields );
+
+		return $tokens;
+	}
+
+	/**
+	 * @param $value
+	 * @param $pieces
+	 * @param $recipe_id
+	 * @param $trigger_data
+	 * @param $user_id
+	 *
+	 * @return string|null
+	 */
+	public function wpff_entry_tokens( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
+		if ( in_array( 'WPFFENTRYTOKENS', $pieces ) ) {
+			if ( $trigger_data ) {
+				foreach ( $trigger_data as $trigger ) {
+					$trigger_id     = $trigger['ID'];
+					$trigger_log_id = $replace_args['trigger_log_id'];
+					$meta_key       = $pieces[2];
+					$meta_value     = Automator()->helpers->recipe->get_form_data_from_trigger_meta( $meta_key, $trigger_id, $trigger_log_id, $user_id );
+					if ( ! empty( $meta_value ) ) {
+						$value = maybe_unserialize( $meta_value );
+					}
 				}
 			}
 		}

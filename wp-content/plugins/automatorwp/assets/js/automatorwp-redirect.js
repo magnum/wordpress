@@ -9,7 +9,9 @@ function automatorwp_check_for_redirect() {
 
     var $ = jQuery;
 
-    if( automatorwp_redirect.user_id === 0 ) {
+    var user_id = parseInt( automatorwp_redirect.user_id );
+
+    if( user_id === 0 || isNaN( user_id ) ) {
         return;
     }
 
@@ -29,6 +31,13 @@ function automatorwp_check_for_redirect() {
         },
         success: function( response ) {
 
+            // Sanitization check
+            if( ! automatorwp_is_response_valid_for_redirect( response ) ) {
+                automatorwp_redirect_in_progress = false;
+                return;
+            }
+
+            // Try to redirect
             if( ! automatorwp_redirect_to_url( response.data.redirect_url ) ) {
                 automatorwp_redirect_in_progress = false;
             }
@@ -36,12 +45,44 @@ function automatorwp_check_for_redirect() {
         },
         error: function( response ) {
 
+            // Sanitization check
+            if( ! automatorwp_is_response_valid_for_redirect( response ) ) {
+                automatorwp_redirect_in_progress = false;
+                return;
+            }
+
+            // Try to redirect
             if( ! automatorwp_redirect_to_url( response.data.redirect_url ) ) {
                 automatorwp_redirect_in_progress = false;
             }
 
         }
     });
+
+}
+
+/**
+ * Check if the response object has all required properties
+ *
+ * @since 2.4.1
+ *
+ * @param {object} response
+ */
+function automatorwp_is_response_valid_for_redirect( response ) {
+
+    if( response === undefined ) {
+        return false;
+    }
+
+    if( response.data === undefined ) {
+        return false;
+    }
+
+    if( response.data.redirect_url === undefined ) {
+        return false;
+    }
+
+    return true;
 
 }
 
@@ -92,7 +133,7 @@ function automatorwp_redirect_is_url_excluded( url, data ) {
     var excluded_url = false;
 
     automatorwp_redirect.excluded_urls.forEach( function ( to_match ) {
-        if( url.includes( to_match ) ) {
+        if( url !== undefined && url.includes( to_match ) || url === to_match ) {
             excluded_url = true;
         }
     } );
@@ -105,7 +146,7 @@ function automatorwp_redirect_is_url_excluded( url, data ) {
     var excluded_data = false;
 
     automatorwp_redirect.excluded_data.forEach( function ( to_match ) {
-        if( data.includes( to_match ) ) {
+        if( data !== undefined && data.includes( to_match ) ) {
             excluded_data = true;
         }
     } );
@@ -115,12 +156,16 @@ function automatorwp_redirect_is_url_excluded( url, data ) {
     }
 
     // If is an ajax call, check for excluded ajax actions
-    if( url.includes('admin-ajax.php') ) {
+    if( url !== undefined && url.includes('admin-ajax.php') ) {
 
         var excluded_action = false;
 
         automatorwp_redirect.excluded_ajax_actions.forEach( function ( to_match ) {
-            if( data.includes( 'action=' + to_match ) ) {
+            if( data !== undefined && data.includes( 'action=' + to_match ) ) {
+                excluded_action = true;
+            }
+
+            if( url !== undefined && url.includes( 'action=' + to_match ) ) {
                 excluded_action = true;
             }
         } );

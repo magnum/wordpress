@@ -226,6 +226,10 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 */
 	public $facebook;
 	/**
+	 * @var Facebook_Groups_Helpers;
+	 */
+	public $facebook_groups;
+	/**
 	 * @var Instagram_Helpers;
 	 */
 	public $instagram;
@@ -262,6 +266,10 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 */
 	public $twilio;
 	/**
+	 * @var Google_Calendar_Helpers
+	 */
+	public $google_calendar;
+	/**
 	 * @var Uncanny_Groups_Helpers;
 	 */
 	public $uncanny_groups;
@@ -269,6 +277,18 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 * @var Automator_Helpers_Recipe
 	 */
 	public $options;
+	/**
+	 * @var PeepSo_Helpers
+	 */
+	public $peepso;
+	/**
+	 * @var Optinmonster_Helpers
+	 */
+	public $optinmonster;
+	/**
+	 * @var Advanced_Coupons_Helpers
+	 */
+	public $advanced_coupons;
 	/*
 	 * Check for loading options.
 	 */
@@ -370,10 +390,10 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 			return true;
 		}
 		// (#3)
-		global $wp_rewrite;
-		if ( null === $wp_rewrite ) {
-			$wp_rewrite = new \WP_Rewrite(); //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-		}
+		//global $wp_rewrite;
+		//if ( null === $wp_rewrite ) {
+		//$wp_rewrite = new \WP_Rewrite(); //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		//}
 
 		// (#4)
 		$current_url = wp_parse_url( add_query_arg( array() ) );
@@ -463,13 +483,15 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 		}
 
 		$option = array(
-			'option_code'   => 'NUMTIMES',
-			'label'         => $label,
-			'description'   => $description,
-			'placeholder'   => $placeholder,
-			'input_type'    => 'int',
-			'default_value' => 1,
-			'required'      => true,
+			'option_code'            => 'NUMTIMES',
+			'label'                  => $label,
+			'show_label_in_sentence' => false,
+			'description'            => $description,
+			'placeholder'            => $placeholder,
+			'input_type'             => 'int',
+			'default_value'          => 1,
+			'min_number'             => 1,
+			'required'               => true,
 		);
 
 		$option = apply_filters_deprecated( 'uap_option_number_of_times', array( $option ), '3.0', 'automator_option_number_of_times' );
@@ -562,8 +584,8 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 		/**
 		 * Allow developers to modify $args
 		 *
-		 * @author  Saad
 		 * @version 2.6
+		 * @author  Saad
 		 */
 		$args = apply_filters( 'automator_wp_query_args', $args );
 
@@ -644,6 +666,15 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 						case 'ID':
 							$order_by = 'p.ID';
 							break;
+						case 'parent_id':
+							$order_by = 'p.parent_id';
+							break;
+						case 'post_date':
+							$order_by = 'p.post_date';
+							break;
+						case 'post_type':
+							$order_by = 'p.post_type';
+							break;
 						case 'title':
 						default:
 							$order_by = 'p.post_title';
@@ -655,7 +686,7 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 					$query .= ' ORDER BY p.post_title';
 				}
 
-				if ( isset( $order ) && empty( $order ) ) {
+				if ( isset( $order ) && ! empty( $order ) ) {
 					$query .= " $order";
 				} else {
 					$query .= ' ASC';
@@ -702,8 +733,8 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 				/**
 				 * Allow developers to modify transient times
 				 *
-				 * @author  Saad
 				 * @version 2.6
+				 * @author  Saad
 				 */
 				$transient_time = apply_filters( 'automator_transient_time', Automator()->cache->expires );
 				Automator()->cache->set( $transient_key, $options, 'automator', $transient_time );
@@ -842,8 +873,8 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 * @param string $limit
 	 *
 	 * @return array
-	 * @author  Saad
 	 * @version 2.6 - this function replaces wp's get_users()
+	 * @author  Saad
 	 */
 	public function wp_users( $limit = 99999 ) {
 		global $wpdb;

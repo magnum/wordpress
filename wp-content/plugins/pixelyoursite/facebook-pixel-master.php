@@ -3,17 +3,17 @@
 /**
  * Plugin Name: PixelYourSite
  * Plugin URI: http://www.pixelyoursite.com/
- * Description: No coding <strong>Meta Pixel (formerly Facebook Pixel), Facebook Converion API,</strong> and <strong>Google Analytics</strong> install. Track key actions with our Signal event, or configure your own events. WooCommerce and EDD fully supported, with Facebook Dynamic Ads Pixel set-up and Google Analytics Enhanced Ecommerce. Insert any custom script with our Head & Footer option. Add the <strong>Pinterest Tag</strong> with our paid add-on. The PRO version adds support for the Google Ads tag plus a lot of extra stuff. Full support for <strong>ConsentMagic.com</strong>.
- * Version: 8.2.18
+ * Description: No coding <strong>Meta Pixel (formerly Facebook Pixel), Facebook Converion API,</strong> and <strong>Google Analytics</strong> install. Track key actions with our Automated Events, or configure your own events. WooCommerce and EDD fully supported, with Facebook Dynamic Ads Pixel set-up and Google Analytics Enhanced Ecommerce. Insert any custom script with our Head & Footer option. Add the <strong>Pinterest Tag</strong> with our paid add-on. The PRO version adds support for the Google Ads tag plus a lot of extra stuff. Full support for <strong>ConsentMagic.com</strong>.
+ * Version: 9.3.2
  * Author: PixelYourSite
  * Author URI: http://www.pixelyoursite.com
  * License: GPLv3
  *
  * Requires at least: 4.4
- * Tested up to: 5.9
+ * Tested up to: 6.3
  *
  * WC requires at least: 2.6.0
- * WC tested up to: 6.3
+ * WC tested up to: 7.3
  *
  * Text Domain: pys
  */
@@ -44,4 +44,9 @@ function pysFreeActivation() {
 /**
  * facebook-pixel-master.php used for backward compatibility.
  */
+add_action( 'before_woocommerce_init', function() {
+    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+    }
+} );
 require_once 'pixelyoursite.php';

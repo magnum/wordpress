@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { SHOP_URL } from '@woocommerce/block-settings';
-import { Icon, cart } from '@woocommerce/icons';
+import { cart } from '@woocommerce/icons';
+import { Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,12 +16,14 @@ const EmptyCart = () => {
 		<div className="wc-block-checkout-empty">
 			<Icon
 				className="wc-block-checkout-empty__image"
-				alt=""
-				srcElement={ cart }
+				icon={ cart }
 				size={ 100 }
 			/>
 			<strong className="wc-block-checkout-empty__title">
-				{ __( 'Your cart is empty!', 'woocommerce' ) }
+				{ __(
+					'Your cart is currently empty!',
+					'woocommerce'
+				) }
 			</strong>
 			<p className="wc-block-checkout-empty__description">
 				{ __(

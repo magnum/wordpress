@@ -60,6 +60,9 @@ class Uoa_Tokens {
 	 * @return array
 	 */
 	public function possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		$new_tokens = array();
 
@@ -162,13 +165,13 @@ class Uoa_Tokens {
 					$value = maybe_unserialize( $meta_value );
 
 					if ( 'UOAERRORS_recipe_log_url' === $meta_field || 'UOARECIPES_recipe_log_url' === $meta_field ) {
-						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-recipe-log&' . $value;
+						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-admin-logs&' . $value;
 					}
 					if ( 'UOAERRORS_trigger_log_url' === $meta_field || 'UOARECIPES_trigger_log_url' === $meta_field ) {
-						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-trigger-log&' . $value;
+						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-admin-logs&' . $value;
 					}
 					if ( 'UOAERRORS_action_log_url' === $meta_field || 'UOARECIPES_action_log_url' === $meta_field ) {
-						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-action-log&' . $value;
+						$value = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-admin-logs&' . $value;
 					}
 				}
 			}
@@ -287,6 +290,9 @@ class Uoa_Tokens {
 	 * @return array
 	 */
 	public function possible_recipe_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		$new_tokens = array();
 
@@ -342,6 +348,9 @@ class Uoa_Tokens {
 	 * @return array
 	 */
 	public function possible_anon_recipe_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];

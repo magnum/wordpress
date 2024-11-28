@@ -43,10 +43,10 @@ function automatorwp_activecampaign_get_webhook_url() {
     $prefix = 'automatorwp_activecampaign_';
     $settings = get_option( 'automatorwp_settings' );
 
-    $webhook_url = $settings[$prefix . 'webhook'];
+    $webhook_url = ( isset( $settings[$prefix . 'webhook'] ) ) ? $settings[$prefix . 'webhook'] : '';
 
     // Check if webhook URL exists
-    if ( ! $webhook_url ){
+    if ( empty( $webhook_url ) ){
 
         $slug = strtolower( wp_generate_password( 8, false ) );
         $webhook_url = get_rest_url() . 'activecampaign/webhooks/' . $slug;
@@ -190,6 +190,9 @@ function automatorwp_activecampaign_get_contact( $email ) {
         return array( 'contacts' => array() );
     }
 
+    // To manage special characters in email;
+    $email = urlencode( $email );
+
     $response = wp_remote_get( $api['url'] . '/api/3/contacts?email=' . $email, array(
         'headers' => array(
             'Accept' => 'application/json',
@@ -246,9 +249,12 @@ function automatorwp_activecampaign_options_cb_tag( $field ) {
  *
  * @since 1.0.0
  *
+ * @param string $search
+ * @param int $page
+ *
  * @return array
  */
-function automatorwp_activecampaign_get_tags( ) {
+function automatorwp_activecampaign_get_tags( $search = '', $page = 1 ) {
 
     $tags = array();
 
@@ -257,12 +263,20 @@ function automatorwp_activecampaign_get_tags( ) {
     if( ! $api ) {
         return $tags;
     }
+
+    $limit = 20;
+    $offset = $limit * ($page - 1);
     
     $response = wp_remote_get( $api['url'] . '/api/3/tags', array(
         'headers' => array(
             'Accept' => 'application/json',
             'Api-Token' => $api['key'],
             'Content-Type'  => 'application/json'
+        ),
+        'body' => array(
+            'search' => $search,
+            'limit' => $limit,
+            'offset' => $offset,
         )
     ) );
     

@@ -13,6 +13,8 @@ final class DroppingStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamInt
     use StreamDecoratorTrait;
     /** @var int */
     private $maxLength;
+    /** @var StreamInterface */
+    private $stream;
     /**
      * @param StreamInterface $stream    Underlying stream to decorate.
      * @param int             $maxLength Maximum size before dropping data.

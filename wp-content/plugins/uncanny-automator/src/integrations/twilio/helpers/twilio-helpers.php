@@ -12,6 +12,13 @@ use Uncanny_Automator_Pro\Twilio_Pro_Helpers;
 class Twilio_Helpers {
 
 	/**
+	 * The API endpoint address.
+	 *
+	 * @var API_ENDPOINT The endpoint adress.
+	 */
+	const API_ENDPOINT = 'v2/twilio';
+
+	/**
 	 * @var Twilio_Helpers
 	 */
 	public $options;
@@ -40,11 +47,11 @@ class Twilio_Helpers {
 			$this->load_options = $uncanny_automator->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
 		}
 
-		$this->setting_tab = 'twilio_api';
-		$this->automator_api = AUTOMATOR_API_URL . 'v2/twilio';
+		$this->setting_tab = 'twilio-api';
+		$this->tab_url     = admin_url( 'edit.php' ) . '?post_type=uo-recipe&page=uncanny-automator-config&tab=premium-integrations&integration=' . $this->setting_tab;
 
-		add_action( 'update_option_uap_automator_twilio_api_auth_token', array( $this, 'twilio_setting_update' ), 100, 3 );
-		add_action( 'update_option_uap_automator_twilio_api_account_sid', array( $this, 'twilio_setting_update' ), 100, 3 );
+		add_action( 'update_option_uap_automator_twilio_api_settings_timestamp', array( $this, 'settings_updated' ), 100, 3 );
+		add_action( 'add_option_uap_automator_twilio_api_settings_timestamp', array( $this, 'settings_updated' ), 100, 3 );
 
 		// Add twilio disconnect action.
 		add_action( 'wp_ajax_automator_twilio_disconnect', array( $this, 'automator_twilio_disconnect' ), 100 );
@@ -55,7 +62,7 @@ class Twilio_Helpers {
 
 	/**
 	 * Load the settings
-	 * 
+	 *
 	 * @return void
 	 */
 	private function load_settings() {
@@ -87,16 +94,7 @@ class Twilio_Helpers {
 	 * @throws ConfigurationException
 	 * @throws TwilioException
 	 */
-	public function send_sms( $to, $body, $user_id ) {
-
-		$client = $this->get_client();
-
-		if ( ! $client ) {
-			return array(
-				'result'  => false,
-				'message' => __( 'Twilio credentails are missing or expired.', 'uncanny-automator' ),
-			);
-		}
+	public function send_sms( $to, $body, $user_id, $action = null ) {
 
 		$from = trim( get_option( 'uap_automator_twilio_api_phone_number', '' ) );
 
@@ -117,20 +115,16 @@ class Twilio_Helpers {
 		}
 
 		$request['action'] = 'send_sms';
-		$request['account_sid'] = $client['account_sid'];
-		$request['auth_token'] = $client['auth_token'];
-
-
-		$request['from'] = $from;
-		$request['to'] = $to;
-		$request['body'] = $body;
+		$request['from']   = $from;
+		$request['to']     = $to;
+		$request['body']   = $body;
 
 		try {
-			$response = Api_Server::api_call( 'v2/twilio', $request );
-		} catch ( \Exception $th ) {
+			$response = $this->api_call( $request, $action );
+		} catch ( \Exception $e ) {
 			return array(
 				'result'  => false,
-				'message' => $th->getMessage(),
+				'message' => $e->getMessage(),
 			);
 		}
 
@@ -170,14 +164,17 @@ class Twilio_Helpers {
 	 */
 	public function get_client() {
 
-		$sid      = get_option( 'uap_automator_twilio_api_account_sid' );
-		$token    = get_option( 'uap_automator_twilio_api_auth_token' );
+		$sid   = get_option( 'uap_automator_twilio_api_account_sid' );
+		$token = get_option( 'uap_automator_twilio_api_auth_token' );
 
 		if ( empty( $sid ) || empty( $token ) ) {
-			return false;
+			throw new \Exception( 'Twilio is not connected' );
 		}
 
-		return array('account_sid' => $sid, 'auth_token' => $token );
+		return array(
+			'account_sid' => $sid,
+			'auth_token'  => $token,
+		);
 
 	}
 
@@ -189,38 +186,14 @@ class Twilio_Helpers {
 	 */
 	public function get_twilio_accounts_connected() {
 
-		$client = $this->get_client();
-
-		if ( empty( $client ) ) {
-			return array();
-		}
-
-		// Return the transient if its available.
-		$accounts_saved = get_transient( '_automator_twilio_account_info' );
-
-		if ( false !== $accounts_saved ) {
-			return $accounts_saved;
-		}
-
 		$body['action'] = 'account_info';
-		$body['account_sid'] = $client['account_sid'];
-		$body['auth_token'] = $client['auth_token'];
 
-		try {
-			$twilio_account = Api_Server::api_call( 'v2/twilio', $body );
-		} catch ( \Exception $th ) {
-			return array();
-		}
+		$twilio_account = $this->api_call( $body );
 
-		if ( empty( $twilio_account ) ) {
-			return array();
-		}
-
-		// Update the transient.
-		set_transient( '_automator_twilio_account_info', $twilio_account, DAY_IN_SECONDS );
+		update_option( 'uap_twilio_connected_user', $twilio_account );
 
 		return $twilio_account;
-		
+
 	}
 
 	/**
@@ -240,6 +213,7 @@ class Twilio_Helpers {
 				'uap_automator_twilio_api_auth_token',
 				'uap_automator_twilio_api_phone_number',
 				'uap_automator_twilio_api_account_sid',
+				'uap_twilio_connected_user',
 			);
 
 			foreach ( $option_keys as $option_key ) {
@@ -250,7 +224,7 @@ class Twilio_Helpers {
 			$transient_keys = array(
 				'_uncannyowl_twilio_settings',
 				'_automator_twilio_account_info',
-				'uap_automator_twilio_api_accounts_response'
+				'uap_automator_twilio_api_accounts_response',
 			);
 
 			foreach ( $transient_keys as $transient_key ) {
@@ -261,10 +235,10 @@ class Twilio_Helpers {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'post_type' 	=> 'uo-recipe',
-					'page'      	=> 'uncanny-automator-config',
-					'tab'       	=> 'premium-integrations',
-					'integration' 	=> 'twilio-api'
+					'post_type'   => 'uo-recipe',
+					'page'        => 'uncanny-automator-config',
+					'tab'         => 'premium-integrations',
+					'integration' => 'twilio-api',
 				),
 				admin_url( 'edit.php' )
 			)
@@ -273,7 +247,94 @@ class Twilio_Helpers {
 		exit;
 	}
 
-	public function twilio_setting_update() {
-		delete_transient( '_automator_twilio_account_info' );
+	/**
+	 * api_call
+	 *
+	 * @param  mixed $body
+	 * @param  mixed $action
+	 * @return void
+	 */
+	public function api_call( $body, $action = null ) {
+
+		$client = $this->get_client();
+
+		$body['account_sid'] = $client['account_sid'];
+		$body['auth_token']  = $client['auth_token'];
+
+		$params = array(
+			'endpoint' => self::API_ENDPOINT,
+			'body'     => $body,
+			'action'   => $action,
+		);
+
+		$response = Api_Server::api_call( $params );
+
+		if ( 200 !== $response['statusCode'] ) {
+			throw new \Exception( $params['endpoint'] . ' failed' );
+		}
+
+		return $response['data'];
+
+	}
+
+	/**
+	 * settings_updated
+	 *
+	 * @return void
+	 */
+	public function settings_updated() {
+
+		$redirect_url = $this->tab_url;
+
+		$result = 1;
+
+		try {
+			$this->get_twilio_accounts_connected();
+		} catch ( \Exception $e ) {
+			update_option( 'uap_twilio_connected_user', array() );
+			$result = $e->getMessage();
+		}
+
+		$redirect_url .= '&connect=' . $result;
+
+		wp_safe_redirect( $redirect_url );
+		die;
+	}
+
+	/**
+	 * get_user
+	 *
+	 * @return void
+	 */
+	public function get_user() {
+		$users_option_exist = get_option( 'uap_twilio_connected_user', 'no' );
+
+		if ( 'no' !== $users_option_exist ) {
+			return $users_option_exist;
+		}
+
+		return $this->get_twilio_accounts_connected();
+	}
+
+	public function integration_status() {
+
+		$user = false;
+
+		try {
+
+			$client = $this->get_client();
+			$user   = get_option( 'uap_twilio_connected_user', array() );
+
+			if ( empty( $user['sid'] ) ) {
+				throw new \Exception( __( 'User account error', 'uncanny-automator' ) );
+			}
+
+			$is_connected = true;
+		} catch ( \Exception $e ) {
+			$user         = array();
+			$is_connected = false;
+		}
+
+		return $is_connected ? 'success' : '';
 	}
 }

@@ -58,7 +58,12 @@ class EventsWoo extends EventsFactory {
     }
 
     private function __construct() {
+        add_filter("pys_event_factory",[$this,"register"]);
+    }
 
+    function register($list) {
+        $list[] = $this;
+        return $list;
     }
 
     function getCount()
@@ -79,7 +84,7 @@ class EventsWoo extends EventsFactory {
 
     function isEnabled()
     {
-        return isWooCommerceActive() && PYS()->getOption( 'woo_enabled' );
+        return isWooCommerceActive();
     }
 
     function getOptions() {
@@ -124,7 +129,9 @@ class EventsWoo extends EventsFactory {
 
             case 'woo_purchase' : {
                 if(PYS()->getOption( 'woo_purchase_enabled' ) && is_order_received_page() &&
-                    isset( $_REQUEST['key'] )  && $_REQUEST['key'] != "" ) {
+                    isset( $_REQUEST['key'] )  && $_REQUEST['key'] != ""
+                    && empty($_REQUEST['wc-api']) // if is not api request
+                ) {
                     $order_key = sanitize_key($_REQUEST['key']);
                     $order_id = (int) wc_get_order_id_by_order_key( $order_key );
 
@@ -191,8 +198,11 @@ class EventsWoo extends EventsFactory {
                 $events = array();
                 $order_key = sanitize_key($_REQUEST['key']);
                 $order_id = (int) wc_get_order_id_by_order_key( $order_key );
-
-                update_post_meta( $order_id, '_pys_purchase_event_fired', true );
+                $order = wc_get_order($order_id);
+                if($order) {
+                    $order->update_meta_data("_pys_purchase_event_fired",true);
+                    $order->save();
+                }
                 $events[] = new SingleEvent($event,EventTypes::$STATIC,'woo');
 
                 // add child event complete_registration

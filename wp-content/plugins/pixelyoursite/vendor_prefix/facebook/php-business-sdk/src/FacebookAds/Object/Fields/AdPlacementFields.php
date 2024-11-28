@@ -41,10 +41,11 @@ class AdPlacementFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const GOOGLE_DISPLAY_FORMAT = 'google_display_format';
     const ID = 'id';
     const NAME = 'name';
+    const PLACEMENT_GROUP = 'placement_group';
     const PLATFORM = 'platform';
     const STATUS = 'status';
     public function getFieldTypes()
     {
-        return array('bundle_id' => 'string', 'display_format' => 'string', 'external_placement_id' => 'string', 'google_display_format' => 'string', 'id' => 'string', 'name' => 'string', 'platform' => 'string', 'status' => 'string');
+        return array('bundle_id' => 'string', 'display_format' => 'string', 'external_placement_id' => 'string', 'google_display_format' => 'string', 'id' => 'string', 'name' => 'string', 'placement_group' => 'Object', 'platform' => 'string', 'status' => 'string');
     }
 }

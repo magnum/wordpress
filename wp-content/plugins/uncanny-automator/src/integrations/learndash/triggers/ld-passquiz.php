@@ -47,15 +47,24 @@ class LD_PASSQUIZ {
 			'accepted_args'       => 2,
 			'validation_function' => array( $this, 'learndash_quiz_completed' ),
 			// very last call in WP, we need to make sure they viewed the page and didn't skip before is was fully viewable
-			'options'             => array(
-				Automator()->helpers->recipe->learndash->options->all_ld_quiz(),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->learndash->options->all_ld_quiz(),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -81,14 +90,34 @@ class LD_PASSQUIZ {
 				$user = wp_get_current_user();
 			}
 
-			$args = array(
+			$pass_args = array(
 				'code'    => $this->trigger_code,
 				'meta'    => $this->trigger_meta,
 				'post_id' => (int) $post_id,
 				'user_id' => $user->ID,
 			);
 
-			Automator()->maybe_add_trigger_entry( $args );
+			$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
+
+			if ( $args ) {
+				foreach ( $args as $result ) {
+					if ( true === $result['result'] ) {
+						$insert = array(
+							'user_id'        => (int) $result['args']['user_id'],
+							'trigger_id'     => (int) $result['args']['trigger_id'],
+							'trigger_log_id' => (int) $result['args']['trigger_log_id'],
+							'run_number'     => (int) $result['args']['run_number'],
+						);
+
+						$insert['meta_key']   = 'quiz_id';
+						$insert['meta_value'] = $post_id;
+						Automator()->insert_trigger_meta( $insert );
+
+						Automator()->maybe_trigger_complete( $result['args'] );
+
+					}
+				}
+			}
 		}
 	}
 }

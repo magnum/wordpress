@@ -7,10 +7,9 @@
  * @class   Automator_Load
  * @since   3.0
  * @version 3.0
- * @package Uncanny_Automator
  * @author  Saad S.
+ * @package Uncanny_Automator
  */
-
 
 namespace Uncanny_Automator;
 
@@ -49,6 +48,14 @@ class Automator_Load {
 	 * class constructor
 	 */
 	public function __construct() {
+
+		// Load text domain
+		add_action(
+			'init',
+			function () {
+				Automator()->automator_load_textdomain();
+			}
+		);
 
 		// Bailout if not php8 compatible.
 		if ( ! $this->is_php8_compat() ) {
@@ -93,6 +100,8 @@ class Automator_Load {
 			),
 			99
 		);
+
+		add_action( 'admin_init', array( $this, 'automator_schedule_healthchecks' ) );
 
 		$this->load_automator();
 
@@ -147,8 +156,9 @@ class Automator_Load {
 		// An old version of Uncanny Automator is running
 		$url = admin_url( 'plugins.php#uncanny-automator-pro-update' );
 
-		/* translators: 1. Trademarked term. 2. Trademarked term */
-		$message        = sprintf( __( "%2\$s recipes have been disabled because your version of PHP (%3\$s) is not fully compatible with the version of %1\$s that's installed.", 'uncanny-automator' ), 'Uncanny Automator Pro', 'Uncanny Automator', PHP_VERSION );
+		/* translators: 2. Recipes. 3. PHP version */
+		$message = sprintf( __( "%2\$s recipes have been disabled because your version of PHP (%3\$s) is not fully compatible with the version of %1\$s that's installed.", 'uncanny-automator' ), 'Uncanny Automator Pro', 'Uncanny Automator', PHP_VERSION );
+		/* translators: 1. Trademarked term. 2. Version number */
 		$message_update = sprintf( __( 'Please update %1$s to version %2$s or later.', 'uncanny-automator' ), 'Uncanny Automator Pro', $version );
 
 		printf( '<div class="%1$s"><h3 style="font-weight: bold; color: red"><span class="dashicons dashicons-warning"></span>%2$s <a href="%3$s">' . esc_html( $message_update ) . '</a></h3></div>', esc_attr( $class ), esc_html( $message ), esc_url_raw( $url ) );
@@ -158,7 +168,39 @@ class Automator_Load {
 	 * @param $plugin
 	 */
 	public function automator_activated( $plugin ) {
-		if ( $plugin === plugin_basename( AUTOMATOR_BASE_FILE ) && true === apply_filters( 'automator_on_activate_redirect_to_dashboard', true ) ) {
+
+		if ( plugin_basename( AUTOMATOR_BASE_FILE ) === $plugin && true === apply_filters( 'automator_on_activate_redirect_to_dashboard', true ) ) {
+
+			$checked = filter_input( INPUT_POST, 'checked', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+
+			// Bail if bulked activated and there are more than 1 plugin.
+			if ( is_array( $checked ) && count( $checked ) >= 2 ) {
+				return;
+			}
+
+			// Bail if not from `wp-admin/plugins.php` (e.g coming from an ajax, or unit test)
+			if ( false !== wp_get_referer() && ! strpos( wp_get_referer(), 'wp-admin/plugins.php' ) ) {
+				return;
+			}
+
+			// Bail if from Codeception WPTestCase.
+			if ( class_exists( '\Codeception\TestCase\WPTestCase' ) ) {
+				return;
+			}
+
+			// Bail if in WP CLI mode.
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				return;
+			}
+
+			// If the site is not previously connected, let's redirect to Setup Wizard
+			if ( class_exists( '\Uncanny_Automator\Api_Server' ) && empty( Api_Server::get_license_key() ) ) {
+				wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-setup-wizard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+				exit();
+
+			}
+
+			// Else, redirect back to Dashboard
 			wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-dashboard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit();
 		}
@@ -196,9 +238,6 @@ class Automator_Load {
 		if ( false === LOAD_AUTOMATOR ) {
 			return;
 		}
-
-		// Load text domain
-		add_action( 'plugins_loaded', array( $this, 'automator_load_textdomain' ) );
 
 		do_action( 'automator_before_configure' );
 
@@ -268,6 +307,7 @@ class Automator_Load {
 
 		require UA_ABSPATH . 'src/core/class-utilities.php';
 		Utilities::get_instance();
+
 	}
 
 	/**
@@ -317,10 +357,10 @@ class Automator_Load {
 		$this->load_traits();
 
 		foreach ( $classes as $class_name => $file ) {
-			if ( ! file_exists( $file ) ) {
+			if ( ! is_file( $file ) ) {
 				continue;
 			}
-			require $file;
+			require_once $file;
 			$class                                 = __NAMESPACE__ . '\\' . $class_name;
 			self::$core_class_inits[ $class_name ] = new $class();
 		}
@@ -353,15 +393,6 @@ class Automator_Load {
 		$run_automator = apply_filters_deprecated( 'uap_run_automator_actions', array( $run_automator ), '3.0', 'automator_run_automator_actions' );
 
 		return apply_filters( 'automator_run_automator_actions', $run_automator );
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 *
-	 * @since 1.0.0
-	 */
-	public function automator_load_textdomain() {
-		load_plugin_textdomain( 'uncanny-automator', false, basename( dirname( AUTOMATOR_BASE_FILE ) ) . '/languages/' );
 	}
 
 	/**
@@ -403,14 +434,23 @@ class Automator_Load {
 		if ( empty( $check_closure ) ) {
 			return;
 		}
-		$user_id   = wp_get_current_user()->ID;
+		$user_id = wp_get_current_user()->ID;
+
+		// Filter to optionally bail out
+		global $post;
+		$is_uoa_redirect = (bool) apply_filters( 'automator_run_closure_uoa_redirect', true, $post, $user_id );
+
+		if ( true !== $is_uoa_redirect ) {
+			return;
+		}
+
 		$api_setup = array(
 			'root'              => esc_url_raw( rest_url() . AUTOMATOR_REST_API_END_POINT . '/uoa_redirect/' ),
 			'nonce'             => wp_create_nonce( 'wp_rest' ),
 			'user_id'           => $user_id,
 			'client_secret_key' => md5( 'l6fsX3vAAiJbSXticLBd' . $user_id ),
 		);
-		wp_register_script( 'uoapp-client', Utilities::automator_get_asset( 'legacy/js/uo-sseclient.js' ), array(), '2.1.0' ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NotInFooter
+		wp_register_script( 'uoapp-client', Utilities::automator_get_asset( 'legacy/js/uo-sseclient.js' ), array(), AUTOMATOR_PLUGIN_VERSION ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NotInFooter
 		wp_localize_script( 'uoapp-client', 'uoAppRestApiSetup', $api_setup );
 		wp_enqueue_script( 'uoapp-client' );
 	}
@@ -443,10 +483,14 @@ class Automator_Load {
 
 		do_action( 'automator_before_admin_init' );
 
-		$classes['Admin_Menu']        = UA_ABSPATH . 'src/core/admin/class-admin-menu.php';
-		$classes['Copy_Recipe_Parts'] = UA_ABSPATH . 'src/core/admin/class-copy-recipe-parts.php';
-		$classes['Prune_Logs']        = UA_ABSPATH . 'src/core/admin/class-prune-logs.php';
-		$classes['Admin_Settings']    = UA_ABSPATH . 'src/core/admin/admin-settings/admin-settings.php';
+		$classes['Admin_Menu']     = UA_ABSPATH . 'src/core/admin/class-admin-menu.php';
+		$classes['Prune_Logs']     = UA_ABSPATH . 'src/core/admin/class-prune-logs.php';
+		$classes['Admin_Logs']     = UA_ABSPATH . 'src/core/admin/admin-logs/admin-logs.php';
+		$classes['Admin_Tools']    = UA_ABSPATH . 'src/core/admin/admin-tools/admin-tools.php';
+		$classes['Admin_Settings'] = UA_ABSPATH . 'src/core/admin/admin-settings/admin-settings.php';
+		$classes['Pro_Upsell']     = UA_ABSPATH . 'src/core/admin/pro-upgrade/class-pro-upsell.php';
+
+		$classes['Api_Log'] = UA_ABSPATH . 'src/core/admin/api-log/class-api-log.php';
 
 		$classes['Add_User_Recipe_Type'] = UA_ABSPATH . 'src/core/classes/class-add-user-recipe-type.php';
 		if ( ! defined( 'AUTOMATOR_PRO_FILE' ) ) {
@@ -547,17 +591,35 @@ class Automator_Load {
 		$classes['Automator_Send_Webhook_Ajax_Handler'] = UA_ABSPATH . 'src/core/lib/webhooks/class-automator-send-webhook-ajax-handler.php';
 		$classes['Automator_Review']                    = UA_ABSPATH . 'src/core/admin/class-automator-review.php';
 		$classes['Automator_Autoloader']                = UA_ABSPATH . 'src/core/lib/autoload/class-ua-autoloader.php';
-		$classes['Api_Server']                          = UA_ABSPATH . 'src/core/classes/class-api-server.php';
-		$classes['Usage_Reports']                       = UA_ABSPATH . 'src/core/classes/class-usage-reports.php';
-		$classes['Set_Up_Automator']                    = UA_ABSPATH . 'src/core/classes/class-set-up-automator.php';
+		//$classes['Api_Server']                          = UA_ABSPATH . 'src/core/classes/class-api-server.php';
+		$classes['Usage_Reports']           = UA_ABSPATH . 'src/core/classes/class-usage-reports.php';
+		$classes['Set_Up_Automator']        = UA_ABSPATH . 'src/core/classes/class-set-up-automator.php';
+		$classes['Initialize_Automator']    = UA_ABSPATH . 'src/core/classes/class-initialize-automator.php';
+		$classes['Automator_Notifications'] = UA_ABSPATH . 'src/core/admin/notifications/notifications.php';
+		$classes['Calculation_Token']       = UA_ABSPATH . 'src/core/classes/class-calculation-token.php';
+		$classes['Copy_Recipe_Parts']       = UA_ABSPATH . 'src/core/admin/class-copy-recipe-parts.php';
+		$classes['Background_Actions']      = UA_ABSPATH . 'src/core/classes/class-background-actions.php';
 
-		//$classes['Import_Recipe'] = UA_ABSPATH . 'src/core/classes/class-import-recipe.php';
+		require_once UA_ABSPATH . 'src/core/classes/class-api-server.php';
+
+		// Load migrations
+		$this->load_migrations();
 
 		do_action( 'automator_after_autoloader' );
 
 		return $classes;
 	}
 
+	/**
+	 * load_migrations
+	 *
+	 * @return void
+	 */
+	public function load_migrations() {
+		require_once UA_ABSPATH . 'src/core/migrations/abstract-migration.php';
+		require_once UA_ABSPATH . 'src/core/migrations/class-migrate-schedules.php';
+		require_once UA_ABSPATH . 'src/core/migrations/class-migrate-triggers.php';
+	}
 
 	/**
 	 *
@@ -568,6 +630,8 @@ class Automator_Load {
 		// Settings
 		$classes['Trait_Settings_Premium_Integrations'] = UA_ABSPATH . 'src/core/lib/settings/trait-premium-integrations.php';
 
+		$classes['Premium_Integration_Settings'] = UA_ABSPATH . 'src/core/lib/settings/premium-integration-settings.php';
+
 		// Integrations
 		$classes['Integrations'] = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-integrations.php';
 
@@ -575,12 +639,19 @@ class Automator_Load {
 		$classes['Trait_Closure_Setup'] = UA_ABSPATH . 'src/core/lib/recipe-parts/closures/trait-closure-setup.php';
 		$classes['Closures']            = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-closures.php';
 
+		// Tokens
+		$classes['Trait_Trigger_Tokens'] = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-trigger-tokens.php';
+
 		// Triggers
-		$classes['Trait_Trigger_Setup']      = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-setup.php';
-		$classes['Trait_Trigger_Filters']    = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-filters.php';
-		$classes['Trait_Trigger_Conditions'] = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-conditions.php';
-		$classes['Trait_Trigger_Process']    = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-process.php';
-		$classes['Triggers']                 = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-triggers.php';
+		$classes['Trait_Trigger_Setup']          = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-setup.php';
+		$classes['Trait_Trigger_Filters']        = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-filters.php';
+		$classes['Trait_Trigger_Recipe_Filters'] = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-recipe-filters.php';
+		$classes['Trait_Trigger_Conditions']     = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-conditions.php';
+		$classes['Trait_Trigger_Process']        = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-trigger-process.php';
+		$classes['Triggers']                     = UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/trait-triggers.php';
+
+		// Action Tokens
+		$classes['Trait_Action_Tokens'] = UA_ABSPATH . 'src/core/lib/recipe-parts/actions/trait-action-tokens.php';
 
 		// Actions
 		$classes['Trait_Action_Setup']         = UA_ABSPATH . 'src/core/lib/recipe-parts/actions/trait-action-setup.php';
@@ -686,10 +757,29 @@ class Automator_Load {
 		if ( defined( 'DOING_AJAX' ) ) {
 			// Add the ajax listener.
 			include_once UA_ABSPATH . 'src/core/admin/setup-wizard/setup-wizard.php';
-			add_action( 'wp_ajax_uo_setup_wizard_set_tried_connecting', array(
-				'\Uncanny_Automator\Setup_Wizard',
-				'set_tried_connecting',
-			) );
+			add_action(
+				'wp_ajax_uo_setup_wizard_set_tried_connecting',
+				array(
+					'\Uncanny_Automator\Setup_Wizard',
+					'set_tried_connecting',
+				)
+			);
+		}
+	}
+
+	/**
+	 * automator_schedule_healthchecks
+	 *
+	 * @return void
+	 */
+	public function automator_schedule_healthchecks() {
+
+		if ( ! wp_next_scheduled( 'automator_weekly_healthcheck' ) ) {
+			wp_schedule_event( time(), 'weekly', 'automator_weekly_healthcheck' );
+		}
+
+		if ( ! wp_next_scheduled( 'automator_daily_healthcheck' ) ) {
+			wp_schedule_event( time(), 'daily', 'automator_daily_healthcheck' );
 		}
 	}
 }

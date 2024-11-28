@@ -29,6 +29,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\LocalServiceBusinessFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessAvailabilityValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessConditionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessImageFetchStatusValues;
 /**
  * This class is auto-generated.
@@ -50,6 +52,8 @@ class LocalServiceBusiness extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCr
     protected static function getReferencedEnums()
     {
         $ref_enums = array();
+        $ref_enums['Availability'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessAvailabilityValues::getInstance()->getValues();
+        $ref_enums['Condition'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessConditionValues::getInstance()->getValues();
         $ref_enums['ImageFetchStatus'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessImageFetchStatusValues::getInstance()->getValues();
         return $ref_enums;
     }

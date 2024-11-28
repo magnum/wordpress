@@ -16,12 +16,18 @@ class Add_Google_Sheet_Integration {
 	 */
 	public static $integration = 'GOOGLESHEET';
 
-	public $connected = false;
+	public $is_connected = false;
 
 	/**
 	 * Add_Integration constructor.
 	 */
 	public function __construct() {
+
+		if ( false !== $this->get_google_client() ) {
+
+			$this->is_connected = true;
+
+		}
 
 	}
 
@@ -80,23 +86,64 @@ class Add_Google_Sheet_Integration {
 	 */
 	public function add_integration_func() {
 
-		global $uncanny_automator;
-
-		$gtw_options = get_option( '_uncannyowl_google_sheet_settings', array() );
-
-		if ( isset( $gtw_options['refresh_token'] ) && ! empty( $gtw_options['refresh_token'] ) ) {
-			$this->connected = true;
-		}
-
-		$uncanny_automator->register->integration(
+		Automator()->register->integration(
 			self::$integration,
 			array(
 				'name'         => 'Google Sheets',
-				'connected'    => $this->connected,
+				'connected'    => $this->is_connected && ! $this->has_missing_scope(),
 				'icon_svg'     => Utilities::automator_get_integration_icon( __DIR__ . '/img/google-sheet-icon.svg' ),
-				'settings_url' => automator_get_premium_integrations_settings_url( 'google-sheet' )
+				'settings_url' => automator_get_premium_integrations_settings_url( 'google-sheet' ),
 			)
 		);
 
+	}
+
+	/**
+	 * Method has_missing_scope
+	 *
+	 * Checks the client if it has any missing scope or not.
+	 *
+	 * @return boolean True if there is a missing scope. Otherwise, false.
+	 */
+	public function has_missing_scope() {
+
+		$client = get_option( '_uncannyowl_google_sheet_settings', array() );
+
+		$scopes = array(
+			'https://www.googleapis.com/auth/drive',
+			'https://www.googleapis.com/auth/spreadsheets',
+			'https://www.googleapis.com/auth/userinfo.profile',
+			'https://www.googleapis.com/auth/userinfo.email',
+		);
+
+		if ( empty( $client['scope'] ) ) {
+			return true;
+		}
+
+		$has_missing_scope = false;
+
+		foreach ( $scopes as $scope ) {
+			if ( false === strpos( $client['scope'], $scope ) ) {
+				$has_missing_scope = true;
+			}
+		}
+
+		return $has_missing_scope;
+	}
+
+	/**
+	 * Get Google Client object
+	 *
+	 * @return false|array
+	 */
+	public function get_google_client() {
+
+		$access_token = get_option( '_uncannyowl_google_sheet_settings', array() );
+
+		if ( empty( $access_token ) || ! isset( $access_token['access_token'] ) ) {
+			return false;
+		}
+
+		return $access_token;
 	}
 }

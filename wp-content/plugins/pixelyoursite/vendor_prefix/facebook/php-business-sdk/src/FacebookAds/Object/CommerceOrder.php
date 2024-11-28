@@ -87,6 +87,16 @@ class CommerceOrder extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObjec
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
+    public function createFulfillOrder(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('idempotency_key' => 'string', 'items' => 'list<map>');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/fulfill_order', new \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
     public function getItems(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -157,6 +167,16 @@ class CommerceOrder extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObjec
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
     }
+    public function createReturn(array $fields = array(), array $params = array(), $pending = \false)
+    {
+        $this->assureId();
+        $param_types = array('items' => 'list<map>', 'merchant_return_id' => 'string', 'return_message' => 'string', 'update' => 'map');
+        $enums = array();
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/returns', new \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request->addParams($params);
+        $request->addFields($fields);
+        return $pending ? $request : $request->execute();
+    }
     public function getShipments(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
@@ -180,7 +200,7 @@ class CommerceOrder extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObjec
     public function createUpdateShipment(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('fulfillment_id' => 'string', 'idempotency_key' => 'string', 'tracking_info' => 'map');
+        $param_types = array('external_shipment_id' => 'string', 'fulfillment_id' => 'string', 'idempotency_key' => 'string', 'shipment_id' => 'string', 'tracking_info' => 'map');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/update_shipment', new \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CommerceOrder::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

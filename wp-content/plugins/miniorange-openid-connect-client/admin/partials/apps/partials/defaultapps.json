@@ -131,6 +131,12 @@
 	"wildApricot": {
 		"label":"Wild Apricot", "type":"oauth", "image":"wildApricot.png", "scope": "auto", "authorize": "https://<your_account_url>/sys/login/OAuthLogin", "token": "https://oauth.wildapricot.org/auth/token", "userinfo": "https://api.wildapricot.org/v2.1/accounts/<account_id>/contacts/me", "guide":"https://plugins.miniorange.com/guide-configure-wild-apricot-oauth-server"
 	},
+	"idaptive": {
+		"label":"Idaptive | CyberArk", "type":"openidconnect", "image":"idaptive.png", "scope": "openid", "domain":"Add issuer ex. https://aae8888.my.idaptive.app/oidc", "discovery":"domain/.well-known/openid-configuration", "authorize": "https://<idaptive-domain>/OAuth2/Authorize/oidc", "token": "https://<idaptive-domain>/OAuth2/Token/oidc", "userinfo": "https://<idaptive-domain>/OAuth2/UserInfo/oidc", "guide":"https://plugins.miniorange.com/idaptive-single-sign-on-for-wordpress-using-oauth", "logo_class":"fa fa-lock"
+	},
+	"5Paisa.com": {
+		"label":"5Paisa.com", "type":"openidconnect", "image":"fivepaisa.jpg", "scope": "openid", "domain":"", "discovery":"", "authorize": "https://dev-openapi.5paisa.com/WebVendorLogin/VLogin/Index?VendorKey=uOmI3anLbyZnP2u6OiUdwmj6nHISn8tF&ResponseURL=", "token": "https://openapi.5paisa.com/VendorsAPI/Service1.svc/GetAccessToken", "userinfo": "", "guide":"", "logo_class":"fa fa-lock"
+	},
 	"connect2id": {
 		"label":"Connect2id", "type":"oauth", "image":"connect2id.png", "scope": "openid", "authorize": "https://c2id.com/login", "token": "https://<your-base-server-url>/token", "userinfo": "https://<your-base-server-url>/userinfo", "guide":"https://plugins.miniorange.com/guide-to-configure-connect2id-as-an-oauth-server"
 	},

@@ -212,6 +212,36 @@ class Recipe_Post_Rest_Api {
 				'permission_callback' => array( $this, 'save_settings_permissions' ),
 			)
 		);
+
+		register_rest_route(
+			AUTOMATOR_REST_API_END_POINT,
+			'/duplicate_action/',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'duplicate_action' ),
+				'permission_callback' => array( $this, 'save_settings_permissions' ),
+			)
+		);
+
+		register_rest_route(
+			AUTOMATOR_REST_API_END_POINT,
+			'/resend_api_request/',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'resend_api_request' ),
+				'permission_callback' => array( $this, 'save_settings_permissions' ),
+			)
+		);
+
+		register_rest_route(
+			AUTOMATOR_REST_API_END_POINT,
+			'/triggers_change_logic/',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'triggers_change_logic' ),
+				'permission_callback' => array( $this, 'save_settings_permissions' ),
+			)
+		);
 	}
 
 	/**
@@ -427,6 +457,20 @@ class Recipe_Post_Rest_Api {
 			$action_integration = Automator()->get->action_integration_from_action_code( $item_code );
 			update_post_meta( $post_id, 'integration', $action_integration );
 			update_post_meta( $post_id, 'uap_action_version', Utilities::automator_get_version() );
+
+			/**
+			 * @since 4.5
+			 */
+			$actions_order = $request->has_param( 'actions_order' ) ? $request->get_param( 'actions_order' ) : array();
+			if ( ! empty( $actions_order ) ) {
+				foreach ( $actions_order as $index => $__action_id ) {
+					if ( 'new_action' === $__action_id ) {
+						$__action_id             = $post_id;
+						$actions_order[ $index ] = $post_id;
+					}
+					Automator()->db->action->update_menu_order( $__action_id, ( $index + 1 ) * 10 );
+				}
+			}
 			/**
 			 * @param int $post_id Action ID
 			 * @param string $item_code Action item code
@@ -490,6 +534,12 @@ class Recipe_Post_Rest_Api {
 			$delete_posts = wp_delete_post( absint( $request->get_param( 'ID' ) ), true );
 
 			if ( $delete_posts ) {
+				$actions_order = $request->has_param( 'actions_order' ) ? $request->get_param( 'actions_order' ) : array();
+				if ( ! empty( $actions_order ) ) {
+					foreach ( $actions_order as $index => $__action_id ) {
+						Automator()->db->action->update_menu_order( $__action_id, ( $index + 1 ) * 10 );
+					}
+				}
 				Automator()->cache->clear_automator_recipe_part_cache( $request->get_param( 'ID' ) );
 
 				$return['message']        = 'Deleted!';
@@ -519,13 +569,12 @@ class Recipe_Post_Rest_Api {
 	 * @return WP_REST_Response
 	 */
 	public function update( WP_REST_Request $request ) {
-
 		if ( $request->has_param( 'itemId' ) && is_numeric( $request->get_param( 'itemId' ) ) && $request->has_param( 'optionCode' ) && $request->has_param( 'optionValue' ) ) {
-
 			$item_id    = absint( $request->get_param( 'itemId' ) );
 			$recipe_id  = Automator()->get->maybe_get_recipe_id( $item_id );
 			$meta_key   = (string) Automator()->utilities->automator_sanitize( $request->get_param( 'optionCode' ) );
-			$meta_value = Automator()->utilities->automator_sanitize( $request->get_param( 'optionValue' ), 'mixed' );
+			$meta_value = $request->get_param( 'optionValue' );
+			$meta_value = Automator()->utilities->automator_sanitize( $meta_value, 'mixed', $meta_key, $request->get_param( 'options' ) );
 
 			/*
 			 * Save human readable sentence that will be stored as trigger and action meta.
@@ -534,6 +583,14 @@ class Recipe_Post_Rest_Api {
 			 */
 			if ( $request->has_param( 'sentence_human_readable' ) ) {
 				$human_readable = sanitize_text_field( $request->get_param( 'sentence_human_readable' ) );
+				// Fix for 4.2.1.2 where token is erroneously parsed because of four brackets.
+				$human_readable = strtr(
+					$human_readable,
+					array(
+						'{{{{' => '{{',
+						'}}}}' => '}}',
+					)
+				);
 				update_post_meta( $item_id, 'sentence_human_readable', $human_readable );
 			}
 
@@ -548,10 +605,28 @@ class Recipe_Post_Rest_Api {
 			if ( $item ) {
 				if ( is_array( $meta_value ) ) {
 					foreach ( $meta_value as $meta_key => $meta_val ) {
+						$meta_val = Automator()->utilities->maybe_slash_json_value( $meta_val, true );
 						update_post_meta( $item_id, $meta_key, $meta_val );
+
+						/**
+						 * Added in case the action uses another action's token,
+						 * and it happens to use Background processing
+						 *
+						 * @since 4.6
+						 */
+						$this->has_action_token( $item, $meta_val );
 					}
 				} else {
+					$meta_value = Automator()->utilities->maybe_slash_json_value( $meta_value, true );
 					update_post_meta( $item_id, $meta_key, $meta_value );
+
+					/**
+					 * Added in case the action uses another action's token,
+					 * and it happens to use Background processing
+					 *
+					 * @since 4.6
+					 */
+					$this->has_action_token( $item, $meta_value );
 				}
 				Automator()->cache->clear_automator_recipe_part_cache( $recipe_id );
 
@@ -564,14 +639,13 @@ class Recipe_Post_Rest_Api {
 				$return = apply_filters( 'automator_option_updated', $return, $item, $meta_key, $meta_value );
 
 				return new WP_REST_Response( $return, 200 );
-			} else {
-				$return['message'] = 'You are trying to update trigger meta for a trigger that does not exist. Please reload the page and trying again.';
-				$return['success'] = false;
-				$return['data']    = $request;
-				$return['post']    = '';
-
-				return new WP_REST_Response( $return, 200 );
 			}
+			$return['message'] = 'You are trying to update trigger meta for a trigger that does not exist. Please reload the page and trying again.';
+			$return['success'] = false;
+			$return['data']    = $request;
+			$return['post']    = '';
+
+			return new WP_REST_Response( $return, 200 );
 		}
 
 		$return['message'] = 'The data that was sent was malformed. Please reload the page and trying again.';
@@ -696,6 +770,9 @@ class Recipe_Post_Rest_Api {
 				);
 
 				$updated = wp_update_post( $post );
+
+				// Fallback code to add add_action meta in < 3.0 triggers.
+				$this->process_post_migratable( $post_id );
 
 				if ( $updated ) {
 					$return['message'] = 'Updated!';
@@ -1050,7 +1127,7 @@ class Recipe_Post_Rest_Api {
 		// Make sure we have all the data
 		if ( $request->get_param( 'recipeId' ) && $request->has_param( 'actionId' ) ) {
 
-			Utilities::log( 'Removing schedule $request: ' . var_export( $request, true ) );
+			Utilities::log( 'Removing schedule $request: ' . var_export( $request, true ) ); //phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
 			$post_id   = (int) $request->get_param( 'actionId' );
 			$recipe_id = (int) $request->get_param( 'recipeId' );
@@ -1122,19 +1199,21 @@ class Recipe_Post_Rest_Api {
 	public function update_actions_order( WP_REST_Request $request ) {
 
 		// Make sure we have a recipe ID and the newOrder
-		if ( $request->has_param( 'recipeID' ) && $request->has_param( 'newOrder' ) ) {
+		if ( $request->has_param( 'recipe_id' ) && $request->has_param( 'actions_order' ) ) {
 
-			$recipe_id = absint( $request->get_param( 'recipeID' ) );
-			$new_order = $request->get_param( 'newOrder' );
-
-			// Update the actions menu_order here
-			foreach ( $new_order as $index => $action_id ) {
-				Automator()->db->action->update_menu_order( $action_id, ( $index + 1 ) * 10 );
-			}
-
-			$return['message'] = 'Updated!';
-			$return['success'] = true;
+			$recipe_id         = absint( $request->get_param( 'recipe_id' ) );
+			$actions_order     = $request->has_param( 'actions_order' ) ? $request->get_param( 'actions_order' ) : array();
+			$return['message'] = 'The action order array is empty.';
+			$return['success'] = false;
 			$return['action']  = 'update_actions_order';
+			if ( ! empty( $actions_order ) ) {
+				// Update the actions menu_order here
+				foreach ( $actions_order as $index => $action_id ) {
+					Automator()->db->action->update_menu_order( $action_id, ( $index + 1 ) * 10 );
+				}
+				$return['message'] = 'Updated!';
+				$return['success'] = true;
+			}
 
 			Automator()->cache->clear_automator_recipe_part_cache( $recipe_id );
 
@@ -1181,6 +1260,239 @@ class Recipe_Post_Rest_Api {
 		$return['message'] = 'Failed to update';
 		$return['success'] = false;
 		$return['action']  = 'show_error';
+
+		return new WP_REST_Response( $return, 200 );
+	}
+
+	/**
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function duplicate_action( WP_REST_Request $request ) {
+
+		// Make sure we have a recipe ID and the newOrder
+		if ( ! $request->has_param( 'recipe_id' ) || ! $request->has_param( 'action_id' ) ) {
+			$return['message'] = 'Recipe or Action ID is empty';
+			$return['success'] = false;
+			$return['action']  = 'show_error';
+
+			return new WP_REST_Response( $return, 400 );
+		}
+
+		$recipe_id   = absint( $request->get_param( 'recipe_id' ) );
+		$action_id   = $request->get_param( 'action_id' );
+		$action_post = get_post( $action_id );
+		if ( ! $action_post instanceof \WP_Post ) {
+			$return['message'] = 'Action does not exist';
+			$return['success'] = false;
+			$return['action']  = 'show_error';
+
+			return new WP_REST_Response( $return, 400 );
+		}
+
+		if ( 'uo-action' !== $action_post->post_type ) {
+			$return['message'] = 'Action is not of the correct post type';
+			$return['success'] = false;
+			$return['action']  = 'show_error';
+
+			return new WP_REST_Response( $return, 400 );
+		}
+
+		if ( ! automator_duplicate_recipe_part( $action_id, $recipe_id, 'draft' ) ) {
+			$return['message'] = 'Something went wrong';
+			$return['success'] = false;
+			$return['action']  = 'show_error';
+
+			return new WP_REST_Response( $return, 400 );
+		}
+		Automator()->cache->clear_automator_recipe_part_cache( $recipe_id );
+
+		$return                   = array();
+		$return['success']        = true;
+		$return['post_ID']        = $recipe_id;
+		$return['action']         = 'add-new-action';
+		$return['recipes_object'] = Automator()->get_recipes_data( true, $recipe_id );
+
+		return new WP_REST_Response( $return, 200 );
+	}
+
+	/**
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function resend_api_request( WP_REST_Request $request ) {
+
+		// Make sure we have a recipe ID and the newOrder
+		if ( ! $request->has_param( 'item_log_id' ) ) {
+			$return['success'] = false;
+			$return['message'] = __( 'Action Log ID is empty', 'uncanny-automator' );
+
+			return new WP_REST_Response( $return, 400 );
+		}
+
+		$item_log_id = absint( $request->get_param( 'item_log_id' ) );
+
+		$api_request = Automator()->db->api->get_by_log_id( 'action', $item_log_id );
+
+		if ( empty( $api_request->params ) ) {
+			$return['success'] = false;
+			$return['message'] = __( 'Missing action params', 'uncanny-automator' );
+		}
+
+		$params = maybe_unserialize( $api_request->params );
+
+		$params['resend'] = true;
+
+		try {
+			$response = Api_Server::api_call( $params );
+		} catch ( \Exception $e ) {
+			$return['success'] = false;
+			$return['message'] = $e->getMessage();
+			automator_log( $e->getMessage() );
+
+			return new WP_REST_Response( $return, $e->getCode() );
+		}
+
+		$return['message'] = __( 'The request has been successfully resent', 'uncanny-automator' );
+		$return['success'] = true;
+
+		return new WP_REST_Response( $return, 200 );
+	}
+
+	/**
+	 * @param $item
+	 * @param $meta_value
+	 *
+	 * @return void
+	 */
+	public function has_action_token( $item, $meta_value ) {
+		if ( 'uo-action' !== $item->post_type ) {
+			return;
+		}
+
+		// Match action tokens
+		preg_match_all( '/{{ACTION\_(FIELD|META)\:(.*?)}}/', $meta_value, $matches );
+		// Nothing matched
+		if ( empty( $matches ) || ! array_key_exists( 0, $matches ) || empty( $matches[0] ) ) {
+			return;
+		}
+		$already_updated = array();
+		foreach ( $matches[0] as $action_token ) {
+			/**
+			 * SAMPLE: {{ACTION_META:74046:FACEBOOK_GROUPS_PUBLISH_POST:POST_LINK}}
+			 * 0 = ACTION_META
+			 * 1 = 74046
+			 * 2 = FACEBOOK_GROUPS_PUBLISH_POST
+			 * 3 = POST_LINK
+			 */
+			$raw = explode( ':', str_replace( array( '{', '}' ), '', $action_token ) );
+			// Get action ID
+			$action_id = isset( $raw[1] ) ? absint( $raw[1] ) : null;
+			// Get action code
+			$action_code = isset( $raw[2] ) ? sanitize_text_field( $raw[2] ) : null;
+			// Check if the action has background processing set to true
+			$has_background_processing = Automator()->get->action_has_background_processing( $action_code );
+			if ( ! $has_background_processing ) {
+				continue;
+			}
+			if ( null !== $action_id && ! in_array( $action_id, $already_updated, true ) ) {
+				// Update that action's postmeta to skip background processing
+				update_post_meta( $action_id, Background_Actions::IS_USED_FOR_ACTION_TOKEN, $item->ID );
+				$already_updated[] = $action_id;
+			}
+		}
+	}
+
+	/**
+	 * Processes migratable posts (e.g. Triggers that do not have `add_action` (pre 3.0)).
+	 *
+	 * @param integer $post_id The post ID.
+	 *
+	 * @return boolean True, always.
+	 */
+	private function process_post_migratable( $post_id ) {
+
+		// Check the current post type.
+		$object = get_post( $post_id );
+
+		if ( 'uo-action' === $object->post_type || 'uo-trigger' === $object->post_type ) {
+
+			$post_id = wp_get_post_parent_id( $post_id );
+
+		}
+
+		// Otherwise, assume $post_id is a recipe.
+		$triggers = $this->fetch_all_triggers_with_missing_hook_from_recipe( $post_id );
+
+		if ( ! empty( $triggers ) ) {
+			// If there are any missing `add_action` in the current recipe triggers, do migrate.
+			( new \Uncanny_Automator\Migrations\Migrate_Triggers() )->migrate();
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Fetches all triggers with a missing hook from a given recipe.
+	 *
+	 * @param int $recipe_id The recipe ID.
+	 *
+	 * @return array The triggers that are missing `add_action` post_meta.
+	 */
+	private function fetch_all_triggers_with_missing_hook_from_recipe( $recipe_id ) {
+
+		global $wpdb;
+
+		// Retrieve all triggers first from current recipe.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT posts.ID , pm.meta_value as trigger_code
+				FROM $wpdb->posts as posts
+				JOIN $wpdb->postmeta pm
+				ON posts.ID = pm.post_id and pm.meta_key = 'code'
+				WHERE posts.post_type = %s
+				AND posts.post_parent = %d
+				AND posts.post_type = 'uo-trigger'
+				AND NOT EXISTS (
+						SELECT * FROM $wpdb->postmeta
+						WHERE $wpdb->postmeta.meta_key = 'add_action'
+						AND $wpdb->postmeta.post_id=posts.ID
+					)
+				",
+				'uo-trigger',
+				$recipe_id
+			),
+			ARRAY_A
+		);
+
+	}
+
+	/**
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function triggers_change_logic( WP_REST_Request $request ) {
+
+		// Make sure we have a recipe ID and the newOrder
+		if ( ! $request->has_param( 'recipe_id' ) || ! $request->has_param( 'trigger_logic' ) ) {
+			$return['message'] = 'Recipe or Trigger logic is not available';
+			$return['success'] = false;
+			$return['action']  = 'show_error';
+
+			return new WP_REST_Response( $return, 400 );
+		}
+
+		$recipe_id     = absint( $request->get_param( 'recipe_id' ) );
+		$trigger_logic = sanitize_text_field( $request->get_param( 'trigger_logic' ) );
+		update_post_meta( $recipe_id, 'automator_trigger_logic', $trigger_logic );
+		Automator()->cache->clear_automator_recipe_part_cache( $recipe_id );
+
+		$return            = array();
+		$return['success'] = true;
 
 		return new WP_REST_Response( $return, 200 );
 	}

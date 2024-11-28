@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-import { Icon, card } from '@woocommerce/icons';
-import { registerFeaturePluginBlockType } from '@woocommerce/block-settings';
+import { Icon, payment } from '@wordpress/icons';
+import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Edit, Save } from './edit';
-import metadata from './block.json';
 
-registerFeaturePluginBlockType( metadata, {
+registerBlockType( 'woocommerce/checkout-express-payment-block', {
 	icon: {
 		src: (
 			<Icon
-				srcElement={ card }
+				icon={ payment }
 				className="wc-block-editor-components-block-icon"
 			/>
 		),

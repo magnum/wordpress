@@ -13,46 +13,34 @@ namespace Uncanny_Automator;
 /**
  * Hubspot Settings
  */
-class Hubspot_Settings {
+class Hubspot_Settings extends Settings\Premium_Integration_Settings {
+
+	protected $client;
+	protected $is_connected;
 
 	/**
-	 * This trait defines properties and methods shared across all the
-	 * settings pages of Premium Integrations
-	 */
-	use Settings\Premium_Integrations;
-
-    protected $helpers;
-
-	/**
-	 * Creates the settings page
-	 */
-	public function __construct( $helpers ) {
-
-        $this->helpers = $helpers;
-
-		// Register the tab
-		$this->setup_settings();
-
-		// The methods above load even if the tab is not selected
-		if ( ! $this->is_current_page_settings() ) {
-			return;
-		}
-
-	}
-
-    /**
 	 * Sets up the properties of the settings page
 	 */
-	protected function set_properties() {
+	public function set_properties() {
 
 		$this->set_id( 'hubspot-api' );
 
-		$this->set_icon( 'hubspot' );
+		$this->set_icon( 'HUBSPOT' );
 
 		$this->set_name( 'Hubspot' );
 
-		$this->set_status( false === $this->helpers->get_client() ? '' : 'success' );
+	}
 
+	public function get_status() {
+
+		try {
+			$this->helpers->get_client();
+			$is_connected = true;
+		} catch ( \Exception $e ) {
+			$is_connected = false;
+		}
+
+		return false === $is_connected ? '' : 'success';
 	}
 
 	/**
@@ -62,16 +50,19 @@ class Hubspot_Settings {
 	 */
 	public function output() {
 
-        $client = $this->helpers->get_client();
+		try {
+			$this->client       = $this->helpers->get_client();
+			$this->is_connected = true;
+		} catch ( \Exception $e ) {
+			$this->client       = false;
+			$this->is_connected = false;
+		}
 
-		// Check if Hubspot is connected
-		$is_connected = false !== $client;
+		$connect_url = $this->helpers->connect_url();
 
-        $connect_url = $this->helpers->connect_url();
+		$disconnect_url = $this->helpers->disconnect_url();
 
-        $disconnect_url = $this->helpers->disconnect_url();
-
-        $token_info = $this->helpers->api_token_info();
+		$token_info = $this->helpers->api_token_info();
 
 		// Check if the user JUST connected the workspace and returned
 		// from the HubSpot connection page

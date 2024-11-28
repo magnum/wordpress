@@ -25,11 +25,18 @@ class WP_SUBMITCOMMENT {
 	public function __construct() {
 		$this->trigger_code = 'WPSUBMITCOMMENT';
 		$this->trigger_meta = 'WPPOSTCOMMENTS';
-		if ( is_admin() ) {
-			add_action( 'wp_loaded', array( $this, 'plugins_loaded' ), 99 );
-		} else {
-			$this->define_trigger();
+		if ( Automator()->helpers->recipe->is_edit_page() ) {
+			add_action(
+				'wp_loaded',
+				function () {
+					$this->define_trigger();
+				},
+				99
+			);
+
+			return;
 		}
+		$this->define_trigger();
 	}
 
 	/**
@@ -37,36 +44,7 @@ class WP_SUBMITCOMMENT {
 	 */
 	public function define_trigger() {
 
-		$all_post_types = Automator()->helpers->recipe->wp->options->all_post_types(
-			null,
-			'WPPOSTTYPES',
-			array(
-				'token'        => false,
-				'is_ajax'      => true,
-				'target_field' => $this->trigger_meta,
-				'endpoint'     => 'select_all_post_from_SELECTEDPOSTTYPE',
-			)
-		);
-
-		// now get regular post types.
-		$args = array(
-			'public'   => true,
-			'_builtin' => true,
-		);
-
-		$output         = 'object';
-		$operator       = 'and';
-		$options        = array();
-		$options['- 1'] = __( 'Any post type', 'uncanny-automator' );
-		$post_types     = get_post_types( $args, $output, $operator );
-		if ( ! empty( $post_types ) ) {
-			foreach ( $post_types as $post_type ) {
-				$options[ $post_type->name ] = esc_html( $post_type->labels->singular_name );
-			}
-		}
-		$options                   = array_merge( $options, $all_post_types['options'] );
-		$all_post_types['options'] = $options;
-		$trigger                   = array(
+		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/wordpress-core/' ),
 			'integration'         => self::$integration,
@@ -79,44 +57,84 @@ class WP_SUBMITCOMMENT {
 			'priority'            => 90,
 			'accepted_args'       => 3,
 			'validation_function' => array( $this, 'submitted_comment' ),
-			'options'             => array(
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
-			'options_group'       => array(
-				$this->trigger_meta => array(
-					$all_post_types,
-					Automator()->helpers->recipe->field->select_field(
-						$this->trigger_meta,
-						__( 'Post', 'uncanny-automator' ),
-						array(),
-						null,
-						false,
-						false,
-						array(
-							$this->trigger_meta                => esc_attr__( 'Post title', 'uncanny-automator' ),
-							$this->trigger_meta . '_EXCERPT'   => esc_attr__( 'Post excerpt', 'uncanny-automator' ),
-							$this->trigger_meta . '_ID'        => esc_attr__( 'Post ID', 'uncanny-automator' ),
-							$this->trigger_meta . '_URL'       => esc_attr__( 'Post URL', 'uncanny-automator' ),
-							$this->trigger_meta . '_THUMB_ID'  => esc_attr__( 'Post featured image ID', 'uncanny-automator' ),
-							$this->trigger_meta . '_THUMB_URL' => esc_attr__( 'Post featured image URL', 'uncanny-automator' ),
-							'POSTCOMMENTCONTENT'               => esc_attr__( 'Comment', 'uncanny-automator' ),
-							'POSTCOMMENTDATE'                  => esc_attr__( 'Comment date', 'uncanny-automator' ),
-							'POSTCOMMENTEREMAIL'               => esc_attr__( 'Commenter email', 'uncanny-automator' ),
-							'POSTCOMMENTERNAME'                => esc_attr__( 'Commenter name', 'uncanny-automator' ),
-							'POSTCOMMENTSTATUS'                => esc_attr__( 'Commenter status', 'uncanny-automator' ),
-						)
-					),
-				),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
-
-		return;
 	}
 
 	/**
+	 * Method load_options.
 	 *
+	 * @return void
+	 */
+	public function load_options() {
+
+		Automator()->helpers->recipe->wp->options->load_options = true;
+
+		$all_post_types = Automator()->helpers->recipe->wp->options->all_post_types(
+			null,
+			'WPPOSTTYPES',
+			array(
+				'token'        => false,
+				'is_ajax'      => true,
+				'target_field' => $this->trigger_meta,
+				'endpoint'     => 'select_all_post_from_SELECTEDPOSTTYPE',
+				'comments'     => true,
+			)
+		);
+
+		$options = Automator()->utilities->keep_order_of_options(
+			array(
+				'options'       => array(
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+				'options_group' => array(
+					$this->trigger_meta => array(
+						$all_post_types,
+						Automator()->helpers->recipe->field->select_field(
+							$this->trigger_meta,
+							__( 'Post', 'uncanny-automator' ),
+							array(),
+							null,
+							false,
+							false,
+							array(
+								$this->trigger_meta    => esc_attr__( 'Post title', 'uncanny-automator' ),
+								$this->trigger_meta . '_ID' => esc_attr__( 'Post ID', 'uncanny-automator' ),
+								$this->trigger_meta . '_URL' => esc_attr__( 'Post URL', 'uncanny-automator' ),
+								'POSTCONTENT'          => esc_attr__( 'Post content', 'uncanny-automator' ),
+								$this->trigger_meta . '_EXCERPT' => esc_attr__( 'Post excerpt', 'uncanny-automator' ),
+								'WPPOSTTYPES'          => esc_attr__( 'Post type', 'uncanny-automator' ),
+								$this->trigger_meta . '_THUMB_ID' => esc_attr__( 'Post featured image ID', 'uncanny-automator' ),
+								$this->trigger_meta . '_THUMB_URL' => esc_attr__( 'Post featured image URL', 'uncanny-automator' ),
+								'POSTAUTHORFN'         => esc_attr__( 'Post author first name', 'uncanny-automator-pro' ),
+								'POSTAUTHORLN'         => esc_attr__( 'Post author last name', 'uncanny-automator-pro' ),
+								'POSTAUTHORDN'         => esc_attr__( 'Post author display name', 'uncanny-automator-pro' ),
+								'POSTAUTHOREMAIL'      => esc_attr__( 'Post author email', 'uncanny-automator-pro' ),
+								'POSTAUTHORURL'        => esc_attr__( 'Post author URL', 'uncanny-automator-pro' ),
+								'POSTCOMMENTCONTENT'   => esc_attr__( 'Comment content', 'uncanny-automator' ),
+								'POSTCOMMENTDATE'      => esc_attr__( 'Comment submitted date', 'uncanny-automator' ),
+								'POSTCOMMENTEREMAIL'   => esc_attr__( 'Commenter email', 'uncanny-automator' ),
+								'POSTCOMMENTERNAME'    => esc_attr__( 'Commenter name', 'uncanny-automator' ),
+								'POSTCOMMENTERWEBSITE' => esc_attr__( 'Commenter website', 'uncanny-automator' ),
+								'POSTCOMMENTSTATUS'    => esc_attr__( 'Commenter status', 'uncanny-automator' ),
+								'POSTCOMMENTURL'       => esc_attr__( 'Comment URL', 'uncanny-automator-pro' ),
+
+							)
+						),
+					),
+				),
+			)
+		);
+
+		return $options;
+	}
+
+	/**
+	 * Method plugins_loaded.
+	 *
+	 * @return void
 	 */
 	public function plugins_loaded() {
 		$this->define_trigger();
@@ -143,14 +161,15 @@ class WP_SUBMITCOMMENT {
 		$post_type = get_post_type_object( $post_type );
 
 		if ( ! empty( $conditions ) ) {
-			foreach ( $conditions['recipe_ids'] as $recipe_id ) {
+			foreach ( $conditions['recipe_ids'] as $recipe_id => $trigger_id ) {
 				if ( ! Automator()->is_recipe_completed( $recipe_id, $user_id ) ) {
 					$args = array(
-						'code'            => $this->trigger_code,
-						'meta'            => $this->trigger_meta,
-						'recipe_to_match' => $recipe_id,
-						'post_id'         => $commentdata['comment_post_ID'],
-						'user_id'         => $user_id,
+						'code'             => $this->trigger_code,
+						'meta'             => $this->trigger_meta,
+						'recipe_to_match'  => $recipe_id,
+						'trigger_to_match' => $trigger_id,
+						'post_id'          => $commentdata['comment_post_ID'],
+						'user_id'          => $user_id,
 					);
 
 					$arr = Automator()->maybe_add_trigger_entry( $args, false );
@@ -164,35 +183,8 @@ class WP_SUBMITCOMMENT {
 									'run_number'     => $result['args']['run_number'],
 								);
 
-								// Post
-								$trigger_meta['meta_key']   = 'WPPOSTCOMMENTS';
-								$trigger_meta['meta_value'] = $commentdata['comment_post_ID'];
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								// Post Type Token
-								$trigger_meta['meta_key']   = 'WPPOSTTYPES';
-								$trigger_meta['meta_value'] = maybe_serialize( $post_type->labels->singular_name );
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								$trigger_meta['meta_key']   = 'POSTCOMMENTCONTENT';
-								$trigger_meta['meta_value'] = maybe_serialize( $commentdata['comment_content'] );
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								$trigger_meta['meta_key']   = 'POSTCOMMENTDATE';
-								$trigger_meta['meta_value'] = maybe_serialize( $commentdata['comment_date'] );
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								$trigger_meta['meta_key']   = 'POSTCOMMENTERNAME';
-								$trigger_meta['meta_value'] = maybe_serialize( $commentdata['comment_author'] );
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								$trigger_meta['meta_key']   = 'POSTCOMMENTEREMAIL';
-								$trigger_meta['meta_value'] = maybe_serialize( $commentdata['comment_author_email'] );
-								Automator()->insert_trigger_meta( $trigger_meta );
-
-								$trigger_meta['meta_key']   = 'POSTCOMMENTSTATUS';
-								$trigger_meta['meta_value'] = maybe_serialize( wp_get_comment_status( (int) $comment_id ) );
-								Automator()->insert_trigger_meta( $trigger_meta );
+								// Comment ID
+								Automator()->db->token->save( 'comment_id', $comment_id, $trigger_meta );
 
 								Automator()->maybe_trigger_complete( $result['args'] );
 							}
@@ -227,14 +219,14 @@ class WP_SUBMITCOMMENT {
 			foreach ( $recipe['triggers'] as $trigger ) {
 				if ( ! key_exists( 'WPPOSTTYPES', $trigger['meta'] ) ) {
 					if ( key_exists( $trigger_meta, $trigger['meta'] ) && ( (string) $trigger['meta'][ $trigger_meta ] === (string) $match_post_id || '-1' === (string) $trigger['meta'][ $trigger_meta ] ) ) {
-						$recipe_ids[ $recipe['ID'] ] = $recipe['ID'];
+						$recipe_ids[ $recipe['ID'] ] = $trigger['ID'];
 					}
 				} else {
 					if ( key_exists( $trigger_meta, $trigger['meta'] )
-					     && ( (string) $trigger['meta'][ $trigger_meta ] === (string) $match_post_id || '-1' === (string) $trigger['meta'][ $trigger_meta ] )
-					     && ( (string) $trigger['meta']['WPPOSTTYPES'] === (string) $match_post_type || '-1' === (string) $trigger['meta']['WPPOSTTYPES'] )
+						 && ( (string) $trigger['meta'][ $trigger_meta ] === (string) $match_post_id || '-1' === (string) $trigger['meta'][ $trigger_meta ] )
+						 && ( (string) $trigger['meta']['WPPOSTTYPES'] === (string) $match_post_type || '-1' === (string) $trigger['meta']['WPPOSTTYPES'] )
 					) {
-						$recipe_ids[ $recipe['ID'] ] = $recipe['ID'];
+						$recipe_ids[ $recipe['ID'] ] = $trigger['ID'];
 					}
 				}
 			}

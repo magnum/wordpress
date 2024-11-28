@@ -29,7 +29,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AutomotiveModelFields;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AutomotiveModelBodyStyleValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AutomotiveModelImageFetchStatusValues;
 /**
  * This class is auto-generated.
@@ -42,13 +41,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AutomotiveModelImageFetchStatusValu
 class AutomotiveModel extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
 {
     /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'automotive_models';
-    }
-    /**
      * @return AutomotiveModelFields
      */
     public static function getFieldsEnum()
@@ -59,7 +51,6 @@ class AutomotiveModel extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObj
     {
         $ref_enums = array();
         $ref_enums['ImageFetchStatus'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AutomotiveModelImageFetchStatusValues::getInstance()->getValues();
-        $ref_enums['BodyStyle'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AutomotiveModelBodyStyleValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function getAugmentedRealitiesMetadata(array $fields = array(), array $params = array(), $pending = \false)

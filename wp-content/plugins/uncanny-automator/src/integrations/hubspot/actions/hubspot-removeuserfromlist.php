@@ -43,17 +43,18 @@ class HUBSPOT_REMOVEUSERFROMLIST {
 	public function define_action() {
 
 		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/hubspot/' ),
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
-			'sentence'           => sprintf( __( "Remove the user's HubSpot contact from {{a static list:%1\$s}}", 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( "Remove the user's HubSpot contact from {{a static list}}", 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'requires_user'      => true,
-			'execution_function' => array( $this, 'remove_contact_from_list' ),
-			'options_callback'   => array( $this, 'load_options' ),
+			'author'                => Automator()->get_author_name( $this->action_code ),
+			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'integration/hubspot/' ),
+			'integration'           => self::$integration,
+			'code'                  => $this->action_code,
+			'sentence'              => sprintf( __( "Remove the user's HubSpot contact from {{a static list:%1\$s}}", 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( "Remove the user's HubSpot contact from {{a static list}}", 'uncanny-automator' ),
+			'priority'              => 10,
+			'accepted_args'         => 1,
+			'requires_user'         => true,
+			'execution_function'    => array( $this, 'remove_contact_from_list' ),
+			'options_callback'      => array( $this, 'load_options' ),
+			'background_processing' => true,
 		);
 
 		Automator()->register->action( $action );
@@ -91,52 +92,22 @@ class HUBSPOT_REMOVEUSERFROMLIST {
 	 */
 	public function remove_contact_from_list( $user_id, $action_data, $recipe_id, $args ) {
 
+		$helpers = Automator()->helpers->recipe->hubspot->options;
+
 		$user_data = get_userdata( $user_id );
 
 		$email = $user_data->user_email;
 
 		$list = trim( Automator()->parse->text( $action_data['meta']['HUBSPOTLIST'], $recipe_id, $user_id, $args ) );
 
-		if ( empty( $email ) ) {
-			$error_message                       = __( 'Email is missing', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
+		try {
+
+			$response = $helpers->remove_contact_from_list( $list, $email, $action_data );
+
+			Automator()->complete_action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
+			$helpers->log_action_error( $e->getMessage(), $user_id, $action_data, $recipe_id );
 		}
-
-		if ( empty( $list ) ) {
-			$error_message                       = __( 'List is missing', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		$response = Automator()->helpers->recipe->hubspot->options->remove_contact_from_list( $list, $email );
-
-		if ( is_wp_error( $response ) ) {
-			$error_message                       = $response->get_error_message();
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		$json_data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( 200 !== intval( $json_data['statusCode'] ) ) {
-
-			Automator()->helpers->recipe->hubspot->options->log_action_error( $json_data, $user_id, $action_data, $recipe_id );
-			return;
-		}
-
-		// If the email was not found in contacts
-		if ( ! empty( $json_data['data'] ) && ! empty( $json_data['data']['invalidEmails'] ) ) {
-			$error_message                       = __( 'Contact with such email address was not found in the list', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		Automator()->complete_action( $user_id, $action_data, $recipe_id );
-
 	}
 }

@@ -38,6 +38,12 @@ namespace Uncanny_Automator;
 		// Create tabs
 		foreach ( $integrations_tabs as $tab_key => $integration_tab ) {
 
+			$integration_tab = (object) $integration_tab;
+
+			if ( empty( $integration_tab->preload ) ) {
+				$integration_tab->preload = false;
+			}
+
 			?>
 
 			<uo-tab
@@ -95,7 +101,7 @@ namespace Uncanny_Automator;
 					?>
 
 					<uo-icon
-						id="<?php echo esc_attr( $integration_tab->icon ); ?>"
+						integration="<?php echo esc_attr( $integration_tab->icon ); ?>"
 					></uo-icon>
 
 					<?php
@@ -109,11 +115,13 @@ namespace Uncanny_Automator;
 			<?php
 
 		}
-
 	}
 
 	// Add tab panels
 	foreach ( $integrations_tabs as $tab_key => $integration_tab ) {
+
+		$integration_tab = (object) $integration_tab;
+
 		// Check if we have to load the content
 		// The content will load if one of these conditions are meet
 		// 1. If the tab is selected
@@ -157,7 +165,6 @@ namespace Uncanny_Automator;
 			include Utilities::automator_get_view( 'admin-settings/tab/premium-integrations/none-selected.php' );
 
 		}
-
 	}
 
 	?>

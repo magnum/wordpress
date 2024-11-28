@@ -4,8 +4,59 @@
  */
 function automator_pro_items_list() {
 	return array(
-		'ACF'            => array(
+		'ADVADS'            => array(
 			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Advanced Ads */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{An ad's}} status changes from {{a specific status}} to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(),
+		),
+		'ACFWC'             => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Advanced Coupons */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's current store credit exceeds {{a specific amount}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Advanced Coupons */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's lifetime store credit exceeds {{a specific amount}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Advanced Coupons */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a specific amount of}} store credit to the user's account", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Advanced Coupons */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a specific amount of}} store credit from the user's account", 'uncanny-automator' ),
+				),
+			),
+		),
+		'ACF'               => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Advanced Custom Fields */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user updates {{a field}} on {{a post}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Advanced Custom Fields */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's {{field}} is updated", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 				array(
 					/* translators: Anonymous trigger - Advanced Custom Fields */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -15,7 +66,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'AFFWP'          => array(
+		'AFFWP'             => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - AffiliateWP */
@@ -59,9 +110,67 @@ function automator_pro_items_list() {
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Create a referral for the user", 'uncanny-automator' ),
 				),
+				array(
+					/* translators: Action - AffiliateWP */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create {{an affiliate}}", 'uncanny-automator' ),
+				),
 			),
 		),
-		'UOA'            => array(
+		'AMELIABOOKING'     => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user books an appointment for {{a specific service}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's booking of an appointment for {{a service}} has been changed to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's booking of an appointment for {{a specific service}} is canceled", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's booking of an appointment for {{a specific service}} is rescheduled", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A booking of an appointment for {{a service}} has been changed to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A booking of an appointment for {{a specific service}} is canceled", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A booking of an appointment for {{a specific service}} is rescheduled", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Amelia */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An appointment is booked for {{a specific service}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'UOA'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Automator Core */
@@ -87,12 +196,6 @@ function automator_pro_items_list() {
 					'name' => __( "{{A magic link}} is clicked", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
-				array(
-					/* translators: Anonymous trigger - Automator Core */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Receive data from {{a webhook}}", 'uncanny-automator' ),
-					'type' => 'anonymous',
-				),
 			),
 			'actions'  => array(
 				array(
@@ -103,11 +206,16 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - Automator Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Run {{a JavaScript code}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Automator Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Run {{a WordPress hook}}", 'uncanny-automator' ),
 				),
 			),
 		),
-		'BO'             => array(
+		'BO'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - BadgeOS */
@@ -139,13 +247,19 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'BB'             => array(
+		'BB'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - bbPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user replies to {{a topic}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - bbPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A guest replies to {{a topic}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
 				),
 			),
 			'actions'  => array(
@@ -166,12 +280,54 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'BDB'            => array(
+		'BDB'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user activates a new account via an email invitation", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user creates a forum", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user creates a group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is banned from a {{specific type of}} group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is removed from a {{specific type of}} group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is suspended", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is unsuspended", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user joins {{a hidden group}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -195,7 +351,25 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user leaves a {{specific type of}} group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user makes a post to the activity stream of {{a group}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user receives a private message from {{a user}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user receives a {{type of}} on-screen notification", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -213,7 +387,31 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user rejects a friendship request", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A {{user}} replies to an activity stream message", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user requests access to {{a private group}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user requests to join a {{specific type of}} private group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user sends a private message to {{a user}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -246,6 +444,12 @@ function automator_pro_items_list() {
 					'name' => __( "A user's email invitation results in a new member registration", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
+				array(
+					/* translators: Logged-in trigger - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's topic in {{a forum}} receives a reply", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 			),
 			'actions'  => array(
 				array(
@@ -262,6 +466,11 @@ function automator_pro_items_list() {
 					/* translators: Action - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Add a post to the user's {{activity}} stream", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create a friendship between {{a user}} and {{another user}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - BuddyBoss */
@@ -306,12 +515,22 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send {{a private message}} to {{a specific user}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Send a private message to all members of {{a group}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Send {{a private message}} to the user", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send an email to all members of {{a group}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - BuddyBoss */
@@ -331,6 +550,11 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - BuddyBoss */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Show {{an on-screen notification}} to the user", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyBoss */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Stop following {{a user}}", 'uncanny-automator' ),
 				),
 				array(
@@ -340,8 +564,20 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'BP'             => array(
+		'BP'                => array(
 			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user creates a group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is removed from {{a specific type of}} group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 				array(
 					/* translators: Logged-in trigger - BuddyPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -363,6 +599,12 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - BuddyPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user leaves {{a specific type of}} group", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user makes a post to the activity stream of {{a group}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
@@ -375,7 +617,25 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - BuddyPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user rejects a friendship request", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A user}} replies to an activity stream message", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user requests access to {{a private group}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user requests to join a {{specific type of}} group", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -394,6 +654,12 @@ function automator_pro_items_list() {
 					/* translators: Logged-in trigger - BuddyPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's connection request is accepted", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's topic in {{a forum}} receives a reply", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -442,7 +708,17 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - BuddyPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send {{a private message}} to {{a specific user}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Send {{a private message}} to the user", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send all members of {{a group}} a notification", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - BuddyPress */
@@ -459,9 +735,14 @@ function automator_pro_items_list() {
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Set the user's {{Xprofile data}}", 'uncanny-automator' ),
 				),
+				array(
+					/* translators: Action - BuddyPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send a private message to a specific user", 'uncanny-automator' ),
+				),
 			),
 		),
-		'CF'             => array(
+		'CF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Caldera Forms */
@@ -484,7 +765,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'CF7'            => array(
+		'CF7'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Contact Form 7 */
@@ -507,7 +788,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'DIVI'           => array(
+		'DIVI'              => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Divi */
@@ -524,7 +805,29 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'EDD'            => array(
+		'ESAF'              => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - Easy Affiliate */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A payout is made to {{an affiliate}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Easy Affiliate */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add a {{new affiliate}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Easy Affiliate */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Record a sale for {{an affiliate}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'EDD'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Easy Digital Downloads */
@@ -535,7 +838,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'ELEM'           => array(
+		'ELEM'              => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Elementor Pro */
@@ -558,7 +861,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'EVENTSMANAGER'  => array(
+		'EVENTSMANAGER'     => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Events Manager */
@@ -572,6 +875,12 @@ function automator_pro_items_list() {
 					'name' => __( "A user unregisters from {{an event}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
+				array(
+					/* translators: Anonymous trigger - Events Manager */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A booking for {{an event}} is approved", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
 				array(
@@ -581,7 +890,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WPFF'           => array(
+		'WPFF'              => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Fluent Forms */
@@ -604,7 +913,66 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'FCRM'           => array(
+		'FLSUPPORT'         => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket for {{a product}} is closed by {{a customer or an agent}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket for {{a product}} is opened by {{a customer or an agent}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket for {{a product}} is replied to by a customer", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket for {{a product}} is replied to by an agent", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket with {{a priority}} is closed by {{a customer or an agent}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket with {{a priority}} is opened by {{a customer or an agent}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket with {{a priority}} is replied to by a customer", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A ticket with {{a priority}} is replied to by an agent", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Fluent Support */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create {{a ticket}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'FCRM'              => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - FluentCRM */
@@ -635,6 +1003,16 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - FluentCRM */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a contact}} to {{a list}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FluentCRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{tags}} from a contact", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FluentCRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Remove {{tags}} from the user", 'uncanny-automator' ),
 				),
 				array(
@@ -644,7 +1022,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'FI'             => array(
+		'FI'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Formidable Forms */
@@ -673,7 +1051,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'FR'             => array(
+		'FR'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Forminator */
@@ -690,7 +1068,67 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'GP'             => array(
+		'AUTONAMI'          => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A tag}} is removed from a user", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is removed from {{a list}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A contact is removed from {{a list}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A tag}} is removed from a contact", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add a contact to {{a list}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add the user to {{a list}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove a contact from {{a list}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a tag}} from a contact", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a tag}} from the user", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - FunnelKit Automations */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove the user from {{a list}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'GP'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - GamiPress */
@@ -708,6 +1146,12 @@ function automator_pro_items_list() {
 					/* translators: Logged-in trigger - GamiPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user earns {{an achievement}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - GamiPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's total points reaches {{a specific threshold}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -740,7 +1184,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'GIVEWP'         => array(
+		'GIVEWP'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - GiveWP */
@@ -772,6 +1216,12 @@ function automator_pro_items_list() {
 					'name' => __( "{{A donation form}} is submitted", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
+				array(
+					/* translators: Anonymous trigger - GiveWP */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A donation is made via {{a form}} for an amount {{greater than, less than, or equal to}} {{an amount}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
 				array(
@@ -786,37 +1236,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'GTT'            => array(
-			'triggers' => array(),
-			'actions'  => array(
-				array(
-					/* translators: Action - GoToTraining */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Add the user to {{a training session}}", 'uncanny-automator' ),
-				),
-				array(
-					/* translators: Action - GoToTraining */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Remove the user from {{a training session}}", 'uncanny-automator' ),
-				),
-			),
-		),
-		'GTM'            => array(
-			'triggers' => array(),
-			'actions'  => array(
-				array(
-					/* translators: Action - GoToWebinar */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Add the user to {{a webinar}}", 'uncanny-automator' ),
-				),
-				array(
-					/* translators: Action - GoToWebinar */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Remove the user from {{a webinar}}", 'uncanny-automator' ),
-				),
-			),
-		),
-		'GF'             => array(
+		'GF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Gravity Forms */
@@ -848,8 +1268,19 @@ function automator_pro_items_list() {
 					'name' => __( "{{A form}} is submitted with payment", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
+				array(
+					/* translators: Anonymous trigger - Gravity Forms */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A specific field}} in an entry for {{a form}} is updated to {{a specific value}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
+				array(
+					/* translators: Action - Gravity Forms */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create an entry for {{a form}}", 'uncanny-automator' ),
+				),
 				array(
 					/* translators: Action - Gravity Forms */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -857,7 +1288,24 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'GH'             => array(
+		'GK'                => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - GravityKit */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An entry for {{a specific form}} is approved", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - GravityKit */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An entry for {{a specific form}} is rejected", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'GH'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Groundhogg */
@@ -886,7 +1334,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'H5P'            => array(
+		'H5P'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - H5P */
@@ -909,7 +1357,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'HF'             => array(
+		'HF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - HappyForms */
@@ -932,7 +1380,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'IFTTT'          => array(
+		'IFTTT'             => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - IFTTT */
@@ -949,7 +1397,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'INTEGRATELY'    => array(
+		'INTEGRATELY'       => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - Integrately */
@@ -966,7 +1414,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'INTEGROMAT'     => array(
+		'INTEGROMAT'        => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - Integromat */
@@ -977,8 +1425,148 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'LD'             => array(
+		'JETENGINE'         => array(
 			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - JetEngine */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user updates {{a specific JetEngine field}} on {{a specific post type}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - JetEngine */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user updates {{a specific JetEngine field}} on {{a specific post type}} to {{a specific value}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(),
+		),
+		'JET_FORM_BUILDER'  => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - JetFormBuilder */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user submits {{a form}} with {{a specific value}} in {{a specific field}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - JetFormBuilder */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A form}} is submitted with {{a specific value}} in {{a specific field}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'JETCRM'            => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A company is deleted", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A contact is deleted", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A quote is created", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A quote status is accepted", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A tag}} is added to a company", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A tag}} is added to a contact", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A transaction is deleted", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An invoice is created", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An invoice is deleted", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Jetpack CRM */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Change a contact's status to {{a new status}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'KONNECTZ_IT'       => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - KonnectzIT */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Receive data from KonnectzIT {{webhook}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'LD'                => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A Group Leader is added to {{a group}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A Group Leader is removed from {{a group}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user answers {{a quiz}} question correctly", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user answers {{a quiz}} question incorrectly", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user completes {{a group's}} courses", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 				array(
 					/* translators: Logged-in trigger - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -1012,11 +1600,28 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user submits an essay for {{a quiz}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's access to {{a course}} expires", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
+				array(
+					/* translators: Anonymous trigger - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A course}} is added to {{a group}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a course}} to {{a group}}", 'uncanny-automator' ),
+				),
 				array(
 					/* translators: Action - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -1035,7 +1640,17 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a course}} from {{a group}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Remove the Group Leader from {{a group}} and all its children", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove the user as a leader of {{a group}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - LearnDash */
@@ -1046,6 +1661,11 @@ function automator_pro_items_list() {
 					/* translators: Action - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Remove the user from {{a group}} and all its children", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove the user from all groups", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - LearnDash */
@@ -1065,6 +1685,11 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - LearnDash */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Send an {{email}} to Group Leaders of {{a group}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Send an {{email}} to the user's group leader(s)", 'uncanny-automator' ),
 				),
 				array(
@@ -1072,9 +1697,19 @@ function automator_pro_items_list() {
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Unenroll the user from {{a course}}", 'uncanny-automator' ),
 				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Unenroll the user from all courses", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - LearnDash */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Unenroll the user from all courses associated with {{a group}}", 'uncanny-automator' ),
+				),
 			),
 		),
-		'LP'             => array(
+		'LP'                => array(
 			'triggers' => array(),
 			'actions'  => array(
 				array(
@@ -1094,7 +1729,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'LF'             => array(
+		'LF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - LifterLMS */
@@ -1154,7 +1789,32 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'MAILPOET'       => array(
+		'MAILERLITE'        => array(
+			'triggers' => array(),
+			'actions'  => array(
+				array(
+					/* translators: Action - MailerLite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a subscriber}} to {{a group}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - MailerLite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create {{a group}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - MailerLite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a specific group}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - MailerLite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a subscriber}} from {{a group}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'MAILPOET'          => array(
 			'triggers' => array(),
 			'actions'  => array(
 				array(
@@ -1169,7 +1829,18 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'MSLMS'          => array(
+		'MAKE'              => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - Make */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Receive data from Make {{webhook}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'MSLMS'             => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - MasterStudy LMS */
@@ -1201,7 +1872,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'MP'             => array(
+		'MP'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - MemberPress */
@@ -1224,6 +1895,12 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - MemberPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A sub account is added to {{a parent account}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - MemberPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's membership to {{a specific product}} expires", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
@@ -1237,6 +1914,12 @@ function automator_pro_items_list() {
 					/* translators: Logged-in trigger - MemberPress */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's membership to {{a specific product}} is paused", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - MemberPress */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's transaction for {{a membership}} is set to {{a status}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 			),
@@ -1263,7 +1946,53 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'MEC'            => array(
+		'MPC'               => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - MemberPress Courses */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user achieves a score {{greater than, less than or equal to}} a {{value}} on a {{quiz}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - MemberPress Courses */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user achieves points {{greater than, less than or equal to}} a {{value}} on a {{quiz}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - MemberPress Courses */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Reset the user's progress in {{a course}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'METABOX'           => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Meta Box */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user updates {{a field}} on {{a post}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Meta Box */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's {{Meta Box field}} is updated", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - Meta Box */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A field}} is updated on {{a post}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'MEC'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Modern Events Calendar */
@@ -1292,7 +2021,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'MYCRED'         => array(
+		'MYCRED'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - myCred */
@@ -1341,7 +2070,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'NEWSLETTER'     => array(
+		'NEWSLETTER'        => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - Newsletter */
@@ -1358,7 +2087,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'NF'             => array(
+		'NF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Ninja Forms */
@@ -1381,7 +2110,17 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'OPTINMONSTER'   => array(
+		'OPEN_AI'           => array(
+			'triggers' => array(),
+			'actions'  => array(
+				array(
+					/* translators: Action - OpenAI */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Use {{a prompt}} to generate text with the Davinci model", 'uncanny-automator' ),
+				),
+			),
+		),
+		'OPTINMONSTER'      => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - OptinMonster */
@@ -1398,8 +2137,14 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'PMP'            => array(
+		'PMP'               => array(
 			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Paid Memberships Pro */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An admin assigns {{a membership level}} to a user", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 				array(
 					/* translators: Logged-in trigger - Paid Memberships Pro */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -1420,7 +2165,53 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'PRESTO'         => array(
+		'PP'                => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user gains a new follower", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user loses a follower", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user publishes an activity post", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user unfollows {{another PeepSo member}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user updates {{a specific field}} to {{a specific field value}} in their profile", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a post}} to the site wide activity stream", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - PeepSo */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Change the user's PeepSo role to {{a new role}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'PRESTO'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Presto Player */
@@ -1431,7 +2222,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'RC'             => array(
+		'RC'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Restrict Content Pro */
@@ -1454,7 +2245,35 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'EC'             => array(
+		'STUDIOCART'        => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Studiocart */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's subscription is cancelled for {{a product}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Anonymous trigger - Studiocart */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A guest completes an order for {{a product}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'SURECART'          => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - SureCart */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A guest purchases {{a product}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'EC'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - The Events Calendar */
@@ -1468,21 +2287,74 @@ function automator_pro_items_list() {
 					'name' => __( "An attendee is registered for {{an event}}", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
+				array(
+					/* translators: Anonymous trigger - The Events Calendar */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An attendee is registered for {{an event}} with WooCommerce", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
 				array(
 					/* translators: Action - The Events Calendar */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "RSVP for {{an event}}", 'uncanny-automator' ),
-				),
-				array(
-					/* translators: Action - The Events Calendar */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "RSVP on behalf of the user for {{an event}}", 'uncanny-automator' ),
+					'name' => __( "RSVP on behalf of {{an attendee}} for {{an event}}", 'uncanny-automator' ),
 				),
 			),
 		),
-		'TUTORLMS'       => array(
+		'THRIVE_APPRENTICE' => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user attempts to access {{a restricted course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user makes a purchase", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user progresses in {{a course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user starts {{a course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user starts {{a lesson}} in {{a course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user starts {{a module}} in {{a course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Grant the user access to {{a product}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Thrive Apprentice */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove the user's access to {{a product}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'TUTORLMS'          => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Tutor LMS */
@@ -1494,6 +2366,12 @@ function automator_pro_items_list() {
 					/* translators: Logged-in trigger - Tutor LMS */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user is enrolled in {{a course}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Tutor LMS */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user posts a question in {{a course}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 			),
@@ -1525,17 +2403,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'TWILIO'         => array(
-			'triggers' => array(),
-			'actions'  => array(
-				array(
-					/* translators: Action - Twilio */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Send an SMS message to {{a number}}", 'uncanny-automator' ),
-				),
-			),
-		),
-		'UM'             => array(
+		'UM'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Ultimate Member */
@@ -1557,7 +2425,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'UPSELL'         => array(
+		'UPSELL'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - Upsell Plugin */
@@ -1568,8 +2436,76 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'WISHLISTMEMBER' => array(
+		'WEBHOOKS'          => array(
 			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - Webhooks */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Receive data from a webhook", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'WHOLESALESUITE'    => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A wholesale lead is approved", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A wholesale lead is rejected", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A wholesale order for {{a specific product}} is received", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Deactivate a wholesale customer matching {{a user ID or email}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Reject a wholesale lead matching {{a user ID or email}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - Wholesale Suite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Set the wholesale price of {{a product}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'WISHLISTMEMBER'    => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is approved for {{a membership level}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is confirmed for {{a membership level}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is unconfirmed for {{a membership level}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 				array(
 					/* translators: Logged-in trigger - Wishlist Member */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -1582,6 +2518,30 @@ function automator_pro_items_list() {
 					'name' => __( "A user submits {{a registration form}} with {{a specific value}} in {{a specific field}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's access to {{a membership level}} is cancelled", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's access to {{a membership level}} is unapproved", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's access to {{a membership level}} is uncancelled", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - Wishlist Member */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's {{specific}} membership level account is approved", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
 			),
 			'actions'  => array(
 				array(
@@ -1591,7 +2551,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WC'             => array(
+		'WC'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WooCommerce */
@@ -1602,13 +2562,7 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "A user {{completes, pays for, lands on a thank you page for}} an order", 'uncanny-automator' ),
-					'type' => 'logged-in',
-				),
-				array(
-					/* translators: Logged-in trigger - WooCommerce */
-					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "A user {{completes, pays for, lands on a thank you page for}} an order paid for with {{a specific method}}", 'uncanny-automator' ),
+					'name' => __( "A user {{completes, pays for, lands on a thank you page for}} an order paid for with {{a specific payment method}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -1633,6 +2587,12 @@ function automator_pro_items_list() {
 					/* translators: Logged-in trigger - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user {{completes, pays for, lands on a thank you page for}} an order with {{a specific quantity}} of {{a product}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user {{completes, pays for, lands on a thank you page for}} an order with a total {{greater than, less than or equal to}} {{a specific amount}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -1680,13 +2640,61 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Anonymous trigger - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A guest {{completes, pays for, lands on a thank you page for}} an order with {{a specific coupon}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A guest order's status is changed to {{a specific status}}", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
 				array(
 					/* translators: Anonymous trigger - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A payment fails on an order", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "{{A product}} has its associated order {{completed, paid for, or a thank you page visited}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A product}} has its associated order refunded", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A product}} has its associated order set to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A product variation's}} inventory status is set to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A product's}} inventory status is set to {{a specific status}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An order is partially refunded", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An order is refunded", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
 				array(
@@ -1746,7 +2754,19 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WooCommerce Subscriptions */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user renews a subscription to {{a specific}} variation of {{a variable subscription}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's subscription to {{a product}} expires", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's subscription switches from {{a specific variation}} to {{a specific variation}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -1758,7 +2778,25 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WooCommerce Subscriptions */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's subscription to {{a specific}} variation of {{a variable subscription}} expires", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's subscription to {{a specific}} variation of {{a variable subscription}} is set to {{a status}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user's trial period to {{a subscription}} expires", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user's trial period to {{a specific}} variation of {{a variable subscription}} expires", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 			),
@@ -1766,12 +2804,27 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Cancel the user's subscription to {{a subscription product}}", 'uncanny-automator' ),
+					'name' => __( "Change the price of {{a specific product}} to {{a new price}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - WooCommerce */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Generate and email a coupon {{code}} to the user", 'uncanny-automator' ),
+					'name' => __( "Create an order with {{a product}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create an order with {{a product}} with a payment gateway", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Generate and email a coupon {{code}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Set {{a specific order}} to {{a specific status}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - WooCommerce Memberships */
@@ -1788,9 +2841,34 @@ function automator_pro_items_list() {
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Cancel the user's subscription to {{a variable subscription product}}", 'uncanny-automator' ),
 				),
+				array(
+					/* translators: Action - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create a subscription order with {{a product}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Create a subscription order with {{a product}} with a payment method", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Extend a user’s subscription to {{a specific product}} by {{a number of days}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Set the user's subscription of {{a subscription product}} to {{a status}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WooCommerce Subscriptions */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Set the user's subscription to {{a specific}} variation of {{a variable subscription product}} to {{a status}}", 'uncanny-automator' ),
+				),
 			),
 		),
-		'WP'             => array(
+		'WP'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WordPress Core */
@@ -1819,6 +2897,12 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is deleted", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user resets their password", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
@@ -1837,7 +2921,7 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "A user updates a post in a specific {{taxonomy}}", 'uncanny-automator' ),
+					'name' => __( "A user updates a post in {{a specific taxonomy}}", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -1849,7 +2933,13 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Logged-in trigger - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "{{A user's post}} is set to {{a specific status}}", 'uncanny-automator' ),
+					'name' => __( "A user updates {{a specific meta key}} of a {{specific type of post}} to {{a specific value}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A user's post}} is set to {{a specific}} status", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -1918,8 +3008,41 @@ function automator_pro_items_list() {
 					'name' => __( "A guest comment on {{a user's post}} is approved", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
+				array(
+					/* translators: Anonymous trigger - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A specific meta key}} of a {{specific type of post}} updates to {{a specific value}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A specific type of post}} is set to {{a status}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A taxonomy term}} is added to a {{specific type of post}}", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
 			),
 			'actions'  => array(
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add a comment to {{a post}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a taxonomy term}} to {{a post}} in {{a post type}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{an image}} to the media library", 'uncanny-automator' ),
+				),
 				array(
 					/* translators: Action - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
@@ -1938,7 +3061,22 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
-					'name' => __( "Remove {{a role}} from the user", 'uncanny-automator' ),
+					'name' => __( "Move {{a post}} to the trash", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Move all {{of a specific type of posts}} with {{a taxonomy term}} in {{a taxonomy}} to the trash", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a role}} from the user's roles", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Remove {{a taxonomy term}} from {{a post}} in {{a post type}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - WordPress Core */
@@ -1953,7 +3091,17 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Action - WordPress Core */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Set the featured image of {{a post}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "Set {{user meta}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Core */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Update the author of {{a post}}", 'uncanny-automator' ),
 				),
 				array(
 					/* translators: Action - WordPress Core */
@@ -1977,7 +3125,40 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WPCW'           => array(
+		'WPMU'              => array(
+			'triggers' => array(
+				array(
+					/* translators: Logged-in trigger - WordPress Multisite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user is added to {{a subsite}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+			),
+			'actions'  => array(
+				array(
+					/* translators: Action - WordPress Multisite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add {{a specific user}} to {{a specific subsite}}", 'uncanny-automator' ),
+				),
+				array(
+					/* translators: Action - WordPress Multisite */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "Add the user to {{a subsite}}", 'uncanny-automator' ),
+				),
+			),
+		),
+		'WPAI'              => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - WP All Import */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "An import fails", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'WPCW'              => array(
 			'triggers' => array(),
 			'actions'  => array(
 				array(
@@ -1992,7 +3173,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WF'             => array(
+		'WF'                => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WP Fusion */
@@ -2032,7 +3213,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WPJM'           => array(
+		'WPJM'              => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WP Job Manager */
@@ -2085,7 +3266,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'WPLMS'          => array(
+		'WPLMS'             => array(
 			'triggers' => array(),
 			'actions'  => array(
 				array(
@@ -2095,7 +3276,35 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WPUSERMANAGER'  => array(
+		'WPMAILSMTPPRO'     => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - WP Mail SMTP Pro */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "In an email with {{specific text}} in the subject, a URL containing {{a string}} is clicked", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WP Mail SMTP Pro */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "In any email, a URL containing {{a string}} is clicked", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'WPSIMPLEPAY'       => array(
+			'triggers' => array(
+				array(
+					/* translators: Anonymous trigger - WP Simple Pay */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A subscription for {{a form}} is renewed", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+			),
+			'actions'  => array(),
+		),
+		'WPUSERMANAGER'     => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WP User Manager */
@@ -2154,7 +3363,7 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'WPPOLLS'        => array(
+		'WPPOLLS'           => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WP-Polls */
@@ -2165,12 +3374,18 @@ function automator_pro_items_list() {
 			),
 			'actions'  => array(),
 		),
-		'WPF'            => array(
+		'WPF'               => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - WPForms */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "A user submits {{a form}} with {{a specific value}} in {{a specific field}}", 'uncanny-automator' ),
+					'type' => 'logged-in',
+				),
+				array(
+					/* translators: Logged-in trigger - WPForms */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "A user submits {{a form}} with {{a specific value}} in {{a specific field}} with PayPal payment", 'uncanny-automator' ),
 					'type' => 'logged-in',
 				),
 				array(
@@ -2188,6 +3403,12 @@ function automator_pro_items_list() {
 				array(
 					/* translators: Anonymous trigger - WPForms */
 					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
+					'name' => __( "{{A form}} is submitted with {{a specific value}} in {{a specific field}} with PayPal payment", 'uncanny-automator' ),
+					'type' => 'anonymous',
+				),
+				array(
+					/* translators: Anonymous trigger - WPForms */
+					// phpcs:ignore Squiz.Strings.DoubleQuoteUsage.NotRequired
 					'name' => __( "{{A form}} is submitted with PayPal payment ", 'uncanny-automator' ),
 					'type' => 'anonymous',
 				),
@@ -2200,7 +3421,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'WPFORO'         => array(
+		'WPFORO'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Logged-in trigger - wpForo */
@@ -2217,7 +3438,7 @@ function automator_pro_items_list() {
 				),
 			),
 		),
-		'ZAPIER'         => array(
+		'ZAPIER'            => array(
 			'triggers' => array(
 				array(
 					/* translators: Anonymous trigger - Zapier */

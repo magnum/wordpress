@@ -29,8 +29,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\OfflineConversionDataSetFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceActionSourceValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetPermittedRolesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetRelationshipTypeValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetUploadOrderValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetUploadSortByValues;
 /**
  * This class is auto-generated.
  *
@@ -105,8 +108,8 @@ class OfflineConversionDataSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstra
     public function getAudiences(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('ad_account' => 'string');
-        $enums = array();
+        $param_types = array('action_source' => 'action_source_enum', 'ad_account' => 'string');
+        $enums = array('action_source_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceActionSourceValues::getInstance()->getValues());
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/audiences', new \PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudience(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudience::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
@@ -146,8 +149,8 @@ class OfflineConversionDataSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstra
     {
         $this->assureId();
         $param_types = array('end_time' => 'datetime', 'order' => 'order_enum', 'sort_by' => 'sort_by_enum', 'start_time' => 'datetime', 'upload_tag' => 'string');
-        $enums = array('order_enum' => array('ASCENDING', 'DESCENDING'), 'sort_by_enum' => array('API_CALLS', 'CREATION_TIME', 'EVENT_TIME_MAX', 'EVENT_TIME_MIN', 'FIRST_UPLOAD_TIME', 'IS_EXCLUDED_FOR_LIFT', 'LAST_UPLOAD_TIME'));
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/uploads', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $enums = array('order_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetUploadOrderValues::getInstance()->getValues(), 'sort_by_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\OfflineConversionDataSetUploadSortByValues::getInstance()->getValues());
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/uploads', new \PYS_PRO_GLOBAL\FacebookAds\Object\OfflineConversionDataSetUpload(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\OfflineConversionDataSetUpload::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -157,7 +160,7 @@ class OfflineConversionDataSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstra
         $this->assureId();
         $param_types = array('upload_tag' => 'string');
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/uploads', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/uploads', new \PYS_PRO_GLOBAL\FacebookAds\Object\OfflineConversionDataSetUpload(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\OfflineConversionDataSetUpload::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

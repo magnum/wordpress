@@ -36,6 +36,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class ProductFeedIngestionSourceTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
-    const PRIMARY_FEED = 'PRIMARY_FEED';
-    const SUPPLEMENTARY_FEED = 'SUPPLEMENTARY_FEED';
+    const PRIMARY_FEED = 'primary_feed';
+    const SUPPLEMENTARY_FEED = 'supplementary_feed';
 }

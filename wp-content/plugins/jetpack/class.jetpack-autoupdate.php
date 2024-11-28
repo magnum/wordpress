@@ -59,7 +59,7 @@ class Jetpack_Autoupdate {
 	 * @return self
 	 */
 	public static function init() {
-		if ( is_null( self::$instance ) ) {
+		if ( self::$instance === null ) {
 			self::$instance = new Jetpack_Autoupdate();
 		}
 
@@ -344,12 +344,12 @@ class Jetpack_Autoupdate {
 	public static function get_plugin_slug( $plugin_file ) {
 		$update_plugins = get_site_transient( 'update_plugins' );
 		if ( isset( $update_plugins->no_update ) ) {
-			if ( isset( $update_plugins->no_update[ $plugin_file ] ) ) {
+			if ( isset( $update_plugins->no_update[ $plugin_file ]->slug ) ) {
 				$slug = $update_plugins->no_update[ $plugin_file ]->slug;
 			}
 		}
 		if ( empty( $slug ) && isset( $update_plugins->response ) ) {
-			if ( isset( $update_plugins->response[ $plugin_file ] ) ) {
+			if ( isset( $update_plugins->response[ $plugin_file ]->slug ) ) {
 				$slug = $update_plugins->response[ $plugin_file ]->slug;
 			}
 		}

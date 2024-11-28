@@ -152,7 +152,12 @@ abstract class Settings {
         return $this->values[ $key ];
 
     }
-
+    public function setOption($key, $value){
+        $this->maybeLoad();
+        if (isset($value) ) {
+            $this->values[ $key ] = $value;
+        }
+    }
 	/**
 	 * Load values from database
 	 *
@@ -230,7 +235,7 @@ abstract class Settings {
 		return $this->sanitize_text_field( $value );
 
 	}
-	
+
 	/**
 	 * Output text input
 	 *
@@ -238,12 +243,13 @@ abstract class Settings {
 	 * @param string $placeholder
 	 * @param bool   $disabled
 	 * @param bool   $hidden
+     * @param bool   $empty
 	 */
-	public function render_text_input( $key, $placeholder = '', $disabled = false, $hidden = false ) {
+    public function render_text_input( $key, $placeholder = '', $disabled = false, $hidden = false, $empty = false) {
 
-		$attr_name = "pys[$this->slug][$key]";
-		$attr_id = 'pys_' . $this->slug . '_' . $key;
-		$attr_value = $this->getOption( $key );
+        $attr_name = "pys[$this->slug][$key]";
+        $attr_id = 'pys_' . $this->slug . '_' . $key;
+        $attr_value = $empty == false ? $this->getOption( $key ) : "";
 		
 		$classes = array( 'form-control' );
 		
@@ -324,7 +330,7 @@ abstract class Settings {
      * @param string $placeholder
      * @param int    $index
      */
-    public function render_text_input_array_item( $key, $placeholder = '', $index = 0 ) {
+    public function render_text_input_array_item( $key, $placeholder = '', $index = 0,$hidden = false ) {
 
         $attr_name = "pys[$this->slug][$key][]";
         $attr_id = 'pys_' . $this->slug . '_' . $key . '_' . $index;
@@ -334,7 +340,7 @@ abstract class Settings {
 
         ?>
 
-        <input type="text" name="<?php esc_attr_e( $attr_name ); ?>"
+        <input type=<?=$hidden? "hidden": "text"?> name="<?php esc_attr_e( $attr_name ); ?>"
                id="<?php esc_attr_e( $attr_id ); ?>"
                value="<?php esc_attr_e( $attr_value ); ?>"
                placeholder="<?php esc_attr_e( $placeholder ); ?>"
@@ -798,5 +804,19 @@ abstract class Settings {
         <?php
 
     }
-	
+    public function convertTimeToSeconds($timeValue = 24, $type = 'hours')
+    {
+        switch ($type){
+            case 'hours':
+                $time = $timeValue * 60 * 60;
+                break;
+            case 'minute':
+                $time = $timeValue * 60;
+                break;
+            case 'seconds':
+                $time = $timeValue;
+                break;
+        }
+        return $time;
+    }
 }

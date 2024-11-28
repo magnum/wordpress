@@ -58,7 +58,7 @@ class PublisherBlockList extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrud
         $ref_enums = array();
         return $ref_enums;
     }
-    public function createAppendPublisherUrl(array $fields = array(), array $params = array(), $pending = \false)
+    public function createAppEndPublisherUrl(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
         $param_types = array('publisher_urls' => 'list<string>');

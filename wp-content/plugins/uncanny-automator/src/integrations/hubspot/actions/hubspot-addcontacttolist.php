@@ -44,18 +44,19 @@ class HUBSPOT_ADDCONTACTTOLIST {
 	public function define_action() {
 
 		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/hubspot/' ),
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
+			'author'                => Automator()->get_author_name( $this->action_code ),
+			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'integration/hubspot/' ),
+			'integration'           => self::$integration,
+			'code'                  => $this->action_code,
 			// translators: the selected HubSpot static list name
-			'sentence'           => sprintf( __( 'Add a HubSpot contact to {{a static list:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( 'Add a HubSpot contact to {{a static list}}', 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'requires_user'      => false,
-			'execution_function' => array( $this, 'add_contact_to_list' ),
-			'options_callback'   => array( $this, 'load_options' ),
+			'sentence'              => sprintf( __( 'Add a HubSpot contact to {{a static list:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( 'Add a HubSpot contact to {{a static list}}', 'uncanny-automator' ),
+			'priority'              => 10,
+			'accepted_args'         => 1,
+			'requires_user'         => false,
+			'execution_function'    => array( $this, 'add_contact_to_list' ),
+			'options_callback'      => array( $this, 'load_options' ),
+			'background_processing' => true,
 		);
 
 		Automator()->register->action( $action );
@@ -105,53 +106,16 @@ class HUBSPOT_ADDCONTACTTOLIST {
 		$email = trim( Automator()->parse->text( $action_data['meta']['HUBSPOTEMAIL'], $recipe_id, $user_id, $args ) );
 		$list  = trim( Automator()->parse->text( $action_data['meta']['HUBSPOTLIST'], $recipe_id, $user_id, $args ) );
 
-		if ( empty( $email ) ) {
-			$error_message                       = __( 'Email is missing', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
+		$helpers = Automator()->helpers->recipe->hubspot->options;
+
+		try {
+
+			$response = $helpers->add_contact_to_list( $list, $email, $action_data );
+
+			Automator()->complete_action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
+			$helpers->log_action_error( $e->getMessage(), $user_id, $action_data, $recipe_id );
 		}
-
-		if ( empty( $list ) ) {
-			$error_message                       = __( 'List is missing', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		$response = Automator()->helpers->recipe->hubspot->options->add_contact_to_list( $list, $email );
-
-		if ( is_wp_error( $response ) ) {
-			$error_message                       = $response->get_error_message();
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		$json_data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( 200 !== intval( $json_data['statusCode'] ) ) {
-
-			Automator()->helpers->recipe->hubspot->options->log_action_error( $json_data, $user_id, $action_data, $recipe_id );
-			return;
-		}
-
-		// If the email was already in the list
-		if ( ! empty( $json_data['data'] ) && ! empty( $json_data['data']['discarded'] ) ) {
-			$error_message                       = __( 'Contact with such email address was already in the list', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		// If the email was not found in contacts
-		if ( ! empty( $json_data['data'] ) && ! empty( $json_data['data']['invalidEmails'] ) ) {
-			$error_message                       = __( 'Contact with such email address was not found', 'uncanny-automator' );
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-			return;
-		}
-
-		Automator()->complete_action( $user_id, $action_data, $recipe_id );
 	}
 }

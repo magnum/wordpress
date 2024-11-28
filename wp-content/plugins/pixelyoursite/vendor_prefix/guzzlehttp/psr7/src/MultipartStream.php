@@ -13,6 +13,8 @@ final class MultipartStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamIn
     use StreamDecoratorTrait;
     /** @var string */
     private $boundary;
+    /** @var StreamInterface */
+    private $stream;
     /**
      * @param array  $elements Array of associative arrays, each containing a
      *                         required "name" key mapping to the form field,
@@ -58,6 +60,9 @@ final class MultipartStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamIn
     {
         $stream = new \PYS_PRO_GLOBAL\GuzzleHttp\Psr7\AppendStream();
         foreach ($elements as $element) {
+            if (!\is_array($element)) {
+                throw new \UnexpectedValueException("An array is expected");
+            }
             $this->addElement($stream, $element);
         }
         // Add the trailing boundary with CRLF
@@ -74,7 +79,7 @@ final class MultipartStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamIn
         $element['contents'] = \PYS_PRO_GLOBAL\GuzzleHttp\Psr7\Utils::streamFor($element['contents']);
         if (empty($element['filename'])) {
             $uri = $element['contents']->getMetadata('uri');
-            if (\substr($uri, 0, 6) !== 'php://') {
+            if ($uri && \is_string($uri) && \substr($uri, 0, 6) !== 'php://' && \substr($uri, 0, 7) !== 'data://') {
                 $element['filename'] = $uri;
             }
         }

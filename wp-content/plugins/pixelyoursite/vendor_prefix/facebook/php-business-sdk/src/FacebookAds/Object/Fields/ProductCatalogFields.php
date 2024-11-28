@@ -43,6 +43,7 @@ class ProductCatalogFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const FEED_COUNT = 'feed_count';
     const ID = 'id';
     const IS_CATALOG_SEGMENT = 'is_catalog_segment';
+    const LATEST_FEED_UPLOAD_SESSION = 'latest_feed_upload_session';
     const NAME = 'name';
     const PRODUCT_COUNT = 'product_count';
     const STORE_CATALOG_SETTINGS = 'store_catalog_settings';
@@ -55,6 +56,6 @@ class ProductCatalogFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const PARTNER_INTEGRATION = 'partner_integration';
     public function getFieldTypes()
     {
-        return array('business' => 'Business', 'commerce_merchant_settings' => 'CommerceMerchantSettings', 'da_display_settings' => 'ProductCatalogImageSettings', 'default_image_url' => 'string', 'fallback_image_url' => 'list<string>', 'feed_count' => 'int', 'id' => 'string', 'is_catalog_segment' => 'bool', 'name' => 'string', 'product_count' => 'int', 'store_catalog_settings' => 'StoreCatalogSettings', 'vertical' => 'string', 'catalog_segment_filter' => 'Object', 'catalog_segment_product_set_id' => 'string', 'destination_catalog_settings' => 'map', 'flight_catalog_settings' => 'map', 'parent_catalog_id' => 'string', 'partner_integration' => 'map');
+        return array('business' => 'Business', 'commerce_merchant_settings' => 'CommerceMerchantSettings', 'da_display_settings' => 'ProductCatalogImageSettings', 'default_image_url' => 'string', 'fallback_image_url' => 'list<string>', 'feed_count' => 'int', 'id' => 'string', 'is_catalog_segment' => 'bool', 'latest_feed_upload_session' => 'ProductFeedUpload', 'name' => 'string', 'product_count' => 'int', 'store_catalog_settings' => 'StoreCatalogSettings', 'vertical' => 'string', 'catalog_segment_filter' => 'Object', 'catalog_segment_product_set_id' => 'string', 'destination_catalog_settings' => 'map', 'flight_catalog_settings' => 'map', 'parent_catalog_id' => 'string', 'partner_integration' => 'map');
     }
 }

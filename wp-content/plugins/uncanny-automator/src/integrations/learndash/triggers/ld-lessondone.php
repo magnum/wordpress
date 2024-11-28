@@ -34,9 +34,35 @@ class LD_LESSONDONE {
 	 */
 	public function define_trigger() {
 
+		$trigger = array(
+			'author'              => Automator()->get_author_name( $this->trigger_code ),
+			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/learndash/' ),
+			'integration'         => self::$integration,
+			'code'                => $this->trigger_code,
+			/* translators: Logged-in trigger - LearnDash */
+			'sentence'            => sprintf( esc_attr__( 'A user completes {{a lesson:%1$s}} {{a number of:%2$s}} time(s)', 'uncanny-automator' ), $this->trigger_meta, 'NUMTIMES' ),
+			/* translators: Logged-in trigger - LearnDash */
+			'select_option_name'  => esc_attr__( 'A user completes {{a lesson}}', 'uncanny-automator' ),
+			'action'              => array( 'learndash_lesson_completed', 'automator_learndash_lesson_completed' ),
+			'priority'            => 10,
+			'accepted_args'       => 1,
+			'validation_function' => array( $this, 'lesson_completed' ),
+			'options_callback'    => array( $this, 'load_options' ),
+		);
+
+		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * Loads all options.
+	 *
+	 * @return array[]
+	 */
+	public function load_options() {
+
 		$args = array(
 			'post_type'      => 'sfwd-courses',
-			'posts_per_page' => 999,
+			'posts_per_page' => 999, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -58,46 +84,32 @@ class LD_LESSONDONE {
 			$this->trigger_meta . '_THUMB_URL' => esc_attr__( 'Lesson featured image URL', 'uncanny-automator' ),
 		);
 
-		$trigger = array(
-			'author'              => Automator()->get_author_name( $this->trigger_code ),
-			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/learndash/' ),
-			'integration'         => self::$integration,
-			'code'                => $this->trigger_code,
-			/* translators: Logged-in trigger - LearnDash */
-			'sentence'            => sprintf( esc_attr__( 'A user completes {{a lesson:%1$s}} {{a number of:%2$s}} time(s)', 'uncanny-automator' ), $this->trigger_meta, 'NUMTIMES' ),
-			/* translators: Logged-in trigger - LearnDash */
-			'select_option_name'  => esc_attr__( 'A user completes {{a lesson}}', 'uncanny-automator' ),
-			'action'              => 'learndash_lesson_completed',
-			'priority'            => 10,
-			'accepted_args'       => 1,
-			'validation_function' => array( $this, 'lesson_completed' ),
-			'options'             => array(
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
-			'options_group'       => array(
-				$this->trigger_meta => array(
-					Automator()->helpers->recipe->field->select_field_ajax(
-						'LDCOURSE',
-						esc_attr__( 'Course', 'uncanny-automator' ),
-						$options,
-						'',
-						'',
-						false,
-						true,
-						array(
-							'target_field' => $this->trigger_meta,
-							'endpoint'     => 'select_lesson_from_course_LESSONDONE',
-						),
-						$course_relevant_tokens
-					),
-					Automator()->helpers->recipe->field->select_field( $this->trigger_meta, esc_attr__( 'Lesson', 'uncanny-automator' ), array(), false, false, false, $relevant_tokens ),
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options'       => array(
+					Automator()->helpers->recipe->options->number_of_times(),
 				),
-			),
+				'options_group' => array(
+					$this->trigger_meta => array(
+						Automator()->helpers->recipe->field->select_field_ajax(
+							'LDCOURSE',
+							esc_attr__( 'Course', 'uncanny-automator' ),
+							$options,
+							'',
+							'',
+							false,
+							true,
+							array(
+								'target_field' => $this->trigger_meta,
+								'endpoint'     => 'select_lesson_from_course_LESSONDONE',
+							),
+							$course_relevant_tokens
+						),
+						Automator()->helpers->recipe->field->select_field( $this->trigger_meta, esc_attr__( 'Lesson', 'uncanny-automator' ), array(), false, false, false, $relevant_tokens ),
+					),
+				),
+			)
 		);
-
-		Automator()->register->trigger( $trigger );
-
-		return;
 	}
 
 	/**
@@ -114,6 +126,27 @@ class LD_LESSONDONE {
 		$user   = $data['user'];
 		$lesson = $data['lesson'];
 		$course = $data['course'];
+
+		if ( empty( $lesson->ID ) || empty( $user->ID ) ) {
+			return;
+		}
+
+		$cache_key = 'automator_lesson_completed_ ' . $lesson->ID . '_user_' . $user->ID;
+
+		$cache_group = 'automator-ld-lesson-completed';
+
+		/**
+		 * Bail if Trigger has already fired during run time.
+		 *
+		 * This is a LearnDash bug. The action hook `learndash_lesson_completed`
+		 * shouldn't fire n times for quiz completions associated with a lesson.
+		 *
+		 * @ticket 2126631606/46933 - 860pm6a12
+		 * @since 4.10
+		 */
+		if ( false !== wp_cache_get( $cache_key, $cache_group ) ) {
+			return;
+		}
 
 		$args = array(
 			'code'    => $this->trigger_code,
@@ -140,5 +173,9 @@ class LD_LESSONDONE {
 				}
 			}
 		}
+
+		wp_cache_set( $cache_key, true, 'automator-ld-lesson-completed' );
+
 	}
+
 }

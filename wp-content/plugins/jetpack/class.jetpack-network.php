@@ -193,7 +193,6 @@ class Jetpack_Network {
 			}
 			restore_current_blog();
 		}
-
 	}
 
 	/**
@@ -420,7 +419,7 @@ class Jetpack_Network {
 			return;
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Caller (i.e. `$this->jetpack_sites_list()`) should check.
-		$site_id = ( is_null( $site_id ) ) ? $_GET['site_id'] : $site_id;
+		$site_id = ( $site_id === null ) ? ( isset( $_GET['site_id'] ) ? (int) $_GET['site_id'] : null ) : $site_id;
 		switch_to_blog( $site_id );
 		Jetpack::disconnect();
 		restore_current_blog();
@@ -446,7 +445,7 @@ class Jetpack_Network {
 
 		// Figure out what site we are working on.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Caller (i.e. `$this->jetpack_sites_list()`) should check.
-		$site_id = ( is_null( $site_id ) ) ? $_GET['site_id'] : $site_id;
+		$site_id = ( $site_id === null ) ? ( isset( $_GET['site_id'] ) ? (int) $_GET['site_id'] : null ) : $site_id;
 
 		/*
 		 * Here we need to switch to the subsite
@@ -576,7 +575,6 @@ class Jetpack_Network {
 		$network_sites_table->prepare_items();
 		$network_sites_table->display();
 		echo '</form></div>';
-
 	}
 
 	/**
@@ -600,7 +598,7 @@ class Jetpack_Network {
 	 */
 	public function save_network_settings_page() {
 
-		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'jetpack-network-settings' ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'jetpack-network-settings' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			// No nonce, push back to settings page.
 			wp_safe_redirect(
 				add_query_arg(
@@ -612,7 +610,8 @@ class Jetpack_Network {
 		}
 
 		// Try to save the Protect whitelist before anything else, since that action can result in errors.
-		$whitelist = str_replace( ' ', '', $_POST['global-whitelist'] );
+		$whitelist = isset( $_POST['global-whitelist'] ) ? filter_var( wp_unslash( $_POST['global-whitelist'] ) ) : '';
+		$whitelist = str_replace( ' ', '', $whitelist );
 		$whitelist = explode( PHP_EOL, $whitelist );
 		$result    = jetpack_protect_save_whitelist( $whitelist, true );
 		if ( is_wp_error( $result ) ) {

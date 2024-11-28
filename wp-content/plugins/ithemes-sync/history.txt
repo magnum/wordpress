@@ -245,3 +245,12 @@
 	Enhancement: PHP 8 compatibility
 2.1.10 - 2022-03-23 - Josh Oakes
 	Bug Fix: Fix compatibility issue with fallback UTF-8 encoder on PHP 7.4+
+2.1.11 - 2022-11-02 - Josh Oakes
+	Bug Fix: Compatibility with WordPress 6.1
+2.1.12 - 2022-11-03 - Josh Oakes
+	Bug Fix: Improve support for WordPress 6.1
+2.1.13 - 2023-01-26 - Josh Oakes
+	Bug Fix: Fix issue with Client Dashboard
+	Enhancement: Updater improvements
+	Enhancement: Add filter to disable "duplicate post" feature
+	Enhancement: Add filter to exclude post types from "duplicate post" feature

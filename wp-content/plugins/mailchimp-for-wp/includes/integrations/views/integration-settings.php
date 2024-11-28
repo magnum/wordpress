@@ -11,10 +11,10 @@
 		<span class="current-crumb"><strong><?php echo esc_html( $integration->name ); ?></strong></span>
 	</p>
 
-	<div class="main-content mc4wp-row">
+	<div class="mc4wp-row">
 
 		<!-- Main Content -->
-		<div class="main-content mc4wp-col mc4wp-col-4">
+		<div class="main-content mc4wp-col">
 
 			<h1 class="mc4wp-page-title">
 				<?php printf( esc_html__( '%s integration', 'mailchimp-for-wp' ), esc_html( $integration->name ) ); ?>
@@ -180,7 +180,16 @@
 									<?php
 									echo esc_html__( 'Select "yes" if the checkbox should be pre-checked.', 'mailchimp-for-wp' );
 									echo '<br />';
-									echo sprintf( wp_kses( __( '<strong>Warning: </strong> enabling this may affect your <a href="%s">GDPR compliance</a>.', 'mailchimp-for-wp' ), array( 'a' => array( 'href' => array() ) ) ), 'https://www.mc4wp.com/kb/gdpr-compliance/#utm_source=wp-plugin&utm_medium=mailchimp-for-wp&utm_campaign=integrations-page' );
+									echo sprintf(
+										wp_kses(
+											__( '<strong>Warning: </strong> enabling this may affect your <a href="%s">GDPR compliance</a>.', 'mailchimp-for-wp' ),
+											array(
+													'a'      => array( 'href' => array() ),
+													'strong' => array(),
+											)
+										),
+										'https://www.mc4wp.com/kb/gdpr-compliance/#utm_source=wp-plugin&utm_medium=mailchimp-for-wp&utm_campaign=integrations-page'
+									);
 									?>
 								</p>
 							</td>
@@ -311,8 +320,8 @@
 		</div>
 
 		<!-- Sidebar -->
-		<div class="mc4wp-sidebar mc4wp-col mc4wp-col-2">
-			<?php include MC4WP_PLUGIN_DIR . '/includes/views/parts/admin-sidebar.php'; ?>
+		<div class="mc4wp-sidebar mc4wp-col">
+			<?php require MC4WP_PLUGIN_DIR . '/includes/views/parts/admin-sidebar.php'; ?>
 		</div>
 
 	</div>

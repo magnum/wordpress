@@ -18,6 +18,7 @@ class ZOOM_UNREGISTERUSERLESS {
 
 	private $action_code;
 	private $action_meta;
+	private $helpers;
 
 	/**
 	 * Set up Automator action constructor.
@@ -25,6 +26,7 @@ class ZOOM_UNREGISTERUSERLESS {
 	public function __construct() {
 		$this->action_code = 'ZOOMUNREGISTERUSERLESS';
 		$this->action_meta = 'ZOOMMEETING';
+		$this->helpers     = new Zoom_Helpers();
 		$this->define_action();
 	}
 
@@ -34,18 +36,20 @@ class ZOOM_UNREGISTERUSERLESS {
 	public function define_action() {
 
 		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/zoom/' ),
-			'is_pro'             => false,
-			'requires_user'      => false,
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
-			'sentence'           => sprintf( __( 'Remove an attendee from {{a meeting:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( 'Remove an attendee from {{a meeting}}', 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'execution_function' => array( $this, 'zoom_unregister_user' ),
-			'options_callback'   => array( $this, 'load_options' ),
+			'author'                => Automator()->get_author_name( $this->action_code ),
+			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/zoom/' ),
+			'is_pro'                => false,
+			'requires_user'         => false,
+			'integration'           => self::$integration,
+			'code'                  => $this->action_code,
+			/* translators: Meeting topic */
+			'sentence'              => sprintf( __( 'Remove an attendee from {{a meeting:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( 'Remove an attendee from {{a meeting}}', 'uncanny-automator' ),
+			'priority'              => 10,
+			'accepted_args'         => 1,
+			'execution_function'    => array( $this, 'zoom_unregister_user' ),
+			'options_callback'      => array( $this, 'load_options' ),
+			'background_processing' => true,
 		);
 
 		Automator()->register->action( $action );
@@ -71,12 +75,46 @@ class ZOOM_UNREGISTERUSERLESS {
 
 		$email_field = Automator()->helpers->recipe->field->text( $email_field_options );
 
+		$account_users_field = array(
+			'option_code'           => 'ZOOMUSER',
+			'label'                 => __( 'Account user', 'uncanny-automator' ),
+			'input_type'            => 'select',
+			'required'              => false,
+			'is_ajax'               => true,
+			'endpoint'              => 'uap_zoom_api_get_meetings',
+			'fill_values_in'        => $this->action_meta,
+			'options'               => $this->helpers->get_account_user_options(),
+			'relevant_tokens'       => array(),
+			'supports_custom_value' => false,
+		);
+
+		$user_meetings_field = array(
+			'option_code'           => $this->action_meta,
+			'label'                 => __( 'Meeting', 'uncanny-automator' ),
+			'input_type'            => 'select',
+			'required'              => true,
+			'options'               => array(),
+			'supports_tokens'       => false,
+			'supports_custom_value' => false,
+		);
+
+		$option_fileds = array(
+			$email_field,
+			$account_users_field,
+			$user_meetings_field,
+		);
+
+		//Don't show the user dropdown to old credentials so it's easier to test the update
+		if ( $this->helpers->jwt_mode() ) {
+			$option_fileds = array(
+				$email_field,
+				$this->helpers->get_meetings_field(),
+			);
+		}
+
 		return array(
 			'options_group' => array(
-				$this->action_meta => array(
-					$email_field,
-					Automator()->helpers->recipe->zoom->get_meetings( null, $this->action_meta ),
-				),
+				$this->action_meta => $option_fileds,
 			),
 		);
 	}
@@ -90,44 +128,23 @@ class ZOOM_UNREGISTERUSERLESS {
 	 */
 	public function zoom_unregister_user( $user_id, $action_data, $recipe_id, $args ) {
 
-		$meeting_key = Automator()->parse->text( $action_data['meta'][ $this->action_meta ], $recipe_id, $user_id, $args );
-		$email       = Automator()->parse->text( $action_data['meta']['EMAIL'], $recipe_id, $user_id, $args );
+		try {
+			$meeting_key = Automator()->parse->text( $action_data['meta'][ $this->action_meta ], $recipe_id, $user_id, $args );
+			$email       = Automator()->parse->text( $action_data['meta']['EMAIL'], $recipe_id, $user_id, $args );
 
-		if ( empty( $email ) || ! is_email( $email ) ) {
-			$error_msg                           = __( 'Email address is missing or invalid.', 'uncanny-automator' );
-			$action_data['do-nothing']           = true;
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
+			if ( empty( $meeting_key ) ) {
+				throw new \Exception( __( 'Meeting was not found.', 'uncanny-automator' ) );
+			}
 
-			return;
-		}
-
-		if ( empty( $meeting_key ) ) {
-			$error_msg                           = __( 'Meeting not found.', 'uncanny-automator' );
-			$action_data['do-nothing']           = true;
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
-
-			return;
-		}
-
-		if ( ! empty( $meeting_key ) ) {
 			$meeting_key = str_replace( '-objectkey', '', $meeting_key );
-		}
 
-		$result = Automator()->helpers->recipe->zoom->unregister_user( $email, $meeting_key );
+			$result = $this->helpers->unregister_user( $email, $meeting_key, $action_data );
 
-		if ( ! $result['result'] ) {
-			$error_msg                           = $result['message'];
-			$action_data['do-nothing']           = true;
+			Automator()->complete_action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
 			$action_data['complete_with_errors'] = true;
-			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
-
-			return;
+			Automator()->complete_action( $user_id, $action_data, $recipe_id, $e->getMessage() );
 		}
-
-		Automator()->complete_action( $user_id, $action_data, $recipe_id );
-
 	}
-
 }

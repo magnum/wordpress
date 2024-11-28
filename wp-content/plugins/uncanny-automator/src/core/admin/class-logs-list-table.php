@@ -40,6 +40,8 @@ class Logs_List_Table extends WP_List_Table {
 				'ajax'     => false,
 			)
 		);
+
+		add_filter( 'automator_action_log_error', array( self::class, 'format_all_upgrade_links' ), 10, 2 );
 	}
 
 	/**
@@ -365,6 +367,7 @@ class Logs_List_Table extends WP_List_Table {
 				$recipe_id   = 0;
 			}
 
+			/* translators: Recipe ID */
 			$recipe_name = ! empty( $recipe->recipe_title ) ? $recipe->recipe_title : sprintf( esc_attr__( 'ID: %1$s (no title)', 'uncanny-automator' ), $recipe_id );
 
 			if ( '#' !== $recipe_link ) {
@@ -387,12 +390,15 @@ class Logs_List_Table extends WP_List_Table {
 			} elseif ( 9 === (int) $recipe->recipe_completed ) {
 				/* translators: Recipe status */
 				$recipe_status = esc_attr_x( 'Completed - do nothing', 'Recipe', 'uncanny-automator' );
+			} elseif ( 10 === (int) $recipe->recipe_completed ) {
+				/* translators: Recipe status */
+				$recipe_status = esc_attr_x( 'Completed - pending response', 'Recipe', 'uncanny-automator' );
 			} else {
 				/* translators: Recipe status */
 				$recipe_status = esc_attr_x( 'In progress', 'Recipe', 'uncanny-automator' );
 			}
 
-			$recipe_date_completed = ( 1 === absint( $recipe->recipe_completed ) || 2 === absint( $recipe->recipe_completed ) || 9 === absint( $recipe->recipe_completed ) ) ? $recipe->recipe_date_time : '';
+			$recipe_date_completed = ( 10 === absint( $recipe->recipe_completed ) || 1 === absint( $recipe->recipe_completed ) || 2 === absint( $recipe->recipe_completed ) || 9 === absint( $recipe->recipe_completed ) ) ? $recipe->recipe_date_time : '';
 			$current_type          = Automator()->utilities->get_recipe_type( $recipe_id );
 			$run_number            = 'anonymous' === $current_type ? 'N/A' : $recipe->run_number;
 
@@ -409,9 +415,8 @@ class Logs_List_Table extends WP_List_Table {
 			}
 			$run_number_log = 'anonymous' === $current_type ? 0 === absint( $recipe->run_number ) ? 1 : $recipe->run_number : $recipe->run_number;
 			$url            = sprintf(
-				'%s?post_type=%s&page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&minimal=1',
-				admin_url( 'edit.php' ),
-				'uo-recipe',
+				'%s?page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&automator_minimal=1',
+				admin_url( 'options.php' ),
 				'uncanny-automator-recipe-activity-details',
 				$recipe_id,
 				$run_number_log,
@@ -470,6 +475,7 @@ class Logs_List_Table extends WP_List_Table {
 				$recipe_id   = 0;
 			}
 
+			/* translators: Recipe ID */
 			$recipe_name = ! empty( $recipe->recipe_title ) ? $recipe->recipe_title : sprintf( esc_attr__( 'ID: %1$s (no title)', 'uncanny-automator' ), $recipe_id );
 
 			if ( '#' !== $recipe_link ) {
@@ -492,12 +498,15 @@ class Logs_List_Table extends WP_List_Table {
 			} elseif ( 9 === (int) $recipe->recipe_completed ) {
 				/* translators: Recipe status */
 				$recipe_status = esc_attr_x( 'Completed - do nothing', 'Recipe', 'uncanny-automator' );
+			} elseif ( 10 === (int) $recipe->recipe_completed ) {
+				/* translators: Recipe status */
+				$recipe_status = esc_attr_x( 'Completed - pending response', 'Recipe', 'uncanny-automator' );
 			} else {
 				/* translators: Recipe status */
 				$recipe_status = esc_attr_x( 'In progress', 'Recipe', 'uncanny-automator' );
 			}
 
-			$recipe_date_completed = ( 1 === absint( $recipe->recipe_completed ) || 2 === absint( $recipe->recipe_completed ) || 9 === absint( $recipe->recipe_completed ) ) ? $recipe->recipe_date_time : '';
+			$recipe_date_completed = ( 10 === absint( $recipe->recipe_completed ) || 1 === absint( $recipe->recipe_completed ) || 2 === absint( $recipe->recipe_completed ) || 9 === absint( $recipe->recipe_completed ) ) ? $recipe->recipe_date_time : '';
 			$current_type          = Automator()->utilities->get_recipe_type( $recipe_id );
 			$run_number            = 'anonymous' === $current_type ? 'N/A' : $recipe->run_number;
 
@@ -515,7 +524,7 @@ class Logs_List_Table extends WP_List_Table {
 
 			$run_number_log = 'anonymous' === $current_type ? 0 === absint( $recipe->run_number ) ? 1 : $recipe->run_number : $recipe->run_number;
 
-			$url     = sprintf( '%s?post_type=%s&page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&minimal=1', admin_url( 'edit.php' ), 'uo-recipe', 'uncanny-automator-recipe-activity-details', $recipe_id, $run_number_log, absint( $recipe_log_id ) );
+			$url     = sprintf( '%s?page=%s&recipe_id=%d&run_number=%d&recipe_log_id=%d&automator_minimal=1', admin_url( 'options.php' ), 'uncanny-automator-recipe-activity-details', $recipe_id, $run_number_log, absint( $recipe_log_id ) );
 			$actions = array(
 				'view'  => sprintf( '<a href="%s" data-lity>%s</a>', $url, esc_attr__( 'Details', 'uncanny-automator' ) ),
 				'rerun' => sprintf( '<a href="%s" onclick="return confirm(\"%s\")">%s</a>', '#', esc_attr__( 'Are you sure you want to re-run this recipe?', 'uncanny-automator' ), esc_attr__( 'Re-run', 'uncanny-automator' ) ),
@@ -626,6 +635,7 @@ class Logs_List_Table extends WP_List_Table {
 				'recipe_completed'   => $recipe_status,
 				'recipe_date_time'   => $recipe_date_completed,
 				'recipe_run_number'  => $recipe_run_number,
+				/* translators: 1. Trigger run number 2. Trigger total times */
 				'trigger_run_number' => sprintf( esc_attr__( '%1$d of %2$d', 'uncanny-automator' ), $trigger_run_number, $trigger_total_times ),
 				'display_name'       => $user_name,
 			);
@@ -719,6 +729,9 @@ class Logs_List_Table extends WP_List_Table {
 			} elseif ( 9 === (int) $action->action_completed ) {
 				/* translators: Action status */
 				$st = esc_attr_x( 'Completed, do nothing', 'Action', 'uncanny-automator' );
+			} elseif ( 10 === (int) $action->action_completed ) {
+				/* translators: Action status */
+				$st = esc_attr_x( 'Completed, awaiting', 'Action', 'uncanny-automator' );
 			}
 			$action_code = $this->item_code( $recipes_data, absint( $action->automator_action_id ) );
 			/* translators: 1. Action ID */
@@ -745,7 +758,7 @@ class Logs_List_Table extends WP_List_Table {
 
 			$action_date_completed = $action->action_date;
 			$action_status         = apply_filters( 'automator_action_log_status', $st, $action );
-			$error_message         = $action->error_message;
+			$error_message         = apply_filters( 'automator_action_log_error', $action->error_message, $action );
 			$recipe_link           = get_edit_post_link( absint( $action->automator_recipe_id ) );
 			$recipe_name           = '<a href="' . $recipe_link . '" class="uap-log-table__recipe-name">' . $action->recipe_title . '</a>';
 
@@ -778,6 +791,15 @@ class Logs_List_Table extends WP_List_Table {
 				/* translators: User type */
 				$user_name = esc_attr_x( 'N/A', 'User', 'uncanny-automator' );
 			}
+
+			$buttons = array();
+
+			$api_request = Automator()->db->api->get_by_log_id( 'action', $action->action_log_id );
+
+			if ( ! empty( $api_request->params ) ) {
+				$buttons['resend'] = Api_Log::resend_button_html( $action->action_log_id );
+			}
+
 			$data[] = array(
 				'action_title'      => $action_name,
 				'action_date'       => $action_date_completed,
@@ -788,10 +810,28 @@ class Logs_List_Table extends WP_List_Table {
 				'recipe_date_time'  => $recipe_date_completed,
 				'recipe_run_number' => $recipe_run_number,
 				'display_name'      => $user_name,
+				'buttons'           => join( ' ', $buttons ),
 			);
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Replaces {{automator_upgrade_link}} with actual upgrade link.
+	 *
+	 * @param string $message The message.
+	 *
+	 * @return string The message with upgrade link.
+	 */
+	public static function format_all_upgrade_links( $message, $action ) {
+
+		$link = 'https://automatorplugin.com/pricing/?utm_source=uncanny_automator&utm_medium=recipe_log&utm_content=upgrade_to_pro';
+
+		$upgrade_link = sprintf( '<a target="_blank" href="%1$s" title="%2$s">%2$s</a>', $link, esc_html__( 'Please upgrade for unlimited credits', 'uncanny-automator' ) );
+
+		return str_replace( '{{automator_upgrade_link}}', $upgrade_link, $message );
+
 	}
 
 	/**

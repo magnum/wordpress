@@ -1,14 +1,21 @@
 /**
  * External dependencies
  */
-import { useMemo, useEffect, Fragment } from '@wordpress/element';
+import { useMemo, useEffect, Fragment, useState } from '@wordpress/element';
 import {
 	useCheckoutAddress,
 	useStoreEvents,
 	useEditorContext,
+	noticeContexts,
 } from '@woocommerce/base-context';
 import { AddressForm } from '@woocommerce/base-components/cart-checkout';
 import Noninteractive from '@woocommerce/base-components/noninteractive';
+import type {
+	BillingAddress,
+	AddressField,
+	AddressFields,
+} from '@woocommerce/settings';
+import { StoreNoticesContainer } from '@woocommerce/blocks-checkout';
 
 /**
  * Internal dependencies
@@ -30,19 +37,39 @@ const Block = ( {
 } ): JSX.Element => {
 	const {
 		defaultAddressFields,
-		billingFields,
-		setBillingFields,
-		setPhone,
+		billingAddress,
+		setBillingAddress,
+		setShippingAddress,
+		setBillingPhone,
+		setShippingPhone,
+		useBillingAsShipping,
 	} = useCheckoutAddress();
 	const { dispatchCheckoutEvent } = useStoreEvents();
 	const { isEditor } = useEditorContext();
-
 	// Clears data if fields are hidden.
 	useEffect( () => {
 		if ( ! showPhoneField ) {
-			setPhone( '' );
+			setBillingPhone( '' );
 		}
-	}, [ showPhoneField, setPhone ] );
+	}, [ showPhoneField, setBillingPhone ] );
+
+	const [ addressesSynced, setAddressesSynced ] = useState( false );
+
+	// Syncs shipping address with billing address if "Force shipping to the customer billing address" is enabled.
+	useEffect( () => {
+		if ( addressesSynced ) {
+			return;
+		}
+		if ( useBillingAsShipping ) {
+			setShippingAddress( billingAddress );
+		}
+		setAddressesSynced( true );
+	}, [
+		addressesSynced,
+		setShippingAddress,
+		billingAddress,
+		useBillingAsShipping,
+	] );
 
 	const addressFieldsConfig = useMemo( () => {
 		return {
@@ -54,32 +81,51 @@ const Block = ( {
 				hidden: ! showApartmentField,
 			},
 		};
-	}, [ showCompanyField, requireCompanyField, showApartmentField ] );
+	}, [
+		showCompanyField,
+		requireCompanyField,
+		showApartmentField,
+	] ) as Record< keyof AddressFields, Partial< AddressField > >;
 
 	const AddressFormWrapperComponent = isEditor ? Noninteractive : Fragment;
 
 	return (
 		<AddressFormWrapperComponent>
+			<StoreNoticesContainer context={ noticeContexts.BILLING_ADDRESS } />
 			<AddressForm
 				id="billing"
 				type="billing"
-				onChange={ ( values: Record< string, unknown > ) => {
-					setBillingFields( values );
+				onChange={ ( values: Partial< BillingAddress > ) => {
+					setBillingAddress( values );
+					if ( useBillingAsShipping ) {
+						setShippingAddress( values );
+						dispatchCheckoutEvent( 'set-shipping-address' );
+					}
 					dispatchCheckoutEvent( 'set-billing-address' );
 				} }
-				values={ billingFields }
-				fields={ Object.keys( defaultAddressFields ) }
+				values={ billingAddress }
+				fields={
+					Object.keys(
+						defaultAddressFields
+					) as ( keyof AddressFields )[]
+				}
 				fieldConfig={ addressFieldsConfig }
 			/>
 			{ showPhoneField && (
 				<PhoneNumber
 					isRequired={ requirePhoneField }
-					value={ billingFields.phone }
+					value={ billingAddress.phone }
 					onChange={ ( value ) => {
-						setPhone( value );
+						setBillingPhone( value );
 						dispatchCheckoutEvent( 'set-phone-number', {
 							step: 'billing',
 						} );
+						if ( useBillingAsShipping ) {
+							setShippingPhone( value );
+							dispatchCheckoutEvent( 'set-phone-number', {
+								step: 'shipping',
+							} );
+						}
 					} }
 				/>
 			) }

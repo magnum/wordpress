@@ -34,9 +34,16 @@ class EventsManager {
   
         wp_register_script( 'js-cookie', PYS_FREE_URL . '/dist/scripts/js.cookie-2.1.3.min.js', array(), '2.1.3' );
         wp_enqueue_script( 'js-cookie' );
-		
-		wp_enqueue_script( 'pys', PYS_FREE_URL . '/dist/scripts/public.js',
-			array( 'jquery', 'js-cookie', 'jquery-bind-first' ), PYS_FREE_VERSION );
+        if ( PYS()->getOption( 'compress_front_js' )){
+            wp_enqueue_script( 'pys', PYS_FREE_URL . '/dist/scripts/public.bundle.js',
+                array( 'jquery', 'js-cookie', 'jquery-bind-first' ), PYS_FREE_VERSION );
+        }
+        else
+        {
+            wp_enqueue_script( 'pys', PYS_FREE_URL . '/dist/scripts/public.js',
+                array( 'jquery', 'js-cookie', 'jquery-bind-first' ), PYS_FREE_VERSION );
+        }
+
 
 	}
 
@@ -60,10 +67,13 @@ class EventsManager {
 		}
 
 		$options = array(
-			'debug' => PYS()->getOption( 'debug_enabled' ),
-			'siteUrl' => site_url(),
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'enable_remove_download_url_param'=> PYS()->getOption( 'enable_remove_download_url_param' ),
+			'debug'                             => PYS()->getOption( 'debug_enabled' ),
+			'siteUrl'                           => site_url(),
+			'ajaxUrl'                           => admin_url( 'admin-ajax.php' ),
+            'ajax_event'                        => wp_create_nonce('ajax-event-nonce'),
+            'enable_remove_download_url_param'  => PYS()->getOption( 'enable_remove_download_url_param' ),
+            'cookie_duration'                   => PYS()->getOption( 'cookie_duration' ),
+            'last_visit_duration'               => PYS()->getOption('last_visit_duration')
 		);
 
 		$options['gdpr'] = array(
@@ -94,8 +104,16 @@ class EventsManager {
 			'cookie_law_info_integration_enabled' => isCookieLawInfoPluginActivated() && PYS()->getOption( 'gdpr_cookie_law_info_integration_enabled' ),
 		);
 
-        $options['edd'] = EventsEdd()->getOptions();
-        $options['woo'] = EventsWoo()->getOptions();
+        /**
+         * @var EventsFactory[] $eventsFactory
+         */
+        $eventsFactory = apply_filters("pys_event_factory",[]);
+        foreach ($eventsFactory as $factory) {
+            $opt =  $factory->getOptions();
+            if(!empty($opt)) {
+                $options[$factory::getSlug()] = $factory->getOptions();
+            }
+        }
 
 
         $data = array_merge( $data, $options );
@@ -141,23 +159,12 @@ class EventsManager {
                 $this->addStaticEvent( $event,$pixel,"" );
             }
         }
-        // search event
-        if ( PYS()->getOption('search_event_enabled' ) && is_search() ) {
-            $searchEvent = new SingleEvent('search_event', EventTypes::$STATIC,'');
 
-            foreach (PYS()->getRegisteredPixels() as $pixel) {
-                $events = $pixel->generateEvents( $searchEvent );
-                foreach ($events as $event) {
-                    $event->addParams($this->standardParams);
-                    $this->addStaticEvent( $event,$pixel,"" );
-                }
-            }
-        }
 
         /**
          * @var EventsFactory[] $eventsFactory
          **/
-        $eventsFactory = array(EventsFdp(),EventsEdd(),EventsCustom(),EventsSignal(),EventsWoo());
+        $eventsFactory = apply_filters("pys_event_factory",[]);
 
         foreach ($eventsFactory as $factory) {
             if(!$factory->isEnabled())  continue;
@@ -189,6 +196,13 @@ class EventsManager {
 
         if(count($this->facebookServerEvents)>0 && Facebook()->enabled()) {
             FacebookServer()->sendEventsAsync($this->facebookServerEvents);
+        }
+
+        // remove new user mark
+        if($user_id = get_current_user_id()) {
+            if ( get_user_meta( $user_id, 'pys_complete_registration', true ) ) {
+                delete_user_meta( $user_id, 'pys_complete_registration' );
+            }
         }
 	}
 
@@ -287,6 +301,9 @@ class EventsManager {
         if(!PYS()->getOption('enable_page_title_param')) {
             unset($data['params']['page_title']);
         }
+        if(!PYS()->getOption('enable_post_category_param')) {
+            unset($data['params']['post_category']);
+        }
 
         if($slug == EventsWoo::getSlug()) {
             if(!PYS()->getOption("enable_woo_category_name_param")) {
@@ -296,8 +313,8 @@ class EventsManager {
                 unset($data['params']['num_items']);
             }
 
-            if(!PYS()->getOption("enable_woo_product_price_param")) {
-                unset($data['params']['product_price']);
+            if(!PYS()->getOption("enable_woo_tags_param")) {
+                unset($data['params']['tags']);
             }
 
         }
@@ -310,8 +327,8 @@ class EventsManager {
                 unset($data['params']['num_items']);
             }
 
-            if(!PYS()->getOption("enable_edd_product_price_param")) {
-                unset($data['params']['product_price']);
+            if(!PYS()->getOption("enable_edd_tags_param")) {
+                unset($data['params']['tags']);
             }
         }
 
@@ -393,49 +410,47 @@ class EventsManager {
 	}
 
 	public static function setupWooSingleProductData() {
-		global $product;
+        global $product;
 
-        if($product == null || !is_a($product,"WC_Product")) return;
+        if ( ! is_object( $product)) $product = wc_get_product( get_the_ID() );
 
-		/** @var \WC_Product $product */
-		if ( isWooCommerceVersionGte( '2.6' ) ) {
-			$product_id = $product->get_id();
-		} else {
-			$product_id = $product->post->ID;
-		}
+        if(!$product || !is_a($product,"WC_Product") ) return;
 
-		// main product id
-		$product_ids[] = $product_id;
+        if ( wooProductIsType( $product, 'external' ) ) {
+            $eventType = 'woo_affiliate';
+        } else {
+            $eventType = 'woo_add_to_cart_on_button_click';
+        }
+        $product_id = $product->get_id();
 
-		// variations ids
-		if ( wooProductIsType( $product, 'variable' ) ) {
+        // main product id
+        $product_ids[] = $product_id;
 
-			/** @var \WC_Product_Variable $variation */
-			foreach ( $product->get_available_variations() as $variation ) {
+        // variations ids
+        if ( wooProductIsType( $product, 'variable' ) ) {
+            $product_ids = array_merge($product_ids, $product->get_children());
+        }
 
-				$variation = wc_get_product( $variation['variation_id'] );
-                if(!$variation) continue;
-				if ( isWooCommerceVersionGte( '2.6' ) ) {
-					$product_ids[] = $variation->get_id();
-				} else {
-					$product_ids[] = $variation->post->ID;
-				}
+        $params = array();
 
-			}
+        foreach ( $product_ids as $product_id ) {
 
-		}
+            foreach ( PYS()->getRegisteredPixels() as $pixel ) {
+                /** @var Pixel|Settings $pixel */
+                $initEvent = new SingleEvent($eventType,EventTypes::$STATIC,"woo");
+                $initEvent->args = ['productId' => $product_id,'quantity' => 1];
+                $events = [];
+                if(method_exists($pixel,'generateEvents')) {
+                    add_filter('pys_conditional_post_id', function($id) use ($product_id) { return $product_id; });
+                    $events =  $pixel->generateEvents( $initEvent );
+                    remove_all_filters('pys_conditional_post_id',10);
+                } else {
+                    if( $pixel->addParamsToEvent( $initEvent )) {
+                        $events[] = $initEvent;
+                    }
+                }
 
-		$params = array();
-        $eventType = 'woo_add_to_cart_on_button_click';
-        $event = new SingleEvent($eventType,EventTypes::$STATIC,'woo');
-        $event->args = ['productId' => $product_id,'quantity' => 1];
-
-		foreach ( $product_ids as $product_id ) {
-			foreach ( PYS()->getRegisteredPixels() as $pixel ) {
-				/** @var Pixel|Settings $pixel */
-
-
-                $events = $pixel->generateEvents( $event );
+                if(count($events) == 0) continue;
                 foreach ($events as $event) {
                     // prepare event data
                     $eventData = $event->getData();
@@ -443,25 +458,27 @@ class EventsManager {
 
                     $params[ $product_id ][ $pixel->getSlug() ] = $eventData; // replace (use only one event for product)
                 }
-			}
-		}
 
-		if ( empty( $params ) ) {
-			return;
-		}
+            }
 
-		?>
+        }
 
-		<script type="application/javascript" style="display:none">
+        if ( empty( $params ) ) {
+            return;
+        }
+
+        ?>
+
+        <script type="application/javascript" style="display:none">
             /* <![CDATA[ */
             window.pysWooProductData = window.pysWooProductData || [];
-			<?php foreach ( $params as $product_id => $product_data ) : ?>
+            <?php foreach ( $params as $product_id => $product_data ) : ?>
             window.pysWooProductData[<?php echo $product_id; ?>] = <?php echo json_encode( $product_data ); ?>;
-			<?php endforeach; ?>
+            <?php endforeach; ?>
             /* ]]> */
-		</script>
+        </script>
 
-		<?php
+        <?php
 
 	}
 

@@ -48,6 +48,7 @@ class PaymentEnginePaymentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Abstra
     const ITEMS = 'items';
     const PAYOUT_FOREIGN_EXCHANGE_RATE = 'payout_foreign_exchange_rate';
     const PHONE_SUPPORT_ELIGIBLE = 'phone_support_eligible';
+    const PLATFORM = 'platform';
     const REFUNDABLE_AMOUNT = 'refundable_amount';
     const REQUEST_ID = 'request_id';
     const TAX = 'tax';
@@ -56,6 +57,6 @@ class PaymentEnginePaymentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Abstra
     const USER = 'user';
     public function getFieldTypes()
     {
-        return array('actions' => 'list<Object>', 'application' => 'Application', 'country' => 'string', 'created_time' => 'datetime', 'disputes' => 'list<Object>', 'fraud_status' => 'string', 'fulfillment_status' => 'string', 'id' => 'string', 'is_from_ad' => 'bool', 'is_from_page_post' => 'bool', 'items' => 'list<Object>', 'payout_foreign_exchange_rate' => 'float', 'phone_support_eligible' => 'bool', 'refundable_amount' => 'CurrencyAmount', 'request_id' => 'string', 'tax' => 'string', 'tax_country' => 'string', 'test' => 'unsigned int', 'user' => 'User');
+        return array('actions' => 'list<Object>', 'application' => 'Application', 'country' => 'string', 'created_time' => 'datetime', 'disputes' => 'list<Object>', 'fraud_status' => 'string', 'fulfillment_status' => 'string', 'id' => 'string', 'is_from_ad' => 'bool', 'is_from_page_post' => 'bool', 'items' => 'list<Object>', 'payout_foreign_exchange_rate' => 'float', 'phone_support_eligible' => 'bool', 'platform' => 'string', 'refundable_amount' => 'CurrencyAmount', 'request_id' => 'string', 'tax' => 'string', 'tax_country' => 'string', 'test' => 'unsigned int', 'user' => 'User');
     }
 }

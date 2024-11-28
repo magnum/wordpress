@@ -61,26 +61,67 @@ if ( ! class_exists( 'WC_Connect_Functions' ) ) {
 		}
 
 		/**
+		 * Check if current page is a cart page or has woocommerce cart block.
+		 *
+		 * @return bool
+		 */
+		public static function is_cart() {
+			if ( is_cart() || self::has_cart_block() ) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Check if current page is a checkout page or has woocommerce checkout block.
+		 *
+		 * @return bool
+		 */
+		public static function is_checkout() {
+			if ( is_checkout() || self::has_checkout_block() ) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Check if current page has woocommerce cart block.
+		 *
+		 * @return bool
+		 */
+		public static function has_cart_block() {
+			// To support WP < 5.0.0, we need to check if `has_block` exists first as has_block only being introduced on WP 5.0.0.
+			if ( function_exists( 'has_block' ) ) {
+				return has_block( 'woocommerce/cart' );
+			}
+
+			return false;
+		}
+
+		/**
+		 * Check if current page has woocommerce checkout block.
+		 *
+		 * @return bool
+		 */
+		public static function has_checkout_block() {
+			// To support WP < 5.0.0, we need to check if `has_block` exists first as has_block only being introduced on WP 5.0.0.
+			if ( function_exists( 'has_block' ) ) {
+				return has_block( 'woocommerce/checkout' );
+			}
+
+			return false;
+		}
+
+		/**
 		 * Check if current page has woocommerce cart or checkout block.
 		 *
 		 * @return bool
 		 */
 		public static function has_cart_or_checkout_block() {
-			$page = get_post();
-			if ( ! $page ) {
-				return false;
-			}
-
-			$blocks = parse_blocks( $page->post_content );
-			if ( ! $blocks ) {
-				return false;
-			}
-
-			foreach ( $blocks as $block ) {
-				$block_name = $block['blockName'];
-				if ( 'woocommerce/cart' === $block_name || 'woocommerce/checkout' === $block_name ) {
-					return true;
-				}
+			if ( self::has_checkout_block() || self::has_cart_block() ) {
+				return true;
 			}
 
 			return false;
@@ -220,6 +261,30 @@ if ( ! class_exists( 'WC_Connect_Functions' ) ) {
 			$backed_up  = file_put_contents( $upload_dir['basedir'] . '/taxjar-wc_tax_rates-' . date( 'm-d-Y' ) . '-' . time() . '.csv', $csv );
 
 			return (bool) $backed_up;
+		}
+
+		/**
+		 * Search the uploads directory and return all backed up
+		 * tax rate files.
+		 *
+		 * @return array|false
+		 */
+		public static function get_backed_up_tax_rate_files() {
+			$upload_dir  = wp_upload_dir();
+			$pattern     = $upload_dir['basedir'] . '/taxjar-wc_tax_rates-*.csv';
+			$found_files = glob( $pattern );
+
+			if ( empty( $found_files ) ) {
+				return false;
+			}
+
+			$files = [];
+			foreach ( $found_files as $file ) {
+				$filename           = basename( $file );
+				$files[ $filename ] = $upload_dir['baseurl'] . '/' . $filename;
+			}
+
+			return $files;
 		}
 	}
 }

@@ -369,7 +369,11 @@ class WC_Session_Handler extends WC_Session {
 	public function forget_session() {
 		wc_setcookie( $this->_cookie, '', time() - YEAR_IN_SECONDS, $this->use_secure_cookie(), true );
 
-		wc_empty_cart();
+		if ( ! is_admin() ) {
+			include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
+
+			wc_empty_cart();
+		}
 
 		$this->_data        = array();
 		$this->_dirty       = false;
@@ -422,7 +426,7 @@ class WC_Session_Handler extends WC_Session {
 	/**
 	 * Returns the session.
 	 *
-	 * @param string $customer_id Custo ID.
+	 * @param string $customer_id Customer ID.
 	 * @param mixed  $default Default session value.
 	 * @return string|array
 	 */

@@ -45,12 +45,17 @@ class Bp_Tokens {
 	}
 
 	/**
+	 * BuddyPress possible tokens.
+	 *
 	 * @param array $tokens
 	 * @param array $args
 	 *
 	 * @return array
 	 */
 	public function bp_possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 		$trigger_integration = $args['integration'];
 		$trigger_meta        = $args['meta'];
 
@@ -115,7 +120,7 @@ class Bp_Tokens {
 			$fields[] = array(
 				'tokenId'         => 'ACTIVITY_ID',
 				'tokenName'       => __( 'Activity ID', 'uncanny-automator' ),
-				'tokenType'       => 'text',
+				'tokenType'       => 'int',
 				'tokenIdentifier' => 'BPUSERACTIVITY',
 			);
 			$fields[] = array(
@@ -143,7 +148,7 @@ class Bp_Tokens {
 			$fields[]     = array(
 				'tokenId'         => 'FRIEND_ID',
 				'tokenName'       => __( 'Friend ID', 'uncanny-automator' ),
-				'tokenType'       => 'text',
+				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			);
 			$fields[]     = array(
@@ -172,6 +177,8 @@ class Bp_Tokens {
 	}
 
 	/**
+	 * Parse BuddyPress Token.
+	 *
 	 * @param $value
 	 * @param $pieces
 	 * @param $recipe_id
@@ -197,9 +204,15 @@ class Bp_Tokens {
 			} elseif ( in_array( 'BPXPROFILE', $pieces ) ) {
 
 				if ( isset( $pieces[2] ) && ! empty( $pieces[2] ) ) {
-					$value = $this->get_xprofile_data( $user_id, $pieces[2] );
-					if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $value ) !== false ) {
-						$value = date( 'Y-m-d', $value );
+
+					// The function bp_get_profile_field_data() already formats the value.
+					if ( function_exists( 'bp_get_profile_field_data' ) ) {
+						$value = bp_get_profile_field_data(
+							array(
+								'field'   => absint( $pieces[2] ),
+								'user_id' => $user_id,
+							)
+						);
 					}
 				}
 			} elseif ( in_array( 'BPUSERACTIVITY', $pieces ) ) {
@@ -235,6 +248,8 @@ class Bp_Tokens {
 	}
 
 	/**
+	 * Get xprofile data.
+	 *
 	 * @param $user_id
 	 * @param $field_id
 	 *

@@ -46,6 +46,7 @@ class FacebookServer {
         $this->isDebug = PYS()->getOption( 'debug_enabled' );
 
         if($this->isEnabled) {
+            add_action( 'woocommerce_checkout_update_order_meta',array($this,'saveFbTagsInOrder'),10, 2);
             add_action( 'wp_ajax_pys_api_event',array($this,"catchAjaxEvent"));
             add_action( 'wp_ajax_nopriv_pys_api_event', array($this,"catchAjaxEvent"));
             add_action( 'woocommerce_remove_cart_item', array($this, 'trackRemoveFromCartEvent'), 10, 2);
@@ -99,8 +100,9 @@ class FacebookServer {
      * @param int $order_id the order ID
      */
     function completed_purchase($order_id) {
-
-        if(get_post_meta( $order_id, '_pys_purchase_event_fired', true )
+        $order = wc_get_order($order_id);
+        if(!$order
+            || $order->get_meta( '_pys_purchase_event_fired', true )
             || !PYS()->getOption( 'woo_purchase_enabled' )) {
             return;
         }
@@ -209,6 +211,10 @@ class FacebookServer {
         $eddOrder = isset($_POST['edd_order']) ? $_POST['edd_order'] : null;
 
 
+        if ( empty( $_REQUEST['ajax_event'] ) || !wp_verify_nonce( $_REQUEST['ajax_event'], 'ajax-event-nonce' ) ) {
+            wp_die();
+            return;
+        }
 
         if($event == "hCR") $event="CompleteRegistration"; // de mask completer registration event if it was hidden
 
@@ -270,6 +276,15 @@ class FacebookServer {
 
             $api = Api::init(null, null, $this->access_token[$pixel_Id],false);
 
+            /**
+             * filter pys_before_send_fb_server_event
+             * Help add custom options or get data from event before send
+             * FacebookAds\Object\ServerSide\Event $event
+             * String $pixel_Id
+             * String EventId
+             */
+            $event = apply_filters("pys_before_send_fb_server_event",$event,$pixel_Id,$event->getEventId());
+
             $request = (new EventRequest($pixel_Id))->setEvents([$event]);
             $request->setPartnerAgent("dvpixelyoursite");
             if(!empty($this->testCode[$pixel_Id])) {
@@ -287,6 +302,17 @@ class FacebookServer {
                     PYS()->getLog()->error('Error send FB server event',$e);
                 }
             }
+        }
+    }
+
+    public function saveFbTagsInOrder($order_id, $data) {
+        $pysData = [];
+        $pysData['fbc'] = ServerEventHelper::getFbc();
+        $pysData['fbp'] = ServerEventHelper::getFbp();
+        $order = wc_get_order($order_id);
+        if($order) {
+            $order->update_meta_data("pys_fb_cookie",$pysData);
+            $order->save();
         }
     }
 

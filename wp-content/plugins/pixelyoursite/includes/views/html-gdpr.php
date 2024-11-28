@@ -61,7 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
             <div class="row justify-content-center">
                 <div class="col-4">
-                    <a href="https://www.consentmagic.com/?utm_source=pys&utm_medium=free-plugin&utm_campaign=consent-page" target="_blank" class="btn btn-sm pys_btn_orange">
+                    <a href="https://www.pixelyoursite.com/plugins/consentmagic/?utm_source=pixelyoursite-free&utm_medium=pixelyoursite-free&utm_campaign=pixelyoursite-free&utm_content=pixelyoursite-free&utm_term=pixelyoursite-free" target="_blank" class="btn btn-sm pys_btn_orange">
                         Lean more about Consent Magic
                     </a>
                 </div>

@@ -14,30 +14,91 @@ class Recipe_Post_Utilities {
 	 */
 	public function __construct() {
 		// Add the custom columns to the uo-recipe.
-		add_filter( 'manage_uo-recipe_posts_columns', array( $this, 'set_custom_columns' ) );
+		add_filter(
+			'manage_uo-recipe_posts_columns',
+			array(
+				$this,
+				'set_custom_columns',
+			)
+		);
 
 		// Add the data to the custom columns for uo-recipe.
-		add_action( 'manage_uo-recipe_posts_custom_column', array( $this, 'custom_column' ), 10, 2 );
+		add_action(
+			'manage_uo-recipe_posts_custom_column',
+			array(
+				$this,
+				'custom_column',
+			),
+			10,
+			2
+		);
 
 		// Add admin post creation scripts.
-		add_action( 'admin_enqueue_scripts', array( $this, 'automator_recipe_scripts' ) );
+		add_action(
+			'admin_enqueue_scripts',
+			array(
+				$this,
+				'automator_recipe_scripts',
+			),
+			999
+		);
 
 		// Change to before delete post.
-		add_action( 'delete_post', array( $this, 'delete_triggers_actions' ), 10, 1 );
+		add_action(
+			'delete_post',
+			array(
+				$this,
+				'delete_triggers_actions',
+			),
+			10,
+			1
+		);
 
 		// Draft when recipe moved to trash.
-		add_action( 'wp_trash_post', array( $this, 'draft_triggers_actions' ), 10, 1 );
+		add_action(
+			'wp_trash_post',
+			array(
+				$this,
+				'draft_triggers_actions',
+			),
+			10,
+			1
+		);
 
 		// Prepopulate recipe from a URL query (only for admins).
 		if ( is_admin() ) {
-			add_action( 'wp_insert_post', array( 'Uncanny_Automator\Populate_From_Query', 'maybe_populate' ), 9, 3 );
+			add_action(
+				'wp_insert_post',
+				array(
+					'Uncanny_Automator\Populate_From_Query',
+					'maybe_populate',
+				),
+				9,
+				3
+			);
 		}
 
 		// Change Default new recipe post from auto-draft to draft.
-		add_action( 'wp_insert_post', array( $this, 'change_default_post_status' ), 10, 3 );
+		add_action(
+			'wp_insert_post',
+			array(
+				$this,
+				'change_default_post_status',
+			),
+			10,
+			3
+		);
 
 		// Add recipe and redirect to it in edit mode.
-		add_filter( 'replace_editor', array( $this, 'redirect_to_recipe' ), 20, 2 );
+		add_filter(
+			'replace_editor',
+			array(
+				$this,
+				'redirect_to_recipe',
+			),
+			20,
+			2
+		);
 
 		// Remove WordPress default publish box.
 		add_action( 'admin_menu', array( $this, 'remove_publish_box' ) );
@@ -116,6 +177,9 @@ class Recipe_Post_Utilities {
 			return;
 		}
 
+		// Add TinyMCE plugins
+		$this->assets_vendor_tinymce_plugins();
+
 		// Add CodeMirror
 		$this->assets_vendor_codemirror();
 
@@ -135,6 +199,11 @@ class Recipe_Post_Utilities {
 				'uap-codemirror-searchcursor',
 				'uap-codemirror-search',
 				'uap-codemirror-placeholder',
+				'uap-codemirror-mode-xml',
+				'uap-codemirror-mode-css',
+				'uap-codemirror-mode-javascript',
+				'uap-codemirror-mode-htmlmixed',
+				'uap-tinymce-plugin-fullpage',
 			),
 			Utilities::automator_get_version(),
 			true
@@ -154,6 +223,24 @@ class Recipe_Post_Utilities {
 			array(
 				'uap-admin',
 				'uap-codemirror',
+			),
+			Utilities::automator_get_version()
+		);
+
+		// Remove conflictive assets
+		// These shouldn't load in the recipe builder
+		$this->dequeue_conflictive_assets();
+	}
+
+	/**
+	 * Enqueue additional TinyMCE plugins for WordPress' editor
+	 */
+	private function assets_vendor_tinymce_plugins() {
+		wp_enqueue_script(
+			'uap-tinymce-plugin-fullpage',
+			Utilities::automator_get_vendor_asset( 'tinymce/plugins/fullpage/plugin.min.js' ),
+			array(
+				'wp-tinymce',
 			),
 			Utilities::automator_get_version()
 		);
@@ -235,6 +322,115 @@ class Recipe_Post_Utilities {
 			Utilities::automator_get_version(),
 			true
 		);
+
+		wp_enqueue_script(
+			'uap-codemirror-mode-xml',
+			Utilities::automator_get_vendor_asset( 'codemirror/js/modes/xml/xml.min.js' ),
+			array(
+				'jquery',
+				'uap-codemirror',
+			),
+			Utilities::automator_get_version(),
+			true
+		);
+
+		wp_enqueue_script(
+			'uap-codemirror-mode-css',
+			Utilities::automator_get_vendor_asset( 'codemirror/js/modes/css/css.min.js' ),
+			array(
+				'jquery',
+				'uap-codemirror',
+			),
+			Utilities::automator_get_version(),
+			true
+		);
+
+		wp_enqueue_script(
+			'uap-codemirror-mode-javascript',
+			Utilities::automator_get_vendor_asset( 'codemirror/js/modes/javascript/javascript.min.js' ),
+			array(
+				'jquery',
+				'uap-codemirror',
+			),
+			Utilities::automator_get_version(),
+			true
+		);
+
+		wp_enqueue_script(
+			'uap-codemirror-mode-htmlmixed',
+			Utilities::automator_get_vendor_asset( 'codemirror/js/modes/htmlmixed/htmlmixed.min.js' ),
+			array(
+				'jquery',
+				'uap-codemirror',
+			),
+			Utilities::automator_get_version(),
+			true
+		);
+	}
+
+	/**
+	 * Dequeues conflictive assets that shouldn't be loading in the recipe builder
+	 */
+	private function dequeue_conflictive_assets() {
+		// Set conflictive scripts
+		$conflictive_scripts = array(
+			// General
+			'select2',
+
+			// WooCommerce
+			'selectWoo',
+			'wc-enhanced-select',
+
+			// LearnDash
+			'learndash-select2-jquery-script',
+
+			// The Events Calendar
+			'tribe-select2',
+
+			// Studiocart
+			'sc-select2_js',
+
+			// JW Player 6 for WordPress
+			'jquerySelect2',
+			'jwp6media',
+
+			// YouTube Embed Plus
+			'__ytprefs_admin__',
+		);
+
+		$conflictive_styles = array(
+			// General
+			'select2',
+
+			// LearnDash
+			'learndash-select2-jquery-style',
+
+			// Studiocart
+			'sc-select2_css',
+
+			// JW Player 6 for WordPress
+			'jquerySelect2Style',
+		);
+
+		$conflictive_assets = array(
+			'scripts' => $conflictive_scripts,
+			'styles'  => $conflictive_styles,
+		);
+
+		$conflictive_assets = apply_filters( 'automator_conflictive_assets', $conflictive_assets );
+
+		// Check if the array is valid
+		if ( empty( $conflictive_assets ) || ! isset( $conflictive_assets['scripts'] ) || ! isset( $conflictive_assets['styles'] ) ) {
+			// Someone made a mess and this is empty now. Bail
+			return;
+		}
+		foreach ( $conflictive_assets['scripts'] as $conflictive_script ) {
+			wp_deregister_script( $conflictive_script );
+		}
+
+		foreach ( $conflictive_assets['styles'] as $conflictive_style ) {
+			wp_deregister_style( $conflictive_style );
+		}
 	}
 
 	/**
@@ -258,6 +454,10 @@ class Recipe_Post_Utilities {
 		$completions_allowed     = get_post_meta( $post_id, 'recipe_completions_allowed', true );
 		$max_completions_allowed = get_post_meta( $post_id, 'recipe_max_completions_allowed', true );
 		$recipe_type             = get_post_meta( $post_id, 'uap_recipe_type', true );
+		$trigger_logic           = get_post_meta( $post_id, 'automator_trigger_logic', true );
+		if ( empty( $trigger_logic ) ) {
+			$trigger_logic = 'all';
+		}
 
 		// Get source
 		$source = get_post_meta( $post_id, 'source', true );
@@ -267,7 +467,7 @@ class Recipe_Post_Utilities {
 			'newUser'      => array(),
 		);
 		// Check if the user defined a valid source
-		if ( in_array( $source, array( 'existingUser', 'newUser' ), false ) ) {
+		if ( in_array( $source, array( 'existingUser', 'newUser' ), true ) ) {
 			// If the user did it, then add the fields
 			$fields[ $source ] = get_post_meta( $post_id, 'fields', true );
 		}
@@ -280,15 +480,18 @@ class Recipe_Post_Utilities {
 
 		// Remove any cached extra options
 		delete_post_meta( $post_id, 'extra_options' );
-		$count     = Automator()->get->recipe_completed_times( $post_id );
-		$url       = add_query_arg(
+		$count = Automator()->get->recipe_completed_times( $post_id );
+		$url   = add_query_arg(
 			array(
 				'post_type' => 'uo-recipe',
-				'page'      => 'uncanny-automator-recipe-log',
+				'page'      => 'uncanny-automator-admin-logs',
 				'recipe_id' => $post_id,
 			),
 			admin_url( 'edit.php' )
 		);
+
+		Automator()->automator_load_textdomain();
+
 		$api_setup = array(
 			'wp'                  => false,
 			'restURL'             => esc_url_raw( rest_url() . AUTOMATOR_REST_API_END_POINT ),
@@ -302,6 +505,7 @@ class Recipe_Post_Utilities {
 				'permalinksURL'  => esc_url( admin_url( 'options-permalink.php' ) ),
 				'automatorTools' => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-tools' ),
 			),
+			'isMultisite'         => ( is_multisite() ) ? true : false,
 			'integrations'        => Automator()->get_integrations(),
 			'triggers'            => Automator()->get_triggers(),
 			'actions'             => Automator()->get_actions(),
@@ -309,7 +513,7 @@ class Recipe_Post_Utilities {
 			'i18n'                => Automator()->i18n->get_all(),
 			'recipes_object'      => Automator()->get_recipes_data( true, $post_id ),
 			'version'             => Utilities::automator_get_version(),
-			'proVersion'          => defined( 'AUTOMATOR_PRO_FILE' ) ? \Uncanny_Automator_Pro\InitializePlugin::PLUGIN_VERSION : '',
+			'proVersion'          => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ? AUTOMATOR_PRO_PLUGIN_VERSION : '',
 			'proFeatures'         => $this->get_pro_items(),
 			'recipe'              => array(
 				'id'               => $post_id,
@@ -319,6 +523,7 @@ class Recipe_Post_Utilities {
 				'isLive'           => 'publish' === $post->post_status,
 				'requiresUserData' => Automator()->get->get_recipe_requires_user( $post_id ),
 				'errorMode'        => false,
+				'triggersLogic'    => $trigger_logic,
 				'isValid'          => false,
 				'userSelector'     => array(
 					'source'    => $source,
@@ -349,20 +554,33 @@ class Recipe_Post_Utilities {
 					'copyToDraft'            => sprintf( '%s?action=%s&post=%d&return_to_recipe=yes&_wpnonce=%s', admin_url( 'edit.php' ), 'copy_recipe_parts', $post_id, wp_create_nonce( 'Aut0Mat0R' ) ),
 				),
 			),
+			'isRTL'               => is_rtl(),
 			'format'              => array(
 				'date' => get_option( 'date_format' ),
+				'time' => get_option( 'time_format' ),
 			),
 			'connectApiUrl'       => sprintf( '%s%s?redirect_url=%s', AUTOMATOR_FREE_STORE_URL, AUTOMATOR_FREE_STORE_CONNECT_URL, rawurlencode( admin_url( 'admin.php?page=uncanny-automator-dashboard' ) ) ),
 			'dashboardUrl'        => admin_url( 'admin.php?page=uncanny-automator-dashboard' ),
-			'hasAccountConnected' => ( ! Admin_Menu::is_automator_connected() ? false : true ),
+			'hasAccountConnected' => ( ! Api_Server::is_automator_connected() ? false : true ),
 			'hasValidProLicense'  => ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === get_option( 'uap_automator_pro_license_status' ) ),
-			'licenseUrl'          => site_url( 'wp-admin/edit.php?post_type=uo-recipe&page=uncanny-automator-license-activation' ),
+			'licenseUrl'          => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=general&general=license' ),
 			'marketing'           => array(
 				'utmR' => get_option( 'uncannyautomator_source', '' ),
+			),
+			'assets'              => array(
+				'global'        => array(
+					'style'  => Utilities::automator_get_asset( 'backend/dist/bundle.min.css' ),
+					'script' => Utilities::automator_get_asset( 'backend/dist/bundle.min.js' ),
+				),
+				'recipeBuilder' => array(
+					'style'  => Utilities::automator_get_recipe_dist( 'bundle.min.css' ),
+					'script' => Utilities::automator_get_recipe_dist( 'bundle.min.js' ),
+				),
 			),
 		);
 
 		$api_setup = apply_filters_deprecated( 'uap_api_setup', array( $api_setup ), '3.0', 'automator_api_setup' ); // deprecate
+
 		return apply_filters( 'automator_api_setup', $api_setup );
 	}
 
@@ -419,7 +637,8 @@ class Recipe_Post_Utilities {
 			'post_parent'    => $post_ID,
 			'post_status'    => 'any',
 			'post_type'      => 'uo-trigger',
-			'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+			'posts_per_page' => 999,
+			//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 		);
 
 		$children = get_children( $args );
@@ -439,7 +658,8 @@ class Recipe_Post_Utilities {
 			'post_parent'    => $post_ID,
 			'post_status'    => 'any',
 			'post_type'      => 'uo-action',
-			'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+			'posts_per_page' => 999,
+			//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 		);
 
 		$children = get_children( $args );
@@ -459,7 +679,8 @@ class Recipe_Post_Utilities {
 			'post_parent'    => $post_ID,
 			'post_status'    => 'any',
 			'post_type'      => 'uo-closure',
-			'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+			'posts_per_page' => 999,
+			//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 		);
 
 		$children = get_children( $args );
@@ -491,7 +712,8 @@ class Recipe_Post_Utilities {
 				'post_parent'    => $post->ID,
 				'post_status'    => 'any',
 				'post_type'      => 'uo-trigger',
-				'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+				'posts_per_page' => 999,
+				//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			);
 
 			$children = get_children( $args );
@@ -514,7 +736,8 @@ class Recipe_Post_Utilities {
 				'post_parent'    => $post->ID,
 				'post_status'    => 'any',
 				'post_type'      => 'uo-action',
-				'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+				'posts_per_page' => 999,
+				//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			);
 
 			$children = get_children( $args );
@@ -537,7 +760,8 @@ class Recipe_Post_Utilities {
 				'post_parent'    => $post->ID,
 				'post_status'    => 'any',
 				'post_type'      => 'uo-closure',
-				'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+				'posts_per_page' => 999,
+				//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			);
 
 			$children = get_children( $args );
@@ -588,7 +812,7 @@ class Recipe_Post_Utilities {
 
 				break;
 			case 'actions':
-				$action_titles = $wpdb->get_results( $wpdb->prepare( "SELECT post_status, post_title FROM {$wpdb->posts} WHERE post_parent=%d AND post_type=%s", $post_id, 'uo-action' ) );
+				$action_titles = $wpdb->get_results( $wpdb->prepare( "SELECT post_status, post_title FROM {$wpdb->posts} WHERE post_parent=%d AND post_type=%s ORDER BY `menu_order` ASC", $post_id, 'uo-action' ) );
 				?>
 				<div class="uap">
 					<div class="uo-post-column__list">
@@ -607,7 +831,7 @@ class Recipe_Post_Utilities {
 				$url   = add_query_arg(
 					array(
 						'post_type' => 'uo-recipe',
-						'page'      => 'uncanny-automator-recipe-log',
+						'page'      => 'uncanny-automator-admin-logs',
 						'recipe_id' => $post_id,
 					),
 					admin_url( 'edit.php' )
@@ -656,4 +880,5 @@ class Recipe_Post_Utilities {
 
 		return $new_columns;
 	}
+
 }

@@ -1,10 +1,12 @@
 === WooCommerce Shipping & Tax ===
 Contributors: woocommerce, automattic, woothemes, allendav, kellychoffman, jkudish, jeffstieler, nabsul, robobot3000, danreylop, mikeyarce, shaunkuschel, orangesareorange, pauldechov, dappermountain, radogeorgiev, bor0, royho, cshultz88, bartoszbudzanowski, harriswong, ferdev, superdav42
 Tags: shipping, stamps, usps, woocommerce, taxes, payment, dhl, labels
+Requires PHP: 5.6
 Requires at least: 4.6
-Requires PHP: 5.3
-Tested up to: 5.9
-Stable tag: 1.25.25
+Tested up to: 6.1.1
+WC requires at least: 3.6
+WC tested up to: 7.3.0
+Stable tag: 2.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +77,59 @@ The source code is freely available [in GitHub](https://github.com/Automattic/wo
 6. Checking and exporting the label purchase reports
 
 == Changelog ==
+
+= 2.2.3 - 2023-02-14 =
+* Fix   - Link correction on Automated taxes description text.
+
+= 2.2.2 - 2023-02-02 =
+* Fix   - Adjust checkout US zipcode validation to run only when exactly 5 or 10 digits are typed.
+
+= 2.2.1 - 2023-01-24 =
+* Fix   - Fix warning on checkout page apper if zipcode doesn't match selected state.
+
+= 2.2.0 - 2023-01-19 =
+* Add   - Add option to let user pick whether to save the last package & service or not.
+
+= 2.1.1 - 2023-01-02 =
+* Fix   - Save the selected package box and do not skip the package step.
+
+= 2.1.0 - 2022-11-30 =
+* Tweak - Catch malformed zipcode and display WC notice.
+
+= 2.0.0 - 2022-11-16 =
+* Add   - High-Performance Order Storage compatibility.
+* Add   - Add list of tax rate backup files for merchants to click and download.
+* Tweak - Transition version numbering from SemVer to WordPress versioning.
+
+= 1.26.3 - 2022-08-03 =
+* Tweak - Always let the user to pick the package box.
+* Add   - Add filter to override TaxJar result.
+* Fix   - Uncatch error when installing/connecting the Jetpack.
+
+= 1.26.2 - 2022-07-04 =
+* Fix   - Change the wp-calypso commit to fix NPM Error when run `npm run prepare`.
+* Fix   - E2E Tests: npm ci, update puppeteer to v2
+* Fix   - JS Tests: npm ci
+* Tweak - Replace colors npm package with chalk
+
+= 1.26.1 - 2022-06-21 =
+* Add   - Display warning if non-roman character is entered in address fields.
+* Fix   - "Division by Zero" fatal error on PHP 8.
+
+= 1.26.0 - 2022-05-27 =
+* Add   - Tool to clear cached Tax server responses from the transients.
+* Tweak - Enable shipping tax by default if is Florida interstate shipping.
+
+= 1.25.28 - 2022-05-12 =
+* Fix   - Notice: Undefined index: 'from_country' when validating TaxJar request.
+
+= 1.25.27 - 2022-05-03 =
+* Fix   - Cart with non-taxable product still calculate the tax.
+* Tweak - Validate the TaxJar request before calling the api and cache 404 and 400 TaxJar response error for 5 minutes.
+
+= 1.25.26 - 2022-04-19 =
+* Fix   - Display error on cart block and checkout block from WC Blocks plugin.
+* Fix   - TaxJar does not calculate Quebec Sales Tax when shipping from Canadian address.
 
 = 1.25.25 - 2022-03-29 =
 * Fix   - TaxJar does not get the tax if the cart has non-taxable on the first item.

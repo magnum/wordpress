@@ -116,7 +116,7 @@ class MessageFormatter implements \PYS_PRO_GLOBAL\GuzzleHttp\MessageFormatterInt
                     break;
                 case 'uri':
                 case 'url':
-                    $result = $request->getUri();
+                    $result = $request->getUri()->__toString();
                     break;
                 case 'target':
                     $result = $request->getRequestTarget();

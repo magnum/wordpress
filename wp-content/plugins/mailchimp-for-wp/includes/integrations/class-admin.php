@@ -52,7 +52,7 @@ class MC4WP_Integration_Admin {
 	 *
 	 * @return void
 	 */
-	public function enqueue_assets( $suffix, $page = '' ) {
+	public function enqueue_assets( $suffix, $page ) {
 		// only load on integrations pages
 		if ( $page !== 'integrations' ) {
 			return;
@@ -136,6 +136,11 @@ class MC4WP_Integration_Admin {
 			$settings['lists'] = array_filter( $settings['lists'] );
 		} else {
 			$settings['lists'] = array();
+		}
+
+		$settings['label'] = strip_tags( $settings['label'], '<strong><b><br><a><script><u><em><i><span><img>' );
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			$settings['label'] = mc4wp_kses( $settings['label'] );
 		}
 
 		return $settings;

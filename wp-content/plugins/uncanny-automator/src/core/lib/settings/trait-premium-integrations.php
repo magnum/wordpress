@@ -5,8 +5,8 @@
  * @class   Settings
  * @since   3.7
  * @version 3.7
- * @package Uncanny_Automator
  * @author  Agustin B.
+ * @package Uncanny_Automator
  */
 
 namespace Uncanny_Automator\Settings;
@@ -85,6 +85,13 @@ trait Premium_Integrations {
 	protected $css = '';
 
 	/**
+	 * An array of alerts to display on the current settings page
+	 *
+	 * @var array
+	 */
+	protected $alerts = array();
+
+	/**
 	 * Make this method mandatory
 	 * Sets up the properties of the settings page
 	 */
@@ -103,6 +110,10 @@ trait Premium_Integrations {
 		// Register the settings page
 		// Invoke this method last
 		$this->register_settings();
+
+		if ( $this->is_current_page_settings() ) {
+			$this->maybe_settings_updated();
+		}
 	}
 
 	/**
@@ -316,8 +327,8 @@ trait Premium_Integrations {
 	 */
 	public function is_current_page_settings() {
 		return automator_filter_input( 'page' ) === 'uncanny-automator-config'
-		       && automator_filter_input( 'tab' ) === 'premium-integrations'
-		       && automator_filter_input( 'integration' ) === $this->get_id();
+			   && automator_filter_input( 'tab' ) === 'premium-integrations'
+			   && automator_filter_input( 'integration' ) === $this->get_id();
 	}
 
 	/**
@@ -330,62 +341,52 @@ trait Premium_Integrations {
 		}
 
 		// Add the tab using the filter
-		$this->add_tab();
+		//$this->add_tab();
+		add_filter( 'automator_settings_premium_integrations_tabs', array( $this, 'add_tab' ) );
 
 		// Register the options/settings
-		$this->add_wordpress_settings();
+		//$this->add_wordpress_settings();
+		add_filter( 'admin_init', array( $this, 'add_wordpress_settings' ) );
 
 		// Enqueue the assets
-		$this->enqueue_assets();
+		//$this->enqueue_assets();
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	/**
 	 * Adds the tab and the function that outputs the content to the Settings page
 	 */
-	private function add_tab() {
+	public function add_tab( $tabs ) {
 		// Check if the ID is defined
-		// Add it using the filter
-		add_filter(
-			'automator_settings_premium_integrations_tabs',
-			function ( $tabs ) {
-
-				// Create the tab
-				$tabs[ $this->get_id() ] = (object) array(
-					'name'     => $this->get_name(),
-					'icon'     => $this->get_icon(),
-					'status'   => $this->get_status(),
-					'preload'  => $this->get_preload(),
-					'function' => array( $this, 'output' ),
-				);
-
-				return $tabs;
-			}
+		// Create the tab
+		$tabs[ $this->get_id() ] = (object) array(
+			'name'     => $this->get_name(),
+			'icon'     => $this->get_icon(),
+			'status'   => $this->get_status(),
+			'preload'  => $this->get_preload(),
+			'function' => array( $this, 'output' ),
 		);
+
+		return $tabs;
 	}
 
 	/**
 	 * Registers the options
 	 */
-	private function add_wordpress_settings() {
+	public function add_wordpress_settings() {
 		// Check if it has options
 		if ( empty( $this->get_options() ) ) {
 			return;
 		}
 
-		// Register the options/settings
-		add_action(
-			'admin_init',
-			function () {
-				foreach ( $this->get_options() as $option_name ) {
-					register_setting( $this->get_settings_id(), $option_name );
-				}
-			}
-		);
+		foreach ( $this->get_options() as $option_name ) {
+			register_setting( $this->get_settings_id(), $option_name );
+		}
 	}
 
 	/**
 	 * Returns the option group user in settings_fields()
-	 * 
+	 *
 	 * @return String The option group
 	 */
 	public function get_settings_id() {
@@ -394,7 +395,7 @@ trait Premium_Integrations {
 
 	/**
 	 * Returns the nonce action
-	 * 
+	 *
 	 * @return String The nonce action
 	 */
 	public function get_nonce_action() {
@@ -404,42 +405,179 @@ trait Premium_Integrations {
 	/**
 	 * Enqueue the assets
 	 */
-	private function enqueue_assets() {
+	public function enqueue_assets() {
 		// Check if there are assets defined
 		if ( ! $this->get_css() && ! $this->get_js() ) {
 			return;
 		}
 
-		// Enqueue assets
-		add_action(
-			'admin_enqueue_scripts',
-			function () {
-				// Only enqueue the assets of this integration on its own settings page
-				if ( ! $this->is_current_page_settings() ) {
-					return;
-				}
+		// Only enqueue the assets of this integration on its own settings page
+		if ( ! $this->is_current_page_settings() ) {
+			return;
+		}
 
-				// Enqueue the CSS
-				if ( $this->get_css() ) {
-					wp_enqueue_style(
-						'uap-premium-integration-' . $this->get_id(),
-						plugins_url( '/src/integrations/' . $this->get_css(), AUTOMATOR_BASE_FILE ),
-						array( 'uap-admin' ),
-						AUTOMATOR_PLUGIN_VERSION
-					);
-				}
+		// Enqueue the CSS
+		if ( $this->get_css() ) {
+			wp_enqueue_style(
+				'uap-premium-integration-' . $this->get_id(),
+				plugins_url( '/src/integrations/' . $this->get_css(), AUTOMATOR_BASE_FILE ),
+				array( 'uap-admin' ),
+				AUTOMATOR_PLUGIN_VERSION
+			);
+		}
 
-				// Enqueue the JS
-				if ( $this->get_js() ) {
-					wp_enqueue_script(
-						'uap-premium-integration-' . $this->get_id(),
-						plugins_url( '/src/integrations/' . $this->get_js(), AUTOMATOR_BASE_FILE ),
-						array( 'uap-admin' ),
-						AUTOMATOR_PLUGIN_VERSION,
-						true
-					);
-				}
+		// Enqueue the JS
+		if ( $this->get_js() ) {
+			wp_enqueue_script(
+				'uap-premium-integration-' . $this->get_id(),
+				plugins_url( '/src/integrations/' . $this->get_js(), AUTOMATOR_BASE_FILE ),
+				array( 'uap-admin' ),
+				AUTOMATOR_PLUGIN_VERSION,
+				true
+			);
+		}
+
+	}
+
+	/**
+	 * Determines whether the current page settings were updated
+	 *
+	 * @return void
+	 */
+	public function maybe_settings_updated() {
+		if ( 'true' === automator_filter_input( 'settings-updated' ) ) {
+			$this->settings_updated();
+		}
+	}
+
+	/**
+	 * Override this method to run code when the settings were updated
+	 *
+	 * @return void
+	 */
+	public function settings_updated() {
+	}
+
+	/**
+	 * add_alert
+	 *
+	 * Add an alert to show on the settings page
+	 *
+	 * @param array $alert
+	 *
+	 * @return void
+	 */
+	public function add_alert( $alert ) {
+		$this->alerts[] = $alert;
+	}
+
+	/**
+	 * get_alerts
+	 *
+	 * Get all alerts
+	 *
+	 * @return array
+	 */
+	public function get_alerts() {
+		return $this->alerts;
+	}
+
+	/**
+	 * This method will output all the queued alerts HTML.
+	 *
+	 * @return void
+	 */
+	public function display_alerts() {
+
+		if ( ! empty( $this->get_alerts() ) ) {
+			foreach ( $this->get_alerts() as $alert ) {
+				$this->alert_html( $alert );
 			}
+		}
+	}
+
+	/**
+	 * alert_html
+	 *
+	 * Output the uo-alert HTML
+	 *
+	 * @param array $alert
+	 *
+	 * @return void
+	 */
+	public function alert_html( $alert ) {
+
+		$default = array(
+			'type'    => '',
+			'heading' => '',
+			'content' => '',
 		);
+
+		$alert = wp_parse_args( $alert, $default );
+
+		$allowed_html = array(
+			'a'       => array(
+				'href'   => array(),
+				'target' => array(),
+			),
+			'uo-icon' => array(
+				'id' => array(),
+			),
+		);
+
+		?>
+
+		<uo-alert
+			type="<?php echo esc_attr( $alert['type'] ); ?>"
+			heading="<?php echo esc_attr( $alert['heading'] ); ?>"
+			class="uap-spacing-bottom uap-spacing-top"
+		><?php echo( wp_kses( $alert['content'], $allowed_html ) ); ?></uo-alert>
+
+		<?php
+
+	}
+
+	/**
+	 * text_input_html
+	 *
+	 * Output the uo-text-input HTML
+	 *
+	 * @param array $input
+	 *
+	 * @return void
+	 */
+	public function text_input_html( $input ) {
+
+		$default = array(
+			'id'       => '',
+			'value'    => '',
+			'label'    => '',
+			'required' => '',
+			'class'    => '',
+			'hidden'   => '',
+			'disabled' => '',
+		);
+
+		$input = wp_parse_args( $input, $default );
+		?>
+
+		<uo-text-field
+			id="<?php echo esc_attr( $input['id'] ); ?>"
+			value="<?php echo esc_attr( $input['value'] ); ?>"
+			label="<?php echo esc_attr( $input['label'] ); ?>"
+			class="<?php echo esc_attr( $input['class'] ); ?>"
+			<?php
+			if ( ! empty( $input['required'] ) ) {
+				echo 'required ';
+			}
+			if ( ! empty( $input['hidden'] ) ) {
+				echo 'hidden ';
+			}
+			if ( ! empty( $input['disabled'] ) ) {
+				echo 'disabled ';
+			}
+			?>
+		></uo-text-field>
+		<?php
 	}
 }

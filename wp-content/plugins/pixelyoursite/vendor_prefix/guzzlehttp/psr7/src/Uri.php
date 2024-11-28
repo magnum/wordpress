@@ -12,7 +12,7 @@ use PYS_PRO_GLOBAL\Psr\Http\Message\UriInterface;
  * @author Tobias Schultze
  * @author Matthew Weier O'Phinney
  */
-class Uri implements \PYS_PRO_GLOBAL\Psr\Http\Message\UriInterface
+class Uri implements \PYS_PRO_GLOBAL\Psr\Http\Message\UriInterface, \JsonSerializable
 {
     /**
      * Absolute http and https URIs require a host per RFC 7230 Section 2.7
@@ -409,6 +409,10 @@ class Uri implements \PYS_PRO_GLOBAL\Psr\Http\Message\UriInterface
         $new->fragment = $fragment;
         $new->composedComponents = null;
         return $new;
+    }
+    public function jsonSerialize() : string
+    {
+        return $this->__toString();
     }
     /**
      * Apply parse_url parts to a URI.

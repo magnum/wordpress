@@ -1,21 +1,20 @@
 /**
  * External dependencies
  */
-import { Icon, truck } from '@woocommerce/icons';
-import { registerFeaturePluginBlockType } from '@woocommerce/block-settings';
+import { Icon, shipping } from '@wordpress/icons';
+import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Edit, Save } from './edit';
 import attributes from './attributes';
-import metadata from './block.json';
 
-registerFeaturePluginBlockType( metadata, {
+registerBlockType( 'woocommerce/checkout-shipping-methods-block', {
 	icon: {
 		src: (
 			<Icon
-				srcElement={ truck }
+				icon={ shipping }
 				className="wc-block-editor-components-block-icon"
 			/>
 		),

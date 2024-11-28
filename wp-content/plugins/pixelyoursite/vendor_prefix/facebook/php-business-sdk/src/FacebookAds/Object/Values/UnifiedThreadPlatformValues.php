@@ -38,4 +38,5 @@ class UnifiedThreadPlatformValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Abstr
 {
     const INSTAGRAM = 'INSTAGRAM';
     const MESSENGER = 'MESSENGER';
+    const WHATSAPP = 'WHATSAPP';
 }

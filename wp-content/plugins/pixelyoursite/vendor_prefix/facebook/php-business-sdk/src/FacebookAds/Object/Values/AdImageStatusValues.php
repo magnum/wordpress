@@ -38,4 +38,5 @@ class AdImageStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const ACTIVE = 'ACTIVE';
     const DELETED = 'DELETED';
+    const INTERNAL = 'INTERNAL';
 }

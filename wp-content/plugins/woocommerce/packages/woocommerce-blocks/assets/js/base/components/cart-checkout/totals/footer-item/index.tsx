@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import classNames from 'classnames';
 import { createInterpolateElement } from '@wordpress/element';
 import FormattedMonetaryAmount from '@woocommerce/base-components/formatted-monetary-amount';
 import {
@@ -10,8 +11,12 @@ import {
 } from '@woocommerce/blocks-checkout';
 import { useStoreCart } from '@woocommerce/base-context/hooks';
 import { getSetting } from '@woocommerce/settings';
-import { CartResponseTotals, Currency } from '@woocommerce/types';
-import { LooselyMustHave } from '@woocommerce/type-defs/utils';
+import {
+	CartResponseTotals,
+	Currency,
+	LooselyMustHave,
+} from '@woocommerce/types';
+import { formatPrice } from '@woocommerce/price-format';
 
 /**
  * Internal dependencies
@@ -30,6 +35,7 @@ export interface TotalsFooterItemProps {
 	 * convenience, but will use only these two properties.
 	 */
 	values: LooselyMustHave< CartResponseTotals, 'total_price' | 'total_tax' >;
+	className?: string;
 }
 
 /**
@@ -42,12 +48,17 @@ export interface TotalsFooterItemProps {
 const TotalsFooterItem = ( {
 	currency,
 	values,
+	className,
 }: TotalsFooterItemProps ): JSX.Element => {
 	const SHOW_TAXES =
 		getSetting< boolean >( 'taxesEnabled', true ) &&
 		getSetting< boolean >( 'displayCartPricesIncludingTax', false );
 
-	const { total_price: totalPrice, total_tax: totalTax } = values;
+	const {
+		total_price: totalPrice,
+		total_tax: totalTax,
+		tax_lines: taxLines,
+	} = values;
 
 	// Prepare props to pass to the __experimentalApplyCheckoutFilter filter.
 	// We need to pluck out receiveCart.
@@ -61,10 +72,31 @@ const TotalsFooterItem = ( {
 	} );
 
 	const parsedTaxValue = parseInt( totalTax, 10 );
+	const description =
+		taxLines && taxLines.length > 0
+			? sprintf(
+					/* translators: %s is a list of tax rates */
+					__( 'Including %s', 'woo-gutenberg-products-block' ),
+					taxLines
+						.map( ( { name, price } ) => {
+							return `${ formatPrice(
+								price,
+								currency
+							) } ${ name }`;
+						} )
+						.join( ', ' )
+			  )
+			: __(
+					'Including <TaxAmount/> in taxes',
+					'woo-gutenberg-products-block'
+			  );
 
 	return (
 		<TotalsItem
-			className="wc-block-components-totals-footer-item"
+			className={ classNames(
+				'wc-block-components-totals-footer-item',
+				className
+			) }
 			currency={ currency }
 			label={ label }
 			value={ parseInt( totalPrice, 10 ) }
@@ -72,21 +104,15 @@ const TotalsFooterItem = ( {
 				SHOW_TAXES &&
 				parsedTaxValue !== 0 && (
 					<p className="wc-block-components-totals-footer-item-tax">
-						{ createInterpolateElement(
-							__(
-								'Including <TaxAmount/> in taxes',
-								'woo-gutenberg-products-block'
+						{ createInterpolateElement( description, {
+							TaxAmount: (
+								<FormattedMonetaryAmount
+									className="wc-block-components-totals-footer-item-tax-value"
+									currency={ currency }
+									value={ parsedTaxValue }
+								/>
 							),
-							{
-								TaxAmount: (
-									<FormattedMonetaryAmount
-										className="wc-block-components-totals-footer-item-tax-value"
-										currency={ currency }
-										value={ parsedTaxValue }
-									/>
-								),
-							}
-						) }
+						} ) }
 					</p>
 				)
 			}

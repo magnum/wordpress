@@ -36,8 +36,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 class SavedAudienceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const ACCOUNT = 'account';
-    const APPROXIMATE_COUNT = 'approximate_count';
-    const APPROXIMATE_COUNT_64BIT = 'approximate_count_64bit';
     const APPROXIMATE_COUNT_LOWER_BOUND = 'approximate_count_lower_bound';
     const APPROXIMATE_COUNT_UPPER_BOUND = 'approximate_count_upper_bound';
     const DELETE_TIME = 'delete_time';
@@ -55,6 +53,6 @@ class SavedAudienceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const TIME_UPDATED = 'time_updated';
     public function getFieldTypes()
     {
-        return array('account' => 'AdAccount', 'approximate_count' => 'int', 'approximate_count_64bit' => 'int', 'approximate_count_lower_bound' => 'int', 'approximate_count_upper_bound' => 'int', 'delete_time' => 'int', 'description' => 'string', 'extra_info' => 'string', 'id' => 'string', 'name' => 'string', 'operation_status' => 'CustomAudienceStatus', 'page_deletion_marked_delete_time' => 'int', 'permission_for_actions' => 'AudiencePermissionForActions', 'run_status' => 'string', 'sentence_lines' => 'list', 'targeting' => 'Targeting', 'time_created' => 'datetime', 'time_updated' => 'datetime');
+        return array('account' => 'AdAccount', 'approximate_count_lower_bound' => 'int', 'approximate_count_upper_bound' => 'int', 'delete_time' => 'int', 'description' => 'string', 'extra_info' => 'string', 'id' => 'string', 'name' => 'string', 'operation_status' => 'CustomAudienceStatus', 'page_deletion_marked_delete_time' => 'int', 'permission_for_actions' => 'AudiencePermissionForActions', 'run_status' => 'string', 'sentence_lines' => 'list', 'targeting' => 'Targeting', 'time_created' => 'datetime', 'time_updated' => 'datetime');
     }
 }

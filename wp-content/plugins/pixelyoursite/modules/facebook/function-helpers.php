@@ -29,7 +29,7 @@ function getAdvancedMatchingParams() {
 	 * Add common WooCommerce Advanced Matching params
 	 */
 
-	if ( PixelYourSite\isWooCommerceActive() && PixelYourSite\PYS()->getOption( 'woo_enabled' ) ) {
+	if ( PixelYourSite\isWooCommerceActive() ) {
 
 		// if first name is not set in regular wp user meta
 		if ( empty( $params['fn'] ) ) {
@@ -94,7 +94,7 @@ function getAdvancedMatchingParams() {
 	 * Add common EDD Advanced Matching params
 	 */
 
-	if ( PixelYourSite\isEddActive() && PixelYourSite\PYS()->getOption( 'edd_enabled' ) ) {
+	if ( PixelYourSite\isEddActive()) {
 
 		/**
 		 * Add purchase EDD Advanced Matching params

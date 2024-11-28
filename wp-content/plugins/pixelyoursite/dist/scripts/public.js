@@ -188,6 +188,26 @@ if (!Array.prototype.includes) {
 
         var gtag_loaded = false;
 
+        let isNewSession = checkSession();
+
+        let utmTerms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+
+        let utmId = ['fbadid', 'gadid', 'padid', 'bingid'];
+
+        function validateEmail(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+        function getDomain(url) {
+
+            url = url.replace(/(https?:\/\/)?(www.)?/i, '');
+
+            if (url.indexOf('/') !== -1) {
+                return url.split('/')[0];
+            }
+
+            return url;
+        }
         function loadPixels() {
 
             if (!options.gdpr.all_disabled_by_api) {
@@ -208,7 +228,157 @@ if (!Array.prototype.includes) {
                     Bing.loadPixel();
                 }
             }
+            if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
+                if (typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1) {
+                    Analytics.loadPixel();
+                }
+            }
 
+        }
+
+        function checkSession() {
+            let duration = options.last_visit_duration * 60000
+            if( Cookies.get('pys_start_session') === undefined ||
+                Cookies.get('pys_session_limit') === undefined) {
+                var now = new Date();
+                now.setTime(now.getTime() + duration);
+                Cookies.set('pys_session_limit', true,{ expires: now })
+                Cookies.set('pys_start_session', true)
+                return true
+            }
+            return false
+
+        }
+
+        function getTrafficSource() {
+
+            try {
+
+                let referrer = document.referrer.toString(),
+                    source;
+
+                let direct = referrer.length === 0;
+                let internal = direct ? false : referrer.indexOf(options.siteUrl) === 0;
+                let external = !direct && !internal;
+
+                if (external === false) {
+                    source = 'direct';
+                } else {
+                    source = referrer;
+                }
+
+                if (source !== 'direct') {
+                    // leave only domain (Issue #70)
+                    return getDomain(source);
+                } else {
+                    return source;
+                }
+
+            } catch (e) {
+                console.error(e);
+                return 'direct';
+            }
+
+        }
+
+        /**
+         * Return query variables object with where property name is query variable
+         * and property value is query variable value.
+         */
+        function getQueryVars() {
+
+            try {
+
+                var result = {},
+                    tmp = [];
+
+                window.location.search
+                    .substr(1)
+                    .split("&")
+                    .forEach(function (item) {
+
+                        tmp = item.split('=');
+
+                        if (tmp.length > 1) {
+                            result[tmp[0]] = tmp[1];
+                        }
+
+                    });
+
+                return result;
+
+            } catch (e) {
+                console.error(e);
+                return {};
+            }
+
+        }
+
+
+        function getUTMId(useLast = false) {
+            try {
+                let cookiePrefix = 'pys_'
+                let terms = [];
+                if (useLast) {
+                    cookiePrefix = 'last_pys_'
+                }
+                $.each(utmId, function (index, name) {
+                    if (Cookies.get(cookiePrefix + name)) {
+                        terms[name] = Cookies.get(cookiePrefix + name)
+                    }
+                });
+                return terms;
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        }
+        /**
+         * Return UTM terms from request query variables or from cookies.
+         */
+        function getUTMs(useLast = false) {
+
+            try {
+                let cookiePrefix = 'pys_'
+                if(useLast) {
+                    cookiePrefix = 'last_pys_'
+                }
+                let terms = [];
+                $.each(utmTerms, function (index, name) {
+                    if (Cookies.get(cookiePrefix + name)) {
+                        let value = Cookies.get(cookiePrefix + name);
+                        terms[name] = filterEmails(value); // do not allow email in request params (Issue #70)
+                    }
+                });
+
+                return terms;
+
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+
+        }
+
+        function getDateTime() {
+            var dateTime = new Array();
+            var date = new Date(),
+                days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                months = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ],
+                hours = ['00-01', '01-02', '02-03', '03-04', '04-05', '05-06', '06-07', '07-08',
+                    '08-09', '09-10', '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17',
+                    '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24'
+                ];
+            dateTime.push(hours[date.getHours()]);
+            dateTime.push(days[date.getDay()]);
+            dateTime.push(months[date.getMonth()]);
+            return dateTime;
+        }
+
+        function filterEmails(value) {
+            return validateEmail(value) ? undefined : value;
         }
 
         /**
@@ -219,6 +389,7 @@ if (!Array.prototype.includes) {
             PRODUCT_VARIABLE : 1,
             PRODUCT_BUNDLE : 2,
             PRODUCT_GROUPED : 3,
+
             fireEventForAllPixel:function(functionName,events){
                 if (events.hasOwnProperty(Facebook.tag()))
                     Facebook[functionName](events[Facebook.tag()]);
@@ -249,6 +420,56 @@ if (!Array.prototype.includes) {
                     to[key] = from[key];
                 }
                 return to;
+            },
+
+            manageCookies: function () {
+                let expires = parseInt(options.cookie_duration); //  days
+                let queryVars = getQueryVars();
+                let landing = window.location.href.split('?')[0];
+                try {
+                    // save data for first visit
+                    if(Cookies.get('pys_first_visit') === undefined) {
+                        Cookies.set('pys_first_visit', true, { expires: expires });
+                        Cookies.set('pysTrafficSource', getTrafficSource(), { expires: expires });
+                        Cookies.set('pys_landing_page',landing,{ expires: expires });
+                        $.each(utmTerms, function (index, name) {
+                            if (queryVars.hasOwnProperty(name)) {
+                                Cookies.set('pys_' + name, queryVars[name], { expires: expires });
+                            } else {
+                                Cookies.remove('pys_' + name)
+                            }
+                        });
+                        $.each(utmId,function(index,name) {
+                            if (queryVars.hasOwnProperty(name)) {
+                                Cookies.set('pys_' + name, queryVars[name], { expires: expires });
+                            } else {
+                                Cookies.remove('pys_' + name)
+                            }
+                        })
+                    }
+
+                    // save data for last visit if it new session
+                    if(isNewSession) {
+                        Cookies.set('last_pysTrafficSource', getTrafficSource(), { expires: expires });
+                        $.each(utmTerms, function (index, name) {
+                            if (queryVars.hasOwnProperty(name)) {
+                                Cookies.set('last_pys_' + name, queryVars[name], { expires: expires });
+                            } else {
+                                Cookies.remove('last_pys_' + name)
+                            }
+                        });
+                        $.each(utmId,function(index,name) {
+                            if (queryVars.hasOwnProperty(name)) {
+                                Cookies.set('last_pys_' + name, queryVars[name], { expires: expires });
+                            } else {
+                                Cookies.remove('last_pys_' + name)
+                            }
+                        })
+                        Cookies.set('last_pys_landing_page',landing,{ expires: expires });
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             },
             // clone object
             clone: function(obj) {
@@ -561,7 +782,15 @@ if (!Array.prototype.includes) {
                             return true;
                         }
                     }
+                    if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
+                        if ((typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1) && pixel == 'analytics') {
+                            return true;
+                        }
 
+                        if ((typeof CS_Data.cs_google_ads_consent_mode !== "undefined" && CS_Data.cs_google_ads_consent_mode == 1) && pixel == 'google_ads') {
+                            return true;
+                        }
+                    }
                     return false;
 
                 }
@@ -679,11 +908,12 @@ if (!Array.prototype.includes) {
                                     
                                     if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.loadPixel();
-                                    } 
-                                    
-                                    if (categoryCookie === CS_Data.cs_script_cat.analytics) {
+                                    }
+
+                                    if (categoryCookie === CS_Data.cs_script_cat.analytics || (typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1)) {
+
                                         Analytics.loadPixel();
-                                    } 
+                                    }
                                     
                                      if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.loadPixel();
@@ -695,11 +925,10 @@ if (!Array.prototype.includes) {
                                     
                                      if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.disable();
-                                    } 
-                                    
-                                     if (categoryCookie === CS_Data.cs_script_cat.analytics) {
+                                    }
+                                    if (categoryCookie === CS_Data.cs_script_cat.analytics && (typeof CS_Data.cs_google_analytics_consent_mode == "undefined" || CS_Data.cs_google_analytics_consent_mode == 0)) {
                                         Analytics.disable();
-                                    } 
+                                    }
                                     
                                      if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.disable();
@@ -724,7 +953,10 @@ if (!Array.prototype.includes) {
                             } else if(button_action === 'disable_all') {
                                 Facebook.disable();
                                 Bing.disable();
-                                Analytics.disable();
+                                if(CS_Data.cs_google_analytics_consent_mode == 0 || typeof CS_Data.cs_google_analytics_consent_mode == "undefined")
+                                {
+                                    Analytics.disable();
+                                }
                                 Pinterest.disable();
                             }
                         });
@@ -857,8 +1089,82 @@ if (!Array.prototype.includes) {
                 } else {
                     return "";
                 }
-            }
+            },
+            /**
+             * Enrich
+             */
+            isCheckoutPage: function () {
+                return $('body').hasClass('woocommerce-checkout') ||
+                    $('body').hasClass('edd-checkout');
+            },
+            addCheckoutFields : function() {
+                var utm = "";
+                var utms = getUTMs()
 
+                $.each(utmTerms, function (index, name) {
+                    if(index > 0) {
+                        utm+="|";
+                    }
+                    utm+=name+":"+utms[name];
+                });
+                var utmIdList = "";
+                var utmsIds = getUTMId()
+                $.each(utmId, function (index, name) {
+                    if(index > 0) {
+                        utmIdList+="|";
+                    }
+                    utmIdList+=name+":"+utmsIds[name];
+                });
+                var utmIdListLast = "";
+                var utmsIdsLast = getUTMId(true)
+                $.each(utmId, function (index, name) {
+                    if(index > 0) {
+                        utmIdListLast+="|";
+                    }
+                    utmIdListLast+=name+":"+utmsIdsLast[name];
+                });
+
+
+                var utmLast = "";
+                var utmsLast = getUTMs(true)
+                $.each(utmTerms, function (index, name) {
+                    if(index > 0) {
+                        utmLast+="|";
+                    }
+                    utmLast+=name+":"+utmsLast[name];
+                });
+
+                var dateTime = getDateTime();
+                var landing = Cookies.get('pys_landing_page');
+                var lastLanding = Cookies.get('last_pys_landing_page');
+                var trafic = Cookies.get('pysTrafficSource');
+                var lastTrafic = Cookies.get('last_pysTrafficSource');
+
+                var $form = null;
+                if($('body').hasClass('woocommerce-checkout')) {
+                    $form = $("form.woocommerce-checkout");
+                } else {
+                    $form = $("#edd_purchase_form");
+                }
+                var inputs = {'pys_utm':utm,
+                    'pys_utm_id':utmIdList,
+                    'pys_browser_time':dateTime.join("|"),
+                    'pys_landing':landing,
+                    'pys_source':trafic,
+                    'pys_order_type': $(".wcf-optin-form").length > 0 ? "wcf-optin" : "normal",
+
+                    'last_pys_landing':lastLanding,
+                    'last_pys_source':lastTrafic,
+                    'last_pys_utm':utmLast,
+                    'last_pys_utm_id':utmIdListLast,
+                }
+
+                Object.keys(inputs).forEach(function(key,index) {
+                    $form.append("<input type='hidden' name='"+key+"' value='"+inputs[key]+"' /> ");
+                });
+
+
+            }
         };
 
     }(options);
@@ -897,6 +1203,108 @@ if (!Array.prototype.includes) {
             options.gdpr.cookie_notice_integration_enabled ||
             options.gdpr.cookie_law_info_integration_enabled;
 
+        /**
+         *
+         * @param allData
+         * @param params
+         * @returns {string | null}
+         */
+        function sendFbServerEvent(allData,name,params) {
+            let eventId = null;
+            if(options.facebook.serverApiEnabled) {
+
+                if(allData.e_id === "woo_remove_from_cart" || allData.e_id === "woo_add_to_cart_on_button_click") {// server event will sended from hook
+                    let isAddToCartFromJs =  options.woo.hasOwnProperty("addToCartCatchMethod")
+                        && options.woo.addToCartCatchMethod === "add_cart_js";
+
+                    if(isAddToCartFromJs || allData.e_id !== "woo_add_to_cart_on_button_click") {
+                        Facebook.updateEventId(allData.name);
+                        allData.eventID = Facebook.getEventId(allData.name);
+                    } else {
+                        // not update eventID for woo_add_to_cart_on_button_click,
+                        // web event created by ajax from server
+                    }
+                } else {
+                    if(  options.facebook.ajaxForServerEvent
+                        || isApiDisabled
+                        || allData.delay > 0
+                        || allData.type !== "static")
+                    { // send event from server if they was bloc by gdpr or need send with delay
+                        allData.eventID = pys_generate_token(36);
+                        var json = {
+                            action: 'pys_api_event',
+                            pixel: 'facebook',
+                            event: name,
+                            data:params,
+                            ids:options.facebook.pixelIds,
+                            eventID:allData.eventID,
+                            url:window.location.href,
+                            ajax_event:options.ajax_event
+                        };
+                        if(allData.hasOwnProperty('woo_order')) {
+                            json['woo_order'] = allData.woo_order;
+                        }
+                        if(allData.hasOwnProperty('edd_order')) {
+                            json['edd_order'] = allData.edd_order;
+                        }
+
+                        if(name == 'PageView') {
+                            let expires = parseInt(options.cookie_duration);
+                            var currentTimeInSeconds=Date.now();
+                            var randomNum = Math.floor(1000000000 + Math.random() * 9000000000);
+                            timeoutDelay = 0;
+                            if(allData.delay > 0)
+                            {
+                                timeoutDelay = allData.delay;
+                            }
+                            if(!Cookies.get('_fbp'))
+                            {
+                                timeoutDelay = 100;
+                            }
+                            if(getUrlParameter('fbclid') && !Cookies.get('_fbc'))
+                            {
+                                timeoutDelay = 100;
+                            }
+                            setTimeout(function(){
+                                if(!Cookies.get('_fbp'))
+                                {
+                                    Cookies.set('_fbp','fb.1.'+currentTimeInSeconds+'.'+randomNum,  { expires: expires })
+                                }
+                                if(getUrlParameter('fbclid') && !Cookies.get('_fbc'))
+                                {
+                                    Cookies.set('_fbc', 'fb.1.'+currentTimeInSeconds+'.'+getUrlParameter('fbclid'),  { expires: expires })
+                                }
+                                jQuery.ajax( {
+                                    type: 'POST',
+                                    url: options.ajaxUrl,
+                                    data: json,
+                                    headers: {
+                                        'Cache-Control': 'no-cache'
+                                    },
+                                    success: function(){},
+                                });
+                            },timeoutDelay)
+                        }
+                        else
+                        {
+                            jQuery.ajax( {
+                                type: 'POST',
+                                url: options.ajaxUrl,
+                                data: json,
+                                headers: {
+                                    'Cache-Control': 'no-cache'
+                                },
+                                success: function(){},
+                            });
+                        }
+                    }
+                }
+                eventId = allData.eventID
+            }
+
+            return eventId;
+        }
+
         function fireEvent(name, allData) {
 
             if(typeof window.pys_event_data_filter === "function" && window.pys_disable_event_filter(name,'facebook')) {
@@ -909,66 +1317,7 @@ if (!Array.prototype.includes) {
             var arg = {};
             Utils.copyProperties(data, params);
 
-            if(options.facebook.serverApiEnabled) {
-
-                var isAddToCartFromJs =  options.woo.hasOwnProperty("addToCartCatchMethod")
-                    && options.woo.addToCartCatchMethod === "add_cart_js";
-
-                if(allData.e_id === "woo_remove_from_cart"
-                    || (isAddToCartFromJs && allData.e_id === "woo_add_to_cart_on_button_click"))
-                {
-                    Facebook.updateEventId(allData.name);
-                    allData.eventID = Facebook.getEventId(allData.name);
-                } else  if(  options.facebook.ajaxForServerEvent
-                                || isApiDisabled
-                                || allData.delay > 0
-                                || allData.type !== "static")
-                { // send event from server if they was bloc by gdpr or need send with delay
-                    allData.eventID = pys_generate_token(36);
-                    var json = {
-                        action: 'pys_api_event',
-                        pixel: 'facebook',
-                        event: name,
-                        data:data,
-                        ids:options.facebook.pixelIds,
-                        eventID:allData.eventID,
-                        url:window.location.href,
-                    };
-                    if(allData.hasOwnProperty('woo_order')) {
-                        json['woo_order'] = allData.woo_order;
-                    }
-                    if(allData.hasOwnProperty('edd_order')) {
-                        json['edd_order'] = allData.edd_order;
-                    }
-
-                    if(allData.delay > 0) {
-                        jQuery.ajax( {
-                            type: 'POST',
-                            url: options.ajaxUrl,
-                            data: json,
-                            headers: {
-                                'Cache-Control': 'no-cache'
-                            },
-                            success: function(){},
-                        });
-                    } else {
-                       // if(name != "AddToCart") { // AddToCart call from hook
-                            setTimeout(function (json) {
-                                jQuery.ajax({
-                                    type: 'POST',
-                                    url: options.ajaxUrl,
-                                    data: json,
-                                    headers: {
-                                        'Cache-Control': 'no-cache'
-                                    },
-                                    success: function () {
-                                    },
-                                });
-                            }, 500, json);
-                        //}
-                    }
-                }
-            }
+            let eventId = sendFbServerEvent(allData,name,params)
 
 
             if("hCR" === name) {
@@ -976,11 +1325,11 @@ if (!Array.prototype.includes) {
             }
 
             if (options.debug) {
-                console.log('[Facebook] ' + name, params,"eventID",allData.eventID);
+                console.log('[Facebook] ' + name, params,"eventID",eventId);
             }
 
-            if(allData.hasOwnProperty('eventID')) {
-                arg.eventID = allData.eventID;
+            if(eventId != null) {
+                arg.eventID = eventId;
             }
 
             fbq(actionType, name, params,arg);
@@ -1259,7 +1608,7 @@ if (!Array.prototype.includes) {
             },
             updateEventId:function(key) {
                 var cooData = Cookies.get("pys_fb_event_id")
-                if(data === undefined) {
+                if(cooData === undefined) {
                     this.initEventIdCookies(key);
                 } else {
                     var data = JSON.parse(cooData);
@@ -1325,6 +1674,11 @@ if (!Array.prototype.includes) {
 
         }
         function mapParamsTov4(tag,name,param) {
+            //GA4 automatically collects a number of parameters for all events
+            delete param.page_title;
+            delete param.event_url;
+            delete param.landing_page;
+            // end
             if(isv4(tag)) {
                 delete param.traffic_source;
                 delete param.event_category;
@@ -1341,117 +1695,72 @@ if (!Array.prototype.includes) {
                     delete param.dynx_totalvalue;
                 }
             } else {
+
+                switch (name) {
+
+                    case 'Comment' :
+                    case 'login' :
+                    case 'sign_up' :
+                    case 'EmailClick' :
+                    case 'TelClick' : {
+                        let params = {
+                            event_category: "Key Actions",
+                            event_action: name,
+                             non_interaction: param.non_interaction,
+                        }
+                        return params;
+                    }
+                    case 'Form' : {
+                        let params = {
+                            event_category: "Key Actions",
+                            event_action: name,
+                            non_interaction: param.non_interaction,
+                        }
+                        var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
+                        if(formClass != "") {
+                            params["event_label"] = formClass;
+                        }
+                        return params;
+                    }
+                    case 'Download' : {
+                        let params = {
+                            event_category: "Key Actions",
+                            event_action: name,
+                            event_label: param.download_name,
+                              non_interaction: param.non_interaction,
+                        }
+                        return params;
+                    }
+                    case 'TimeOnPage' :
+                    case 'PageScroll' : {
+                        let params = {
+                            event_category: "Key Actions",
+                            event_action: name,
+                            event_label: document.title,
+                              non_interaction: param.non_interaction,
+                        }
+                        return params;
+                    }
+                    case 'search' : {
+                        let params = {
+                            event_category: "Key Actions",
+                            event_action: name,
+                            event_label: param.search_term,
+                              non_interaction: param.non_interaction,
+                        }
+                        return params;
+                    }
+                }
+
                 //delete standard params
-                delete param.page_title;
+
                 delete param.post_type;
                 delete param.post_id;
                 delete param.plugin;
-                delete param.page_title;
-                delete param.event_url;
                 delete param.user_role;
                 delete param.cartlows;
                 delete param.cartflows_flow;
                 delete param.cartflows_step;
-
-                if(name === 'Signal') {
-                    switch (param.event_action) {
-                        case 'External Click':
-                        case 'Internal Click':
-                        case 'Tel':
-                        case 'Email': {
-                            let params = {
-                                event_category: name,
-                                event_action: param.event_action,
-                                non_interaction: param.non_interaction,
-                            }
-                            if(options.trackTrafficSource) {
-                                params['traffic_source'] = param.traffic_source
-                            }
-                            return params;
-                        }break;
-                        case 'Video': {
-                            let params = {
-                                event_category: name,
-                                event_action: param.event_action,
-                                event_label: param.video_title,
-                                non_interaction: param.non_interaction,
-                            }
-                            if(options.trackTrafficSource) {
-                                params['traffic_source'] = param.traffic_source
-                            }
-                            return params;
-                        }break;
-                        case 'Comment': {
-                            let params = {
-                                event_category: name,
-                                event_action: param.event_action,
-                                event_label: document.location.href,
-                                non_interaction: param.non_interaction,
-                            }
-                            if(options.trackTrafficSource) {
-                                params['traffic_source'] = param.traffic_source
-                            }
-                            return params;
-                        }break;
-                        case 'Form': {
-                            var params = {
-                                event_category: name,
-                                event_action: param.event_action,
-                                non_interaction: param.non_interaction,
-                            };
-                            if(options.trackTrafficSource) {
-                                params['traffic_source'] = param.traffic_source
-                            }
-                            var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
-                            if(formClass != "") {
-                                params["event_label"] = formClass;
-                            }
-                            return params;
-                        }break;
-                        case 'Download': {
-                            return {
-                                event_category: name,
-                                event_action: param.event_action,
-                                event_label: param.download_name,
-                                non_interaction: param.non_interaction,
-                            }
-                        }break;
-                    }
-                    if(param.event_action.indexOf('Scroll') === 0){
-                        var scroll_percent = param.event_action.substring(
-                            param.event_action.indexOf(' ')+1,
-                            param.event_action.indexOf('%')
-                        );
-                        let params =  {
-                            event_category: name,
-                            event_action: param.event_action,
-                            event_label: scroll_percent,
-                            non_interaction: param.non_interaction,
-                        }
-                        if(options.trackTrafficSource) {
-                            params['traffic_source'] = param.traffic_source
-                        }
-                        return params;
-                    }
-                    if(param.event_action.indexOf('Time on page') === 0) {
-                        let time_on_page = param.event_action.substring(
-                            14,
-                            param.event_action.indexOf(' seconds')
-                        );
-                        let params = {
-                            event_category: name,
-                            event_action: param.event_action,
-                            event_label: time_on_page,
-                            non_interaction: param.non_interaction,
-
-                        };
-                        if(options.trackTrafficSource) {
-                            params['traffic_source'] = param.traffic_source
-                        }
-                        return params
-                    }
-                }
-
             }
             return param;
         }
@@ -1500,11 +1809,7 @@ if (!Array.prototype.includes) {
 
                 // configure tracking ids
                 options.ga.trackingIds.forEach(function (trackingId,index) {
-                    if(options.ga.isDebugEnabled.includes("index_"+index)) {
-                        config.debug_mode = true;
-                    } else {
-                        config.debug_mode = false;
-                    }
+                    config.debug_mode = options.ga.isDebugEnabled.includes("index_" + index);
                     if(isv4(trackingId)) {
                         if(options.ga.disableAdvertisingFeatures) {
                             config.allow_google_signals = false
@@ -1513,7 +1818,24 @@ if (!Array.prototype.includes) {
                             config.allow_ad_personalization_signals = false
                         }
                     }
-                    gtag('config', trackingId, config);
+                    if (options.gdpr.cookiebot_integration_enabled && typeof Cookiebot !== 'undefined') {
+
+                        var cookiebot_consent_category = options.gdpr['cookiebot_analytics_consent_category'];
+                        if (options.gdpr['analytics_prior_consent_enabled']) {
+                            if (Cookiebot.consented === true && Cookiebot.consent[cookiebot_consent_category]) {
+                                gtag('config', trackingId, config);
+                            }
+                        } else {
+                            if (Cookiebot.consent[cookiebot_consent_category]) {
+                                gtag('config', trackingId, config);
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        gtag('config', trackingId, config);
+                    }
                 });
 
                 initialized = true;
@@ -1723,25 +2045,29 @@ if (!Array.prototype.includes) {
         var Pinterest = Utils.setupPinterestObject();
         var Bing = Utils.setupBingObject();
 
+        Utils.manageCookies();
         Utils.setupGdprCallbacks();
         // page scroll event
-        if (options.dynamicEvents.hasOwnProperty("signal_page_scroll")) {
+        if ( options.dynamicEvents.hasOwnProperty("automatic_event_scroll")
+        ) {
 
             var singlePageScroll = function () {
 
 
                 var docHeight = $(document).height() - $(window).height();
                 var isFired = false;
-                var pixels = Object.keys(options.dynamicEvents.signal_page_scroll);
 
-                for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_page_scroll[pixels[i]]);
-                    var scroll = Math.round(docHeight * event.scroll_percent / 100)// convert % to absolute positions
+                if (options.dynamicEvents.hasOwnProperty("automatic_event_scroll")) {
+                    var pixels = Object.keys(options.dynamicEvents.automatic_event_scroll);
+                    for(var i = 0;i<pixels.length;i++) {
+                        var event = Utils.clone(options.dynamicEvents.automatic_event_scroll[pixels[i]]);
+                        var scroll = Math.round(docHeight * event.scroll_percent / 100)// convert % to absolute positions
 
-                    if(scroll < $(window).scrollTop()) {
-                        Utils.copyProperties(Utils.getRequestParams(), event.params);
-                        getPixelBySlag(pixels[i]).onPageScroll(event);
-                        isFired = true
+                        if(scroll < $(window).scrollTop()) {
+                            Utils.copyProperties(Utils.getRequestParams(), event.params);
+                            getPixelBySlag(pixels[i]).onPageScroll(event);
+                            isFired = true
+                        }
                     }
                 }
                 if(isFired) {
@@ -1750,13 +2076,14 @@ if (!Array.prototype.includes) {
             }
             $(document).on("scroll",singlePageScroll);
         }
-        // page on time
-        if (options.dynamicEvents.hasOwnProperty("signal_time_on_page")) {
-            var pixels = Object.keys(options.dynamicEvents.signal_time_on_page);
-            var time = options.dynamicEvents.signal_time_on_page[pixels[0]].time_on_page; // the same for all pixel
+
+
+        if (options.dynamicEvents.hasOwnProperty("automatic_event_time_on_page")) {
+            var pixels = Object.keys(options.dynamicEvents.automatic_event_time_on_page);
+            var time = options.dynamicEvents.automatic_event_time_on_page[pixels[0]].time_on_page; // the same for all pixel
             setTimeout(function(){
                 for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_time_on_page[pixels[i]]);
+                    var event = Utils.clone(options.dynamicEvents.automatic_event_time_on_page[pixels[i]]);
                     Utils.copyProperties(Utils.getRequestParams(), event.params);
                     getPixelBySlag(pixels[i]).onTime(event);
                 }
@@ -1764,14 +2091,15 @@ if (!Array.prototype.includes) {
         }
 
         // setup Click Event
-        if (options.dynamicEvents.hasOwnProperty("signal_download")) {
+        if (options.dynamicEvents.hasOwnProperty("automatic_event_download")) {
 
             $(document).onFirst('click', 'a, button, input[type="button"], input[type="submit"]', function (e) {
 
                 var $elem = $(this);
 
                 // Download
-                if (options.dynamicEvents.hasOwnProperty("signal_download")) {
+                if(options.dynamicEvents.hasOwnProperty("automatic_event_download")
+                ) {
                     var isFired = false;
                     if ($elem.is('a')) {
                         var href = $elem.attr('href');
@@ -1783,25 +2111,33 @@ if (!Array.prototype.includes) {
                         var track_download = false;
 
                         if (extension.length > 0) {
-                            var pixels = Object.keys(options.dynamicEvents.signal_download);
-                            for (var i = 0; i < pixels.length; i++) {
-                                var event = Utils.clone(options.dynamicEvents.signal_download[pixels[i]]);
-                                var extensions = event.extensions;
-                                if (extensions.includes(extension)) {
-                                    if(options.enable_remove_download_url_param) {
-                                        href = href.split('?')[0];
-                                    }
-                                    event.params.download_url = href;
-                                    event.params.download_type = extension;
-                                    event.params.download_name = Utils.getLinkFilename(href);
 
-                                    getPixelBySlag(pixels[i]).onDownloadEvent(event);
-                                    isFired = true;
+                            if(options.dynamicEvents.hasOwnProperty("automatic_event_download") ) {
+                                var pixels = Object.keys(options.dynamicEvents.automatic_event_download);
+                                for (var i = 0; i < pixels.length; i++) {
+                                    var event = Utils.clone(options.dynamicEvents.automatic_event_download[pixels[i]]);
+                                    var extensions = event.extensions;
+                                    if (extensions.includes(extension)) {
+
+                                        if(pixels[i] == "tiktok") {
+                                            getPixelBySlag(pixels[i]).fireEvent(tikEvent.name, event);
+                                        } else {
+                                            if (options.enable_remove_download_url_param) {
+                                                href = href.split('?')[0];
+                                            }
+                                            event.params.download_url = href;
+                                            event.params.download_type = extension;
+                                            event.params.download_name = Utils.getLinkFilename(href);
+                                            getPixelBySlag(pixels[i]).onDownloadEvent(event);
+                                        }
+
+                                        isFired = true;
+                                    }
                                 }
                             }
                         }
                     }
-                    if (isFired) { // prevent duplicate events on the same element
+                    if(isFired) { // prevent duplicate events on the same element
                         return;
                     }
                 }
@@ -2044,13 +2380,13 @@ if (!Array.prototype.includes) {
                 $('form#edd_checkout_cart_form .edd_cart_remove_item_btn').on("click",function (e) {
 
                     var href = $(this).attr('href');
-                    var key = href.substring(href.indexOf('=') + 1).charAt(0);
-
-                    if (options.dynamicEvents.edd_remove_from_cart.hasOwnProperty(key)) {
-                        var events = options.dynamicEvents.edd_remove_from_cart[key];
-                        Utils.fireEventForAllPixel("onEddRemoveFromCartEvent",events)
+                    if(href) {
+                        var key = href.substring(href.indexOf('=') + 1).charAt(0);
+                        if (options.dynamicEvents.edd_remove_from_cart.hasOwnProperty(key)) {
+                            var events = options.dynamicEvents.edd_remove_from_cart[key];
+                            Utils.fireEventForAllPixel("onEddRemoveFromCartEvent",events)
+                        }
                     }
-
                 });
 
             }
@@ -2058,15 +2394,17 @@ if (!Array.prototype.includes) {
         }
 
         // setup Comment Event
-        if (options.dynamicEvents.hasOwnProperty("signal_comment")) {
+        if (options.dynamicEvents.hasOwnProperty("automatic_event_comment")
+        ) {
 
             $('form.comment-form').on("submit",function () {
-
-                var pixels = Object.keys(options.dynamicEvents.signal_comment);
-                for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_comment[pixels[i]]);
-                    Utils.copyProperties(Utils.getRequestParams(), event.params);
-                    getPixelBySlag(pixels[i]).onCommentEvent(event);
+                if (options.dynamicEvents.hasOwnProperty("automatic_event_comment")) {
+                    var pixels = Object.keys(options.dynamicEvents.automatic_event_comment);
+                    for (var i = 0; i < pixels.length; i++) {
+                        var event = Utils.clone(options.dynamicEvents.automatic_event_comment[pixels[i]]);
+                        Utils.copyProperties(Utils.getRequestParams(), event.params);
+                        getPixelBySlag(pixels[i]).onCommentEvent(event);
+                    }
                 }
             });
 
@@ -2074,7 +2412,7 @@ if (!Array.prototype.includes) {
 
 
         // setup Form Event
-        if ( options.dynamicEvents.hasOwnProperty("signal_form")) {
+        if ( options.dynamicEvents.hasOwnProperty("automatic_event_form")) {
 
             $(document).onFirst('submit', 'form', function (e) {
 
@@ -2102,12 +2440,20 @@ if (!Array.prototype.includes) {
                     text: $form.find('[type="submit"]').is('input') ?
                         $form.find('[type="submit"]').val() : $form.find('[type="submit"]').text()
                 };
-                var pixels = Object.keys(options.dynamicEvents.signal_form);
-                for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_form[pixels[i]]);
-                    Utils.copyProperties(params,event.params,)
-                    Utils.copyProperties(Utils.getRequestParams(), event.params);
-                    getPixelBySlag(pixels[i]).onFormEvent(event);
+
+                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
+                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
+                    for (var i = 0; i < pixels.length; i++) {
+                        var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
+
+                        if(pixels[i] === "tiktok") {
+                            getPixelBySlag(pixels[i]).fireEvent(event.name, event);
+                        } else {
+                            Utils.copyProperties(params, event.params,)
+                            Utils.copyProperties(Utils.getRequestParams(), event.params);
+                            getPixelBySlag(pixels[i]).onFormEvent(event);
+                        }
+                    }
                 }
             });
 
@@ -2118,12 +2464,14 @@ if (!Array.prototype.includes) {
                     text: $(formData.target).find('.forminator-button-submit').text()
                 };
 
-                var pixels = Object.keys(options.dynamicEvents.signal_form);
-                for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_form[pixels[i]]);
-                    Utils.copyProperties(params,event.params)
-                    Utils.copyProperties(Utils.getRequestParams(), event.params);
-                    getPixelBySlag(pixels[i]).onFormEvent(event);
+                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
+                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
+                    for (var i = 0; i < pixels.length; i++) {
+                        var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
+                        Utils.copyProperties(params, event.params)
+                        Utils.copyProperties(Utils.getRequestParams(), event.params);
+                        getPixelBySlag(pixels[i]).onFormEvent(event);
+                    }
                 }
             });
 
@@ -2135,12 +2483,14 @@ if (!Array.prototype.includes) {
                     text: data.response.data.settings.title
                 };
 
-                var pixels = Object.keys(options.dynamicEvents.signal_form);
-                for(var i = 0;i<pixels.length;i++) {
-                    var event = Utils.clone(options.dynamicEvents.signal_form[pixels[i]]);
-                    Utils.copyProperties(params,event.params)
-                    Utils.copyProperties(Utils.getRequestParams(), event.params);
-                    getPixelBySlag(pixels[i]).onFormEvent(event);
+                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
+                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
+                    for(var i = 0;i<pixels.length;i++) {
+                        var event = options.dynamicEvents.automatic_event_form[pixels[i]];
+                        Utils.copyProperties(params,event.params)
+                        Utils.copyProperties(Utils.getRequestParams(), event.params);
+                        getPixelBySlag(pixels[i]).onFormEvent(event);
+                    }
                 }
 
             });
@@ -2150,7 +2500,10 @@ if (!Array.prototype.includes) {
 
         // load pixel APIs
         Utils.loadPixels();
-
+        // setup Enrich content
+        if(Utils.isCheckoutPage()) {
+            Utils.addCheckoutFields();
+        }
     });
 
 }(jQuery, pysOptions);
@@ -2188,3 +2541,18 @@ function getPixelBySlag(slug) {
         case "pinterest": return window.pys.Pinterest;
     }
 }
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};

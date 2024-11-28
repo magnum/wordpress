@@ -3,17 +3,17 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, head & footer scripts, Pinterest tag
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 5.9
-Stable tag: 8.2.18
+Tested up to: 6.1
+Stable tag: 9.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Meta Pixel (Facebook Pixel) & Conversion API (CAPI), Google Analytics Universal or GA4, plus ANY other script. WooCommerce and EDD with Facebook Dynamic Product Ads and Google Enhanced Ecommerce. Track any action with events. Pinterest Tag support via a dedicated paid add-on. Dedicated paid Bing Tag add-on.
+Meta Pixel (Facebook Pixel) & Conversion API (CAPI), Google Analytics 4 (GA4) or the old Universal, plus ANY other script. WooCommerce and EDD with Facebook Dynamic Product Ads and Google Magnetisation tracking. Track any action with events. Pinterest Tag support via a dedicated paid add-on. Dedicated paid Bing Tag add-on.
 
 == Description ==
-**Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, add your Google Analytics Universal or GA4 with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
+**Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, add your Google Analytics 4 (GA4) or an old Universal property with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
 
-PixelYourSite's Signal event will automatically track important actions and send them to all your configured pixels (searches, form submit, comments, downloads).
+PixelYourSite's Automatic Events will track important actions and send them to all your configured pixels (searches, form submit, comments, downloads). Use these events to understand your visitors' behaviour inside Google Analytics, or to create audiences and conversions for Meta (Facebook), or Google.
 
 You can fire your own events with zero coding.
 
@@ -23,11 +23,15 @@ Take a look at this video to see Facebook Conversion API in action:
 
 [youtube https://www.youtube.com/watch?v=k_bL53qDE0E]
 
-NEW: Facebook Pixel Conversion API: [Learn how to enable and test Conversion API events](https://www.pixelyoursite.com/facebook-conversion-api-capi)
+IMPORTANT:: Facebook Pixel Conversion API: [Learn how to enable and test Conversion API events](https://www.pixelyoursite.com/facebook-conversion-api-capi)
 
 Learn how to [verify your domain on Facebook](https://www.pixelyoursite.com/verify-domain-facebook)
 
-Learn about [the Signal Event and Aggregated Event Measurement](https://www.pixelyoursite.com/signal-custom-conversions-aem)
+Learn how to track key actions with [Automated Events](https://www.pixelyoursite.com/global-events)
+
+NEW: Track and store traffic source, landing page, and UTMs for WooCommerce orders: [click to find more](https://www.pixelyoursite.com/woocommerce-first-party-reports)
+
+NEW: Track and store traffic source, landing page and UTMs for Easy Digital Downloads orders: [click to find more](https://www.pixelyoursite.com/easy-digital-downloads-first-party-reports)
 
 TRACK EVERYTHING WITH A SINGLE PLUGIN:
 
@@ -37,7 +41,7 @@ TRACK EVERYTHING WITH A SINGLE PLUGIN:
 
 * Google Analytics: one click install
 
-* Google Analytics 4: for details, watch [this video](https://www.youtube.com/watch?v=CCVBD_bD-Y0)
+* Google Analytics 4: for details, watch [this video](https://www.youtube.com/watch?v=fwegcsO-yrc)
 
 * ANY script: add any other script with our flexible Head & Footer option
 
@@ -63,11 +67,13 @@ FANTASTIC WOOCOMMERCE INTEGRATION:
 
 * Google Analytics: Enhanced Ecommerce implementation.
 
-* GA4: Monetization data.
+* GA4: Monetisation data.
 
 * Head & Footer scripts: you can insert scripts on the WooCommerce “order-received” page.
 
-* Pinterest e-commerce events.
+* Pinterest e-commerce events with paid add-on.
+
+* TikTok e-commerce events with the paid version of the plugin.
 
 
 
@@ -78,9 +84,9 @@ The EDD integration works just like the WooCommerce integration, with full Dynam
 
 
 
-TRACK KEY ACTIONS WITH THE SIGNAL EVENT:
+TRACK KEY ACTIONS WITH AUTOMATED EVENTS:
 
-The Signal event captures important actions like form submit, comments, downloads, page scroll, and time on page.
+The AUTOMATED EVENTS capture important actions like form submit, comments, downloads, page scroll, and time on page. Use them to measure your users' behaviour inside Google Analytics, or to create custom audiences and conversions on Meta (Facebook), and Google Analytics. 
 
 
 
@@ -146,9 +152,9 @@ TikTok Tag support with [PixelYourSite Professional](https://www.pixelyoursite.c
 
 
 
-EVEN MORE TRIGGERS FOR THE SIGNAL EVENT:
+EVEN MORE AUTOMATED EVENTS:
 
-You can capture clicks on internal or external links, embedded video views, clicks on phone numbers or emails, user signups, clicks on AdSense ads.
+You can capture clicks on internal or external links, embedded video views, clicks on phone numbers or emails, user signups, logins, clicks on AdSense ads.
 
 
 
@@ -224,6 +230,8 @@ GOOGLE ADS TAG (FORMER ADWORDS):
 * Each Global event will be sent to Google Ads too, and you can configure Google Ads conversions.
 
 * Add conversion label to any WooCommerce or EDD event.
+
+* Enhanced Conversions.
 
 
 
@@ -458,6 +466,136 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.3.2 =
+
+* Fix for an issue with WooCommerce logs: pixelyoursite.php is not a known WordPress plugin
+
+
+= PixelYourSite 9.3.1 =
+
+* Fixing a bug related to missing custom parameters for Meta CAPI events configured on the plugin’s Events page.
+
+* Declaring WooCommerce 7.3 compatibility.
+
+* Important code improvements.
+
+* Fixing other bugs.
+
+
+= PixelYourSite 9.3.0 =
+
+* Ensuring compatibility with WooCommerce High-Performance Order Storage (HPOS).
+
+* Meta Conversion API test code will auto-delete in 24 hours.
+
+* Changing the default method for WooCommerce AddToCart event in order to avoid a possible conflict with Elementor.
+
+* Improvements for how we handle licenses and updates for extra add-ons (the Pinterest add-on, the Bing add-on).
+
+* UI changes.
+
+* Fix for a possible conflict with Brick theme.
+
+* Fixing other bugs and code refactoring. 
+
+
+= PixelYourSite 9.2.2 =
+
+* New: hide the plugin for known web crawlers. This can prevent certain Ajax AddToCart WooCommerce buttons to fire CAPI events because of crawlers.
+
+* New: hide the plugin for custom IP addresses. 
+
+* Track WooCommerce’s extra data (traffic source, landing pages, UTMs) even when no tag is installed in the plugin.
+
+* Confirmation dialog when deleting events on the plugin’s Events page.
+
+* Google Consent Mode compatibility with ConsentMagic.
+
+* Fix for a problem with Meta AddToCart IDs for WooCommerce variable items when SKU is used.
+
+* Fix for a conflict with Bricksbuilder editor.
+
+* Some other small changes and code improvements.
+
+* WooCommerce 7.1 compatibility.
+
+* WordPress 6.1 compatibility.
+
+
+= PixelYourSite 9.2.1 =
+
+* Improvements on how the plugins tracks and sends fbp and fbc for Meta CAPI events. In time, this will lead to an improved EMQ score and overall better ads attribution.
+
+* New option to remove the post_category parameter, as required by some users.
+
+* UI changes to reflect new features in the PRO version of the plugin: Advanced user-data detection for forms.
+
+* Updates to our notifications. We now show a number of notifications with tips about the plugin and tracking in general. These notifications can be close individually. Each notification has a button that will turn OFF all notifications at once.
+
+* WooCommerce 7.0 compatibility.
+
+
+= PixelYourSite 9.2.0 =
+
+* New: track and store the traffic source, landing page, UTMs for WooCommerce orders. This helps you identify what generates your sales. [Watch this video for more info](https://www.youtube.com/watch?v=4VpVf9llfkU)
+
+* New: track and store the traffic source, landing page, UTMs for Easy Digital Downloads orders. This helps you identify what generates your sales. [Watch this video for more info](https://www.youtube.com/watch?v=kh17Ik9z5tI)
+
+* Meta API update.
+
+* WooCommerce compatibility check.
+
+* Easy Digital Downloads 3.0 compatibility check.
+
+
+
+= PixelYourSite 9.1.1 =
+
+* Fix for potential warning or fatal error related to pixelyoursite/includes/functions-migrate.php on line 24
+
+
+= PixelYourSite 9.1.0 =
+
+* Automated events are turned ON by default.
+
+* The legacy Signal event is removed.
+
+* Video links updated.
+
+* Code refactoring. 
+
+
+= PixelYourSite 9.0.0 =
+
+* [WATCH THIS VIDEO](https://www.youtube.com/watch?v=625_GpjqEZE) to find out more about this update. We are replacing the Signal event with individual automatic events tracking each action. These events are reported by Google Analytics 4 and can be used for audiences or conversions on Meta (Facebook), Google Analytics, Google Ads, and for audiences on Pinterest, Bing, or TikTok. This version still fires the old Signal event by default and you need to manually turn it OFF and enable the automatic events. Version 9.1 will completely remove the Signal event and enable the automatic events by default. If you have audiences or conversions based on the Signal events, replace them using the new events.
+
+* Bug fix: possible issue with Bing purchase event (for the Bing paid add-on users).
+
+* WooCommerce variable products speed improvement.
+
+* Code improvement to avoid a possible error for sites that don’t use WooCommerce.
+
+* New filter that lets developers get the Facebook CAPI event IDs.
+Usage example:
+
+add_filter(“pys_before_send_fb_server_event”,”pys_test”,10,3);
+function pys_test($event,$pixelId,$eventId) {
+error_log(“Send event for pixel $pixelId id = $eventId”);
+return $event;
+}
+
+It is called before the event is sent to the FB server
+3 parameters:
+
+– the first one is the event object with all the data
+
+– the second is the pixel id
+
+– and the third is the event id, rendered it separately
+
+You need to take into account that our events are mainly sent via Ajax after the page has loaded.
+
 
 
 = PixelYourSite 8.2.18 =

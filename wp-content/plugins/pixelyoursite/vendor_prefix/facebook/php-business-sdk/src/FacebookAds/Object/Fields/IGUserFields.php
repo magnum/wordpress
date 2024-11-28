@@ -46,11 +46,12 @@ class IGUserFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const MENTIONED_MEDIA = 'mentioned_media';
     const NAME = 'name';
     const PROFILE_PICTURE_URL = 'profile_picture_url';
+    const SHOPPING_PRODUCT_TAG_ELIGIBILITY = 'shopping_product_tag_eligibility';
     const SHOPPING_REVIEW_STATUS = 'shopping_review_status';
     const USERNAME = 'username';
     const WEBSITE = 'website';
     public function getFieldTypes()
     {
-        return array('biography' => 'string', 'business_discovery' => 'IGUser', 'followers_count' => 'int', 'follows_count' => 'int', 'id' => 'string', 'ig_id' => 'int', 'media_count' => 'int', 'mentioned_comment' => 'IGComment', 'mentioned_media' => 'IGMedia', 'name' => 'string', 'profile_picture_url' => 'string', 'shopping_review_status' => 'string', 'username' => 'string', 'website' => 'string');
+        return array('biography' => 'string', 'business_discovery' => 'IGUser', 'followers_count' => 'int', 'follows_count' => 'int', 'id' => 'string', 'ig_id' => 'int', 'media_count' => 'int', 'mentioned_comment' => 'IGComment', 'mentioned_media' => 'IGMedia', 'name' => 'string', 'profile_picture_url' => 'string', 'shopping_product_tag_eligibility' => 'bool', 'shopping_review_status' => 'string', 'username' => 'string', 'website' => 'string');
     }
 }

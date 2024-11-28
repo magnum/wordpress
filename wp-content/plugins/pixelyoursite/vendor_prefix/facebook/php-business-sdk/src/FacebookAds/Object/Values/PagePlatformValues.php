@@ -38,4 +38,5 @@ class PagePlatformValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const INSTAGRAM = 'INSTAGRAM';
     const MESSENGER = 'MESSENGER';
+    const WHATSAPP = 'WHATSAPP';
 }

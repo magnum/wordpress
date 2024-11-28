@@ -100,17 +100,11 @@ class Automator_Send_Webhook {
 						if (typeof response.message !== 'undefined') {
 							// Get notice type
 							let noticeType = typeof response.type !== 'undefined' ? response.type : 'gray';
-
-							// Parse message using markdown
-							let markdown = new modules.Markdown(response.message);
-
+							let $message = response.message;
 							// Create notice
 							let $notice = jQuery('<div/>', {
 								'class': 'item-options__notice item-options__notice--' + noticeType
 							});
-
-							// Get markdown HTML
-							let $message = markdown.getHTML();
 
 							// Add message to the notice container
 							$notice.html($message);
@@ -180,7 +174,6 @@ class Automator_Send_Webhook {
 					success: function (response) {
 						// Remove loading animation from the button
 						$button.removeClass('uap-btn--loading uap-btn--disabled');
-
 						// Create notice
 						// But first check if the message is defined
 						if (typeof response.message !== 'undefined') {
@@ -197,8 +190,7 @@ class Automator_Send_Webhook {
 							// Get markdown HTML
 							//let $message = response.message;
 							let $message = markdown.getHTML();
-							//$message = $message.replaceAll('\n', '<br>');
-							//let $message = response.message;
+
 							// Add message to the notice container
 							$notice.html("<pre>" + $message + "<pre>");
 
@@ -358,9 +350,51 @@ class Automator_Send_Webhook {
 		}
 		foreach ( $fields as $field ) {
 			$key   = isset( $field['KEY'] ) ? $this->maybe_parse_tokens( $field['KEY'], $parsing_args ) : null;
+			$type  = isset( $field['VALUE_TYPE'] ) ? $this->maybe_parse_tokens( $field['VALUE_TYPE'], $parsing_args ) : 'text';
 			$value = isset( $field['VALUE'] ) ? $this->maybe_parse_tokens( $field['VALUE'], $parsing_args ) : null;
 			if ( ! is_null( $key ) && ! is_null( $value ) ) {
-				$prepared_data[ $key ] = $value;
+				switch ( $type ) {
+					case 'null':
+					case 'undefined':
+						$value = null;
+						break;
+					case 'int':
+						$value = absint( $value );
+						break;
+					case 'float':
+						$value = floatval( $value );
+						break;
+					case 'bool':
+						$value = str_replace( array( '"', '\'' ), '', html_entity_decode( $value ) );
+						if ( 'true' === strtolower( $value ) || 'false' === strtolower( $value ) ) {
+							$value = 'true' === strtolower( $value ) ? true : false;
+						} elseif ( is_numeric( $value ) && ( 0 === absint( $value ) || 1 === absint( $value ) ) ) {
+							$value = boolval( $value );
+						} else {
+							$value = (string) $value;
+						}
+						break;
+					case 'text':
+					default:
+						/**
+						 * Allows users to overwrite removal of qoutes.
+						 *
+						 * @see <https://secure.helpscout.net/conversation/2067343003/45133?folderId=2122433>
+						 */
+						$should_strip_qoutes = apply_filters( 'automator_send_webhook_get_fields_should_strip_qoutes', true );
+
+						if ( $should_strip_qoutes ) {
+							// Decode HTML entities and replace " and '
+							$value = str_replace( array( '"', '\'' ), '', html_entity_decode( $value ) );
+						}
+
+						$value = apply_filters( 'automator_outgoing_webhook_default_data_value', (string) $value, $key, $type, $this );
+
+						break;
+
+				}
+
+				$prepared_data[ $key ] = apply_filters( 'automator_outgoing_webhook_value', $value, $key, $type, $this );
 			}
 		}
 		$prepared_data = $this->create_tree( $prepared_data, $data_type );
@@ -407,9 +441,9 @@ class Automator_Send_Webhook {
 		foreach ( $header_meta as $meta ) {
 			$key = isset( $meta['NAME'] ) ? $this->maybe_parse_tokens( $meta['NAME'], $parsing_args ) : null;
 			// remove colon if user added in NAME
-			$key             = str_replace( ':', '', $key );
+			$key             = trim( str_replace( ':', '', $key ) );
 			$value           = isset( $meta['VALUE'] ) ? $this->maybe_parse_tokens( $meta['VALUE'], $parsing_args ) : null;
-			$headers[ $key ] = $value;
+			$headers[ $key ] = trim( $value );
 		}
 
 		return array_unique( $headers );
@@ -428,7 +462,7 @@ class Automator_Send_Webhook {
 			return sanitize_text_field( $value );
 		}
 
-		return Automator()->parse->text( $value, $parsing_args['recipe_id'], $parsing_args['user_id'], $parsing_args['args'] );
+		return trim( Automator()->parse->text( $value, $parsing_args['recipe_id'], $parsing_args['user_id'], $parsing_args['args'] ) );
 	}
 
 	/**
@@ -681,7 +715,7 @@ class Automator_Send_Webhook {
 	 * @return array|mixed|void|\WP_Error
 	 */
 	public static function call_webhook( $webhook_url, $args, $request_type = 'POST' ) {
-		switch ( $request_type ) {
+		switch ( sanitize_text_field( wp_unslash( $request_type ) ) ) {
 			case 'PUT':
 			case 'POST':
 			case 'DELETE':

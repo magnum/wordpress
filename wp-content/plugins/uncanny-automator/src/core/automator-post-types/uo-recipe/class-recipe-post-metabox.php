@@ -20,10 +20,12 @@ namespace Uncanny_Automator;
  * @package Uncanny_Automator
  */
 class Recipe_Post_Metabox {
+
 	/**
 	 * Recipe_Post_Metabox constructor.
 	 */
 	public function __construct() {
+
 		// Adding entry point for JS based triggers and actions UI into Meta Boxes
 		add_action( 'add_meta_boxes', array( $this, 'recipe_add_meta_box_ui' ), 11 );
 
@@ -67,7 +69,7 @@ class Recipe_Post_Metabox {
 
 						<!-- Placeholder content -->
 						<div class="uap-placeholder">
-							<div class="item item--trigger">
+							<div class="uap-item item item--trigger">
 								<div>
 									<div class="item-actions">
 										<div class="item-actions__btn">
@@ -115,7 +117,7 @@ class Recipe_Post_Metabox {
 
 						<!-- Placeholder content -->
 						<div class="uap-placeholder">
-							<div class="item item--action">
+							<div class="uap-item item item--action">
 								<div>
 									<div class="item-actions">
 										<div class="item-actions__btn">

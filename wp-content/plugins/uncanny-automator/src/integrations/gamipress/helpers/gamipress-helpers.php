@@ -29,7 +29,7 @@ class Gamipress_Helpers {
 	 */
 	public function __construct() {
 
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
+		$this->load_options = true;
 
 		add_action(
 			'wp_ajax_select_achievements_from_types_AWARDACHIEVEMENT',
@@ -58,7 +58,7 @@ class Gamipress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -125,7 +125,7 @@ class Gamipress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -187,7 +187,7 @@ class Gamipress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -262,7 +262,7 @@ class Gamipress_Helpers {
 				'post_status'    => 'publish',
 			);
 
-			$options = Automator()->helpers->recipe->options->wp_query( $args, true, esc_attr__( 'Any awards', 'uncanny-automator' ) );
+			$options = Automator()->helpers->recipe->options->wp_query( $args, true, esc_attr__( 'Any award', 'uncanny-automator' ) );
 
 			foreach ( $options as $award_id => $award_name ) {
 				$fields[] = array(
@@ -299,6 +299,12 @@ class Gamipress_Helpers {
 
 			$options = Automator()->helpers->recipe->options->wp_query( $args, false, esc_attr__( 'Any awards', 'uncanny-automator' ) );
 
+			// Add any option.
+			$fields[] = array(
+				'value' => -1,
+				'text'  => esc_html__( 'Any rank', 'uncanny-automator-pro' ),
+			);
+
 			foreach ( $options as $award_id => $award_name ) {
 				$fields[] = array(
 					'value' => $award_id,
@@ -306,7 +312,11 @@ class Gamipress_Helpers {
 				);
 			}
 		}
+
 		echo wp_json_encode( $fields );
+
 		die();
+
 	}
+
 }

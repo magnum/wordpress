@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CheckBatchRequestStatusFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CheckBatchRequestStatusErrorPriorityValues;
 /**
  * This class is auto-generated.
  *
@@ -49,6 +50,7 @@ class CheckBatchRequestStatus extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstrac
     protected static function getReferencedEnums()
     {
         $ref_enums = array();
+        $ref_enums['ErrorPriority'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CheckBatchRequestStatusErrorPriorityValues::getInstance()->getValues();
         return $ref_enums;
     }
 }

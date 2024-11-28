@@ -4,10 +4,9 @@
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { FormStep } from '@woocommerce/base-components/cart-checkout';
-import {
-	useCheckoutContext,
-	useShippingDataContext,
-} from '@woocommerce/base-context';
+import { useShippingData } from '@woocommerce/base-context/hooks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { CHECKOUT_STORE_KEY } from '@woocommerce/block-data';
 
 /**
  * Internal dependencies
@@ -15,13 +14,17 @@ import {
 import CheckoutOrderNotes from '../../order-notes';
 
 const Block = ( { className }: { className?: string } ): JSX.Element => {
-	const { needsShipping } = useShippingDataContext();
-	const {
-		isProcessing: checkoutIsProcessing,
-		orderNotes,
-		dispatchActions,
-	} = useCheckoutContext();
-	const { setOrderNotes } = dispatchActions;
+	const { needsShipping } = useShippingData();
+	const { isProcessing: checkoutIsProcessing, orderNotes } = useSelect(
+		( select ) => {
+			const store = select( CHECKOUT_STORE_KEY );
+			return {
+				isProcessing: store.isProcessing(),
+				orderNotes: store.getOrderNotes(),
+			};
+		}
+	);
+	const { __internalSetOrderNotes } = useDispatch( CHECKOUT_STORE_KEY );
 
 	return (
 		<FormStep
@@ -35,7 +38,7 @@ const Block = ( { className }: { className?: string } ): JSX.Element => {
 		>
 			<CheckoutOrderNotes
 				disabled={ checkoutIsProcessing }
-				onChange={ setOrderNotes }
+				onChange={ __internalSetOrderNotes }
 				placeholder={
 					needsShipping
 						? __(

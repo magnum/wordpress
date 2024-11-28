@@ -23,32 +23,53 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="uap-settings-panel-title">
 
-				<uo-icon id="google"></uo-icon> 
+				<uo-icon integration="GOOGLESHEET"></uo-icon>
 
-				<?php esc_html_e( 'Google', 'uncanny-automator' ); ?>
+				<?php esc_html_e( 'Google Sheets', 'uncanny-automator' ); ?>
 
 			</div>
 
 			<div class="uap-settings-panel-content">
 
-				<?php if ( $gs_client && ! empty( $connect ) && 1 === $connect ) { ?>
+				<?php if ( $this->client && 1 === $connect ) { ?>
+
 					<?php /* translators: Success message */ ?>
 					<uo-alert heading="<?php echo esc_attr( sprintf( __( 'Your account "%s" has been connected successfully!', 'uncanny-automator' ), $user_info['email'] ) ); ?>" type="success" class="uap-spacing-bottom"></uo-alert>
+
 				<?php } ?>
 
 				<?php // Show some error message in case there is an error. ?>
-				<?php if ( $gs_client && ! empty( $connect ) && 1 !== $connect ) { ?>
-					<uo-alert heading="<?php esc_attr_e( 'An error has occured while connecting to Google API. Please try again later.', 'uncanny-automator' ); ?>" type="error" class="uap-spacing-bottom"></uo-alert>
+
+				<?php if ( 2 === $connect ) { ?>
+
+					<uo-alert heading="<?php esc_attr_e( 'An error has occurred while connecting to the Google API. Please try again later.', 'uncanny-automator' ); ?>" type="error" class="uap-spacing-bottom"></uo-alert>
+
 				<?php } ?>
 
-				<?php if ( ! $gs_client ) { ?>
+				<?php // Show missing_auth error ?>
+
+				<?php if ( 3 === $connect ) { ?>
+
+					<uo-alert heading="<?php esc_attr_e( 'Required permissions not granted.', 'uncanny-automator' ); ?>" type="error" class="uap-spacing-bottom">
+
+						<?php esc_html_e( 'Make sure everything is checked off in the list of required permissions. Sometimes the last 2 checkboxes are unchecked by default.', 'uncanny-automator' ); ?>
+
+					</uo-alert>
+
+				<?php } ?>
+
+				<?php if ( ! $this->client ) { ?>
 
 					<div class="uap-settings-panel-content-subtitle">
-						<?php esc_html_e( 'Connect Uncanny Automator to Google', 'uncanny-automator' ); ?>
+
+						<?php esc_html_e( 'Connect Uncanny Automator to Google Sheets', 'uncanny-automator' ); ?>
+
 					</div>
 
 					<div class="uap-settings-panel-content-paragraph uap-settings-panel-content-paragraph--subtle">
-						<?php esc_html_e( 'Connect Uncanny Automator to Google to automatically send data to Google Sheets when users perform actions like submitting forms, making purchases or completing courses on your site. Turn Google Sheets into a powerful reporting tool for your WordPress site.', 'uncanny-automator' ); ?>
+
+						<?php esc_html_e( 'Connect Uncanny Automator to Google Sheets to automatically send data to Google Sheets when users perform actions like submitting forms, making purchases or completing courses on your site. Turn Google Sheets into a powerful reporting tool for your WordPress site.', 'uncanny-automator' ); ?>
+
 					</div>
 
 					<p>
@@ -60,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<uo-icon id="bolt"></uo-icon> <strong><?php esc_html_e( 'Action:', 'uncanny-automator' ); ?></strong> <?php esc_html_e( 'Create a row in a Google Sheet', 'uncanny-automator' ); ?>
 						</li>
 						<li>
-							<uo-icon id="bolt"></uo-icon> <strong><?php esc_html_e( 'Action:', 'uncanny-automator' ); ?></strong> <?php esc_html_e( 'Update a row in a Google sheet', 'uncanny-automator' ); ?>
+							<uo-icon id="bolt"></uo-icon> <strong><?php esc_html_e( 'Action:', 'uncanny-automator' ); ?></strong> <?php esc_html_e( 'Update a row in a Google Sheet', 'uncanny-automator' ); ?>
 						</li>
 					</ul>
 
@@ -70,22 +91,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php esc_html_e( 'If you create recipes and then change the connected Google account, your previous recipes may no longer work.', 'uncanny-automator' ); ?>
 					</uo-alert>
 
-				<?php }?>
+				<?php } ?>
 
 			</div>
 
 		</div>
 
-		<div class="uap-settings-panel-bottom">
+		<div class="uap-settings-panel-bottom" <?php echo $this->client ? '' : 'has-arrow'; ?>>
 
-				<?php if ( ! $gs_client ) { ?>
+				<?php if ( ! $this->client ) { ?>
 
 					<div class="uap-settings-panel-bottom-left">
 
-						<uo-button href="<?php echo esc_url( $auth_url ); ?>">
-
-							<?php esc_html_e( 'Connect Google account', 'uncanny-automator' ); ?>
-
+						<uo-button class="uap-settings-button-google" href="<?php echo esc_url( $auth_url ); ?>">
+							<uo-icon id="google"></uo-icon><?php esc_html_e( 'Sign in with Google', 'uncanny-automator' ); ?>
 						</uo-button>
 
 					</div> <!--.uap-settings-panel-bottom-left -->

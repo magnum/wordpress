@@ -34,18 +34,19 @@ class AUDIENCE_UNSUBSCRIBEAUSER {
 	public function define_action() {
 
 		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/mailchimp/' ),
-			'is_pro'             => false,
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
+			'author'                => Automator()->get_author_name( $this->action_code ),
+			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/mailchimp/' ),
+			'is_pro'                => false,
+			'integration'           => self::$integration,
+			'code'                  => $this->action_code,
 			// translators: Mailchimp audience
-			'sentence'           => sprintf( __( 'Unsubscribe the user from {{an audience:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name' => __( 'Unsubscribe the user from {{an audience}}', 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'options_callback'   => array( $this, 'load_options' ),
-			'execution_function' => array( $this, 'unsubscribe_audience_member' ),
+			'sentence'              => sprintf( __( 'Unsubscribe the user from {{an audience:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( 'Unsubscribe the user from {{an audience}}', 'uncanny-automator' ),
+			'priority'              => 10,
+			'accepted_args'         => 1,
+			'options_callback'      => array( $this, 'load_options' ),
+			'execution_function'    => array( $this, 'unsubscribe_audience_member' ),
+			'background_processing' => true,
 		);
 
 		Automator()->register->action( $action );
@@ -65,10 +66,10 @@ class AUDIENCE_UNSUBSCRIBEAUSER {
 						'MCLIST'
 					),
 					Automator()->helpers->recipe->mailchimp->options->get_double_opt_in(
-						__( 'Delete subscriber from MailChimp?', 'uncanny-automator' ),
+						__( 'Delete subscriber from Mailchimp?', 'uncanny-automator' ),
 						'MCDELETEMEMBER',
 						array(
-							'description' => __( 'Yes, delete from MailChimp, No, only unsubscribe from audience', 'uncanny-automator' ),
+							'description' => __( 'Yes, delete from Mailchimp, No, only unsubscribe from audience', 'uncanny-automator' ),
 						)
 					),
 				),
@@ -85,6 +86,8 @@ class AUDIENCE_UNSUBSCRIBEAUSER {
 	 */
 	public function unsubscribe_audience_member( $user_id, $action_data, $recipe_id, $args ) {
 
+		$helpers = Automator()->helpers->recipe->mailchimp->options;
+
 		try {
 			// Here unsubscribe
 			$list_id       = $action_data['meta']['MCLIST'];
@@ -94,66 +97,33 @@ class AUDIENCE_UNSUBSCRIBEAUSER {
 			$user      = get_userdata( $user_id );
 			$user_hash = md5( strtolower( trim( $user->user_email ) ) );
 
-			$mc_client = Automator()->helpers->recipe->mailchimp->options->get_mailchimp_client();
-			if ( $mc_client ) {
+			if ( 'no' === $delete_member ) {
+				$user_data = array(
+					'status' => 'unsubscribed',
+				);
 
-				if ( 'no' === $delete_member ) {
-					$user_data = array(
-						'status' => 'unsubscribed',
-					);
+				$request_params = array(
+					'action'    => 'update_subscriber',
+					'list_id'   => $list_id,
+					'user_hash' => $user_hash,
+					'user_data' => wp_json_encode( $user_data ),
+				);
 
-					$request_params = array(
-						'action'    => 'update_subscriber',
-						'list_id'   => $list_id,
-						'user_hash' => $user_hash,
-						'user_data' => wp_json_encode( $user_data ),
-					);
-
-				} else {
-					$request_params = array(
-						'action'    => 'delete_subscriber',
-						'list_id'   => $list_id,
-						'user_hash' => $user_hash,
-					);
-
-				}
-
-				$response = Automator()->helpers->recipe->mailchimp->options->api_request( $request_params );
-
-				// prepare meeting lists
-				if ( 200 === intval( $response->statusCode ) ) { // phpcs:ignore
-
-					Automator()->complete_action( $user_id, $action_data, $recipe_id );
-
-					return;
-				} else {
-
-					Automator()->helpers->recipe->mailchimp->options->log_action_error( $response, $user_id, $action_data, $recipe_id );
-
-					return;
-				}
 			} else {
-				// log error when no token found.
-				$error_msg                           = __( 'Mailchimp account is not connected.', 'uncanny-automator' );
-				$action_data['do-nothing']           = true;
-				$action_data['complete_with_errors'] = true;
-				Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
+				$request_params = array(
+					'action'    => 'delete_subscriber',
+					'list_id'   => $list_id,
+					'user_hash' => $user_hash,
+				);
 
-				return;
 			}
+
+			$response = $helpers->api_request( $request_params, $action_data );
+
+			Automator()->complete_action( $user_id, $action_data, $recipe_id );
+
 		} catch ( \Exception $e ) {
-			$error_msg = $e->getMessage();
-			$json      = json_decode( $error_msg );
-
-			if ( isset( $json->error ) && isset( $json->error->message ) ) {
-				$error_msg = $json->error->message;
-			}
-
-			$action_data['do-nothing']           = true;
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
-
-			return;
+			$helpers->complete_with_error( $e->getMessage(), $user_id, $action_data, $recipe_id );
 		}
 	}
 

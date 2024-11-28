@@ -33,11 +33,6 @@ class BP_ADDTOGROUP {
 	 */
 	public function define_action() {
 
-		$bp_group_args = array(
-			'uo_include_any' => false,
-			'status'         => array( 'public', 'hidden', 'private' ),
-		);
-
 		$action = array(
 			'author'             => Automator()->get_author_name(),
 			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/buddypress/' ),
@@ -50,12 +45,31 @@ class BP_ADDTOGROUP {
 			'priority'           => 10,
 			'accepted_args'      => 1,
 			'execution_function' => array( $this, 'add_to_bp_group' ),
-			'options'            => array(
-				Automator()->helpers->recipe->buddypress->options->all_buddypress_groups( null, 'BPGROUPS', $bp_group_args ),
-			),
+			'options_callback'   => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->action( $action );
+	}
+
+	/**
+	 * Loads the options.
+	 *
+	 * @return array The options.
+	 */
+	public function load_options() {
+
+		$bp_group_args = array(
+			'uo_include_any' => false,
+			'status'         => array( 'public', 'hidden', 'private' ),
+		);
+
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->buddypress->options->all_buddypress_groups( null, 'BPGROUPS', $bp_group_args ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -67,10 +81,29 @@ class BP_ADDTOGROUP {
 	 */
 	public function add_to_bp_group( $user_id, $action_data, $recipe_id, $args ) {
 
-		$add_to_bp_gropu = $action_data['meta'][ $this->action_meta ];
+		$group_id = absint( $action_data['meta'][ $this->action_meta ] );
 
-		groups_join_group( $add_to_bp_gropu, $user_id );
+		$has_joined_groups = groups_join_group( $group_id, $user_id );
 
-		Automator()->complete_action( $user_id, $action_data, $recipe_id );
+		if ( true !== $has_joined_groups ) {
+
+			$action_data['complete_with_errors'] = true;
+
+			return Automator()->complete->action(
+				$user_id,
+				$action_data,
+				$recipe_id,
+				sprintf(
+					/* translators: Error message */
+					esc_html__( 'Failed to add member into the group. User ID: %1$d | Group ID %2$d', 'uncanny-automator' ),
+					$user_id,
+					$group_id
+				)
+			);
+		}
+
+		return Automator()->complete->action( $user_id, $action_data, $recipe_id );
+
 	}
+
 }

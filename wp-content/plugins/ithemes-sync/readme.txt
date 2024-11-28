@@ -3,8 +3,8 @@ Contributors: ithemes, layotte, oakesjosh
 Tags: manage multiple Sites, backup, security, migrate, SEO, manage updates, administration, update manager, reports, sync, google analytics, optimize, uptime, ithemes, customize dashboard, client sites, maintenance, management, google webmaster tools, reporting
 Requires at least: 4.5
 Requires PHP: 5.6
-Tested up to: 5.9.2
-Stable tag: 2.1.10
+Tested up to: 6.1
+Stable tag: 2.1.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/quick-guide-gplv3.html
 
@@ -87,6 +87,18 @@ Make steady, reliable income for WordPress maintenance with iThemes Sync Pro’s
 
 == Changelog ==
 
+= 2.1.13 =
+* Bug Fix: Fix issue with Client Dashboard
+* Enhancement: Updater improvements
+* Enhancement: Add filter to disable "duplicate post" feature
+* Enhancement: Add filter to exclude post types from "duplicate post" feature
+
+= 2.1.12 =
+* Bug Fix: Improve support for WordPress 6.1
+
+= 2.1.11 =
+* Bug Fix: Compatibility with WordPress 6.1
+
 = 2.1.10 =
 * Bug Fix: Fix compatibility issue with fallback UTF-8 encoder on PHP 7.4+
 
@@ -144,7 +156,7 @@ Make steady, reliable income for WordPress maintenance with iThemes Sync Pro’s
 * Enhancemet: Added silent mode hooks
 
 = 2.0.13 =
-* Enhancment: Updater improvements
+* Enhancement: Updater improvements
 
 = 2.0.12 =
 * Enhancement: Add check for Yoast SEO Premium plugin for Yoast SEO functionality

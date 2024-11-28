@@ -37,6 +37,7 @@ class CommerceMerchantSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Ab
 {
     const BRAINTREE_MERCHANT_ID = 'braintree_merchant_id';
     const CHECKOUT_MESSAGE = 'checkout_message';
+    const COMMERCE_STORE = 'commerce_store';
     const CONTACT_EMAIL = 'contact_email';
     const CTA = 'cta';
     const DISABLE_CHECKOUT_URLS = 'disable_checkout_urls';
@@ -62,6 +63,6 @@ class CommerceMerchantSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\Ab
     const WHATSAPP_CHANNEL = 'whatsapp_channel';
     public function getFieldTypes()
     {
-        return array('braintree_merchant_id' => 'string', 'checkout_message' => 'string', 'contact_email' => 'string', 'cta' => 'string', 'disable_checkout_urls' => 'bool', 'display_name' => 'string', 'external_merchant_id' => 'string', 'facebook_channel' => 'Object', 'feature_eligibility' => 'Object', 'has_discount_code' => 'bool', 'has_onsite_intent' => 'bool', 'id' => 'string', 'instagram_channel' => 'Object', 'merchant_alert_email' => 'string', 'merchant_page' => 'Profile', 'merchant_status' => 'string', 'onsite_commerce_merchant' => 'Object', 'payment_provider' => 'string', 'privacy_url_by_locale' => 'map<string, string>', 'review_rejection_messages' => 'list<string>', 'review_rejection_reasons' => 'list<string>', 'supported_card_types' => 'list<string>', 'terms' => 'string', 'terms_url_by_locale' => 'map<string, string>', 'whatsapp_channel' => 'Object');
+        return array('braintree_merchant_id' => 'string', 'checkout_message' => 'string', 'commerce_store' => 'Object', 'contact_email' => 'string', 'cta' => 'string', 'disable_checkout_urls' => 'bool', 'display_name' => 'string', 'external_merchant_id' => 'string', 'facebook_channel' => 'Object', 'feature_eligibility' => 'Object', 'has_discount_code' => 'bool', 'has_onsite_intent' => 'bool', 'id' => 'string', 'instagram_channel' => 'Object', 'merchant_alert_email' => 'string', 'merchant_page' => 'Profile', 'merchant_status' => 'string', 'onsite_commerce_merchant' => 'Object', 'payment_provider' => 'string', 'privacy_url_by_locale' => 'map<string, string>', 'review_rejection_messages' => 'list<string>', 'review_rejection_reasons' => 'list<string>', 'supported_card_types' => 'list<string>', 'terms' => 'string', 'terms_url_by_locale' => 'map<string, string>', 'whatsapp_channel' => 'Object');
     }
 }

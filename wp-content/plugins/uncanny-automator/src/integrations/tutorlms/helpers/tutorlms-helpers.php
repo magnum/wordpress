@@ -12,6 +12,7 @@ use function tutor_utils;
  * @package Uncanny_Automator
  */
 class Tutorlms_Helpers {
+
 	/**
 	 * @var Tutorlms_Helpers
 	 */
@@ -33,12 +34,23 @@ class Tutorlms_Helpers {
 	public $load_any_options = true;
 
 	/**
+	 * @var bool
+	 */
+	public $load_all_options = false;
+
+	/**
 	 * Tutorlms_Helpers constructor.
 	 */
 	public function __construct() {
 
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
-		add_action( 'wp_ajax_select_lesson_from_course_LESSONCOMPLETED', array( $this, 'select_lesson_from_course_func' ) );
+		$this->load_options = true;
+		add_action(
+			'wp_ajax_select_lesson_from_course_LESSONCOMPLETED',
+			array(
+				$this,
+				'select_lesson_from_course_func',
+			)
+		);
 	}
 
 	/**
@@ -223,8 +235,8 @@ class Tutorlms_Helpers {
 	 *
 	 * @param object $attempt The quiz attempt object.
 	 *
-	 * @return int
 	 * @since 2.4.0
+	 * @return int
 	 */
 	public function get_percentage_scored( $attempt ) {
 		return number_format( ( $attempt->earned_marks * 100 ) / $attempt->total_marks );
@@ -235,8 +247,8 @@ class Tutorlms_Helpers {
 	 *
 	 * @param object $attempt The quiz attempt object.
 	 *
-	 * @return int
 	 * @since 2.4.0
+	 * @return int
 	 */
 	public function get_percentage_required( $attempt ) {
 		return (int) tutor_utils()->get_quiz_option( $attempt->quiz_id, 'passing_grade', 0 );
@@ -244,7 +256,6 @@ class Tutorlms_Helpers {
 
 	/**
 	 * Return all the specific fields of a form ID provided in ajax call
-	 *
 	 */
 	public function select_lesson_from_course_func() {
 
@@ -267,9 +278,17 @@ class Tutorlms_Helpers {
 		}
 
 		if ( absint( '-1' ) === absint( $course_id ) || true === (bool) $this->load_any_options ) {
+			// Use `Any lesson` for triggers.
+			$text = __( 'Any lesson', 'uncanny-automator' );
+
+			if ( true === $this->load_all_options ) {
+				// Use `All lessons` for this specific endpoint.
+				$text = __( 'All lessons', 'uncanny-automator' );
+			}
+
 			$fields[] = array(
 				'value' => '-1',
-				'text'  => 'Any lesson',
+				'text'  => $text,
 			);
 		}
 
@@ -297,7 +316,15 @@ class Tutorlms_Helpers {
 			}
 		}
 
+		// Remove `All lessons` option by resetting the $fields array if there are no lessons found.
+		if ( 1 === count( $fields ) && '-1' === current( array_column( $fields, 'value' ) ) ) {
+			$fields = array();
+		}
+
 		echo wp_json_encode( $fields );
+
 		die();
+
 	}
+
 }

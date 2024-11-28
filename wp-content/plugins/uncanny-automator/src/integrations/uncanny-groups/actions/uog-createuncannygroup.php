@@ -9,14 +9,25 @@ namespace Uncanny_Automator;
  */
 class UOG_CREATEUNCANNYGROUP {
 
+	use Recipe\Action_Tokens;
+
 	/**
 	 * Integration code
 	 *
 	 * @var string
 	 */
 	public static $integration = 'UOG';
+	/**
+	 * @var
+	 */
 	public static $number_of_keys;
+	/**
+	 * @var string
+	 */
 	private $action_code;
+	/**
+	 * @var string
+	 */
 	private $action_meta;
 
 	/**
@@ -33,6 +44,44 @@ class UOG_CREATEUNCANNYGROUP {
 	 */
 	public function define_action() {
 
+		$action = array(
+			'author'             => Automator()->get_author_name( $this->action_code ),
+			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/uncanny-groups/' ),
+			'integration'        => self::$integration,
+			'code'               => $this->action_code,
+			/* translators: Logged-in trigger - Uncanny Groups */
+			'sentence'           => sprintf( esc_attr__( 'Create {{an Uncanny group:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
+			/* translators: Logged-in trigger - Uncanny Groups */
+			'select_option_name' => esc_attr__( 'Create {{an Uncanny group}}', 'uncanny-automator' ),
+			'priority'           => 10,
+			'accepted_args'      => 1,
+			'execution_function' => array( $this, 'create_uncanny_group' ),
+			'options_callback'   => array( $this, 'load_options' ),
+		);
+
+		$this->set_action_tokens(
+			array(
+				'GROUP_ID'            => array(
+					'name' => __( 'Group ID', 'uncanny-automator' ),
+				),
+				'GROUP_COURSES'       => array(
+					'name' => __( 'Group courses', 'uncanny-automator' ),
+				),
+				'GROUP_LEADER_EMAILS' => array(
+					'name' => __( 'Group Leader emails', 'uncanny-automator' ),
+				),
+			),
+			$this->action_code
+		);
+
+		Automator()->register->action( $action );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function load_options() {
+
 		$args = array(
 			'post_type'      => 'sfwd-courses',
 			'posts_per_page' => 999,
@@ -48,20 +97,8 @@ class UOG_CREATEUNCANNYGROUP {
 			esc_attr__( 'Only users with the Group Leader role can be made the leader of a group.', 'uncanny-automator' ),
 			esc_attr__( 'This action will not alter the roles of Admin users.', 'uncanny-automator' )
 		);
-
-		$action = array(
-			'author'             => Automator()->get_author_name( $this->action_code ),
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'integration/uncanny-groups/' ),
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
-			/* translators: Logged-in trigger - Uncanny Groups */
-			'sentence'           => sprintf( esc_attr__( 'Create {{an Uncanny group:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
-			/* translators: Logged-in trigger - Uncanny Groups */
-			'select_option_name' => esc_attr__( 'Create {{an Uncanny group}}', 'uncanny-automator' ),
-			'priority'           => 10,
-			'accepted_args'      => 1,
-			'execution_function' => array( $this, 'create_uncanny_group' ),
-			'options_group'      =>
+		$options      = array(
+			'options_group' =>
 				array(
 					$this->action_meta =>
 						array(
@@ -78,6 +115,7 @@ class UOG_CREATEUNCANNYGROUP {
 								'required'                 => true,
 								'supports_multiple_values' => true,
 								'options'                  => $options,
+								'token_name'               => esc_attr__( 'Group course IDs', 'uncanny-automator' ),
 							),
 							array(
 								'option_code' => 'UOGROUPNUMSEATS',
@@ -106,7 +144,7 @@ class UOG_CREATEUNCANNYGROUP {
 				),
 		);
 
-		Automator()->register->action( $action );
+		return Automator()->utilities->keep_order_of_options( $options );
 	}
 
 	/**
@@ -215,7 +253,37 @@ class UOG_CREATEUNCANNYGROUP {
 
 		do_action( 'uo_new_group_created', $group_id, $user_id );
 
+		$this->hydrate_tokens(
+			array(
+				'GROUP_ID'            => $group_id,
+				'GROUP_COURSES'       => $this->get_group_names( $group_id ),
+				'GROUP_LEADER_EMAILS' => $this->get_group_leaders_email_addresses( $group_id ),
+			)
+		);
+
 		Automator()->complete_action( $user_id, $action_data, $recipe_id );
 
 	}
+
+	private function get_group_names( $group_id ) {
+
+		$groups = learndash_group_enrolled_courses( $group_id );
+
+		$group_names = array();
+
+		foreach ( $groups as $group_id ) {
+			$group_names[] = get_the_title( $group_id );
+		}
+
+		return implode( ', ', $group_names );
+	}
+
+	private function get_group_leaders_email_addresses( $group_id ) {
+
+		$group_leaders = learndash_get_groups_administrators( $group_id );
+
+		return ( is_array( array_column( $group_leaders, 'user_email' ) ) ) ? implode( ', ', array_column( $group_leaders, 'user_email' ) ) : array();
+
+	}
+
 }

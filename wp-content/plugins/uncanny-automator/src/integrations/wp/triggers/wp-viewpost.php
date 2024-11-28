@@ -46,14 +46,32 @@ class WP_VIEWPOST {
 			'priority'            => 90,
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'view_post' ),
+			'options_callback'    => array( $this, 'load_options' ),
 			// very last call in WP, we need to make sure they viewed the post and didn't skip before is was fully viewable
-			'options'             => array(
-				Automator()->helpers->recipe->wp->options->all_posts(),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * load_options
+	 *
+	 * @return void
+	 */
+	public function load_options() {
+
+		Automator()->helpers->recipe->wp->options->load_options = true;
+
+		$options = Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->wp->options->all_posts(),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
+
+		return $options;
 	}
 
 	/**
@@ -65,7 +83,11 @@ class WP_VIEWPOST {
 			return;
 		}
 
-		if ( ! is_singular( $post->post_type ) && ! is_post_type_viewable( $post->post_type ) ) {
+		if ( ! is_singular( $post->post_type ) || ! is_post_type_viewable( $post->post_type ) ) {
+			return;
+		}
+
+		if ( ! is_user_logged_in() ) {
 			return;
 		}
 
@@ -88,17 +110,8 @@ class WP_VIEWPOST {
 						'run_number'     => $result['args']['run_number'],
 					);
 
-					$trigger_meta['meta_key']   = 'WPPOST';
-					$trigger_meta['meta_value'] = maybe_serialize( $post->post_title );
-					Automator()->insert_trigger_meta( $trigger_meta );
-
-					$trigger_meta['meta_key']   = 'WPPOST_ID';
-					$trigger_meta['meta_value'] = maybe_serialize( $post->ID );
-					Automator()->insert_trigger_meta( $trigger_meta );
-
-					$trigger_meta['meta_key']   = 'WPPOST_URL';
-					$trigger_meta['meta_value'] = maybe_serialize( get_permalink( $post->ID ) );
-					Automator()->insert_trigger_meta( $trigger_meta );
+					// post_id Token
+					Automator()->db->token->save( 'post_id', $post->ID, $trigger_meta );
 
 					Automator()->maybe_trigger_complete( $result['args'] );
 				}

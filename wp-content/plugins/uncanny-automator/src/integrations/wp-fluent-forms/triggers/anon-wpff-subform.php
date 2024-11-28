@@ -53,11 +53,22 @@ class ANON_WPFF_SUBFORM {
 			'priority'            => 20,
 			'accepted_args'       => 3,
 			'validation_function' => array( $this, 'wpffform_submit' ),
-			'options'             => array(
-				Automator()->helpers->recipe->wp_fluent_forms->options->list_wp_fluent_forms( null, $this->trigger_meta ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->wp_fluent_forms->options->list_wp_fluent_forms( null, $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -79,6 +90,8 @@ class ANON_WPFF_SUBFORM {
 		if ( ! $matches ) {
 			return;
 		}
+
+		$entry_data = json_decode( $insert_data['response'], true );
 
 		foreach ( $matches as $trigger_id => $match ) {
 			if ( Automator()->is_recipe_completed( $match['recipe_id'], $user_id ) ) {
@@ -104,26 +117,36 @@ class ANON_WPFF_SUBFORM {
 							$wp_ff_args = array(
 								'code'           => $this->trigger_code,
 								'meta'           => $this->trigger_meta,
-								'post_id'        => intval( $form->id ),
+								'post_id'        => absint( $form->id ),
 								'trigger_id'     => (int) $r['args']['trigger_id'],
-								'meta_key'       => $this->trigger_meta,
 								'user_id'        => $user_id,
 								'trigger_log_id' => $r['args']['get_trigger_id'],
 								'run_number'     => $r['args']['run_number'],
 							);
 
-							Automator()->helpers->recipe->wp_fluent_forms->extract_save_wp_fluent_form_fields( $data, $form, $wp_ff_args );
+							$wp_ff_args['meta_key'] = $this->trigger_meta;
+							Automator()->helpers->recipe->wp_fluent_forms->extract_save_wp_fluent_form_fields( $entry_data, $form, $wp_ff_args );
 
-							$insert = array(
-								'user_id'        => $user_id,
-								'trigger_id'     => (int) $r['args']['trigger_id'],
-								'trigger_log_id' => $r['args']['get_trigger_id'],
-								'meta_key'       => $this->trigger_meta . '_ID',
-								'meta_value'     => intval( $form->id ),
-								'run_number'     => $r['args']['run_number'],
-							);
+							$wp_ff_args['meta_key']   = $this->trigger_meta . '_ID';
+							$wp_ff_args['meta_value'] = absint( $form->id );
+							Automator()->insert_trigger_meta( $wp_ff_args );
 
-							Automator()->insert_trigger_meta( $insert );
+							$wp_ff_args['meta_key']   = 'WPFFENTRYID';
+							$wp_ff_args['meta_value'] = $insert_data['serial_number'];
+							Automator()->insert_trigger_meta( $wp_ff_args );
+
+							$wp_ff_args['meta_key']   = 'WPFFENTRYIP';
+							$wp_ff_args['meta_value'] = $insert_data['ip'];
+							Automator()->insert_trigger_meta( $wp_ff_args );
+
+							$wp_ff_args['meta_key']   = 'WPFFENTRYSOURCEURL';
+							$wp_ff_args['meta_value'] = $insert_data['source_url'];
+							Automator()->insert_trigger_meta( $wp_ff_args );
+
+							$wp_ff_args['meta_key']   = 'WPFFENTRYDATE';
+							$wp_ff_args['meta_value'] = maybe_serialize( date( 'Y-m-d H:i:s', strtotime( $insert_data['created_at'] ) ) );
+							Automator()->insert_trigger_meta( $wp_ff_args );
+
 							Automator()->process->user->maybe_trigger_complete( $r['args'] );
 						}
 					}
@@ -171,4 +194,5 @@ class ANON_WPFF_SUBFORM {
 
 		return false;
 	}
+
 }

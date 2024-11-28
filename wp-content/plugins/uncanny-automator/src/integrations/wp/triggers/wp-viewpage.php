@@ -51,13 +51,31 @@ class WP_VIEWPAGE {
 			'priority'            => 90,
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'view_page' ),
-			'options'             => array(
-				Automator()->helpers->recipe->wp->options->all_pages(),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * load_options
+	 *
+	 * @return array
+	 */
+	public function load_options() {
+
+		Automator()->helpers->recipe->wp->options->load_options = true;
+
+		$options = Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->wp->options->all_pages(),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
+
+		return $options;
 	}
 
 	/**
@@ -66,7 +84,6 @@ class WP_VIEWPAGE {
 	public function view_page() {
 
 		global $post;
-
 		// Bail out if the page is not of a post type 'page'.
 		if ( ! is_singular( 'page' ) ) {
 			return;
@@ -98,6 +115,15 @@ class WP_VIEWPAGE {
 		if ( $arr ) {
 			foreach ( $arr as $result ) {
 				if ( true === $result['result'] ) {
+					$trigger_meta = array(
+						'user_id'        => (int) $user_id,
+						'trigger_id'     => $result['args']['trigger_id'],
+						'trigger_log_id' => $result['args']['get_trigger_id'],
+						'run_number'     => $result['args']['run_number'],
+					);
+					// post_id Token
+					Automator()->db->token->save( 'post_id', $post->ID, $trigger_meta );
+
 					Automator()->process->user->maybe_trigger_complete( $result['args'] );
 				}
 			}

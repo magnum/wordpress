@@ -1,11 +1,11 @@
-# Copyright (C) 2022 iThemes Sync
+# Copyright (C) 2023 iThemes Sync
 # This file is distributed under the same license as the iThemes Sync package.
 msgid ""
 msgstr ""
-"Project-Id-Version: iThemes Sync 2.1.10\n"
+"Project-Id-Version: iThemes Sync 2.1.13\n"
 "Report-Msgid-Bugs-To: http://ithemes.com/support/\n"
-"POT-Creation-Date: 2022-03-24 17:51:59+00:00\n"
-"PO-Revision-Date: 2022-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2023-01-26 17:06:10+00:00\n"
+"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -33,11 +33,11 @@ msgstr ""
 msgid "iThemes Sync"
 msgstr ""
 
-#: admin.php:213 lib/updater/admin.php:218
+#: admin.php:213 lib/updater/admin.php:181
 msgid "Manage iThemes product licenses to receive automatic upgrade support"
 msgstr ""
 
-#: admin.php:213 lib/updater/admin.php:218
+#: admin.php:213 lib/updater/admin.php:181
 msgid "License"
 msgstr ""
 
@@ -54,11 +54,11 @@ msgctxt "Welcome panel"
 msgid "Welcome"
 msgstr ""
 
-#: duplicator.php:31
+#: duplicator.php:35
 msgid "Duplicate Post"
 msgstr ""
 
-#: duplicator.php:71
+#: duplicator.php:76
 msgid "copy"
 msgstr ""
 
@@ -70,388 +70,281 @@ msgstr ""
 msgid "iThemes Sync requires PHP 5.6 or greater. Please update you PHP version to ensure all features work properly."
 msgstr ""
 
-#: lib/updater/admin.php:177
+#: lib/updater/admin.php:140
 msgid "To receive automatic updates for %l, use the <a href=\"%s\">iThemes Licensing</a> page found in the Settings menu."
 msgstr ""
 
-#: lib/updater/admin.php:184 lib/updater/admin.php:190
-#: lib/updater/settings-page.php:274
+#: lib/updater/admin.php:147 lib/updater/admin.php:153
+#: lib/updater/settings-page.php:302
 msgid "iThemes Licensing"
 msgstr ""
 
-#: lib/updater/api.php:57
-msgid "Unrecognized response from <code>wp_remote_get</code>."
+#: lib/updater/api.php:41 lib/updater/api.php:59
+msgid "<p>Unable to get changelog data at this time.</p><p>Error <code>%1$s</code>: %2$s</p>"
 msgstr ""
 
-#: lib/updater/api.php:73
-msgid "Unrecognized response from iThemes API server."
+#: lib/updater/api.php:45
+msgid "<p>Unable to get changelog data at this time.</p><p>Error: Unrecognized response from <code>wp_remote_get</code>.</p>"
 msgstr ""
 
-#: lib/updater/api.php:321
-msgid "Incorrect password. Please make sure that you are supplying your iThemes membership username and password details."
+#: lib/updater/api.php:49
+msgid "<p>Unable to get changelog data at this time.</p><p>Error code <code>%1$s</code>: %2$s</p>"
 msgstr ""
 
-#: lib/updater/api.php:325
-msgid "Invalid username. Please make sure that you are supplying your iThemes membership username and password details."
+#: lib/updater/api.php:61
+msgid "<p>Unable to get changelog data at this time.</p><p>Error: Unrecognized response from iThemes API server.</p>"
 msgstr ""
 
-#: lib/updater/api.php:328
-msgid "The licensing server reports that the %1$s (%2$s) product is unknown. Please contact support for assistance."
-msgstr ""
-
-#: lib/updater/api.php:331
-msgid "%1$s could not be licensed since the membership account is out of available licenses for this product. You can unlicense the product on other sites or upgrade your membership to one with a higher number of licenses in order to increase the amount of available licenses."
-msgstr ""
-
-#: lib/updater/api.php:334
-msgid "%s could not be licensed due to an internal error. Please try to license %s again at a later time. If this problem continues, please contact iThemes support."
-msgstr ""
-
-#: lib/updater/api.php:340
-msgid "An unknown error relating to the %1$s product occurred. Please contact iThemes support. Error details: %2$s"
-msgstr ""
-
-#: lib/updater/api.php:342
-msgid "An unknown error occurred. Please contact iThemes support. Error details: %s"
-msgstr ""
-
-#. translators: 1. Error message, 2. Error code
-
-#: lib/updater/information.php:42
-msgid "<p>Unable to get changelog data at this time.</p><p>%1$s (%2$s)</p>"
-msgstr ""
-
-#: lib/updater/server.php:104
+#: lib/updater/server.php:78
 msgid "The server could not be contacted. Requests are delayed for %d minute to allow the server to recover."
 msgid_plural "The server could not be contacted. Requests are delayed for %d minutes to allow the server to recover."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/server.php:181
+#: lib/updater/server.php:155
 msgid "The server was unable to be contacted."
 msgstr ""
 
-#: lib/updater/server.php:191
+#: lib/updater/server.php:165
 msgid "An error occurred when communicating with the iThemes update server: %s (%s)"
 msgstr ""
 
-#: lib/updater/settings-page.php:115 settings-page.php:239
+#: lib/updater/settings-page.php:77
+msgid "Incorrect password. Please make sure that you are supplying your iThemes membership username and password details."
+msgstr ""
+
+#: lib/updater/settings-page.php:81
+msgid "Invalid username. Please make sure that you are supplying your iThemes membership username and password details."
+msgstr ""
+
+#: lib/updater/settings-page.php:84
+msgid "The licensing server reports that the %1$s (%2$s) product is unknown. Please contact support for assistance."
+msgstr ""
+
+#: lib/updater/settings-page.php:87
+msgid "%1$s could not be licensed since the membership account is out of available licenses for this product. You can unlicense the product on other sites or upgrade your membership to one with a higher number of licenses in order to increase the amount of available licenses."
+msgstr ""
+
+#: lib/updater/settings-page.php:90
+msgid "%s could not be licensed due to an internal error. Please try to license %s again at a later time. If this problem continues, please contact iThemes support."
+msgstr ""
+
+#: lib/updater/settings-page.php:96
+msgid "An unknown error relating to the %1$s product occurred. Please contact iThemes support. Error details: %2$s"
+msgstr ""
+
+#: lib/updater/settings-page.php:98
+msgid "An unknown error occurred. Please contact iThemes support. Error details: %s"
+msgstr ""
+
+#: lib/updater/settings-page.php:129 settings-page.php:239
 msgid "Settings saved"
 msgstr ""
 
-#: lib/updater/settings-page.php:122
+#: lib/updater/settings-page.php:136
 msgid "You must supply an iThemes membership username and password in order to license products."
 msgstr ""
 
-#: lib/updater/settings-page.php:124
+#: lib/updater/settings-page.php:138
 msgid "You must supply an iThemes membership username in order to license products."
 msgstr ""
 
-#: lib/updater/settings-page.php:126
+#: lib/updater/settings-page.php:140
 msgid "You must supply an iThemes membership password in order to license products."
 msgstr ""
 
-#: lib/updater/settings-page.php:128
+#: lib/updater/settings-page.php:142
 msgid "You must select at least one product to license. Ensure that you select the products that you wish to license in the listing below."
 msgstr ""
 
-#: lib/updater/settings-page.php:143
+#: lib/updater/settings-page.php:157
 msgid "An unknown server error occurred. Please try to license your products again at another time."
 msgstr ""
 
-#: lib/updater/settings-page.php:163
+#: lib/updater/settings-page.php:177
 msgid "Your product subscription has expired"
 msgstr ""
 
-#: lib/updater/settings-page.php:170
+#: lib/updater/settings-page.php:184
 msgid "Successfully licensed %l."
 msgstr ""
 
-#: lib/updater/settings-page.php:174 lib/updater/settings-page.php:179
+#: lib/updater/settings-page.php:188 lib/updater/settings-page.php:193
 msgid "Unable to license %1$s. Reason: %2$s"
 msgstr ""
 
-#: lib/updater/settings-page.php:187
+#: lib/updater/settings-page.php:201
 msgid "You must supply an iThemes membership username and password in order to remove licenses."
 msgstr ""
 
-#: lib/updater/settings-page.php:189
+#: lib/updater/settings-page.php:203
 msgid "You must supply an iThemes membership username in order to remove licenses."
 msgstr ""
 
-#: lib/updater/settings-page.php:191
+#: lib/updater/settings-page.php:205
 msgid "You must supply an iThemes membership password in order to remove licenses."
 msgstr ""
 
-#: lib/updater/settings-page.php:193
+#: lib/updater/settings-page.php:207
 msgid "You must select at least one license to remove. Ensure that you select the licenses that you wish to remove in the listing below."
 msgstr ""
 
-#: lib/updater/settings-page.php:208
+#: lib/updater/settings-page.php:222
 msgid "An unknown server error occurred. Please try to remove licenses from your products again at another time."
 msgstr ""
 
-#: lib/updater/settings-page.php:229
+#: lib/updater/settings-page.php:243
 msgid "Unknown server error."
 msgstr ""
 
-#: lib/updater/settings-page.php:234
+#: lib/updater/settings-page.php:248
 msgid "Successfully removed license from %l."
 msgid_plural "Successfully removed licenses from %l."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/settings-page.php:238
+#: lib/updater/settings-page.php:252
 msgid "Unable to remove license from %1$s. Reason: %2$s"
 msgstr ""
 
-#: lib/updater/settings-page.php:265 lib/updater/settings-page.php:852
-#: lib/updater/settings-page.php:867
-msgid "Successfully updated the Licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:295
+#: lib/updater/settings-page.php:324
 msgid "Settings"
 msgstr ""
 
-#: lib/updater/settings-page.php:301 lib/updater/settings-page.php:656
-msgid "Licensed URL"
-msgstr ""
-
-#: lib/updater/settings-page.php:306
-msgid "Change"
-msgstr ""
-
-#: lib/updater/settings-page.php:310
-msgid "The Licensed URL should be the primary URL of this WordPress network. If this is not set correctly, some features may not function as expected."
-msgstr ""
-
-#: lib/updater/settings-page.php:312
-msgid "The Licensed URL should be the primary URL of this WordPress site. If this is not set correctly, some features may not function as expected."
-msgstr ""
-
-#: lib/updater/settings-page.php:318
+#: lib/updater/settings-page.php:330
 msgid "Quick Release Updates"
 msgstr ""
 
-#: lib/updater/settings-page.php:325
+#: lib/updater/settings-page.php:337
 msgid "Enable quick release updates"
 msgstr ""
 
-#: lib/updater/settings-page.php:328
+#: lib/updater/settings-page.php:340
 msgid "Some products have quick releases that are created to solve specific issues that some users experience. In order to avoid causing users to have updates show up too frequently, automatic updates to these quick releases are disabled by default. Enabling this feature allows quick releases to be available to the automatic update system. Using this option is only recommended if support has requested that you enable it in order to receive a quick release. You should disable this option at a later time after confirming that the quick release solves the issue for you."
 msgstr ""
 
-#: lib/updater/settings-page.php:335
+#: lib/updater/settings-page.php:347
 msgid "Save Settings"
 msgstr ""
 
-#: lib/updater/settings-page.php:354 lib/updater/settings-page.php:385
-#: lib/updater/settings-page.php:509 lib/updater/settings-page.php:577
+#: lib/updater/settings-page.php:366 lib/updater/settings-page.php:397
+#: lib/updater/settings-page.php:521 lib/updater/settings-page.php:589
 msgid "Product"
 msgstr ""
 
-#: lib/updater/settings-page.php:355 lib/updater/settings-page.php:387
+#: lib/updater/settings-page.php:367 lib/updater/settings-page.php:399
 msgid "Member"
 msgstr ""
 
-#: lib/updater/settings-page.php:356 lib/updater/settings-page.php:389
+#: lib/updater/settings-page.php:368 lib/updater/settings-page.php:401
 msgid "Expiration"
 msgstr ""
 
-#: lib/updater/settings-page.php:357 lib/updater/settings-page.php:390
+#: lib/updater/settings-page.php:369 lib/updater/settings-page.php:402
 msgid "Remaining Licenses"
 msgstr ""
 
-#: lib/updater/settings-page.php:373
+#: lib/updater/settings-page.php:385
 msgid "Licensed Products"
 msgstr ""
 
-#: lib/updater/settings-page.php:379 lib/updater/settings-page.php:503
+#: lib/updater/settings-page.php:391 lib/updater/settings-page.php:515
 msgid "Select All"
 msgstr ""
 
-#: lib/updater/settings-page.php:388
+#: lib/updater/settings-page.php:400
 msgid "Product Status"
 msgstr ""
 
-#: lib/updater/settings-page.php:398
+#: lib/updater/settings-page.php:410
 msgid "unlimited"
 msgstr ""
 
-#: lib/updater/settings-page.php:439 lib/updater/settings-page.php:533
+#: lib/updater/settings-page.php:451 lib/updater/settings-page.php:545
 msgid "Select %s"
 msgstr ""
 
-#: lib/updater/settings-page.php:459
+#: lib/updater/settings-page.php:471
 msgid "Remove Licenses"
 msgstr ""
 
-#: lib/updater/settings-page.php:493
+#: lib/updater/settings-page.php:505
 msgid "Unlicensed Products"
 msgstr ""
 
-#: lib/updater/settings-page.php:495
+#: lib/updater/settings-page.php:507
 msgid "The following products have not been licensed. Licensing a product gives you access to automatic updates from within WordPress."
 msgstr ""
 
-#: lib/updater/settings-page.php:496
+#: lib/updater/settings-page.php:508
 msgid "To license products, select the products you wish to license, enter your iThemes membership username and password, and press the License Products button."
 msgstr ""
 
-#: lib/updater/settings-page.php:497
+#: lib/updater/settings-page.php:509
 msgid "Need help? <a href=\"%s\">Click here for a quick video tutorial</a>."
 msgstr ""
 
-#: lib/updater/settings-page.php:549
+#: lib/updater/settings-page.php:561
 msgid "License Products"
 msgstr ""
 
-#: lib/updater/settings-page.php:569
+#: lib/updater/settings-page.php:581
 msgid "Unrecognized Products"
 msgstr ""
 
-#: lib/updater/settings-page.php:571
+#: lib/updater/settings-page.php:583
 msgid "The following products were not recognized by the licensing system. This can be due to a bug in the product code, a temporary server issue, or because the product is no longer supported."
 msgstr ""
 
-#: lib/updater/settings-page.php:572
+#: lib/updater/settings-page.php:584
 msgid "Please check this page again at a later time to see if the problem resolves itself. If the product remains, please contact <a href=\"%s\">iThemes support</a> and provide them with the details given below."
 msgstr ""
 
-#: lib/updater/settings-page.php:578
+#: lib/updater/settings-page.php:590
 msgid "Type"
 msgstr ""
 
-#: lib/updater/settings-page.php:579
+#: lib/updater/settings-page.php:591
 msgid "Package"
 msgstr ""
 
-#: lib/updater/settings-page.php:580
+#: lib/updater/settings-page.php:592
 msgid "Version"
 msgstr ""
 
-#: lib/updater/settings-page.php:581
+#: lib/updater/settings-page.php:593
 msgid "Server Response"
 msgstr ""
 
-#: lib/updater/settings-page.php:591
+#: lib/updater/settings-page.php:603
 msgid "Unknown Error"
 msgstr ""
 
-#: lib/updater/settings-page.php:643 lib/updater/settings-page.php:748
-msgid "Licensing"
-msgstr ""
-
-#: lib/updater/settings-page.php:645
-msgid "Please confirm this site's licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:659
-msgid "The Licensed URL should be the primary URL of this WordPress network."
-msgstr ""
-
-#: lib/updater/settings-page.php:660 lib/updater/settings-page.php:663
-msgid "If not set correctly, some features may not function as expected."
-msgstr ""
-
-#: lib/updater/settings-page.php:662
-msgid "The Licensed URL should be the primary URL of this WordPress site."
-msgstr ""
-
-#: lib/updater/settings-page.php:677 lib/updater/settings-page.php:807
-msgid "Save"
-msgstr ""
-
-#: lib/updater/settings-page.php:692 lib/updater/settings-page.php:829
-msgid "The licensed URL cannot be blank."
-msgstr ""
-
-#: lib/updater/settings-page.php:694 lib/updater/settings-page.php:831
-msgid "The licensed URL must be a valid URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:717
-msgid "Successfully set the Licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:750
-msgid "The licenses on this site are for <code>%s</code>."
-msgstr ""
-
-#: lib/updater/settings-page.php:762
-msgid "License Option"
-msgstr ""
-
-#: lib/updater/settings-page.php:769
-msgid "Create new licenses for this site."
-msgstr ""
-
-#: lib/updater/settings-page.php:772
-msgid "Use this option if this site was cloned from another site and needs to have its own licenses."
-msgstr ""
-
-#: lib/updater/settings-page.php:778
-msgid "Change the existing licenses to be for <code>%s</code>."
-msgstr ""
-
-#: lib/updater/settings-page.php:783
-msgid "Note: If the <code>%s</code> site still exists and is different from this site, you will have to create new licenses on that site."
-msgstr ""
-
-#: lib/updater/settings-page.php:785
-msgid "Use this option if this site's primary URL has changed from <code>%1$s</code> to <code>%2$s</code>."
-msgstr ""
-
-#: lib/updater/settings-page.php:790
-msgid "iThemes Username"
-msgstr ""
-
-#: lib/updater/settings-page.php:797
-msgid "iThemes Password"
-msgstr ""
-
-#: lib/updater/settings-page.php:823
-msgid "You must supply an iThemes membership username and password in order to change the licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:825
-msgid "You must supply an iThemes membership username in order to change the licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:827
-msgid "You must supply an iThemes membership password in order to change the licensed URL."
-msgstr ""
-
-#: lib/updater/settings-page.php:833
-msgid "You must pick one of the License Option options."
-msgstr ""
-
-#: lib/updater/settings-page.php:927
+#: lib/updater/settings-page.php:642
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/settings-page.php:929
+#: lib/updater/settings-page.php:644
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/settings-page.php:931
+#: lib/updater/settings-page.php:646
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/settings-page.php:933
+#: lib/updater/settings-page.php:648
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/updater/settings-page.php:936
+#: lib/updater/settings-page.php:651
 msgid "%s ago"
 msgstr ""
 

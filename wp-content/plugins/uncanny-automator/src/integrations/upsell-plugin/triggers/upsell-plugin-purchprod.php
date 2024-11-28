@@ -46,16 +46,24 @@ class UPSELL_PLUGIN_PURCHPROD {
 			'priority'            => 99,
 			'accepted_args'       => 1,
 			'validation_function' => array( $this, 'upsell_order_completed' ),
-			'options'             => array(
-				Automator()->helpers->recipe->upsell_plugin->options->all_upsell_products( esc_attr__( 'Product', 'uncanny-automator' ) ),
-				Automator()->helpers->recipe->options->number_of_times(),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
-
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->upsell_plugin->options->all_upsell_products( esc_attr__( 'Product', 'uncanny-automator' ) ),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
 	}
 
 	public function upsell_order_completed( $order ) {
@@ -68,8 +76,13 @@ class UPSELL_PLUGIN_PURCHPROD {
 			return;
 		}
 
-		$customer = get_user_by_email( $order->customer_email );
-		$user_id  = ( ! empty( $customer ) ) ? $customer->ID : 0;
+		if ( true === apply_filters( 'automator_upsell_order_use_current_logged_user', false, $order ) ) {
+			$user_id = get_current_user_id();
+		} else {
+			$customer = get_user_by_email( $order->customer_email );
+			$user_id  = ( ! empty( $customer ) ) ? $customer->ID : 0;
+		}
+
 		if ( 0 === $user_id ) {
 			// Its a logged in recipe and
 			// user ID is 0. Skip process
@@ -147,4 +160,5 @@ class UPSELL_PLUGIN_PURCHPROD {
 
 		return;
 	}
+
 }

@@ -33,54 +33,76 @@ class Learndash_Helpers {
 	/**
 	 * Learndash_Helpers constructor.
 	 */
-	public function __construct() {
+	public function __construct( $load_action_hook = true ) {
 
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
+		$this->load_options = true;
+		if ( true === $load_action_hook ) {
 
-		add_action( 'wp_ajax_select_lesson_from_course_LESSONDONE', array( $this, 'select_lesson_from_course_func' ) );
-		add_action(
-			'wp_ajax_select_lesson_from_course_MARKLESSONDONE',
-			array(
-				$this,
-				'select_lesson_from_course_no_any',
-			)
-		);
+			add_action(
+				'wp_ajax_select_lesson_from_course_LESSONDONE',
+				array(
+					$this,
+					'select_lesson_from_course_func',
+				)
+			);
+			add_action(
+				'wp_ajax_select_lesson_from_course_MARKLESSONDONE',
+				array(
+					$this,
+					'select_lesson_from_course_no_any',
+				)
+			);
 
-		add_action( 'wp_ajax_select_lesson_from_course_LD_TOPICDONE', array( $this, 'lesson_from_course_func' ), 15 );
-		add_action(
-			'wp_ajax_select_lesson_from_course_MARKTOPICDONE',
-			array(
-				$this,
-				'lesson_from_course_func_no_any',
-			),
-			15
-		);
+			add_action(
+				'wp_ajax_select_lesson_from_course_LD_TOPICDONE',
+				array(
+					$this,
+					'lesson_from_course_func',
+				),
+				15
+			);
+			add_action(
+				'wp_ajax_select_lesson_from_course_MARKTOPICDONE',
+				array(
+					$this,
+					'lesson_from_course_func_no_any',
+				),
+				15
+			);
 
-		add_action(
-			'wp_ajax_select_topic_from_lesson_MARKTOPICDONE',
-			array(
-				$this,
-				'topic_from_lesson_func_no_any',
-			),
-			15
-		);
-		add_action( 'wp_ajax_select_topic_from_lesson_LD_TOPICDONE', array( $this, 'topic_from_lesson_func' ), 15 );
+			add_action(
+				'wp_ajax_select_topic_from_lesson_MARKTOPICDONE',
+				array(
+					$this,
+					'topic_from_lesson_func_no_any',
+				),
+				15
+			);
+			add_action( 'wp_ajax_select_topic_from_lesson_LD_TOPICDONE', array( $this, 'topic_from_lesson_func' ), 15 );
 
-
-		add_action( 'learndash_update_user_activity', array( $this, 'learndash_update_user_activity_func' ), 20, 1 );
+			add_action(
+				'learndash_update_user_activity',
+				array(
+					$this,
+					'learndash_update_user_activity_func',
+				),
+				20,
+				1
+			);
+		}
 	}
 
 	/**
 	 * @param Learndash_Helpers $options
 	 */
-	public function setOptions( Learndash_Helpers $options ) {
+	public function setOptions( Learndash_Helpers $options ) { //phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		$this->options = $options;
 	}
 
 	/**
 	 * @param Learndash_Pro_Helpers $pro
 	 */
-	public function setPro( Learndash_Pro_Helpers $pro ) {
+	public function setPro( Learndash_Pro_Helpers $pro ) { //phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		$this->pro = $pro;
 	}
 
@@ -91,7 +113,7 @@ class Learndash_Helpers {
 	 *
 	 * @return mixed
 	 */
-	public function all_ld_courses( $label = null, $option_code = 'LDCOURSE', $any_option = true ) {
+	public function all_ld_courses( $label = null, $option_code = 'LDCOURSE', $any_option = true, $relevant_tokens = true ) {
 		if ( ! $this->load_options ) {
 
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
@@ -103,7 +125,7 @@ class Learndash_Helpers {
 
 		$args = array(
 			'post_type'      => 'sfwd-courses',
-			'posts_per_page' => 999,
+			'posts_per_page' => 9999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -118,16 +140,35 @@ class Learndash_Helpers {
 			'required'                 => true,
 			'options'                  => $options,
 			'relevant_tokens'          => array(
-				$option_code                => esc_attr__( 'Course title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Course ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Course URL', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Course featured image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Course featured image URL', 'uncanny-automator' ),
+				$option_code                    => esc_attr__( 'Course title', 'uncanny-automator' ),
+				$option_code . '_ID'            => esc_attr__( 'Course ID', 'uncanny-automator' ),
+				$option_code . '_STATUS'        => esc_attr__( 'Course status', 'uncanny-automator' ),
+				$option_code . '_ACCESS_EXPIRY' => esc_attr__( 'Course access expiry date', 'uncanny-automator' ),
+				$option_code . '_URL'           => esc_attr__( 'Course URL', 'uncanny-automator' ),
+				$option_code . '_THUMB_ID'      => esc_attr__( 'Course featured image ID', 'uncanny-automator' ),
+				$option_code . '_THUMB_URL'     => esc_attr__( 'Course featured image URL', 'uncanny-automator' ),
 			),
 			'custom_value_description' => _x( 'Course ID', 'LearnDash', 'uncanny-automator' ),
 		);
 
+		if ( false === $relevant_tokens ) {
+			$option['relevant_tokens'] = array();
+		}
+
 		return apply_filters( 'uap_option_all_ld_courses', $option );
+	}
+
+	/**
+	 * @param string $label
+	 * @param string $option_code
+	 * @param bool $any_option
+	 *
+	 * @return mixed
+	 */
+	public function get_all_ld_courses( $label = null, $option_code = 'LDCOURSE', $any_option = true ) {
+		$this->load_options = true;
+
+		return $this->all_ld_courses( $label, $option_code, $any_option );
 	}
 
 	/**
@@ -148,7 +189,7 @@ class Learndash_Helpers {
 
 		$args = array(
 			'post_type'      => 'sfwd-lessons',
-			'posts_per_page' => 9999,
+			'posts_per_page' => 9999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -193,7 +234,7 @@ class Learndash_Helpers {
 
 		$args = array(
 			'post_type'      => 'sfwd-topic',
-			'posts_per_page' => 9999,
+			'posts_per_page' => 9999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -226,7 +267,7 @@ class Learndash_Helpers {
 	 *
 	 * @return mixed
 	 */
-	public function all_ld_groups( $label = null, $option_code = 'LDGROUP', $all_label = false, $any_option = true ) {
+	public function all_ld_groups( $label = null, $option_code = 'LDGROUP', $all_label = false, $any_option = true, $multiple_values = false, $relevant_tokens = true ) {
 		if ( ! $this->load_options ) {
 
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
@@ -238,7 +279,7 @@ class Learndash_Helpers {
 
 		$args = array(
 			'post_type'      => 'groups',
-			'posts_per_page' => 9999,
+			'posts_per_page' => 9999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -256,6 +297,7 @@ class Learndash_Helpers {
 			'input_type'               => 'select',
 			'required'                 => true,
 			'options'                  => $options,
+			'supports_multiple_values' => $multiple_values,
 			'relevant_tokens'          => array(
 				$option_code                => esc_attr__( 'Group title', 'uncanny-automator' ),
 				$option_code . '_ID'        => esc_attr__( 'Group ID', 'uncanny-automator' ),
@@ -265,6 +307,10 @@ class Learndash_Helpers {
 			),
 			'custom_value_description' => _x( 'Group ID', 'LearnDash', 'uncanny-automator' ),
 		);
+
+		if ( false === $relevant_tokens ) {
+			$option['relevant_tokens'] = array();
+		}
 
 		return apply_filters( 'uap_option_all_ld_groups', $option );
 	}
@@ -287,7 +333,7 @@ class Learndash_Helpers {
 
 		$args = array(
 			'post_type'      => 'sfwd-quiz',
-			'posts_per_page' => 9999,
+			'posts_per_page' => 9999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -540,7 +586,7 @@ class Learndash_Helpers {
 		// Activity type is lesson, fire do_action
 		if ( 'lesson' === $activity_type ) {
 			do_action(
-				'learndash_lesson_completed',
+				'automator_learndash_lesson_completed',
 				array(
 					'user'     => $user,
 					'course'   => get_post( $course_id ),
@@ -556,7 +602,7 @@ class Learndash_Helpers {
 		if ( 'topic' === $activity_type ) {
 			$lesson_id = learndash_get_lesson_id( $post_id, $course_id );
 			do_action(
-				'learndash_topic_completed',
+				'automator_learndash_lesson_completed',
 				array(
 					'user'     => $user,
 					'course'   => get_post( $course_id ),
@@ -568,31 +614,5 @@ class Learndash_Helpers {
 
 			return;
 		}
-
-//		// Activity type is course, fire do_action
-//		if ( 'course' === $activity_type ) {
-//			do_action(
-//				'learndash_course_completed',
-//				array(
-//					'user'             => $user,
-//					'course'           => get_post( $course_id ),
-//					'progress'         => $course_progress,
-//					'course_completed' => $args['activity_completed'],
-//				)
-//			);
-//
-//			return;
-//		}
-
-//		// Activity type is quiz, fire do_action
-//		if ( 'quiz' === $activity_type ) {
-//			if ( empty( $args['activity_meta'] ) ) {
-//				return;
-//			}
-//			$quizdata = $args['activity_meta'];
-//			do_action( 'learndash_quiz_submitted', $quizdata, $user );
-//
-//			return;
-//		}
 	}
 }

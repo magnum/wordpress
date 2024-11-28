@@ -5,7 +5,6 @@
   "remove_metadata": "checkbox",
 
   "general_event_enabled": "checkbox",
-  "search_event_enabled": "checkbox",
   "comment_event_enabled": "checkbox",
   "download_event_enabled": "checkbox",
   "form_event_enabled": "checkbox",
@@ -52,6 +51,7 @@
   "server_event_use_ajax": "checkbox",
   "server_access_api_token": "array",
   "test_api_event_code": "array",
+  "test_api_event_code_expiration_at": "array",
 
   "complete_registration_event_enabled" : "checkbox",
   "woo_complete_registration_percent_value": "text",
@@ -62,6 +62,14 @@
   "woo_complete_registration_custom_value_old": "radio",
   "woo_complete_registration_send_from_server": "checkbox",
 
-  "signal_events_enabled": "checkbox",
-  "verify_meta_tag": "array_textarea"
+  "verify_meta_tag": "array_textarea",
+
+  "automatic_event_form_enabled":  "checkbox",
+  "automatic_event_signup_enabled":  "checkbox",
+  "automatic_event_login_enabled":  "checkbox",
+  "automatic_event_download_enabled":  "checkbox",
+  "automatic_event_comment_enabled":  "checkbox",
+  "automatic_event_scroll_enabled":  "checkbox",
+  "automatic_event_time_on_page_enabled":  "checkbox",
+  "automatic_event_search_enabled":  "checkbox"
 }

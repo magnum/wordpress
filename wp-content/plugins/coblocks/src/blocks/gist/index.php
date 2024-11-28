@@ -9,7 +9,7 @@
  * Registers the Gist oembed handler.
  */
 function coblocks_register_gist_oembed() {
-	wp_embed_register_handler( 'gist', '/https?:\/\/gist\.github\.com\/([a-zA-Z0-9\/]+)(?:\#file\-([a-zA-Z0-9\_\-]+))?/', 'coblocks_block_gist_handler' );
+	wp_embed_register_handler( 'gist', '/https?:\/\/gist\.github\.com\/([a-zA-Z0-9\/\_\-]+)(?:\#file\-([a-zA-Z0-9\_\-]+))?/', 'coblocks_block_gist_handler' );
 }
 add_action( 'init', 'coblocks_register_gist_oembed' );
 
@@ -45,17 +45,21 @@ function coblocks_block_gist_handler( $matches ) {
 		)
 	);
 
-	// JSON decode the response body.
-	// Then grab files from JSON object.
-	$body  = json_decode( $api_resp['body'], true );
-	$files = empty( $body['files'] ) ? array() : $body['files'];
+	$resp_body = wp_remote_retrieve_body( $api_resp );
+	$result    = json_decode( $resp_body, true );
+
+	if ( ! is_array( $result ) || empty( $result['files'] ) || is_wp_error( $result ) ) {
+		return '';
+	}
 
 	// Map files object into filenames array.
-	$file_list = array_map(
-		function( $file ) {
-			return $file['filename'];
-		},
-		$files
+	$file_list = array_filter(
+		array_map(
+			function( $file ) {
+				return ! empty( $file['filename'] ) ? $file['filename'] : null;
+			},
+			$result['files']
+		)
 	);
 
 	$script_src = untrailingslashit( $gist_path );
@@ -75,10 +79,17 @@ function coblocks_block_gist_handler( $matches ) {
 
 	}
 
-	return sprintf(
-		'%1$s<noscript><a href="%2$s">%3$s</a></noscript>',
-		wp_get_inline_script_tag( null, array( 'src' => esc_url( 'https://gist.github.com/' . $script_src ) ) ),
+	$gist_html = "<span class='coblocks-gist__container' style='pointer-events: none'>";
+
+	$gist_html .= wp_get_inline_script_tag( null, array( 'src' => esc_url( 'https://gist.github.com/' . $script_src ) ) );
+
+	$gist_html .= sprintf(
+		'<a class="gist-block__container" href="%1$s" target="_blank">%2$s</a>',
 		esc_url( $gist_url ),
 		esc_html( __( 'View this gist on GitHub', 'coblocks' ) )
 	);
+
+	$gist_html .= '</span>';
+
+	return $gist_html;
 }

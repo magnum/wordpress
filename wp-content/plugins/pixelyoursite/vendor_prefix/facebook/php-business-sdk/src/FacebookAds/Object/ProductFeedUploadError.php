@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorAffectedSurfacesValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorSeverityValues;
 /**
  * This class is auto-generated.
@@ -60,6 +61,7 @@ class ProductFeedUploadError extends \PYS_PRO_GLOBAL\FacebookAds\Object\Abstract
         $ref_enums = array();
         $ref_enums['AffectedSurfaces'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorAffectedSurfacesValues::getInstance()->getValues();
         $ref_enums['Severity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorSeverityValues::getInstance()->getValues();
+        $ref_enums['ErrorPriority'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function getSamples(array $fields = array(), array $params = array(), $pending = \false)

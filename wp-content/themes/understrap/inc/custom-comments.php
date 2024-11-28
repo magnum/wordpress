@@ -29,7 +29,7 @@ if ( ! function_exists( 'understrap_bootstrap_comment_form_fields' ) ) {
 	function understrap_bootstrap_comment_form_fields( $fields ) {
 
 		$replace = array(
-			'<p class="' => '<div class="form-group ',
+			'<p class="' => '<div class="form-group mb-3',
 			'<input'     => '<input class="form-control" ',
 			'</p>'       => '</div>',
 		);
@@ -45,7 +45,7 @@ if ( ! function_exists( 'understrap_bootstrap_comment_form_fields' ) ) {
 		}
 
 		$replace = array(
-			'<p class="' => '<div class="form-group form-check ',
+			'<p class="' => '<div class="form-group mb-3 form-check ',
 			'<input'     => '<input class="form-check-input" ',
 			'<label'     => '<label class="form-check-label" ',
 			'</p>'       => '</div>',
@@ -71,7 +71,7 @@ if ( ! function_exists( 'understrap_bootstrap_comment_form' ) ) {
 	 */
 	function understrap_bootstrap_comment_form( $args ) {
 		$replace = array(
-			'<p class="' => '<div class="form-group ',
+			'<p class="' => '<div class="form-group mb-3 ',
 			'<textarea'  => '<textarea class="form-control" ',
 			'</p>'       => '</div>',
 		);
@@ -97,7 +97,11 @@ if ( ! function_exists( 'understrap_comment_form_comments_closed' ) ) {
 	 * Displays a note that comments are closed if comments are closed and there are comments.
 	 */
 	function understrap_comment_form_comments_closed() {
-		if ( get_comments_number() && post_type_supports( get_post_type(), 'comments' ) ) {
+		$post_type = get_post_type();
+		if ( false === $post_type ) {
+			return;
+		}
+		if ( get_comments_number() && post_type_supports( $post_type, 'comments' ) ) {
 			?>
 			<p class="no-comments"><?php esc_html_e( 'Comments are closed.', 'understrap' ); ?></p>
 			<?php

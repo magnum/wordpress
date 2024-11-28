@@ -1,9 +1,10 @@
 <?php
-
 namespace Uncanny_Automator;
 
 /**
+ * Class Prune_Logs
  *
+ * @package Uncanny_Automator
  */
 class Prune_Logs {
 
@@ -27,9 +28,12 @@ class Prune_Logs {
 	 * Register the settings
 	 */
 	private function register_settings() {
-		add_action( 'admin_init', function(){
-			register_setting( 'uncanny_automator_manual_prune', 'automator_manual_purge_days' );
-		} );
+		add_action(
+			'admin_init',
+			function() {
+				register_setting( 'uncanny_automator_manual_prune', 'automator_manual_purge_days' );
+			}
+		);
 	}
 
 	/**
@@ -63,14 +67,12 @@ class Prune_Logs {
 			$upgrade_to_pro_url = add_query_arg(
 				// UTM
 				array(
-					'utm_source' => 'uncanny_automator',
-					'utm_medium' => 'settings',
-					'utm_content' => 'auto_prune_tease'
+					'utm_source'  => 'uncanny_automator',
+					'utm_medium'  => 'settings',
+					'utm_content' => 'auto_prune_tease',
 				),
-
 				'https://automatorplugin.com/pricing/'
 			);
-
 
 			// Load the view
 			include Utilities::automator_get_view( 'admin-settings/tab/general/logs/auto-prune-logs-tease.php' );
@@ -99,15 +101,28 @@ class Prune_Logs {
 		global $wpdb;
 
 		$previous_time = gmdate( 'Y-m-d', strtotime( '-' . $prune_days_limit . ' days' ) );
-		$recipes       = $wpdb->get_results( $wpdb->prepare( "SELECT `ID`, `automator_recipe_id` FROM {$wpdb->prefix}uap_recipe_log WHERE `date_time` < %s AND ( `completed` = %d OR `completed` = %d  OR `completed` = %d )", $previous_time, 1, 2, 9 ) );
+
+		// Retrieves all recipes that are not `in progress`, and are not `completed with notice`.
+		$recipes = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT `ID`, `automator_recipe_id` 
+					FROM {$wpdb->prefix}uap_recipe_log 
+					WHERE `date_time` < %s 
+					AND ( `completed` <> %d AND `completed` <> %d )",
+				$previous_time,
+				Automator_Status::IN_PROGRESS,
+				Automator_Status::COMPLETED_WITH_NOTICE
+			)
+		);
 
 		if ( empty( $recipes ) ) {
+
 			update_option( 'automator_last_manual_prune_date', time() );
 
 			wp_safe_redirect(
 				add_query_arg(
 					array(
-						'pruned' => 1
+						'pruned' => 1,
 					),
 					$this->get_logs_settings_url()
 				)
@@ -120,6 +135,9 @@ class Prune_Logs {
 			$recipe_id               = absint( $recipe->automator_recipe_id );
 			$automator_recipe_log_id = absint( $recipe->ID );
 
+			// Prune api logs.
+			automator_purge_api_logs( $recipe_id, $automator_recipe_log_id );
+
 			// Prune recipe logs.
 			automator_purge_recipe_logs( $recipe_id, $automator_recipe_log_id );
 
@@ -131,13 +149,15 @@ class Prune_Logs {
 
 			// Prune closure logs.
 			automator_purge_closure_logs( $recipe_id, $automator_recipe_log_id );
+
 		}
+
 		update_option( 'automator_last_manual_prune_date', time() );
 
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'pruned' => 1
+					'pruned' => 1,
 				),
 				$this->get_logs_settings_url()
 			)
@@ -148,7 +168,7 @@ class Prune_Logs {
 
 	/**
 	 * Get the URL with the field to prune the logs
-	 * 
+	 *
 	 * @return string The URL
 	 */
 	public function get_logs_settings_url() {
@@ -157,7 +177,7 @@ class Prune_Logs {
 				'post_type' => 'uo-recipe',
 				'page'      => 'uncanny-automator-config',
 				'tab'       => 'general',
-				'general'   => 'logs'
+				'general'   => 'logs',
 			),
 			admin_url( 'edit.php' )
 		);

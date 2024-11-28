@@ -27,7 +27,15 @@ class PM_POPUPSHOW {
 		$this->action_meta = 'POPUPID';
 		$this->define_action();
 
-		add_filter( 'automator_option_updated', array( $this, 'automator_option_updated' ), 10, 4 );
+		add_filter(
+			'automator_option_updated',
+			array(
+				$this,
+				'automator_option_updated',
+			),
+			10,
+			4
+		);
 	}
 
 	/**
@@ -35,9 +43,33 @@ class PM_POPUPSHOW {
 	 */
 	public function define_action() {
 
+		$action = array(
+			'author'             => 'Uncanny Automator',
+			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/working-with-popup-maker-actions' ),
+			'integration'        => self::$integration,
+			'code'               => $this->action_code,
+			'requires_user'      => false,
+			/* translators: Logged-in trigger - Popup Maker */
+			'sentence'           => sprintf( esc_attr__( 'Show {{a popup:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
+			/* translators: Logged-in trigger - Popup Maker */
+			'select_option_name' => esc_attr__( 'Show {{a popup}}', 'uncanny-automator' ),
+			'priority'           => 11,
+			'accepted_args'      => 3,
+			'execution_function' => array( $this, 'display_pop_up' ),
+			'options_callback'   => array( $this, 'load_options' ),
+		);
+
+		Automator()->register->action( $action );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+
 		$args = array(
 			'post_type'      => 'popup',
-			'posts_per_page' => 99,
+			'posts_per_page' => 999,
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'publish',
@@ -54,25 +86,13 @@ class PM_POPUPSHOW {
 			'custom_value_description' => esc_attr__( 'Popup ID', 'uncanny-automator' ),
 		);
 
-		$action = array(
-			'author'             => 'Uncanny Automator',
-			'support_link'       => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/working-with-popup-maker-actions' ),
-			'integration'        => self::$integration,
-			'code'               => $this->action_code,
-			'requires_user'      => false,
-			/* translators: Logged-in trigger - Popup Maker */
-			'sentence'           => sprintf( esc_attr__( 'Show {{a popup:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
-			/* translators: Logged-in trigger - Popup Maker */
-			'select_option_name' => esc_attr__( 'Show {{a popup}}', 'uncanny-automator' ),
-			'priority'           => 11,
-			'accepted_args'      => 3,
-			'execution_function' => array( $this, 'display_pop_up' ),
-			'options'            => array(
-				$option,
-			),
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					$option,
+				),
+			)
 		);
-
-		Automator()->register->action( $action );
 	}
 
 	/**
@@ -148,9 +168,23 @@ class PM_POPUPSHOW {
 
 			return;
 		}
+		if ( 0 !== (int) $user_id ) {
+			update_user_meta( $user_id, 'display_pop_up_' . $popup_id, $popup_id );
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
 
-		update_user_meta( $user_id, 'display_pop_up_' . $popup_id, $popup_id );
-		Automator()->complete->action( $user_id, $action_data, $recipe_id );
+			return;
+		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$md5 = md5( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) );
+			update_option( 'automator_display_popup_' . $md5, $popup_id );
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
+
+			return;
+		}
+
+		$error_message                       = sprintf( '%s: %d', __( 'The popup failed to display. Popup ID', 'uncanny-automator' ), $popup_id );
+		$action_data['complete_with_errors'] = true;
+		$action_data['do_nothing']           = true;
+		Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
 	}
 
 	/**
@@ -218,4 +252,5 @@ class PM_POPUPSHOW {
 
 		return $return;
 	}
+
 }

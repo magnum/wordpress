@@ -35,10 +35,10 @@ class AutomatorInstagramSettings {
                     // Check if there is an error defined
                     if (
                         _uo.utility.isDefined( response.error )
-                        && ! _uo.utility.isEmpty( response.error_message )
+                        && !_uo.utility.isEmpty( response.error_message )
                     ) {
-                       // Set error
-                       this.setError( response.error_message ); 
+                        // Set error
+                        this.setError(response.error_message);
                     }
                 }
             },
@@ -62,17 +62,42 @@ class AutomatorInstagramSettings {
         // Remove the current content
         this.$listWrapper.innerHTML = '';
 
+        // Queue to get Instagram pages
+        // We'll render the Instagram pages that are cached, and create a queue to get the others
+        const instagramQueue = [];
+
         // Iterate list
         pages.forEach( ( page ) => {
             // Create Facebook page element
             const $facebookPage = document.createElement( 'div' );
-            $facebookPage.classList.add( 'uap-facebook-account' );
+            $facebookPage.classList.add( 'uap-facebook-account', 'uap-spacing-top' );
+
+            // Create placeholder
+            const placeholderLoadingInstagram = `<span class="uap-placeholder-text" data-placeholder="Icon"></span> <span class="uap-placeholder-text" data-placeholder="account name"></span> <span class="uap-placeholder-text" data-placeholder="followers"></span>`;
 
             // Add inner elements
             $facebookPage.innerHTML = `
-                <div class="uap-facebook-page uap-spacing-top">
+                <div class="uap-facebook-page">
                     <div class="uap-instagram-account">
-                        <span class="uap-placeholder-text" data-placeholder="Icon"></span> <span class="uap-placeholder-text" data-placeholder="account name"></span> <span class="uap-placeholder-text" data-placeholder="followers"></span>
+                        <div class="uap-instagram-account-content">
+                            ${ placeholderLoadingInstagram }
+                        </div>
+                        <div class="uap-instagram-account-actions">
+                            <uo-tooltip>
+                                ${ UncannyAutomatorBackend.i18n.settingsInstagram.refresh }
+
+                                <uo-button
+                                    color="secondary"
+                                    size="extra-small"
+                                    slot="target"
+                                    disabled
+
+                                    class="uap-instagram-account-refresh-button"
+                                >
+                                    <uo-icon id="sync"></uo-icon>
+                                </uo-button>
+                            </uo-tooltip>
+                        </div>
                     </div>
                     <div class="uap-linked-account">
                         ${ UncannyAutomatorBackend.i18n.settingsInstagram.linkedFacebookPage }
@@ -88,7 +113,7 @@ class AutomatorInstagramSettings {
             `;
 
             // Get the element used to show the Instagram account data
-            const $instagramWrapper = $facebookPage.querySelector( '.uap-instagram-account' );
+            const $instagramWrapper = $facebookPage.querySelector( '.uap-instagram-account-content' );
 
             // Append page
             this.$listWrapper.insertAdjacentElement(
@@ -108,60 +133,96 @@ class AutomatorInstagramSettings {
                 // Append Instagram data
                 $instagramWrapper
                     .appendChild(
-                        this.$createInstagramPill( {
+                        this.$createInstagramPill({
                             name: instagramAccountData.username,
-                            profilePicture: instagramAccountData.profile_pic
-                        } )
+                            profilePicture: instagramAccountData.profile_pic,
+                            IGConnection: page.ig_connection
+                        })
                     );
 
             } else {
-
-                // Get Instagram page
-                this.getInstagramAccount( {
-                    facebookPageId: page.value,
-                    onSuccess: ( response ) => {
-
-                        // Check if we found an account
-                        if ( response.statusCode == '200' ) {
-
-                            // Check if the required data is defined
-                            if (
-                                _uo.utility.isDefined( response.data )
-                                && _uo.utility.isDefined( response.data.data )
-                                && _uo.utility.isDefined( response.data.data[0] )
-                            ) {
-                                // Get data
-                                const instagramAccountData = response.data.data[0];
-
-                                // Remove current elements
-                                $instagramWrapper.innerHTML = '';
-
-                                // Append Instagram data
-                                $instagramWrapper
-                                    .appendChild(
-                                        this.$createInstagramPill( {
-                                            name: instagramAccountData.username,
-                                            profilePicture: instagramAccountData.profile_pic
-                                        } )
-                                    );
-                            }
-
-                        } else {
-                            // A different status code means that there is no account
-
-                            // Add message
-                            $instagramWrapper.innerHTML = `
-                                <span class="uap-instagram-account-no-account">
-                                    ${ UncannyAutomatorBackend.i18n.settingsInstagram.noInstagram }
-                                </span>
-                            `;
-
-                        }
-                    }
+                instagramQueue.push( {
+                    id: page.value,
+                    $instagramWrapper: $instagramWrapper
                 } );
-
             }
+
+            // Handle refresh button
+            const $refreshButton = $facebookPage.querySelector( '.uap-instagram-account-refresh-button' );
+            $refreshButton.addEventListener( 'click', () => {
+                // Set loading animation in button
+                $refreshButton.setAttribute( 'loading', '' );
+
+                // Add placeholder
+                $instagramWrapper.innerHTML = placeholderLoadingInstagram;
+
+                // Get Instagram account
+                this.getInstagramAccount({
+                    facebookPageId: page.value,
+                    $instagramWrapper: $instagramWrapper,
+                    onSuccess: ( response ) => {
+                        // Remove loading animation from button
+                        $refreshButton.removeAttribute( 'loading' );
+                    },
+                    onFail: () => {
+                        // Remove loading animation from button
+                        $refreshButton.removeAttribute( 'loading' );
+                    }
+                });
+            } );
         } );
+
+        // Enable all the "Refresh" buttons once the uI loaded
+        document.addEventListener( 'uap/instagram/get-accounts-finished', () => {
+            // Get all buttons
+            this.$listWrapper.querySelectorAll( '.uap-instagram-account-refresh-button' ).forEach( ( $button ) => {
+                $button.removeAttribute( 'disabled' );
+            } );
+        } );
+
+        /**
+         * Recursive function to get Instagram accounts in order
+         * 
+         * @param {Array} queue Array with info about the Facebook pages in which we have to search an Instagram account
+         * @param {Integer} index The current Facebook page we're checking
+         */
+        const getInstagramAccounts = ( queue = instagramQueue, index = 0 ) => {
+            // Check if the Facebook account is defined
+            if ( ! _uo.utility.isDefined( queue[ index ] ) ) {
+                return;
+            }
+
+            // Get Facebook account
+            const facebookAccount = queue[ index ];
+
+            // Get Instagram page
+            this.getInstagramAccount({
+                facebookPageId: facebookAccount.id,
+                $instagramWrapper: facebookAccount.$instagramWrapper,
+                onSuccess: ( response ) => {
+                    // Check if we can get another
+                    if ( _uo.utility.isDefined( queue[ index + 1 ] ) ) {
+                        getInstagramAccounts( queue, ( index + 1 ) );
+                    } else {
+                        document.dispatchEvent( new CustomEvent( 'uap/instagram/get-accounts-finished' ) );
+                    }
+                },
+                onFail: () => {
+                    // Check if we can get another
+                    if ( _uo.utility.isDefined( queue[ index + 1 ] ) ) {
+                        getInstagramAccounts( queue, ( index + 1 ) );
+                    } else {
+                        document.dispatchEvent( new CustomEvent( 'uap/instagram/get-accounts-finished' ) );
+                    }
+                }
+            });
+        }
+
+        if ( ! _uo.utility.isEmpty( instagramQueue ) ) {
+            getInstagramAccounts();
+        } else {
+            document.dispatchEvent( new CustomEvent( 'uap/instagram/get-accounts-finished' ) );
+        }
     }
 
     /**
@@ -187,7 +248,7 @@ class AutomatorInstagramSettings {
      * @param  {String} options.facebookPageId The ID of the page
      * @return {undefined}                       
      */
-    getInstagramAccount( { facebookPageId = '', onSuccess } ) {
+    getInstagramAccount({ facebookPageId = '', $instagramWrapper, onSuccess, onFail }) {
         // Fetch data
         _uo.utility.fetchData({
             url: UncannyAutomatorBackend.ajax.url,
@@ -197,10 +258,54 @@ class AutomatorInstagramSettings {
                 page_id: facebookPageId
             },
             onSuccess: ( response ) => {
+                // Check if we found an account
+                if ( response.statusCode == '200' ) {
+                    // Check if the required data is defined
+                    if (
+                        _uo.utility.isDefined( response.data )
+                        && _uo.utility.isDefined( response.data.data )
+                        && _uo.utility.isDefined( response.data.data[0] )
+                    ) {
+                        // Get data
+                        const instagramAccountData = response.data.data[0];
+
+                        // Remove current elements
+                        $instagramWrapper.innerHTML = '';
+
+                        // Append Instagram data
+                        $instagramWrapper
+                            .appendChild(
+                                this.$createInstagramPill({
+                                    name: instagramAccountData.username,
+                                    profilePicture: instagramAccountData.profile_pic,
+                                    IGConnection: instagramAccountData.ig_connection
+                                })
+                            );
+                    }
+                } else {
+                    // A different status code means that there is no account
+                    // Add message
+                    $instagramWrapper.innerHTML = `
+                        <span class="uap-instagram-account-no-account">
+                            ${ UncannyAutomatorBackend.i18n.settingsInstagram.noInstagram }
+                        </span>
+                    `;
+                }
+
                 // Try to invoke the callback
                 try {
                     onSuccess( response );
-                } catch ( e ) {}
+                } catch ( e ) {
+                    console.error( e );
+                }
+            },
+            onFail: () => {
+                // Try to invoke the callback
+                try {
+                    onFail( response );
+                } catch ( e ) {
+                    console.error( e );
+                }
             }
         });
     }
@@ -213,14 +318,15 @@ class AutomatorInstagramSettings {
      * @param  {String} account.profilePicture The URL of the avatar
      * @return {Node}                          A node with the data
      */
-    $createInstagramPill( { name = '', profilePicture = '' } ) {
+    $createInstagramPill({ name = '', profilePicture = '', IGConnection = {} }) {
         // Create element
         const $instagramAccount = document.createElement( 'div' );
+
         $instagramAccount.classList.add( 'uap-instagram-account-pill' );
 
-        // Add data
-        $instagramAccount.innerHTML = `
+        let $template = `
             <img 
+                onerror="this.remove()"
                 class="uap-instagram-account-pill-avatar"
                 src="${ profilePicture }"
             >
@@ -229,8 +335,20 @@ class AutomatorInstagramSettings {
                 ${ name }
             </span>
 
-            <uo-icon id="instagram"></uo-icon>
+            <uo-icon integration="INSTAGRAM"></uo-icon>
         `;
+
+        // Check if connected.
+        if ( undefined !== IGConnection.is_connected && false === IGConnection.is_connected ) {
+            $template += `
+                <p class="uap-instagram-error-message">
+                    ${ IGConnection.message }
+                </p>
+            `;
+        }
+
+        // Add the html.
+        $instagramAccount.innerHTML = $template;
 
         // Return Instagram account
         return $instagramAccount;
@@ -265,152 +383,3 @@ class AutomatorInstagramSettings {
 }
 
 new AutomatorInstagramSettings();
-
-
-class Instagram_Settings {
-
-    /**
-     * Display all connected Facebook Pages.
-     * 
-     * @return void.
-     */
-    renderFacebookPages() {
-
-        const $instagramLoadingBlock = document.getElementById('instagram-loading-text');
-        const _this = this;
-
-        _uo.utility.fetchData({
-            url: UncannyAutomatorBackend.ajax.url,
-            data: {
-                action: 'automator_integration_instagram_capture_token_fetch_user_pages',
-                nonce: UncannyAutomatorBackend.ajax.nonce
-            },
-
-            onSuccess: (response) => {
-
-                $instagramLoadingBlock.remove();
-
-                const $ul = document.getElementById("facebook-pages-list");
-
-                response.pages.forEach(function (item, i, pages) {
-
-                    const $li = document.createElement("li");
-
-                    let link = 'https://facebook.com/' + item.value;
-                    let itemValue = '<span class="item-value">' + item.value + '</span>';
-                    let itemText = '<span class="item-text">' + '<a target="_blank" href="' + link + '"><strong>' + item.text + '</strong></a></span>';
-                    let instagram = '<span class="uap-spacing-left item-btn">No Instagram account connected. ' + '<uo-button sync data-page-id="' + item.value + '" class="ig-connect-btn" size="small" color="secondary">' + settingsInstagramL10n.labelConnectBtn + '</uo-button>' + '</span>';
-
-                    $li.setAttribute('class', 'uap-spacing-bottom');
-
-                    if (item.ig_account != null) {
-                        instagram = '';
-                        item.ig_account.data;
-                        let igAccounts = item.ig_account.data;
-                        igAccounts.forEach(function (igAccount, j, ig_account_data) {
-                            instagram += _this.getIGAccountCard(
-                                igAccount.id,
-                                igAccount.profile_pic,
-                                igAccount.username
-                            );
-                        });
-                    }
-
-                    $li.innerHTML = itemText + itemValue + instagram;
-
-                    $ul.appendChild($li);
-
-                });
-            },
-
-            onFail: (response, message) => {
-                console.log(message);
-            },
-        });
-    }
-
-    /**
-     * Generate an HTML for displaying the connected Instagram account.
-     * 
-     * @param {...number} userId The id of the user.
-     * @param {string} picture The avatar of the user.
-     * @param {string} username The username of the user.
-     */
-    getIGAccountCard(userId, picture, username) {
-
-        var ig_account_html = '<div data-user-id="' + userId + '" class="uo-ig-account-connected-item">';
-
-        ig_account_html += '<img onerror="jQuery(this).hide();" width="32" src="' + picture + '" />';
-        ig_account_html += '<span>' + username + '</span>';
-        ig_account_html += '</div>';
-
-        return ig_account_html;
-
-    }
-
-    /**
-     * Get the connected Instagram account.
-     * 
-     * @param {...number} pageId The Facebook Page ID.
-     * @param {Object} targetElement A DOM Object where you'd like to display the connected Instagram.
-     */
-    getConnectedInstagram(pageId, targetElement) {
-
-        const _this = this;
-
-        _uo.utility.fetchData({
-            url: UncannyAutomatorBackend.ajax.url,
-            data: {
-                action: 'automator_integration_instagram_capture_token_fetch_instagram_accounts',
-                nonce: UncannyAutomatorBackend.ajax.nonce,
-                page_id: pageId
-            },
-            onSuccess: (response) => {
-
-                targetElement.setAttribute('loading', false);
-                let span = document.createElement('span');
-
-                if (200 === response.statusCode) {
-
-                    let $igAccountHTML = '';
-                    let igResponseData = response.data.data;
-                    const $wrap = targetElement.parentNode;
-
-                    if (igResponseData.length >= 1) {
-
-                        igResponseData.forEach(function (igAccount, i) {
-                            $igAccountHTML = _this.getIGAccountCard(
-                                igAccount.id,
-                                igAccount.profile_pic,
-                                igAccount.username
-                            );
-                        });
-
-                        span.innerHTML = $igAccountHTML;
-                        $wrap.innerHTML = '';
-                        $wrap.appendChild(span);
-
-                    } else {
-                        span.setAttribute('class', 'instagram-info-message');
-                        span.innerHTML = '<uo-icon id="times" color="primary"></uo-icon> ' + settingsInstagramL10n.errorMessage404;
-                        $wrap.innerHTML = '';
-                        $wrap.appendChild(span);
-                    }
-
-                } else {
-                    const $errorMessage = document.createElement("span");
-                    const $wrap = targetElement.parentNode;
-                    $errorMessage.innerHTML = settingsInstagramL10n.errorMessageFailure;
-                    $errorMessage.setAttribute('class', 'instagram-error-message');
-                    $wrap.innerHTML = '';
-                    $wrap.appendChild($errorMessage);
-                    targetElement.remove();
-                }
-            },
-
-            onFail: (response, message) => {
-                console.log(message);
-            },
-        });
-    }
-}

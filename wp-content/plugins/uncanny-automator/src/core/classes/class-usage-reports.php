@@ -11,12 +11,15 @@ use Uncanny_Automator\Automator_System_Report;
  */
 class Usage_Reports {
 
+	const  OPTION_NAME         = 'automator_reporting';
+	const  RECIPE_COUNT_OPTION = 'automator_completed_recipes';
+	const  SCHEDULE_NAME       = 'automator_report';
+	const  AUTOMATOR_PATH      = 'uncanny-automator/uncanny-automator.php';
+	const  AUTOMATOR_PRO_PATH  = 'uncanny-automator-pro/uncanny-automator-pro.php';
 	public $system_report;
 	public $recipes_data;
 	public $report;
-	public $nonce = 'automator_report_nonce';
-
-	public $retry_interval = DAY_IN_SECONDS;
+	private $forced = false;
 
 	/**
 	 * __construct
@@ -25,96 +28,110 @@ class Usage_Reports {
 	 */
 	public function __construct() {
 
-		$this->report = $this->initialize_report();
+		// Check the schedule when plugins are activated.
+		add_action( 'activate_' . self::AUTOMATOR_PATH, array( $this, 'maybe_schedule_report' ) );
+		add_action( 'activate_' . self::AUTOMATOR_PRO_PATH, array( $this, 'maybe_schedule_report' ) );
 
-		add_action( 'rest_api_init', array( $this, 'rest_api_endpoint' ) );
+		// Unschedule the report when Automator Free is deactivated.
+		add_action( 'deactivate_' . self::AUTOMATOR_PATH, array( $this, 'unschedule_report' ) );
 
-		add_action( 'shutdown', array( $this, 'maybe_report' ) );
+		// Postpone unscheduling if Pro is deactivated.
+		add_action( 'deactivate_' . self::AUTOMATOR_PRO_PATH, array( $this, 'pro_deactivated' ) );
+		add_action( 'after_automator_pro_deactivated', array( $this, 'maybe_schedule_report' ) );
 
+		add_action( self::SCHEDULE_NAME, array( $this, 'maybe_send_report' ) );
+
+		add_action( 'automator_recipe_completed', array( $this, 'count_recipe_completion' ) );
+
+		add_action( 'update_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 3 );
+		add_action( 'add_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 3 );
+
+		add_action( 'automator_weekly_healthcheck', array( $this, 'maybe_schedule_report' ) );
 	}
 
 	/**
-	 * rest_api_endpoint
-	 * Create an endpoint so that the process can run at background
-	 * https://site_domain/wp-json/uap/v2/async_report/
+	 * maybe_schedule_report
 	 *
 	 * @return void
 	 */
-	public function rest_api_endpoint() {
-		register_rest_route(
-			AUTOMATOR_REST_API_END_POINT,
-			'/async_report/',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'call_api' ),
-				'permission_callback' => array( $this, 'validate_rest_call' ),
-			)
-		);
-	}
+	public function maybe_schedule_report() {
 
-	/**
-	 * validate_rest_call
-	 *
-	 * @param  mixed $request
-	 * @return void
-	 */
-	public function validate_rest_call( $request ) {
-
-		$next_report = get_option( 'automator_next_report', 0 );
-
-		parse_str( $request->get_body(), $result );
-
-		if ( empty( $result['next_report'] ) ) {
-			return false;
+		if ( ! $this->reporting_enabled() ) {
+			$this->unschedule_report();
+			return;
 		}
 
-		return $next_report == $result['next_report'];
+		$this->schedule_report();
+
 	}
 
 	/**
-	 * initialize_report
+	 * schedule_report
 	 *
 	 * @return void
 	 */
-	public function initialize_report() {
-		return array(
-			'server'         => array(),
-			'wp'             => array(),
-			'automator'      => array(),
-			'license'        => array(),
-			'active_plugins' => array(),
-			'theme'          => array(),
-			'integrations'   => array(),
-			'recipes'        => array(
-				'live_recipes_count'        => 0,
-				'user_recipes_count'        => 0,
-				'everyone_recipes_count'    => 0,
-				'total_actions'             => 0,
-				'total_triggers'            => 0,
-				'async_actions_count'       => 0,
-				'delayed_actions_count'     => 0,
-				'scheduled_actions_count'   => 0,
-				'unpublished_recipes_count' => 0,
-			),
-		);
+	public function schedule_report() {
+		if ( ! wp_next_scheduled( self::SCHEDULE_NAME ) ) {
+			wp_schedule_event( $this->get_random_timestamp(), 'weekly', self::SCHEDULE_NAME );
+		}
 	}
 
 	/**
-	 * maybe_report
+	 * unschedule_report
+	 *
+	 * @return void
+	 */
+	public function unschedule_report() {
+
+		$timestamp = wp_next_scheduled( self::SCHEDULE_NAME );
+
+		if ( false === $timestamp ) {
+			return;
+		}
+
+		wp_unschedule_event( $timestamp, self::SCHEDULE_NAME );
+
+	}
+
+	/**
+	 * pro_deactivated
+	 *
+	 * Because the deactivation hook runs when a plugin is still active, we need to wait a little, before we try to unschedule the report after Automator Pro is deactivated.
+	 *
+	 * @return void
+	 */
+	public function pro_deactivated() {
+		wp_schedule_single_event( time() + 10, 'after_automator_pro_deactivated' );
+	}
+
+	/**
+	 * get_random_timestamp
+	 *
+	 * Will generate a random timestamp within the current week.
+	 *
+	 * @return int timestamp
+	 */
+	public function get_random_timestamp() {
+
+		$last_monday = strtotime( 'last Monday' );
+		$next_monday = strtotime( 'next Monday' );
+
+		return wp_rand( $last_monday, $next_monday );
+
+	}
+
+	/**
+	 * Method maybe_send_report
 	 *
 	 * @return bool
 	 */
-	public function maybe_report() {
+	public function maybe_send_report() {
 
 		if ( ! $this->reporting_enabled() ) {
 			return false;
 		}
 
-		if ( ! $this->time_to_report() ) {
-			return false;
-		}
-
-		return $this->async_report();
+		return $this->send_report();
 
 	}
 
@@ -131,60 +148,46 @@ class Usage_Reports {
 			return AUTOMATOR_REPORTING;
 		}
 
+		if ( (bool) get_option( self::OPTION_NAME, false ) === true ) {
+			$reporting_enabled = true;
+		}
+
 		if ( is_automator_pro_active() ) {
 			$reporting_enabled = true;
 		}
 
-		if ( (bool) get_option( 'automator_reporting', false ) === true ) {
-			$reporting_enabled = true;
-		}
-
-		return apply_filters( 'automator_reporting', $reporting_enabled );
+		return apply_filters( self::OPTION_NAME, $reporting_enabled );
 	}
 
 	/**
-	 * time_to_report
+	 * initialize_report
 	 *
-	 * @return bool
+	 * @return void
 	 */
-	public function time_to_report() {
-
-		$next_report = get_option( 'automator_next_report', 0 );
-
-		if ( $next_report < time() ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * async_report
-	 *
-	 * @return string
-	 */
-	public function async_report() {
-
-		$next_report = time() + $this->retry_interval;
-		// Update the option early to prevent multiple simultaneous calls
-		update_option( 'automator_next_report', $next_report );
-
-		$url = get_rest_url() . 'uap/v2/async_report/';
-
-		// Call the endpoint to make sure that the process runs at the background
-		$response = wp_remote_post(
-			$url,
-			array(
-				'timeout'  => 0.01,
-				'blocking' => false,
-				'body'     => array(
-					'next_report' => $next_report,
-				),
-
-			)
+	public function initialize_report() {
+		$this->report = array(
+			'server'             => array(),
+			'wp'                 => array(),
+			'automator'          => array(),
+			'license'            => array(),
+			'active_plugins'     => array(),
+			'theme'              => array(),
+			'integrations'       => array(),
+			'integrations_array' => array(),
+			'recipe_items'       => array(),
+			'recipes'            => array(
+				'live_recipes_count'        => 0,
+				'user_recipes_count'        => 0,
+				'everyone_recipes_count'    => 0,
+				'total_actions'             => 0,
+				'total_triggers'            => 0,
+				'total_closures'            => 0,
+				'async_actions_count'       => 0,
+				'delayed_actions_count'     => 0,
+				'scheduled_actions_count'   => 0,
+				'unpublished_recipes_count' => 0,
+			),
 		);
-
-		return $url;
 	}
 
 	/**
@@ -194,13 +197,16 @@ class Usage_Reports {
 	 */
 	public function get_data() {
 
+		$this->initialize_report();
+
 		$started_at = microtime( true );
 
-		$Automator_System_Report = Automator_System_Report::get_instance();
+		$automator_system_report = Automator_System_Report::get_instance();
 
-		$this->system_report = $Automator_System_Report->get();
+		$this->system_report = $automator_system_report->get();
 		$this->recipes_data  = Automator()->get_recipes_data( false );
 
+		$this->get_unique_site_hash();
 		$this->get_server_info();
 		$this->get_wp_info();
 		$this->get_theme_info();
@@ -208,12 +214,30 @@ class Usage_Reports {
 		$this->report['active_plugins'] = $this->get_plugins_info( $this->system_report['active_plugins'] );
 		$this->get_automator_info();
 		$this->get_recipes_info();
+		$this->get_date();
 
 		$finished_at = microtime( true );
 
 		$this->report['get_data_took'] = round( ( $finished_at - $started_at ) * 1000 );
 
+		$this->report['forced'] = $this->forced;
+
 		return $this->report;
+	}
+
+	/**
+	 * get_unique_site_hash
+	 *
+	 * Generate a unique site hash. We can't send the site URL without owner's consent due to GDPR.
+	 *
+	 * @return void
+	 */
+	public function get_unique_site_hash() {
+
+		$site_url                  = get_site_url();
+		$site_hash                 = md5( $site_url );
+		$this->report['site_hash'] = $site_hash;
+
 	}
 
 	/**
@@ -266,7 +290,7 @@ class Usage_Reports {
 		$wp['multisite']       = $this->system_report['environment']['wp_multisite'];
 		$wp['sites']           = $wp['multisite'] ? $this->sites_count() : 1;
 		$wp['user_count']      = $this->get_user_count();
-		$wp['timezone_offset'] = date( 'P' );
+		$wp['timezone_offset'] = Automator()->get_timezone_string();
 		$wp['locale']          = get_locale();
 
 		$this->report['wp'] = $wp;
@@ -382,20 +406,22 @@ class Usage_Reports {
 	 */
 	public function get_recipes_info() {
 
+		$this->report['recipes']['completed_recipes'] = $this->get_completed_runs();
+
+		$this->report['recipes']['completed_recipes_last_week'] = Automator()->get->completed_runs( WEEK_IN_SECONDS );
+
 		if ( empty( $this->recipes_data ) ) {
 			return;
 		}
 
 		foreach ( $this->recipes_data as $recipe_data ) {
 
-			if ( $recipe_data['post_status'] !== 'publish' ) {
+			if ( 'publish' !== $recipe_data['post_status'] ) {
 				$this->report['recipes']['unpublished_recipes_count'] ++;
 				continue;
 			}
 
 			$this->process_recipe_data( $recipe_data );
-			$this->process_items( 'triggers', $recipe_data );
-			$this->process_items( 'actions', $recipe_data );
 
 		}
 
@@ -403,11 +429,25 @@ class Usage_Reports {
 
 		$this->report['recipes']['total_integrations_used'] = count( $this->report['integrations'] );
 
-		$this->report['recipes']['completed_recipes'] = Automator()->get->total_completed_runs();
+	}
 
-		$report_frequency                                       = get_option( 'automator_report_frequency', WEEK_IN_SECONDS );
-		$this->report['recipes']['completed_recipes_last_week'] = Automator()->get->completed_runs( $report_frequency );
+	/**
+	 * get_completed_runs
+	 *
+	 * @return void
+	 */
+	public function get_completed_runs() {
+		return absint( get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() ) );
+	}
 
+	/**
+	 * count_recipe_completion
+	 *
+	 * @return void
+	 */
+	public function count_recipe_completion() {
+		$completed_runs = absint( get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() - 1 ) );
+		update_option( self::RECIPE_COUNT_OPTION, ++$completed_runs );
 	}
 
 	/**
@@ -421,59 +461,170 @@ class Usage_Reports {
 
 		$this->report['recipes']['live_recipes_count'] ++;
 
-		if ( $recipe_data['recipe_type'] === 'user' ) {
+		if ( 'user' === $recipe_data['recipe_type'] ) {
 			$this->report['recipes']['user_recipes_count'] ++;
-		} elseif ( $recipe_data['recipe_type'] === 'anonymous' ) {
+		} elseif ( 'anonymous' === $recipe_data['recipe_type'] ) {
 			$this->report['recipes']['everyone_recipes_count'] ++;
 		}
 
+		$this->process_recipe_items( $recipe_data );
+
 	}
 
 	/**
-	 * get_triggers_info
+	 * process_recipe_items
 	 *
+	 * @param  mixed $recipe
 	 * @return void
 	 */
-	public function process_items( $type, $recipe_data ) {
+	public function process_recipe_items( $recipe_data ) {
 
-		if ( empty( $recipe_data[ $type ] ) ) {
-			return;
+		$recipes_stats = $this->report['recipes'];
+
+		$snapshot = array(
+			'async'     => $recipes_stats['async_actions_count'],
+			'delayed'   => $recipes_stats['delayed_actions_count'],
+			'scheduled' => $recipes_stats['scheduled_actions_count'],
+		);
+
+		$recipe                 = array();
+		$recipe['triggers']     = $this->get_recipe_items( $recipe_data, 'triggers' );
+		$recipe['actions']      = $this->get_recipe_items( $recipe_data, 'actions' );
+		$recipe['closures']     = $this->get_recipe_items( $recipe_data, 'closures' );
+		$recipe['integrations'] = $this->get_recipe_integrations( $recipe_data );
+
+		$recipes_stats = $this->report['recipes'];
+
+		$recipe['async_actions_count']     = $recipes_stats['async_actions_count'] - $snapshot['async'];
+		$recipe['delayed_actions_count']   = $recipes_stats['delayed_actions_count'] - $snapshot['delayed'];
+		$recipe['scheduled_actions_count'] = $recipes_stats['scheduled_actions_count'] - $snapshot['scheduled'];
+
+		$recipe['type'] = $recipe_data['recipe_type'];
+
+		$recipe['actions_conditions'] = $this->get_actions_conditions( $recipe_data );
+
+		$this->report['recipe_items'][] = $recipe;
+
+	}
+
+	/**
+	 * get_actions_conditions
+	 *
+	 * @param  mixed $recipe_data
+	 * @return array
+	 */
+	public function get_actions_conditions( $recipe_data ) {
+
+		$output = array();
+
+		if ( empty( $recipe_data['actions_conditions'] ) ) {
+			return $output;
 		}
 
-		foreach ( $recipe_data[ $type ] as $data ) {
+		$actions_conditions = json_decode( $recipe_data['actions_conditions'], true );
 
-			if ( $data['post_status'] !== 'publish' ) {
+		foreach ( $actions_conditions as $conditon_group ) {
+
+			foreach ( $conditon_group['conditions'] as $condition ) {
+
+				$integration_name = empty( $condition['backup']['integrationName'] ) ? $condition['integration_name'] : $condition['backup']['integrationName'];
+
+				$output[] = $integration_name . '/' . $condition['condition'];
+
+			}
+		}
+
+		return $output;
+
+	}
+
+	/**
+	 * get_recipe_items
+	 *
+	 * @param  mixed $recipe
+	 * @param  mixed $type
+	 * @return void
+	 */
+	public function get_recipe_items( $recipe, $type ) {
+
+		$recipe_items = array();
+
+		if ( empty( $recipe[ $type ] ) ) {
+			return $recipe_items;
+		}
+
+		foreach ( $recipe[ $type ] as $item ) {
+
+			if ( 'publish' !== $item['post_status'] ) {
 				continue;
 			}
 
-			$this->process_async_actions( $data );
+			$meta           = $item['meta'];
+			$recipe_items[] = $meta['integration_name'] . '/' . $meta['code'];
 
-			$this->count_integration( $data['meta'], $type );
+			$this->count_async( $item );
 
+			$this->count_integration( $meta, $type );
 		}
+
+		return $recipe_items;
+	}
+
+	/**
+	 * get_recipe_integrations
+	 *
+	 * @param  mixed $recipe
+	 * @return void
+	 */
+	public function get_recipe_integrations( $recipe ) {
+
+		$output = array();
+		$types  = array( 'triggers', 'actions', 'closures' );
+
+		foreach ( $types as $type ) {
+
+			if ( empty( $recipe[ $type ] ) ) {
+				continue;
+			}
+
+			foreach ( $recipe[ $type ] as $item ) {
+				if ( 'publish' !== $item['post_status'] ) {
+					continue;
+				}
+				$meta     = $item['meta'];
+				$output[] = $meta['integration_name'];
+			}
+		}
+
+		return array_unique( $output );
 
 	}
 
 	/**
-	 * process_async_actions
+	 * count_async
 	 *
 	 * @param mixed $data
 	 *
 	 * @return void
 	 */
-	public function process_async_actions( $data ) {
+	public function count_async( $data ) {
 
 		if ( isset( $data['meta']['async_mode'] ) ) {
+
 			$this->report['recipes']['async_actions_count'] ++;
-			if ( $data['meta']['async_mode'] == 'delay' ) {
+
+			if ( 'delay' === $data['meta']['async_mode'] ) {
+
 				$this->report['recipes']['delayed_actions_count'] ++;
-			} elseif ( $data['meta']['async_mode'] == 'schedule' ) {
+
+			} elseif ( 'schedule' === $data['meta']['async_mode'] ) {
+
 				$this->report['recipes']['scheduled_actions_count'] ++;
+
 			}
 		}
 
 	}
-
 
 	/**
 	 * count_integration
@@ -516,50 +667,53 @@ class Usage_Reports {
 	}
 
 	/**
-	 * call_api
+	 * get_date
 	 *
 	 * @return void
 	 */
-	public function call_api() {
-
-		$api_url = apply_filters( 'automator_api_url', AUTOMATOR_API_URL ) . 'v2/report';
-
-		$data = $this->get_data();
-
-		$response = wp_remote_post(
-			$api_url,
-			array(
-				'method' => 'POST',
-				'body'   => array(
-					'action' => 'save',
-					'data'   => $data,
-				),
-			)
-		);
-
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		$this->schedule_next_report( $body );
-
-		return;
-
+	public function get_date() {
+		$this->report['week']    = gmdate( 'W' );
+		$this->report['year']    = gmdate( 'o' );
+		$this->report['month']   = gmdate( 'n' );
+		$this->report['day']     = gmdate( 'z' );
+		$this->report['weekday'] = gmdate( 'N' );
 	}
 
 	/**
-	 * schedule_next_report
-	 *
-	 * @param mixed $body
+	 * send_report
 	 *
 	 * @return void
 	 */
-	public function schedule_next_report( $body ) {
+	public function send_report() {
 
-		if ( ! is_wp_error( $body ) && is_array( $body ) && isset( $body['data']['report_frequency'] ) ) {
-			$frequency = (int) $body['data']['report_frequency'];
-			update_option( 'automator_next_report', time() + $frequency );
-			update_option( 'automator_report_frequency', $frequency );
-			return;
+		try {
+
+			$body = array(
+				'data'   => wp_json_encode( $this->get_data() ),
+				'action' => 'save_json',
+			);
+
+			$params = array(
+				'endpoint' => 'v2/report',
+				'body'     => $body,
+				'timeout'  => 10,
+			);
+
+			$response = Api_Server::api_call( $params );
+
+			if ( 201 !== $response['statusCode'] ) {
+				throw new \Exception( __( 'Something went wrong', 'uncanny-automator' ) );
+			}
+
+			return true;
+		} catch ( \Exception $e ) {
+
+			automator_log( $e->getMessage(), 'Could not send report' );
+
 		}
 
+		return false;
+
 	}
+
 }

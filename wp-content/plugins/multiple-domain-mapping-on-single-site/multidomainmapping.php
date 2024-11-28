@@ -3,7 +3,7 @@
 Plugin Name: Multiple Domain Mapping on single site
 Plugin URI:  https://wordpress.org/plugins/multiple-domain-mapping-on-single-site/
 Description: Show specific posts, pages, ... within their own, additional domains. Useful for SEO: different domains for landingpages.
-Version:     1.0.5
+Version:     1.1.1
 Author:      Matthias Wagner - FALKEmedia
 Author URI:  https://www.matthias-wagner.at
 License:     GPL2
@@ -57,13 +57,16 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 			'match' => false,
 			'factor' => PHP_INT_MIN
 		);
+		private $saveMappingsButtonDisabled = false;
+		private $pluginVersion = '1.1.1';
 
 		//constructor
 	  private function __construct(){
 
 			//perform database update check
 			require_once(plugin_dir_path( __FILE__ ) . 'includes/upgrades/v_1_0.php');
-			add_action('admin_init', array($this, 'handleUpgradeNotice'));
+			require_once(plugin_dir_path( __FILE__ ) . 'includes/upgrades/latestupgradenotice.php');
+			add_action('admin_init', array($this, 'handleNotices'));
 
 			//retrieve options
 			$this->setMappings(get_option('falke_mdm_mappings'));
@@ -86,6 +89,9 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 
 			//hook some stuff into our own actions
 			add_action( 'plugins_loaded', array( $this, 'hookMDMAction'), 20);
+
+			//html head
+			add_action('wp_head', array( $this, 'output_custom_head_code' ), 20);
 	  }
 
 		//setters/getters
@@ -132,8 +138,8 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 		//enqueue scripts and styles in admin
 		public function admin_scripts(){
 			//custom assets
-			wp_enqueue_style( 'falke_mdm_adminstyle', plugin_dir_url( __FILE__ ) . 'assets/css/admin.css' );
-			wp_register_script( 'falke_mdm_adminscript', plugin_dir_url( __FILE__ ) . 'assets/js/admin.js', array('jquery', 'jquery-ui-accordion'), false, true );
+			wp_enqueue_style( 'falke_mdm_adminstyle', plugin_dir_url( __FILE__ ) . 'assets/css/admin.css', array(), $this->pluginVersion );
+			wp_register_script( 'falke_mdm_adminscript', plugin_dir_url( __FILE__ ) . 'assets/js/admin.js', array('jquery', 'jquery-ui-accordion'), $this->pluginVersion, true );
 			wp_localize_script( 'falke_mdm_adminscript', 'localizedObj', array(
 				'removedMessage' => sprintf('%s "%s"', esc_html__('Mapping will be removed permanently as soon as you click', 'falke_mdm'), esc_html__('Save Mappings', 'falke_mdm')),
 				'undoMessage' => esc_html__('Undo unsaved changes', 'falke_mdm'),
@@ -143,15 +149,19 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 		}
 
 		//we handle the upgrade notice that may be prepared in the included upgrade-script
-		public function handleUpgradeNotice(){
-			$notice = get_option('falke_mdm_notice');
-			if($notice !== false){
-				add_action('admin_notices', array($this, 'outputUpgradeNotice'));
+		public function handleNotices(){
+			$generalNotice = get_option('falke_mdm_notice');
+			if($generalNotice !== false){
+				add_action('admin_notices', array($this, 'outputNotices'));
+			}
+			$upgradeNotice = get_option('falke_mdm_upgrade_notice');
+			if($upgradeNotice !== false){
+				add_action('admin_notices', array($this, 'outputNotices'));
 			}
 		}
-		public function outputUpgradeNotice(){
-			$notice = get_option('falke_mdm_notice');
-			if($notice !== false){
+		public function outputNotices(){
+			$generalNotice = get_option('falke_mdm_notice');
+			if($generalNotice !== false){
 				//here we can also check the current screen and remove the notice if the user has visited our plugin page once
 				$screen = get_current_screen();
 				if(!is_null($screen)){
@@ -159,12 +169,32 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 					if(stripos( $screen->id, str_ireplace('.php', '', plugin_basename(__FILE__)) ) !== false){
 						delete_option('falke_mdm_notice');
 						//this one last time we show the extra notice
-						$notice['text'] = $notice['onScreenText'];
+						$generalNotice['text'] = $generalNotice['onScreenText'];
 					}
 				}
 
 				//do the output
-				echo '<div class="'.$notice['class'].'">'.$notice['text'].'</div>';
+				echo '<div class="'.$generalNotice['class'].'">'.$generalNotice['text'].'</div>';
+			}
+
+			$upgradeNotice = get_option('falke_mdm_upgrade_notice');
+			if($upgradeNotice !== false){
+				//here we can also check the current screen and remove the notice if the user has visited our plugin page once
+				$screen = get_current_screen();
+				if(!is_null($screen)){
+					//plugin page is visited
+					if(stripos( $screen->id, str_ireplace('.php', '', plugin_basename(__FILE__)) ) !== false){
+						delete_option('falke_mdm_upgrade_notice');
+						//this one last time we show the extra notice
+						$upgradeNotice['text'] = $upgradeNotice['onScreenText'];
+
+						//update our db-hint to the current version now
+						update_option('falke_mdm_versionhint', $this->pluginVersion);
+					}
+				}
+
+				//do the output
+				echo '<div class="'.$upgradeNotice['class'].'">'.$upgradeNotice['text'].'</div>';
 			}
 		}
 
@@ -186,8 +216,8 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 	    }
 
 			//find out active tab
-			$active_tab = (isset($_GET['tab']) && ($_GET['tab'] == 'settings' || $_GET['tab'] == 'help' )) ? $_GET['tab'] : 'mappings';
-			$active_tab_name = (isset($_GET['tab']) && ($_GET['tab'] == 'settings' || $_GET['tab'] == 'help' )) ? ucfirst($_GET['tab']) : esc_html__('Mappings', 'falke_mdm');
+			$active_tab = (isset($_GET['tab']) && ($_GET['tab'] == 'settings' || $_GET['tab'] == 'advanced' || $_GET['tab'] == 'help' )) ? $_GET['tab'] : 'mappings';
+			$active_tab_name = (isset($_GET['tab']) && ($_GET['tab'] == 'settings' || $_GET['tab'] == 'advanced' || $_GET['tab'] == 'help' )) ? ucfirst($_GET['tab']) : esc_html__('Mappings', 'falke_mdm');
 
 			echo '<div class="wrap falke_mdm_wrap">';
 
@@ -204,13 +234,14 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 				settings_errors( 'falke_mdm_messages' );
 
 				//page intro
-				echo sprintf('<p>%s <a title="%s" target="_blank" href="https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/">%s</a> %s</p>', esc_html__('With this plugin you can use additional (sub-)domains to show specific pages, posts, archives, ... of your site, which is very useful for landingpages. It requires some important settings in your domains DNS entries and your hosting environment, and will not work "out-of-the-box". Please see the', 'falke_mdm'), esc_html__('WordPress Plugin Repository', 'falke_mdm'), esc_html__( 'description in the plugin repository', 'falke_mdm' ), esc_html__('or the help section below for further information on how to set it up.', 'falke_mdm'));
-				echo sprintf('<p>%s <a title="%s" target="_blank" href="https://www.matthias-wagner.at/">%s</a>.</p>', esc_html__( 'If you enjoy this plugin and especially if you use it for commercial projects, please help us maintain support and development with', 'falke_mdm' ), esc_html__('Donations', 'falke_mdm'), esc_html__('a small donation', 'falke_mdm'));
+				echo sprintf('<p>%s <a title="%s" target="_blank" href="https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/">%s</a> %s</p>', esc_html__('With this plugin you can use additional domains and/or subdomains to show specific pages, posts, archives, ... of your site, which is very useful for landingpages. It requires some important settings in your domains DNS entries and your hosting environment, and will not work "out-of-the-box". Please see the', 'falke_mdm'), esc_html__('WordPress Plugin Repository', 'falke_mdm'), esc_html__( 'description in the plugin repository', 'falke_mdm' ), esc_html__('for further information on how to set it up.', 'falke_mdm'));
+				echo sprintf('<p>%s <a title="%s" target="_blank" href="https://www.matthias-wagner.at/">%s</a>.</p>', esc_html__( 'If you enjoy this plugin and especially if you use it for commercial projects, please help us maintain support and development with', 'falke_mdm' ), esc_html__('Donations', 'falke_mdm'), esc_html__('your donation', 'falke_mdm'));
 
 				//tabs
 				echo '<h2 class="nav-tab-wrapper">';
 					echo '<a href="?page='. plugin_basename(__FILE__) .'&amp;tab=mappings" class="nav-tab ' . ($active_tab == 'mappings' ? 'nav-tab-active ' : '') . '">' . esc_html__('Mappings', 'falke_mdm') . '</a>';
 					echo '<a href="?page='. plugin_basename(__FILE__) .'&amp;tab=settings" class="nav-tab ' . ($active_tab == 'settings' ? 'nav-tab-active ' : '') . '">' . esc_html__('Settings', 'falke_mdm') . '</a>';
+					echo '<a href="?page='. plugin_basename(__FILE__) .'&amp;tab=advanced" class="nav-tab nav-tab-featured ' . ($active_tab == 'advanced' ? 'nav-tab-active ' : '') . '">' . esc_html__('Advanced', 'falke_mdm') . '</a>';
 					echo '<a href="?page='. plugin_basename(__FILE__) .'&amp;tab=help" class="nav-tab ' . ($active_tab == 'help' ? 'nav-tab-active ' : '') . '">' . esc_html__('Help', 'falke_mdm') . '</a>';
 				echo '</h2>';
 
@@ -222,7 +253,7 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 						case 'settings':{
 							add_settings_section(
 								'falke_mdm_section_settings',
-								esc_html__('Additional settings', 'falke_mdm'),
+								esc_html__('Domain mapping settings', 'falke_mdm'),
 								array($this, 'section_settings_callback'),
 								plugin_basename(__FILE__)
 							);
@@ -249,11 +280,31 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 							do_settings_sections( plugin_basename(__FILE__) );
 							break 1;
 						}
-						case 'help':{
-							echo '<p>'.__('We are going to provide some detailed installation instructions soon. Please refer to the <a href="https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/" target="_blank">description in the plugin repository</a> in the meantime.').'</p>';
+						case 'advanced':{
+							echo '<h2>Advanced stuff and additional features</h2>';
+							echo '<p><strong>' . __('This plugin is free and the code is open source. While the functionality in the user interface is pretty limited and straight forward, there are ways to build much more with domain mapping:', 'falke_mdm') . '</strong></p>';
+							echo '<section class="falke_mdm_advanced_section">';
+								echo '<p><a href="https://domainmappingsystem.com/" target="_blank"><img src="https://ps.w.org/domain-mapping-system/assets/banner-1544x500.jpg" alt="'. __('Domain mapping system banner') .'" /></a></p>';
+								echo '<p>' . sprintf(__('We have partnered with the plugin "Domain Mapping System" to unlock a whole bunch of powerful features for you, also for users with less technical experience.<br /><br /><strong>You can use the coupon code <mark>MDMSPECIAL10</mark> which is exclusive for users of this plugin to save 10&percnt;</strong> and get features like Global Domain Mapping, Category/Archive Mapping, Subdirectory Mapping, and much more!<br /><br />Check their websites and be sure to install their free version first: %s | %s', 'falke_mdm'), '<a href="https://wordpress.org/plugins/domain-mapping-system/" target="_blank">https://wordpress.org/plugins/domain-mapping-system/</a>', '<a href="https://domainmappingsystem.com/" target="_blank">https://domainmappingsystem.com/</a>') . '</p>';
+							echo '</section>';
+							echo '<section class="falke_mdm_advanced_section">';
+								echo '<p><a href="https://www.falkemedia.at/multiple-domain-mapping-on-single-site-premium/" target="_blank"><img src="https://ps.w.org/multiple-domain-mapping-on-single-site/assets/multidomainmapping-banner-customcode.jpg" alt="'. __('Custom code') .'" /></a></p>';
+								echo '<p>' . __('If you are an experienced developer or can hire one, you can <strong>use actions and filters</strong> which are placed in this plugin to build your own functionality on top of this plugin. This can be anything like custom templates per domain, different icons per domain, cross-domain-tracking with google analytics, ...<br /><br />As long as those actions and filters are not documented well, just look for "falke_mdma" as action-prefix and "falke_mdmf" as filter-prefix in our php files.<br /><br />Do you have some ideas for further features to include in our plugins? Are you looking for professional and custom coded projects? <a href="https://www.falkemedia.at/multiple-domain-mapping-on-single-site-premium/" target="_blank">Feel free to reach out to the people behind this plugin :)</a>', 'falke_mdm') . '</p>';
+							echo '</ul>';
 							break 1;
 						}
-						default:{
+						case 'help':{
+							echo '<h2>' . __('Help for domain mapping', 'falke_mdm') . '</h2>';
+							echo '<p>'.__('Please refer to the <a href="https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/" target="_blank">description in the plugin repository</a> for instructions on how the setup the plugin. It will require some good knowledge with domains, hosting-setup and DNS-Records.').'</p>';
+
+							echo '<section class="falke_mdm_advanced_section">';
+								echo '<p><a href="https://domainmappingsystem.com/" target="_blank"><img src="https://ps.w.org/domain-mapping-system/assets/banner-1544x500.jpg" alt="'. __('Domain mapping system banner') .'" /></a></p>';
+								echo '<p>'.__('Are you looking for <strong>further help</strong> to set up domain mapping on your wordpress site?<br /><br />We highly recommend our partner-plugin "Domain Mapping System" for less experienced users, which offers great support and advanced features in their paid plans.<br /><br /><strong>Dont forget to use your exclusive partner-coupon <mark>MDMSPECIAL10</mark> at their checkout :)</strong>. <a href="https://domainmappingsystem.com/" target="_blank">See all features of Domain Mapping System</a>').'</p>';
+							echo '</section>';
+							break 1;
+						}
+						default:{ //default is our mappings tab
+
 							add_settings_section(
 								'falke_mdm_section_mappings',
 								esc_html__('Domain mappings', 'falke_mdm'),
@@ -270,13 +321,16 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 							);
 							settings_fields('falke_mdm_mappings_group');
 							do_settings_sections( plugin_basename(__FILE__) );
+
 							break 1;
 						}
 					}
 
 					//dynamic submit button
-					if($active_tab != 'help'){
-						submit_button(sprintf(esc_html__('Save %s', 'falke_mdm'), $active_tab_name));
+					if($active_tab != 'help' && $active_tab != 'advanced'){
+						if($active_tab != 'mappings' || $this->saveMappingsButtonDisabled == false){
+							submit_button(sprintf(esc_html__('Save %s', 'falke_mdm'), $active_tab_name));
+						}
 					}
 
 				echo '</form>';
@@ -327,7 +381,7 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 
 		//generate options fields output for the mappings tab
 		public function section_mappings_callback(){
-			echo __('<b>In the first field</b>, enter your additional (sub-)domain which should show the content from now on. http/https and www/non-www will be detected automatically, so only one line per domain is necessary.<br /><b>In the second field</b>, enter the path to this page, post, archive, ... Please note that all descendant URIs will be mapped as well.', 'falke_mdm');
+			echo __('<b>In the first (left) field</b>, enter your additional (sub-)domain which should show the content from now on. http/https and www/non-www will be detected automatically, so only one line per domain is necessary.<br /><b>In the second (right) field</b>, enter the path to this page, post, archive, ... Please note that all descendant URIs will be mapped as well.', 'falke_mdm');
 		}
 		public function field_mappings_uris_callback(){
 			$options = $this->getMappings();
@@ -365,6 +419,37 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 					echo '</div>';
 				echo '</article>';
 			echo '</section>';
+
+			//calculate and maybe show warning for higher max_input_vars needed
+			$numberOfSettings = 3; //this must be changed when additional input fields emerge
+			if($cnt >= (intval(ini_get('max_input_vars')) / $numberOfSettings - 100)){
+				$this->saveMappingsButtonDisabled = true;
+				echo '<section class="notice notice-error">';
+					echo '<p>';
+						echo sprintf(__('WATCH OUT! Your server is configured to allow a maximum number of %s as %s. Each of the currently defined %s mapping(s) requires %s of these input vars when saving this site (%s). Depending on your other plugins, some dozens of these input vars will also be used by wordpress itself. If you want to save more mappings, you will need to configure your server for a higher value of %s.', 'falke_mdm'), ini_get('max_input_vars'), '<em>max_input_vars</em>', $cnt, $numberOfSettings, $cnt . ' x ' . $numberOfSettings . ' = ' . ($cnt*$numberOfSettings), '<em>max_input_vars</em>');
+						echo ' <a href="https://duckduckgo.com/?q=php+increase+max_input_vars" target="_blank">' . __('Find out how to fix this issue (external link)', 'falke_mdm') . '</a>';
+					echo '</p>';
+					echo '<p>';
+						echo __('Therefore the button to save mappings has been removed as it could happen that you lose some of your mappings when saving with this current configuration.', 'falke_mdm');
+					echo '</p>';
+				echo '</section>';
+			}
+		}
+
+		//function to show additional input fields in mapping body
+		public function render_advanced_mapping_inputs($cnt, $mapping){
+			if($cnt === 'new') return;
+
+			echo '<div class="falke_mdm_mapping_additional_input">';
+				echo '<p class="falke_mdm_mapping_additional_input_header">' . __('Custom html &lt;head&gt;-Code to display only on this mapped domain', 'falke_mdm') . '</p>';
+				echo '<textarea name="falke_mdm_mappings[cnt_'.$cnt.'][customheadcode]" placeholder="' . __('e.g. &lt;meta name=&#34;google-site-verification&#34; content=&#34;…&#34; /&gt;', 'falke_mdm') . '">' . $mapping['customheadcode'] . '</textarea>';
+			echo '</div>';
+
+			// input checkbox is prepared for auto redirects, but nothing more in the whole request-process has been made for that purpose ...
+			// echo '<div class="falke_mdm_mapping_additional_input">';
+			// 	echo '<p class="falke_mdm_mapping_additional_input_header">' . __('Redirect visitors from the original URL to the mapped domain?', 'falke_mdm') . '</p>';
+			// 	echo '<label><input type="checkbox" name="falke_mdm_mappings[cnt_'.$cnt.'][redirection]" value="301" ' . (!empty($mapping['redirection']) ? 'checked="checked"' : '') . ' />' . __('If checked, we will try to tell visitors browsers to redirect to the mapped domain.', 'falke_mdm') . '</label>';
+			// echo '</div>';
 		}
 
 		//sanitize options fields input
@@ -388,7 +473,6 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 			$mappings = array();
 
 			foreach($options as $key=>$val){
-
 				//search for mappings and prepare them for database
 				if(stripos( $key, 'cnt_' ) !== false){
 
@@ -425,6 +509,13 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 									$saveMapping = false;
 								}
 							}
+
+							//save html-head-code encoded
+							if(!empty($val['customheadcode'])) $val['customheadcode'] = htmlentities($val['customheadcode']);
+
+							//only allow integers (statuscode) for redirection
+							if(!empty($val['redirection'])) $val['redirection'] = intval($val['redirection']);
+
 							if($saveMapping){
 								//mapping should be saved and is filtered before
 								//use domain as index, so we do not have any duplicates -> this index will never be used or stored, but we convert it to md5 so it can not be confusing later
@@ -435,7 +526,7 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 							}
 						}else{
 							//check for existence, since this may be called in an upgrade process earlier, when this is not available yet
-							if(function_exists('add_settings_error')) add_settings_error( 'falke_mdm_messages', 'falke_mdm_error_code', esc_html__('At least one mapping with bad URI format has been dropped.', 'falke_mdm'), 'error' );
+							if(function_exists('add_settings_error')) add_settings_error( 'falke_mdm_messages', 'falke_mdm_error_code', esc_html__('At least one mapping with bad URL format has been dropped.', 'falke_mdm'), 'error' );
 						}
 					//if we have only one input filled
 					}else if(!($val['domain'] == '' && $val['path'] == '')){
@@ -765,10 +856,20 @@ if( !class_exists( 'FALKE_MultipleDomainMapping' ) ){
 
 		//hook into some of our own defined actions
 		public function hookMDMAction(){
-			add_action('falke_mdma_after_mapping_body', array( $this, 'simple_premium_notice'), 10, 2);
+			add_action('falke_mdma_after_mapping_body', array( $this, 'render_advanced_mapping_inputs'), 10, 2);
+			add_action('falke_mdma_after_mapping_body', array( $this, 'simple_pro_notice'), 10, 2);
 		}
-		public function simple_premium_notice($cnt, $mapping){
-			if($cnt !== 'new')	echo sprintf('<p class="premium-survey-notice">%s <a title="%s" target="_blank" href="https://www.falkemedia.at/multiple-domain-mapping-on-single-site-premium/">%s</a>.</p>', esc_html__('Looking for extra features and settings?', 'falke_mdm'), esc_html__('Survey', 'falke_mdm'), esc_html__('Find out more about our premium plans', 'falke_mdm'));
+		public function simple_pro_notice($cnt, $mapping){
+			if($cnt !== 'new')	echo sprintf('<p class="pro-upgrade-notice">%s <a title="%s" href="?page='. plugin_basename(__FILE__) .'&amp;tab=advanced">%s</a>.</p>', esc_html__('Looking for extra features and settings or professional help?', 'falke_mdm'), esc_html__('Survey', 'falke_mdm'), esc_html__('Find out more about our premium plans', 'falke_mdm'));
+		}
+
+		//check if custom head code is defined for this mapping and output it with html entities decoded, if so...
+		public function output_custom_head_code(){
+			if(!empty($this->getCurrentMapping()['match'])){
+				if(!empty($this->getCurrentMapping()['match']['customheadcode'])){
+					echo html_entity_decode($this->getCurrentMapping()['match']['customheadcode']);
+				}
+			}
 		}
 	}
 

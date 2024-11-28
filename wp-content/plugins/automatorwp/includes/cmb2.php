@@ -332,6 +332,116 @@ function automatorwp_options_cb_post_status( $field ) {
 }
 
 /**
+ * Options callback for post fields
+ *
+ * @since 1.0.0
+ *
+ * @param stdClass $field
+ *
+ * @return array
+ */
+function automatorwp_options_cb_post_fields( $field ) {
+
+    // Option none
+    $none_value = 'any';
+    $none_label = __( 'any field', 'automatorwp' );
+    $options = automatorwp_options_cb_none_option( $field, $none_value, $none_label );
+
+    $post_fields = array(
+        'ID'                        => __( 'ID', 'automatorwp' ),
+        'post_title'                => __( 'Title', 'automatorwp' ),
+        'post_name'                 => __( 'Slug', 'automatorwp' ),
+        'post_type'                 => __( 'Type', 'automatorwp' ),
+        'post_status'               => __( 'Status', 'automatorwp' ),
+        'post_date'                 => __( 'Date', 'automatorwp' ),
+        'post_date_gmt'             => __( 'Date (GMT)', 'automatorwp' ),
+        'post_date_modified'        => __( 'Date Modified', 'automatorwp' ),
+        'post_date_modified_gmt'    => __( 'Date Modified (GMT)', 'automatorwp' ),
+        'post_author'               => __( 'Author', 'automatorwp' ),
+        'post_content'              => __( 'Content', 'automatorwp' ),
+        'post_excerpt'              => __( 'Excerpt', 'automatorwp' ),
+        'post_parent'               => __( 'Parent', 'automatorwp' ),
+        'menu_order'                => __( 'Order', 'automatorwp' ),
+        'post_password'             => __( 'Password', 'automatorwp' ),
+    );
+
+    $post_fields = apply_filters( 'automatorwp_get_post_fields', $post_fields );
+
+    // Excluded roles
+    $field->args['excluded_post_fields'] = ( isset( $field->args['excluded_post_fields'] ) ? $field->args['excluded_post_fields'] : array() );
+
+    // Ensure excluded roles as array
+    if( ! is_array( $field->args['excluded_post_fields'] ) ) {
+        $field->args['excluded_post_fields'] = array( $field->args['excluded_post_fields'] );
+    }
+
+    foreach ( $post_fields as $post_field => $post_field_label ) {
+
+        // Skip excluded roles
+        if( in_array( $post_field, $field->args['excluded_post_fields'] ) ) {
+            continue;
+        }
+
+        $options[$post_field] = $post_field_label;
+
+    }
+
+    return $options;
+
+}
+
+/**
+ * Options callback for user fields
+ *
+ * @since 1.0.0
+ *
+ * @param stdClass $field
+ *
+ * @return array
+ */
+function automatorwp_options_cb_user_fields( $field ) {
+
+    // Option none
+    $none_value = 'any';
+    $none_label = __( 'any field', 'automatorwp' );
+    $options = automatorwp_options_cb_none_option( $field, $none_value, $none_label );
+
+    $user_fields = array(
+        'ID'                        => __( 'ID', 'automatorwp' ),
+        'user_login'                => __( 'Username', 'automatorwp' ),
+        'user_email'                => __( 'Email', 'automatorwp' ),
+        'display_name'              => __( 'Display name', 'automatorwp' ),
+        'user_nicename'             => __( 'Nicename', 'automatorwp' ),
+        'user_url'                  => __( 'Website', 'automatorwp' ),
+        'user_registered'           => __( 'Registration Date', 'automatorwp' ),
+    );
+
+    $user_fields = apply_filters( 'automatorwp_get_user_fields', $user_fields );
+
+    // Excluded roles
+    $field->args['excluded_user_fields'] = ( isset( $field->args['excluded_user_fields'] ) ? $field->args['excluded_user_fields'] : array() );
+
+    // Ensure excluded roles as array
+    if( ! is_array( $field->args['excluded_user_fields'] ) ) {
+        $field->args['excluded_user_fields'] = array( $field->args['excluded_user_fields'] );
+    }
+
+    foreach ( $user_fields as $user_field => $user_field_label ) {
+
+        // Skip excluded roles
+        if( in_array( $user_field, $field->args['excluded_user_fields'] ) ) {
+            continue;
+        }
+
+        $options[$user_field] = $user_field_label;
+
+    }
+
+    return $options;
+
+}
+
+/**
  * Options callback for WordPress roles
  *
  * @since 1.0.0
@@ -458,6 +568,31 @@ function automatorwp_options_cb_filters( $field ) {
         }
 
         $options[$integration][$filter] = $args['label'];
+    }
+
+    return $options;
+
+}
+
+/**
+ * Options callback for select2 fields assigned to posts
+ *
+ * @since 1.0.0
+ *
+ * @param stdClass $field
+ *
+ * @return array
+ */
+function automatorwp_options_cb_automation_statuses( $field ) {
+
+    $options = automatorwp_get_automation_statuses();
+
+    $object_id = $field->object_id;
+
+    $object = ct_get_object( $object_id );
+
+    if( ! in_array( $object->type, array( 'all-users' , 'all-posts' ) ) ) {
+        unset( $options['in-progress'] );
     }
 
     return $options;

@@ -46,14 +46,23 @@ class ANON_BB_NEWTOPIC {
 			'accepted_args'       => 4,
 			'type'                => 'anonymous',
 			'validation_function' => array( $this, 'bbp_new_topic' ),
-			'options'             => array(
-				Automator()->helpers->recipe->bbpress->options->list_bbpress_forums( null, $this->trigger_meta, true ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->bbpress->options->list_bbpress_forums( null, $this->trigger_meta, true ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -113,6 +122,18 @@ class ANON_BB_NEWTOPIC {
 
 							$trigger_meta['meta_key']   = 'ANONYMOUS_EMAIL';
 							$trigger_meta['meta_value'] = maybe_serialize( $anonymous_data['bbp_anonymous_email'] );
+							Automator()->insert_trigger_meta( $trigger_meta );
+
+							$trigger_meta['meta_key']   = 'ANONYMOUS_GUEST_NAME';
+							$trigger_meta['meta_value'] = maybe_serialize( $anonymous_data['bbp_anonymous_name'] );
+							Automator()->insert_trigger_meta( $trigger_meta );
+
+							$trigger_meta['meta_key']   = 'ANONYMOUS_GUEST_WEBSITE';
+							$trigger_meta['meta_value'] = maybe_serialize( $anonymous_data['bbp_anonymous_website'] );
+							Automator()->insert_trigger_meta( $trigger_meta );
+
+							$trigger_meta['meta_key']   = 'BBTOPIC_ID';
+							$trigger_meta['meta_value'] = maybe_serialize( $topic_id );
 							Automator()->insert_trigger_meta( $trigger_meta );
 
 							Automator()->maybe_trigger_complete( $result['args'] );

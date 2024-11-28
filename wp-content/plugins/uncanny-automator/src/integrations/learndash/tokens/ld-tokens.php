@@ -32,7 +32,20 @@ class Ld_Tokens {
 			9999,
 			2
 		);
+
+		add_filter(
+			'automator_maybe_trigger_ld_ldcourse_tokens',
+			array(
+				$this,
+				'possible_tokens_course_done',
+			),
+			9999,
+			2
+		);
+
 		add_filter( 'automator_maybe_parse_token', array( $this, 'ld_tokens' ), 20, 6 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'ld_course_status_token' ), 9999, 6 );
+		add_filter( 'automator_maybe_parse_token', array( $this, 'ld_course_access_expiry_token' ), 9999, 6 );
 	}
 
 	/**
@@ -42,6 +55,9 @@ class Ld_Tokens {
 	 * @return array
 	 */
 	public function possible_tokens_quiz_score_percent( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 		if ( ! isset( $args['value'] ) || ! isset( $args['meta'] ) ) {
 			return $tokens;
 		}
@@ -103,6 +119,9 @@ class Ld_Tokens {
 	 * @return array
 	 */
 	public function possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		if ( ! isset( $args['value'] ) || ! isset( $args['meta'] ) ) {
 			return $tokens;
@@ -214,6 +233,7 @@ class Ld_Tokens {
 				|| in_array( 'LDQUIZ_quiz_passing_percentage', $pieces, true )
 				|| in_array( 'LDQUIZ_achieved_score', $pieces, true )
 				|| in_array( 'LDQUIZ_achieved_points', $pieces, true )
+				|| in_array( 'LDCOURSE_course_completed_on', $pieces, true )
 			) {
 				if ( ! absint( $user_id ) ) {
 					return $value;
@@ -312,6 +332,20 @@ class Ld_Tokens {
 				// LD QUIZPERCENT token
 				if ( in_array( 'LDQUIZ_quiz_passing_percentage', $pieces, true ) ) {
 					return Automator()->get->mayabe_get_token_meta_value_from_trigger_log( $trigger_id, $run_number, $recipe_id, 'LDQUIZ_quiz_passing_percentage', $user_id, $recipe_log_id );
+				}
+
+				// LD Course completion date token
+				if ( in_array( 'LDCOURSE_course_completed_on', $pieces, true ) ) {
+					$course_id = Automator()->get->mayabe_get_token_meta_value_from_trigger_log( $trigger_id, $run_number, $recipe_id, 'LDCOURSE', $user_id, $recipe_log_id );
+
+					$t_data = array_shift( $trigger_data );
+					if ( isset( $t_data['meta']['LDCOURSE'] ) && 0 === (int) $course_id ) {
+						$course_id = $t_data['meta']['LDCOURSE'];
+					}
+
+					$completed_on = \learndash_user_get_course_completed_date( $user_id, $course_id );
+
+					return \learndash_adjust_date_time_display( $completed_on );
 				}
 
 				// User's QUIZSCORE token
@@ -427,5 +461,123 @@ class Ld_Tokens {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * @param $value
+	 * @param $pieces
+	 * @param $recipe_id
+	 * @param $trigger_data
+	 * @param $user_id
+	 * @param $replace_args
+	 *
+	 * @return mixed|string
+	 */
+	public function ld_course_status_token( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args = array() ) {
+
+		if ( empty( $pieces ) || empty( $trigger_data ) || empty( $replace_args ) ) {
+			return $value;
+		}
+		if ( ! in_array( 'LDCOURSE_STATUS', $pieces, true ) ) {
+			return $value;
+		}
+
+		if ( ! absint( $user_id ) ) {
+			return $value;
+		}
+
+		if ( ! absint( $recipe_id ) ) {
+			return $value;
+		}
+		$course_id = (int) Automator()->db->token->get( 'LDCOURSE', $replace_args );
+		if ( empty( $course_id ) ) {
+			$trigger = array_shift( $trigger_data );
+			if ( isset( $trigger['meta'] ) && isset( $trigger['meta']['LDCOURSE'] ) && intval( '-1' ) !== intval( $trigger['meta']['LDCOURSE'] ) ) {
+				$course_id = absint( $trigger['meta']['LDCOURSE'] );
+			}
+		}
+		if ( empty( $course_id ) ) {
+			return '-';
+		}
+
+		return learndash_course_status( $course_id, $user_id );
+	}
+
+	/**
+	 * @param $value
+	 * @param $pieces
+	 * @param $recipe_id
+	 * @param $trigger_data
+	 * @param $user_id
+	 * @param $replace_args
+	 *
+	 * @return mixed|string
+	 */
+	public function ld_course_access_expiry_token( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args = array() ) {
+
+		if ( empty( $pieces ) || empty( $trigger_data ) || empty( $replace_args ) ) {
+			return $value;
+		}
+		if ( ! in_array( 'LDCOURSE_ACCESS_EXPIRY', $pieces, true ) ) {
+			return $value;
+		}
+
+		if ( ! absint( $user_id ) ) {
+			return $value;
+		}
+
+		if ( ! absint( $recipe_id ) ) {
+			return $value;
+		}
+		$course_id = (int) Automator()->db->token->get( 'LDCOURSE', $replace_args );
+		if ( empty( $course_id ) ) {
+			$trigger = array_shift( $trigger_data );
+			if ( isset( $trigger['meta'] ) && isset( $trigger['meta']['LDCOURSE'] ) && intval( '-1' ) !== intval( $trigger['meta']['LDCOURSE'] ) ) {
+				$course_id = absint( $trigger['meta']['LDCOURSE'] );
+			}
+		}
+		if ( empty( $course_id ) ) {
+			return '-';
+		}
+
+		return learndash_adjust_date_time_display( ld_course_access_expires_on( $course_id, $user_id ) );
+	}
+
+	/**
+	 * @param $tokens
+	 * @param $args
+	 *
+	 * @return array|mixed
+	 */
+	public function possible_tokens_course_done( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
+		if ( ! isset( $args['meta'] ) ) {
+			return $tokens;
+		}
+
+		if ( empty( $args['meta'] ) ) {
+			return $tokens;
+		}
+		if ( ! isset( $args['triggers_meta'] ) ) {
+			return $tokens;
+		}
+
+		$trigger_meta = $args['meta'];
+		$trigger_code = $args['triggers_meta']['code'];
+
+		if ( 'COURSEDONE' === $trigger_code ) {
+			$new_tokens[] = array(
+				'tokenId'         => $trigger_meta . '_course_completed_on',
+				'tokenName'       => __( 'Course completion date', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_meta,
+			);
+
+			$tokens = array_merge( $tokens, $new_tokens );
+		}
+
+		return $tokens;
 	}
 }

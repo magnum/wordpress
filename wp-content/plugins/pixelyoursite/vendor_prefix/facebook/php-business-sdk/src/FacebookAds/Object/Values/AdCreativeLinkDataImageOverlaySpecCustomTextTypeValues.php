@@ -37,4 +37,5 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 class AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const FREE_SHIPPING = 'free_shipping';
+    const POPULAR = 'popular';
 }

@@ -86,6 +86,9 @@ class PYS_Logger
 
         if ( $file ) {
             if ( ! file_exists( $file ) ) {
+                if(!is_dir(trailingslashit( PYS_FREE_PATH ).'logs/')) {
+                    mkdir(trailingslashit( PYS_FREE_PATH ).'logs/', 0777, true);
+                }
                 $temphandle = @fopen( $file, 'w+' ); // @codingStandardsIgnoreLine.
                 if ( is_resource( $temphandle ) ) {
                     @fclose( $temphandle ); // @codingStandardsIgnoreLine.

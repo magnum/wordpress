@@ -65,9 +65,7 @@ class Utilities {
 	/**
 	 * Utilities constructor.
 	 */
-	public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'automator_enqueue_frontend_assets' ) );
-	}
+	public function __construct() {}
 
 	/**
 	 * Adds the autoloaded class in an accessible object
@@ -184,24 +182,25 @@ class Utilities {
 		 * @since 3.0
 		 */
 		if ( ! empty( $file_name ) && is_dir( dirname( $file_name ) ) ) {
-			$icon = basename( $file_name ); // icon with extension.
-			if ( version_compare( PHP_VERSION, '7.0', '>=' ) ) {
-				$integration_dir = basename( dirname( $file_name ) ); // integration folder path.
-			} else {
-				$integration_dir = basename( dirname( $file_name ) ); // integration folder path.
+			$icon            = basename( $file_name ); // icon with extension.
+			$integration_dir = basename( dirname( $file_name ) ); // integration folder path.
+			$path            = self::cleanup_icon_path( AUTOMATOR_BASE_FILE, $icon, $file_name ); // path relative to plugin.
+			$path            = apply_filters( 'automator_integration_icon_path', $path . $icon, $icon, $integration_dir, $plugin_path );
+			$base_path       = apply_filters( 'automator_integration_icon_base_path', $plugin_path, $path, $icon, $integration_dir );
+			if ( ! empty( $path ) && ! empty( $base_path ) ) {
+				return plugins_url( $path, $base_path );
 			}
-			$path      = self::cleanup_icon_path( AUTOMATOR_BASE_FILE, $icon, $file_name ); // path relative to plugin.
-			$path      = apply_filters( 'automator_integration_icon_path', $path . $icon, $icon, $integration_dir, $plugin_path );
-			$base_path = apply_filters( 'automator_integration_icon_base_path', $plugin_path, $path, $icon, $integration_dir );
-
-			return plugins_url( $path, $base_path );
 		}
 
 		// fallback
 		$path      = apply_filters( 'automator_integration_icon_path_legacy', 'src/recipe-ui/dist/media/integrations/' . $file_name, $file_name, $plugin_path );
 		$base_path = apply_filters( 'automator_integration_icon_base_path_legacy', WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $plugin_path, $file_name );
 
-		return plugins_url( $path, $base_path );
+		if ( ! empty( $path ) && ! empty( $base_path ) ) {
+			return plugins_url( $path, $base_path );
+		}
+
+		return '';
 	}
 
 	/**
@@ -213,7 +212,7 @@ class Utilities {
 	 */
 	public static function cleanup_icon_path( $dirname, $icon, $file_name ) {
 		// path relative to plugin
-		if ( file_exists( $file_name ) ) {
+		if ( is_file( $file_name ) ) {
 			$val = str_replace(
 				array(
 					dirname( $dirname ),
@@ -275,22 +274,11 @@ class Utilities {
 	 *
 	 */
 	public static function legacy_automator_enqueue_global_assets() {
-		wp_enqueue_style( 'uap-admin-global-fonts', 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap', array(), Utilities::automator_get_version() );
+		wp_enqueue_style( 'uap-admin-global-fonts', 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap', array(), self::automator_get_version() );
 
-		wp_enqueue_style( 'uap-admin-global', Utilities::automator_get_asset( 'legacy/css/admin/global.css' ), array( 'uap-admin-global-fonts' ), Utilities::automator_get_version() );
-		self::automator_enqueue_frontend_assets();
+		wp_enqueue_style( 'uap-admin-global', self::automator_get_asset( 'legacy/css/admin/global.css' ), array( 'uap-admin-global-fonts' ), self::automator_get_version() );
 
-		wp_enqueue_script( 'uap-admin-global', Utilities::automator_get_asset( 'legacy/js/admin/global.js' ), array( 'jquery' ), Utilities::automator_get_version(), true );
-	}
-
-	/**
-	 * Enqueues frontend JS and CSS files
-	 *
-	 * @since    3.1.1
-	 *
-	 */
-	public static function automator_enqueue_frontend_assets() {
-		wp_enqueue_style( 'uap-automator-css', Utilities::automator_get_asset( 'legacy/css/automator.css' ), null, Utilities::automator_get_version() );
+		wp_enqueue_script( 'uap-admin-global', self::automator_get_asset( 'legacy/js/admin/global.js' ), array( 'jquery' ), self::automator_get_version(), true );
 	}
 
 	/**
@@ -448,7 +436,7 @@ class Utilities {
 	 *
 	 */
 	public static function get_pro_items_list() {
-		include Utilities::automator_get_include( 'pro-items-list.php' );
+		include self::automator_get_include( 'pro-items-list.php' );
 
 		return automator_pro_items_list();
 	}
@@ -499,27 +487,29 @@ class Utilities {
 			return false;
 		}
 
-		$timestamp           = current_time( self::automator_get_date_time_format() ); //phpcs ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+		$timestamp           = current_time( 'Y-m-d H:i:s A' ); //phpcs ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 		$current_host        = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 		$current_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		$current_page_link   = "https://{$current_host}{$current_request_uri}";
-		$trace_start         = "\n===========================<<<< $timestamp >>>>===========================\n";
+		$trace_start         = "\n\n===========================<<<< $timestamp >>>>=======================\n\n";
 		$trace_heading       = "* Heading: $trace_heading \n* Current Page: $current_page_link \n";
-		//$trace_end         = "\n===========================<<<< TRACE END >>>>===========================\n";
 
-		$backtrace_start = "\n===========================<<<< BACKTRACE START >>>>===========================\n";
-		$error_string    = print_r( ( new \Exception )->getTraceAsString(), true );
-		$backtrace_end   = "\n===========================<<<< BACKTRACE END >>>>===========================\n";
+		$backtrace_start = "\n\n===========================<<<< BACKTRACE START >>>>===========================\n\n";
+		$error_string    = print_r( ( new \Exception() )->getTraceAsString(), true );
+		$backtrace_end   = "\n\n===========================<<<< BACKTRACE END >>>>=============================\n\n";
 
-		$trace_msg_start = "\n===========================<<<< TRACE MESSAGE START >>>>===========================\n";
-		$trace_finish    = "\n===========================<<<< END >>>>===========================\n\n";
+		$trace_msg_start = "\n===========================<<<< TRACE MESSAGE START >>>>=========================\n\n";
+		$trace_finish    = "\n\n===========================<<<< TRACE MESSAGE END >>>>==========================\n\n\n";
 
 		$trace_message = print_r( $trace_message, true );
 		$log_directory = UA_DEBUG_LOGS_DIR;
-		if ( ! file_exists( $log_directory ) ) {
+
+		if ( ! is_dir( $log_directory ) ) {
 			mkdir( $log_directory, 0755 );
 		}
-		$file = $log_directory . 'uo-' . $file_name . '.log';
+
+		$file = $log_directory . 'uo-' . sanitize_file_name( $file_name ) . '.log';
+
 		if ( ! $backtrace ) {
 			$complete_message = $trace_start . $trace_heading . $trace_msg_start . $trace_message . $trace_finish;
 		} else {
@@ -537,7 +527,7 @@ class Utilities {
 	 *
 	 */
 	public static function automator_get_debug_mode() {
-		return AUTOMATOR_DEBUG_MODE;
+		return ! empty( get_option( 'automator_settings_debug_enabled', false ) ) ? true : false;
 	}
 
 	/**

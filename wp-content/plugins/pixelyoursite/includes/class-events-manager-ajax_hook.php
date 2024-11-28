@@ -146,7 +146,7 @@ class AjaxHookEventManager {
         $pixelsEventData = self::getPendingEvent("woo_add_to_cart_on_button_click",true);
         if( !is_null($pixelsEventData) ) {
             PYS()->getLog()->debug('trackWooAddToCartEvent printEvent is footer');
-            echo "<div id='pys_late_event' style='display:none' dir='".json_encode($pixelsEventData)."'></div>";
+            echo "<div id='pys_late_event' style='display:none' dir='".json_encode($pixelsEventData,JSON_HEX_APOS)."'></div>";
         }
     }
 
@@ -173,7 +173,7 @@ class AjaxHookEventManager {
     public static function addPixelCodeToAddToCarMessage($message, $products, $show_qty) {
         $pixelsEventData = self::getPendingEvent("woo_add_to_cart_on_button_click",true);
         if( !is_null($pixelsEventData) ){
-            $message .= "<div id='pys_late_event' dir='".json_encode($pixelsEventData)."'></div>";
+            $message .= "<div id='pys_late_event' dir='".json_encode($pixelsEventData,JSON_HEX_APOS)."'></div>";
         }
         return $message;
     }

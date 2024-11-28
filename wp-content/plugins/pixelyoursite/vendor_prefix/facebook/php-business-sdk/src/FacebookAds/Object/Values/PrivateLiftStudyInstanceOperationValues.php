@@ -39,5 +39,6 @@ class PrivateLiftStudyInstanceOperationValues extends \PYS_PRO_GLOBAL\FacebookAd
     const AGGREGATE = 'AGGREGATE';
     const COMPUTE = 'COMPUTE';
     const ID_MATCH = 'ID_MATCH';
+    const NEXT = 'NEXT';
     const NONE = 'NONE';
 }

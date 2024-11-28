@@ -145,7 +145,7 @@ class HeadFooter extends Settings {
 		 * Global
 		 */
 
-		$disabled_by_post = ! empty( $post_meta ) && $post_meta['disable_global'];
+		$disabled_by_post = ! empty( $post_meta ) && isset($post_meta['disable_global']) && $post_meta['disable_global'];
 
 		if ( ! $disabled_by_post ) {
 			add_action( 'wp_head', array( $this, 'output_head_global' ) );

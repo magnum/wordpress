@@ -41,21 +41,15 @@ if ( ! defined( 'ABSPATH' ) ) {
                     will be enabled for Google Analytics.</p>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
-				<?php PYS()->render_switcher_input( 'edd_enabled' ); ?>
-                <h4 class="switcher-label">Enable EasyDigitalDownloads set-up</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <?php PYS()->render_switcher_input( 'edd_enabled_save_data_to_orders' ,false,true); ?>
+                <?php PYS()->render_switcher_input( 'edd_enabled_save_data_to_orders'); ?>
                 <h4 class="switcher-label">Save data to orders</h4>
-                <?php renderProBadge(); ?>
-                <small class="form-text">Save the <i>landing page, UTMs, client's browser's time, day, and month, the number of orders, lifetime value, and average order.</i></small>
+                <small class="form-text">Save the <i>landing page, UTMs, client's browser's time, day, and month, the number of orders, lifetime value, and average order</i>. You can view this data when you edit an order. With the professional version you can view it under the <a href="<?=admin_url("admin.php?page=pixelyoursite_edd_reports")?>">Easy Digital Downloads Reports</a> section.</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col">
                 <?php PYS()->render_switcher_input( 'edd_enabled_save_data_to_user',false,true ); ?>
                 <h4 class="switcher-label">Display data to the user's profile</h4>
@@ -75,7 +69,20 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 </div>
-
+<!-- video -->
+<div class="card card-static">
+    <div class="card-header">
+        Recommended Videos:
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch now</a></p>
+                <p>Track Facebook (META) Ads results with Google Analytics 4 (GA4) using UTMs (10:13) - <a href="https://www.youtube.com/watch?v=v3TfmX5H1Ts" target="_blank">watch now</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 <!--  Transaction ID -->
 <div class="card ">
     <div class="card-header">
@@ -1077,8 +1084,30 @@ e&utm_campaign=pro-feature' ); ?>
         </div>
         <div class="row">
             <div class="col">
-                <?php PYS()->render_switcher_input( 'enable_edd_product_price_param' ); ?>
-                <h4 class="switcher-label">product_price</h4>
+                <?php PYS()->render_switcher_input( 'enable_edd_tags_param' ); ?>
+                <h4 class="switcher-label">tags</h4>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">total (PRO)</h4>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">tax (PRO)</h4>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">coupon (PRO)</h4>
                 <hr>
             </div>
         </div>

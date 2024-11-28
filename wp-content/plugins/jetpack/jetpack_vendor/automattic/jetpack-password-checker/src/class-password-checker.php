@@ -82,7 +82,7 @@ class Password_Checker {
 	 * @param mixed $user can be an integer ID, or a WP_User object.
 	 */
 	public function __construct( $user = null ) {
-		if ( is_null( $user ) ) {
+		if ( $user === null ) {
 			$this->user_id = get_current_user_id();
 		} elseif ( is_object( $user ) && isset( $user->ID ) ) {
 			// Existing user, using their ID.
@@ -508,7 +508,7 @@ class Password_Checker {
 
 		// Spaces.
 		if ( strpos( $password, ' ' ) ) {
-			$size ++;
+			++$size;
 		}
 
 		return $size;
@@ -556,7 +556,7 @@ class Password_Checker {
 		$aidx   = $this->get_char_index( $password[0] );
 		$length = strlen( $password );
 
-		for ( $b = 1; $b < $length; $b ++ ) {
+		for ( $b = 1; $b < $length; $b++ ) {
 			$bidx = $this->get_char_index( $password[ $b ] );
 
 			// 27 = number of chars in the index (a-z,' ').

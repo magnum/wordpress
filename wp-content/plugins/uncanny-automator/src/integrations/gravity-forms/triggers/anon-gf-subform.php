@@ -53,12 +53,23 @@ class ANON_GF_SUBFORM {
 			'priority'            => 20,
 			'accepted_args'       => 2,
 			'validation_function' => array( $this, 'gform_submit' ),
-			'options'             => array(
-				Automator()->helpers->recipe->gravity_forms->options->list_gravity_forms( null, $this->trigger_meta ),
-			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->gravity_forms->options->list_gravity_forms( null, $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -118,6 +129,29 @@ class ANON_GF_SUBFORM {
 			if ( ! empty( $args ) ) {
 				foreach ( $args as $result ) {
 					if ( true === $result['result'] ) {
+						$trigger_meta = array(
+							'user_id'        => $user_id,
+							'trigger_id'     => $result['args']['trigger_id'],
+							'trigger_log_id' => $result['args']['get_trigger_id'],
+							'run_number'     => $result['args']['run_number'],
+						);
+
+						$trigger_meta['meta_key']   = 'GFENTRYID';
+						$trigger_meta['meta_value'] = $entry['id'];
+						Automator()->insert_trigger_meta( $trigger_meta );
+
+						$trigger_meta['meta_key']   = 'GFUSERIP';
+						$trigger_meta['meta_value'] = maybe_serialize( $entry['ip'] );
+						Automator()->insert_trigger_meta( $trigger_meta );
+
+						$trigger_meta['meta_key']   = 'GFENTRYDATE';
+						$trigger_meta['meta_value'] = maybe_serialize( \GFCommon::format_date( $entry['date_created'], false, 'Y/m/d' ) );
+						Automator()->insert_trigger_meta( $trigger_meta );
+
+						$trigger_meta['meta_key']   = 'GFENTRYSOURCEURL';
+						$trigger_meta['meta_value'] = maybe_serialize( $entry['source_url'] );
+						Automator()->insert_trigger_meta( $trigger_meta );
+
 						Automator()->maybe_trigger_complete( $result['args'] );
 					}
 				}

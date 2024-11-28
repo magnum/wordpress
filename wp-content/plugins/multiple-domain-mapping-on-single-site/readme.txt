@@ -3,8 +3,8 @@ Contributors:  matthias.wagner
 Donate link: https://www.matthias-wagner.at
 Tags: multidomain, landingpage, redirect, domainmapping, mapping, multiple, domain, single, site, seo, marketing, mirror
 Requires at least: 4.5
-Tested up to: 5.8
-Stable tag: 1.0.5
+Tested up to: 6.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Show content of specific posts, pages, ... within their own, additional domains.
 This lightweight plugin maps domains to specific URIs in your blog or website. It allows you to add as many mappings, e.g. for landingpages, as you want. 
 Just let the domains point to your WordPress installation (see the installation tab for details) and decide which URI the plugin should map them to.
 
-= Who is this plugin for? =
+= What is this plugin for? =
 The main purpose of the plugin is to have specific domains show the content of specific pages from a bigger website. This is especially needed for marketing and SEO purposes (landingpages). Think of a site-structure like
 
 * www.mainsite.com
@@ -26,8 +26,8 @@ The main purpose of the plugin is to have specific domains show the content of s
 With the plugin you can use an additional domain like www.productA.com to point to your site's www.mainsite.com/productA.
 It is **not a redirection**, instead the additional domain will display the content from the specified page (the additional domain will be visible in the browsers address bar). 
 
-= Who is this plugin not for? =
-It is not our goal to mirror complete websites to additional domains. You can try to do this, but keep the aspects of duplicate content in mind.
+= What is this plugin not for? =
+It is not our goal to mirror complete websites to additional domains. You can try to do this, but keep the aspects of duplicate content in mind. In the help section of the installed plugin we provide links to other plugins who may be better at this task.
 
 = Which Pages, Post Types, ... does the plugin support? =
 The plugin lets you define URIs to map to, so it works for pages, posts, custom post types, archives and so on. The plugin also changes hyperlink destination of the links inside your website. For example: navigation, pagination, archive links and so on. (Note: This only works if your theme and other link-generating plugins use standard WordPress functions like get_permalink).
@@ -37,13 +37,13 @@ So you will not have to select posts to map to your domains, but instead enter U
 = Is it hard to set up? =
 The plugin requires additional steps in setting up your domains and hosting environment (see the installation-tab for details). If you are not familiar with these settings, it can happen that you have troubles with reaching your website. Therefore you should only set up the plugin in a testing environment if you are not sure if you can deal with these external settings.
 
-We give our best to support you, but if you have troubles with correct DNS records and hosting environment settings, you should talk to your hosting provider or development agency first.
+We give our best to support you, but if you have troubles with correct DNS records and hosting environment settings, you should talk to your hosting provider or your web developer first.
 
 = Troubles? =
 Please see installation-tab, FAQ and the already answered support threads for more information or if you have troubles setting up the plugin.
 
 = PREMIUM =
-We plan to release a premium version on top of the existing functionality to cover some of your wishes and add more compatibility to other plugins. [Find more information here.](https://www.falkemedia.at/multiple-domain-mapping-on-single-site-premium/)
+We have partnered with the plugin "Domain Mapping System" to be able to provide plugins for different use cases. Since they offer a paid version, they will also be able to provide you professional support. You want to benefit from special deals and coupons for the other plugin? [Find more information here.](https://www.falkemedia.at/multiple-domain-mapping-on-single-site-premium/)
 
 == Installation ==
 
@@ -69,23 +69,23 @@ After you have the "External Setup" complete, all your domains will redirect to 
 
 * If not, do NOT start to enter mappings in the plugin options - it will make troubleshooting worse.,
 * Disable/Clear your browser cache and also website caching plugins while setting everything up
-* Make sure to only use W3 Total Cache as server-side caching plugin and with the correct settings (see [FAQ](https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/#faq-header)), since this is the only caching-plugin we know to work with our domain mapping plugin.
+* Make sure to only use compatible server-side caching plugin and with the correct settings (see [FAQ](https://de.wordpress.org/plugins/multiple-domain-mapping-on-single-site/#faq-header)), since some of those plugins do not work with our domain mapping plugin.
 * Now begin to enter your domains and the URIs they should match in the settings, located in the Tools-Menu. See screenshots for examples.
 
 == Frequently Asked Questions ==
 
 = Does it work with caching plugins? =
-So far we only know W3 Total Cache to be able to work with our plugin, but it requires some settings!
+So far we only know WP Fastest Cache to work out of the box. Also W3 Total Cache is able to work with our plugin, but it requires some settings:
 * In "General Settings" from W3TC, you can enable the page cache
 * In "Page Cache" W3TC, you need no enable the "Cache alias hostnames" checkbox and leave the "Additional home URLs" field empty!
 
-Keep in mind that CSS/JS combine and minify will only work for pages of your main domain but not for mapped pages. But page cache will work for them, which is better than nothing ;)
+For W3 Total Cache, keep in mind that CSS/JS combine and minify will only work for pages of your main domain but not for mapped pages. We recommend WP Fastest Cache ;)
 
 = Does it work with pagebuilders? =
 Yes. We use Elementor mostly and it works also on mapped pages or posts. If you use another page builder and have troubles, try to activate the enhanced compatibility mode in the settings page (see screenshot #2).
 
 = What about duplicate content? =
-You should always aim to have only one URI connected to one specific (landing-)page or post. If you use our plugin, the mapped content will be reached with the additional domain and the original URI as well. Therefore you should set up a 301-redirection from the original URI to the new domain or use the canonical meta-Tag. If you use Yoast SEO, it will generate the correct canonical-Tag for you right out of the box.
+You should always aim to have only one URI connected to one specific (landing-)page or post. If you use our plugin, the mapped content will be reached with the additional domain and the original URI as well. Therefore you should set up a 301-redirection from the original URI to the new domain or use the canonical meta-Tag. If you use Yoast SEO, it will generate the correct canonical-Tag for you right out of the box. For the redirection, there are many famous plugins out there...
 
 = Does it support german "Umlaute" like ä/ö/ü inside domains? =
 
@@ -150,6 +150,15 @@ Yes. We do not store any user data - neither from you or your visitors. Only the
 2. Additional settings page. Compatibility mode is useful for some page builders if they do not work out of the box.
 
 == Changelog ==
+
+= 1.1.1 =
+* Bugfix: Missing file from 1.1 release
+
+= 1.1 =
+* New feature: Custom HTML-Head-Code per mapped domain
+* New feature: Warning when amount of mappings reaches servers limits (max_input_vars)
+* Compatibility check with WordPress 6
+* Included some hints to our partnership with Domain Mapping System
 
 = 1.0.4 =
 * Bugfix causing problems with hyperlinks being altered which should not be altered

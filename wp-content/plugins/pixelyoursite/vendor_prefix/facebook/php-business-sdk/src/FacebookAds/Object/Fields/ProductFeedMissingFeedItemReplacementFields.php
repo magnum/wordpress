@@ -37,10 +37,9 @@ class ProductFeedMissingFeedItemReplacementFields extends \PYS_PRO_GLOBAL\Facebo
 {
     const HOME_LISTING = 'home_listing';
     const PRODUCT_ITEM = 'product_item';
-    const STORE_PRODUCT_ITEM = 'store_product_item';
     const VEHICLE = 'vehicle';
     public function getFieldTypes()
     {
-        return array('home_listing' => 'Object', 'product_item' => 'Object', 'store_product_item' => 'Object', 'vehicle' => 'Object');
+        return array('home_listing' => 'Object', 'product_item' => 'Object', 'vehicle' => 'Object');
     }
 }

@@ -103,7 +103,7 @@ class AdsPixel extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
     public function createEvent(array $fields = array(), array $params = array(), $pending = \false)
     {
         $this->assureId();
-        $param_types = array('data' => 'list<string>', 'namespace_id' => 'string', 'partner_agent' => 'string', 'test_event_code' => 'string', 'trace' => 'unsigned int', 'upload_id' => 'string', 'upload_source' => 'string', 'upload_tag' => 'string');
+        $param_types = array('data' => 'list<string>', 'namespace_id' => 'string', 'partner_agent' => 'string', 'platforms' => 'list<map>', 'test_event_code' => 'string', 'trace' => 'unsigned int', 'upload_id' => 'string', 'upload_source' => 'string', 'upload_tag' => 'string');
         $enums = array();
         $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/events', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdsPixel(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdsPixel::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);

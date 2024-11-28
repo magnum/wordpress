@@ -85,27 +85,8 @@ function mc4wp_get_api_key() {
  * @return MC4WP_API_V3
  */
 function mc4wp_get_api_v3() {
-	$api_key  = mc4wp_get_api_key();
-	$instance = new MC4WP_API_V3( $api_key );
-	return $instance;
-}
-
-/**
- * Gets the Mailchimp for WP API class and injects it with the API key
- *
- * @deprecated 4.0
- * @use mc4wp_get_api_v3
- *
- * @since 1.0
- * @access public
- *
- * @return MC4WP_API
- */
-function mc4wp_get_api() {
-	_deprecated_function( __FUNCTION__, '4.0', 'mc4wp_get_api_v3' );
-	$api_key  = mc4wp_get_api_key();
-	$instance = new MC4WP_API( $api_key );
-	return $instance;
+	$api_key = mc4wp_get_api_key();
+	return new MC4WP_API_V3( $api_key );
 }
 
 /**
@@ -220,15 +201,27 @@ function mc4wp_get_request_path() {
 */
 function mc4wp_get_request_ip_address() {
 	if ( isset( $_SERVER['X-Forwarded-For'] ) ) {
-		return $_SERVER['X-Forwarded-For'];
+		$ip_address = $_SERVER['X-Forwarded-For'];
+	} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+		$ip_address = $_SERVER['REMOTE_ADDR'];
 	}
 
-	if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		return $_SERVER['HTTP_X_FORWARDED_FOR'];
-	}
+	if ( isset( $ip_address ) ) {
+		if ( ! is_array( $ip_address ) ) {
+			$ip_address = explode( ',', $ip_address );
+		}
 
-	if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-		return $_SERVER['REMOTE_ADDR'];
+		// use first IP in list
+		$ip_address = trim( $ip_address[0] );
+
+		// if IP address is not valid, simply return null
+		if ( ! filter_var( $ip_address, FILTER_VALIDATE_IP ) ) {
+			return null;
+		}
+
+		return $ip_address;
 	}
 
 	return null;
@@ -319,7 +312,7 @@ function _mc4wp_update_groupings_data( $data = array() ) {
 
 			// add to interests data
 			if ( ! in_array( $interest_id, $data['INTERESTS'], false ) ) {
-				$migrated++;
+				++$migrated;
 				$data['INTERESTS'][] = $interest_id;
 			}
 		}
@@ -353,7 +346,7 @@ function _mc4wp_update_groupings_data( $data = array() ) {
  *
  * @return array
  */
-function mc4wp_add_name_data( $data = array() ) {
+function mc4wp_add_name_data( $data ) {
 
 	// Guess first and last name
 	if ( ! empty( $data['NAME'] ) && empty( $data['FNAME'] ) && empty( $data['LNAME'] ) ) {
@@ -496,4 +489,119 @@ function mc4wp_array_get( $array, $key, $default = null ) {
 	}
 
 	return $array;
+}
+
+/**
+ * Filters string and strips out all HTML tags and attributes, except what's in our whitelist.
+ *
+ * @param string $string The string to apply KSES whitelist on
+ * @return string
+ * @since 4.8.8
+ */
+function mc4wp_kses( $string ) {
+	$always_allowed_attr = array_fill_keys(
+		array(
+			'aria-describedby',
+			'aria-details',
+			'aria-label',
+			'aria-labelledby',
+			'aria-hidden',
+			'class',
+			'id',
+			'style',
+			'title',
+			'role',
+			'data-*',
+			'tabindex',
+		),
+		true
+	);
+	$input_allowed_attr  = array_merge(
+		$always_allowed_attr,
+		array_fill_keys(
+			array(
+				'type',
+				'required',
+				'placeholder',
+				'value',
+				'name',
+				'step',
+				'min',
+				'max',
+				'checked',
+				'width',
+				'autocomplete',
+				'autofocus',
+				'minlength',
+				'maxlength',
+				'size',
+				'pattern',
+				'disabled',
+				'readonly',
+			),
+			true
+		)
+	);
+
+	$allowed = array(
+		'p'        => $always_allowed_attr,
+		'label'    => array_merge( $always_allowed_attr, array( 'for' => true ) ),
+		'input'    => $input_allowed_attr,
+		'button'   => $input_allowed_attr,
+		'fieldset' => $always_allowed_attr,
+		'legend'   => $always_allowed_attr,
+		'ul'       => $always_allowed_attr,
+		'ol'       => $always_allowed_attr,
+		'li'       => $always_allowed_attr,
+		'select'   => array_merge( $input_allowed_attr, array( 'multiple' => true ) ),
+		'option'   => array_merge( $input_allowed_attr, array( 'selected' => true ) ),
+		'optgroup' => array(
+			'disabled' => true,
+			'label' => true,
+		),
+		'textarea' => array_merge(
+			$input_allowed_attr,
+			array(
+				'rows' => true,
+				'cols' => true,
+			)
+		),
+		'div'      => $always_allowed_attr,
+		'strong'   => $always_allowed_attr,
+		'b'         => $always_allowed_attr,
+		'i'         => $always_allowed_attr,
+		'br'        => array(),
+		'em'       => $always_allowed_attr,
+		'span'     => $always_allowed_attr,
+		'a'        => array_merge( $always_allowed_attr, array( 'href' => true ) ),
+		'img'      => array_merge(
+			$always_allowed_attr,
+			array(
+				'src' => true,
+				'alt' => true,
+				'width' => true,
+				'height' => true,
+				'srcset' => true,
+				'sizes' => true,
+				'referrerpolicy' => true,
+			)
+		),
+		'u' => $always_allowed_attr,
+	);
+
+	return wp_kses( $string, $allowed );
+}
+
+/**
+ * Helper function for safely deprecating a changed filter hook.
+ *
+ * @param string $old_hook
+ * @param string $new_hook
+ *
+ * @return void
+ */
+function mc4wp_apply_deprecated_filters( $old_hook, $new_hook ) {
+	add_filter( $new_hook, function ( $value, $a = null, $b = null, $c = null ) use ( $new_hook, $old_hook ) {
+		return apply_filters_deprecated( $old_hook, array( $value, $a, $b, $c ), '4.9.0', $new_hook );
+	}, 10, 3 );
 }

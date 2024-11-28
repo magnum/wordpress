@@ -1,21 +1,20 @@
 /**
  * External dependencies
  */
-import { Icon, address } from '@woocommerce/icons';
-import { registerFeaturePluginBlockType } from '@woocommerce/block-settings';
+import { Icon, mapMarker } from '@wordpress/icons';
+import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Edit, Save } from './edit';
 import attributes from './attributes';
-import metadata from './block.json';
 
-registerFeaturePluginBlockType( metadata, {
+registerBlockType( 'woocommerce/checkout-shipping-address-block', {
 	icon: {
 		src: (
 			<Icon
-				srcElement={ address }
+				icon={ mapMarker }
 				className="wc-block-editor-components-block-icon"
 			/>
 		),

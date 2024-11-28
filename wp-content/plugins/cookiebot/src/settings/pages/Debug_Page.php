@@ -17,14 +17,17 @@ use Exception;
 
 class Debug_Page implements Settings_Page_Interface {
 
+	const ADMIN_SLUG = 'cookiebot_debug';
+
 	public function menu() {
 		add_submenu_page(
 			'cookiebot',
 			__( 'Debug info', 'cookiebot' ),
 			__( 'Debug info', 'cookiebot' ),
 			'manage_options',
-			'cookiebot_debug',
-			array( $this, 'display' )
+			self::ADMIN_SLUG,
+			array( $this, 'display' ),
+			25
 		);
 	}
 
@@ -39,9 +42,38 @@ class Debug_Page implements Settings_Page_Interface {
 			Cookiebot_WP::COOKIEBOT_PLUGIN_VERSION,
 			true
 		);
+
+		$style_sheets = array(
+			array( 'cookiebot-debug-css', 'css/backend/debug_info.css' ),
+		);
+
+		foreach ( $style_sheets as $style ) {
+			wp_enqueue_style(
+				$style[0],
+				asset_url( $style[1] ),
+				null,
+				Cookiebot_WP::COOKIEBOT_PLUGIN_VERSION
+			);
+		}
+
 		$debug_output = $this->prepare_debug_data();
 
 		include_view( 'admin/settings/debug-page.php', array( 'debug_output' => $debug_output ) );
+	}
+
+	private function get_ignored_scripts() {
+		$ignored_scripts = get_option( 'cookiebot-ignore-scripts' );
+
+		$ignored_scripts = array_map(
+			function( $ignore_tag ) {
+				return trim( $ignore_tag );
+			},
+			explode( PHP_EOL, $ignored_scripts )
+		);
+
+		$ignored_scripts = apply_filters( 'cybot_cookiebot_ignore_scripts', $ignored_scripts );
+
+		return implode( ', ', $ignored_scripts );
 	}
 
 	/**
@@ -81,6 +113,7 @@ class Debug_Page implements Settings_Page_Interface {
 		$debug_output .= 'Hide Cookie Popup: ' . ( get_option( 'cookiebot-nooutput' ) === '1' ? 'Yes' : 'No' ) . "\n";
 		$debug_output .= 'Disable Cookiebot in WP Admin: ' . ( get_option( 'cookiebot-nooutput-admin' ) === '1' ? 'Yes' : 'No' ) . "\n";
 		$debug_output .= 'Enable Cookiebot on front end while logged in: ' . ( get_option( 'cookiebot-output-logged-in' ) === '1' ? 'Yes' : 'No' ) . "\n";
+		$debug_output .= 'List of ignored javascript files: ' . $this->get_ignored_scripts() . "\n";
 		$debug_output .= 'Banner tag: ' . $cookiebot_javascript_helper->include_cookiebot_js( true ) . "\n";
 		$debug_output .= 'Declaration tag: ' . Cookiebot_Declaration_Shortcode::show_declaration() . "\n";
 

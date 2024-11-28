@@ -10,13 +10,11 @@ class INSTAGRAM_PUBLISH_PHOTO {
 
 	use Recipe\Actions;
 
+	const PAGES_ENDPOINT = 'ig_pages_wp_ajax_endpoint_post_link';
+
 	public function __construct() {
 
-		$this->ig_pages_wp_ajax_endpoint = 'ig_pages_wp_ajax_endpoint_post_link';
-
-		$this->fb_endpoint_uri = AUTOMATOR_API_URL . 'v2/facebook';
-
-		add_action( "wp_ajax_{$this->ig_pages_wp_ajax_endpoint}", array( $this, $this->ig_pages_wp_ajax_endpoint ) );
+		add_action( 'wp_ajax_' . self::PAGES_ENDPOINT, array( $this, self::PAGES_ENDPOINT ) );
 
 		$this->setup_action();
 
@@ -40,10 +38,15 @@ class INSTAGRAM_PUBLISH_PHOTO {
 		$instagram = Automator()->helpers->recipe->instagram->options;
 
 		$this->set_integration( 'INSTAGRAM' );
+
 		$this->set_action_code( 'INSTAGRAM_PUBLISH_PHOTO' );
+
 		$this->set_action_meta( 'INSTAGRAM_PUBLISH_PHOTO_ACCOUNT_ID' );
+
 		$this->set_is_pro( false );
+
 		$this->set_support_link( Automator()->get_author_support_link( $this->get_action_code(), 'knowledge-base/instagram/' ) );
+
 		$this->set_requires_user( false );
 
 		/* translators: Action - WordPress */
@@ -67,11 +70,11 @@ class INSTAGRAM_PUBLISH_PHOTO {
 				// The image url.
 				array(
 					'option_code' => 'INSTAGRAM_IMAGE_URL',
-					'label'       => esc_html__( 'Image URL', 'uncanny-automator' ),
+					'label'       => esc_html__( 'Image URL or Media library ID', 'uncanny-automator' ),
 					'input_type'  => 'url',
 					'required'    => true,
 					'placeholder' => esc_html__( 'https://pathtoimage/image.jpg', 'uncanny-automator' ),
-					'description' => esc_html__( 'The image just be in a JPG, JPEG or PNG format. The file name must not contain spaces and extended JPEG formats (such as MPO and JPS) are not supported.', 'uncanny-automator' ),
+					'description' => esc_html__( 'The image must be in a JPG, JPEG or PNG format. The file name must not contain spaces and extended JPEG formats (such as MPO and JPS) are not supported.', 'uncanny-automator' ),
 				),
 				// The hashtags.
 				array(
@@ -85,7 +88,11 @@ class INSTAGRAM_PUBLISH_PHOTO {
 			),
 		);
 
+		$this->set_wpautop( false );
+
 		$this->set_options_group( $options_group );
+
+		$this->set_background_processing( true );
 
 		$this->register_action();
 
@@ -107,100 +114,90 @@ class INSTAGRAM_PUBLISH_PHOTO {
 
 		$instagram = Automator()->helpers->recipe->instagram->options;
 
-		$page_id   = sanitize_text_field( $parsed['INSTAGRAM_PUBLISH_PHOTO_ACCOUNT_ID'] );
+		$page_id = sanitize_text_field( $parsed['INSTAGRAM_PUBLISH_PHOTO_ACCOUNT_ID'] );
+
 		$image_uri = sanitize_text_field( $parsed['INSTAGRAM_IMAGE_URL'] );
-		$hashtags  = sanitize_text_field( $parsed['INSTAGRAM_HASHTAGS'] );
+
+		$hashtags = sanitize_textarea_field( $parsed['INSTAGRAM_HASHTAGS'] );
 
 		$page_props = $instagram->get_user_page_connected_ig( $page_id );
 
+		if ( is_numeric( trim( $image_uri ) ) ) {
+			$image_uri = wp_get_attachment_url( intval( $image_uri ) );
+		}
+
 		// Bailout if no facebook account connected.
 		if ( empty( $page_props ) ) {
+
 			$action_data['complete_with_errors'] = true;
+
 			Automator()->complete->action( $user_id, $action_data, $recipe_id, esc_html__( 'Cound not find any settings for Facebook Authentication.', 'uncanny-automator' ) );
+
 			return;
+
 		}
 
 		// Bailout if no instagram account connected.
 		if ( empty( $page_props['ig_account'] ) ) {
+
 			$action_data['complete_with_errors'] = true;
+
 			Automator()->complete->action( $user_id, $action_data, $recipe_id, esc_html__( 'Cannot find any Instagram account connected to the Facebook page.', 'uncanny-automator' ) );
+
 			return;
+
 		}
 
-		$page_ig_account = end( $page_props['ig_account']->data );
+		$page_ig_account = (array) end( $page_props['ig_account']->data );
 
-		$business_account_id = $page_ig_account->instagram_business_account;
+		// Get the business account id.
+		$business_account_id = $page_ig_account['instagram_business_account'];
 
-		$http_request_query = array(
-			'body' => array(
-				'action'                 => 'page-ig-media-publish',
-				'access_token'           => $page_props['page_access_token'],
-				'ig_business_account_id' => $business_account_id,
-				'page_id'                => $page_id,
-				'image_uri'              => $image_uri,
-				'caption'                => $hashtags,
-			),
+		// Pass as arguments to body.
+		$body = array(
+			'action'                 => 'page-ig-media-publish',
+			'access_token'           => $page_props['page_access_token'],
+			'ig_business_account_id' => $business_account_id,
+			'image_uri'              => $image_uri,
+			'caption'                => $hashtags,
 		);
 
-		// Add generous timeout limit for slow Instagram endpoint.
-		$http_request_query['timeout'] = 60;
+		// Try sending the data to our API.
+		try {
 
-		$request = wp_remote_post(
-			$this->fb_endpoint_uri,
-			$http_request_query
-		);
+			$response = $instagram->api_request( $body, $action_data );
 
-		if ( ! is_wp_error( $request ) ) {
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
 
-			$response = json_decode( wp_remote_retrieve_body( $request ) );
+		} catch ( \Exception $e ) {
 
-			// Bailout if statusCode is not set.
-			if ( ! isset( $response->statusCode ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-				$action_data['complete_with_errors'] = true;
-				Automator()->complete->action( $user_id, $action_data, $recipe_id, esc_html__( 'There was an error in the response code.', 'uncanny-automator' ) );
-				return;
-			}
-
-			// If Facebook Graph returned a 200 status.
-			if ( 200 === $response->statusCode ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-
-				if ( isset( $response->data->error ) ) {
-
-					$error_message = esc_html__( "Unexpected error occured. If you're using tokens, please check if token values are empty or not.", 'uncanny-automator' );
-
-					if ( isset( $response->data->error->message ) ) {
-
-						$error_message = $response->data->error->message;
-
-					}
-
-					$action_data['complete_with_errors'] = true;
-
-					// Log error if there are any error messages.
-					Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-
-					return;
-
-				}
-
-				// Otherwise, complete the action.
-				Automator()->complete->action( $user_id, $action_data, $recipe_id );
-
-			} else {
-
-				$action_data['complete_with_errors'] = true;
-
-				// Log error if there are any error messages.
-				Automator()->complete->action( $user_id, $action_data, $recipe_id, $response->error->description );
-
-			}
-		} else {
-
-			// Log if there are any http errors.
+			// Log all errors.
 			$action_data['complete_with_errors'] = true;
 
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $request->get_error_message() );
+			$error_message = $this->get_beautified_error_message( $e->getMessage() );
+
+			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
+
 		}
+
+	}
+
+	/**
+	 * Transform API response into more comprehensive message.
+	 *
+	 * @param string $error_mesage The original error message.
+	 *
+	 * @return string The error message.
+	 */
+	protected function get_beautified_error_message( $error_message = '' ) {
+
+		if ( false !== strpos( $error_message, 'cannot be loaded due to missing permissions' ) ) {
+
+			return esc_html__( 'Instagram account not found. Check that the requested account is connected to the associated Facebook page.' );
+
+		}
+
+		return $error_message;
 
 	}
 }

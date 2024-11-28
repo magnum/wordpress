@@ -42,6 +42,7 @@ class GroupFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const EMAIL = 'email';
     const ICON = 'icon';
     const ID = 'id';
+    const INSTALL = 'install';
     const LINK = 'link';
     const MEMBER_COUNT = 'member_count';
     const MEMBER_REQUEST_COUNT = 'member_request_count';
@@ -55,6 +56,6 @@ class GroupFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
     const VENUE = 'venue';
     public function getFieldTypes()
     {
-        return array('archived' => 'bool', 'cover' => 'CoverPhoto', 'created_time' => 'datetime', 'description' => 'string', 'email' => 'string', 'icon' => 'string', 'id' => 'string', 'link' => 'string', 'member_count' => 'unsigned int', 'member_request_count' => 'unsigned int', 'name' => 'string', 'parent' => 'Object', 'permissions' => 'list<string>', 'privacy' => 'string', 'purpose' => 'string', 'subdomain' => 'string', 'updated_time' => 'datetime', 'venue' => 'Location');
+        return array('archived' => 'bool', 'cover' => 'CoverPhoto', 'created_time' => 'datetime', 'description' => 'string', 'email' => 'string', 'icon' => 'string', 'id' => 'string', 'install' => 'Object', 'link' => 'string', 'member_count' => 'unsigned int', 'member_request_count' => 'unsigned int', 'name' => 'string', 'parent' => 'Object', 'permissions' => 'list<string>', 'privacy' => 'string', 'purpose' => 'string', 'subdomain' => 'string', 'updated_time' => 'datetime', 'venue' => 'Location');
     }
 }

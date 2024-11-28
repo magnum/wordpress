@@ -2,8 +2,8 @@
 namespace Automattic\WooCommerce\Blocks\BlockTypes;
 
 use Automattic\WooCommerce\Blocks\Utils\BlocksWpQuery;
-use Automattic\WooCommerce\Blocks\StoreApi\SchemaController;
-use Automattic\WooCommerce\Blocks\Package;
+use Automattic\WooCommerce\StoreApi\SchemaController;
+use Automattic\WooCommerce\StoreApi\StoreApi;
 
 /**
  * AbstractProductGrid class.
@@ -67,11 +67,12 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 	/**
 	 * Include and render the dynamic block.
 	 *
-	 * @param array  $attributes Block attributes. Default empty array.
-	 * @param string $content    Block content. Default empty string.
+	 * @param array         $attributes Block attributes. Default empty array.
+	 * @param string        $content    Block content. Default empty string.
+	 * @param WP_Block|null $block      Block instance.
 	 * @return string Rendered block type output.
 	 */
-	protected function render( $attributes = array(), $content = '' ) {
+	protected function render( $attributes = array(), $content = '', $block = null ) {
 		$this->attributes = $this->parse_attributes( $attributes );
 		$this->content    = $content;
 		$this->query_args = $this->parse_query_args();
@@ -79,6 +80,15 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 
 		if ( ! $products ) {
 			return '';
+		}
+
+		/**
+		 * Override product description to prevent infinite loop.
+		 *
+		 * @see https://github.com/woocommerce/woocommerce-blocks/pull/6849
+		 */
+		foreach ( $products as $product ) {
+			$product->set_description( '' );
 		}
 
 		/**
@@ -101,7 +111,7 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 				rawurlencode(
 					wp_json_encode(
 						array_map(
-							[ Package::container()->get( SchemaController::class )->get( 'product' ), 'get_item_response' ],
+							[ StoreApi::container()->get( SchemaController::class )->get( 'product' ), 'get_item_response' ],
 							$products
 						)
 					)
@@ -131,6 +141,7 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
+				'image'  => $this->get_schema_boolean( true ),
 				'title'  => $this->get_schema_boolean( true ),
 				'price'  => $this->get_schema_boolean( true ),
 				'rating' => $this->get_schema_boolean( true ),
@@ -167,6 +178,7 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 			'categories'        => array(),
 			'catOperator'       => 'any',
 			'contentVisibility' => array(
+				'image'  => true,
 				'title'  => true,
 				'price'  => true,
 				'rating' => true,
@@ -517,6 +529,9 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 	 * @return string
 	 */
 	protected function get_image_html( $product ) {
+		if ( array_key_exists( 'image', $this->attributes['contentVisibility'] ) && false === $this->attributes['contentVisibility']['image'] ) {
+			return '';
+		}
 
 		$attr = array(
 			'alt' => '',
@@ -557,7 +572,6 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 			return '';
 		}
 		$rating_count = $product->get_rating_count();
-		$review_count = $product->get_review_count();
 		$average      = $product->get_average_rating();
 
 		if ( $rating_count > 0 ) {
@@ -632,7 +646,7 @@ abstract class AbstractProductGrid extends AbstractDynamicBlock {
 			'data-product_id'  => $product->get_id(),
 			'data-product_sku' => $product->get_sku(),
 			'rel'              => 'nofollow',
-			'class'            => 'wp-block-button__link add_to_cart_button',
+			'class'            => 'wp-block-button__link ' . ( function_exists( 'wc_wp_theme_get_element_class_name' ) ? wc_wp_theme_get_element_class_name( 'button' ) : '' ) . ' add_to_cart_button',
 		);
 
 		if (

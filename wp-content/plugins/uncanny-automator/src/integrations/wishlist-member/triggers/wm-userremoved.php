@@ -9,6 +9,7 @@ namespace Uncanny_Automator;
  * @package Uncanny_Automator
  */
 class WM_USERREMOVED {
+
 	/**
 	 * Integration code
 	 *
@@ -51,15 +52,27 @@ class WM_USERREMOVED {
 			'action'              => 'wishlistmember_remove_user_levels',
 			'priority'            => 99,
 			'accepted_args'       => 3,
-			'validation_function' => array( $this, 'remove_user_to_membership_level' ),
-			'options'             => array(
-				Automator()->helpers->recipe->wishlist_member->options->wm_get_all_membership_levels( null, $this->trigger_meta ),
+			'validation_function' => array(
+				$this,
+				'remove_user_to_membership_level',
 			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->wishlist_member->options->wm_get_all_membership_levels( null, $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -84,7 +97,7 @@ class WM_USERREMOVED {
 		foreach ( $recipes as $recipe_id => $recipe ) {
 			foreach ( $recipe['triggers'] as $trigger ) {
 				$trigger_id = $trigger['ID'];//return early for all products
-				if ( in_array( $required_level[ $recipe_id ][ $trigger_id ], $remove_levels ) ) {
+				if ( intval( '-1' ) === intval( $required_level[ $recipe_id ][ $trigger_id ] ) || in_array( $required_level[ $recipe_id ][ $trigger_id ], $remove_levels ) ) { //phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 					$matched_recipe_ids[] = array(
 						'recipe_id'  => $recipe_id,
 						'trigger_id' => $trigger_id,
@@ -102,6 +115,7 @@ class WM_USERREMOVED {
 					'recipe_to_match'  => $matched_recipe_id['recipe_id'],
 					'trigger_to_match' => $matched_recipe_id['trigger_id'],
 					'ignore_post_id'   => true,
+					'is_signed_in'     => true,
 				);
 
 				$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
@@ -109,14 +123,27 @@ class WM_USERREMOVED {
 				if ( $args ) {
 					foreach ( $args as $result ) {
 						if ( true === $result['result'] ) {
+
+							$trigger_meta = array(
+								'user_id'        => $user_id,
+								'trigger_id'     => $result['args']['trigger_id'],
+								'trigger_log_id' => $result['args']['get_trigger_id'],
+								'run_number'     => $result['args']['run_number'],
+							);
+
+							foreach ( $remove_levels as $level ) {
+								$level_details              = wlmapi_get_level( $level );
+								$trigger_meta['meta_key']   = $this->trigger_meta;
+								$trigger_meta['meta_value'] = maybe_serialize( $level_details['level']['name'] );
+								Automator()->insert_trigger_meta( $trigger_meta );
+							}
+
 							Automator()->maybe_trigger_complete( $result['args'] );
 						}
 					}
 				}
 			}
 		}
-
-		return;
-
 	}
+
 }

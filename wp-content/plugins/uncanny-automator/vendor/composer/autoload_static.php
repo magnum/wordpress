@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e
+class ComposerStaticInit4d32d33d8413eb75c668450b748bde1a
 {
     public static $prefixLengthsPsr4 = array (
         'F' => 
@@ -20,6 +20,16 @@ class ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'C' => 
+        array (
+            'ChrisKonnertz\\StringCalc' => 
+            array (
+                0 => __DIR__ . '/..' . '/chriskonnertz/string-calc/src',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -27,9 +37,10 @@ class ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7345ba663245bc2cc735a86a52d84e9e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4d32d33d8413eb75c668450b748bde1a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4d32d33d8413eb75c668450b748bde1a::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit4d32d33d8413eb75c668450b748bde1a::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit4d32d33d8413eb75c668450b748bde1a::$classMap;
 
         }, null, ClassLoader::class);
     }

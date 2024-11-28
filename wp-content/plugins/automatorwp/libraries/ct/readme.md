@@ -60,6 +60,21 @@ Other features
 
 ## Changelog ##
 
+**1.0.6**
+
+**Improvements**
+* Added more nonce checks to prevent CSRF attacks.
+
+**1.0.5**
+
+**Improvements**
+* Added more nonce checks to prevent CSRF attacks.
+
+**1.0.4**
+
+**Improvements**
+* Reduced the number of "Show tables" queries.
+
 **1.0.3**
 
 **Improvements**

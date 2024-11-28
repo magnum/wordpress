@@ -8,6 +8,7 @@ namespace Uncanny_Automator;
  * @package Uncanny_Automator
  */
 class ANON_FCRM_TAG_ADDED {
+
 	/**
 	 * Integration code
 	 *
@@ -16,10 +17,15 @@ class ANON_FCRM_TAG_ADDED {
 	public static $integration = 'FCRM';
 
 	/**
+	 * Trigger code.
+	 *
 	 * @var string
 	 */
 	private $trigger_code;
+
 	/**
+	 * Trigger meta.
+	 *
 	 * @var string
 	 */
 	private $trigger_meta;
@@ -51,35 +57,48 @@ class ANON_FCRM_TAG_ADDED {
 			'action'              => 'fluentcrm_contact_added_to_tags',
 			'priority'            => 20,
 			'accepted_args'       => 2,
-			'validation_function' => array( $this, 'anon_tag_added_to_contact' ),
-			'options'             => array(
-				Automator()->helpers->recipe->fluent_crm->options->fluent_crm_tags( null, $this->trigger_meta ),
+			'validation_function' => array(
+				$this,
+				'anon_tag_added_to_contact',
 			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
 
-		return;
 	}
 
 	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->fluent_crm->options->fluent_crm_tags( null, $this->trigger_meta ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Anon tag added to contact.
+	 *
 	 * @param $attached_tag_ids
 	 * @param $subscriber
 	 */
 	public function anon_tag_added_to_contact( $attached_tag_ids, $subscriber ) {
-		$user_id = $subscriber->user_id;
-		$tag_ids = Automator()->helpers->recipe->fluent_crm->get_attached_tag_ids( $attached_tag_ids );
 
-		if ( empty( $tag_ids ) ) {
-			// sanity check
-			return;
-		}
+		$user_id = absint( $subscriber->user_id );
 
-		$matched_recipes = Automator()->helpers->recipe->fluent_crm->match_single_condition( $tag_ids, 'int', $this->trigger_meta, $this->trigger_code );
+		$matched_recipes = Automator()->helpers->recipe->fluent_crm->match_single_condition( $attached_tag_ids, 'int', $this->trigger_meta, $this->trigger_code );
 
 		if ( ! empty( $matched_recipes ) ) {
+
 			foreach ( $matched_recipes as $matched_recipe ) {
+
 				if ( ! Automator()->is_recipe_completed( $matched_recipe->recipe_id, $user_id ) ) {
+
 					$args = array(
 						'code'            => $this->trigger_code,
 						'meta'            => $this->trigger_meta,
@@ -91,9 +110,13 @@ class ANON_FCRM_TAG_ADDED {
 					$result = Automator()->maybe_add_trigger_entry( $args, false );
 
 					if ( $result ) {
+
 						foreach ( $result as $r ) {
+
 							if ( true === $r['result'] ) {
+
 								if ( isset( $r['args'] ) && isset( $r['args']['get_trigger_id'] ) ) {
+
 									$trigger_meta = array(
 										'user_id'        => $user_id,
 										'trigger_id'     => (int) $r['args']['trigger_id'],
@@ -108,14 +131,18 @@ class ANON_FCRM_TAG_ADDED {
 									$trigger_meta['meta_key']   = 'subscriber_id';
 									$trigger_meta['meta_value'] = maybe_serialize( $subscriber->id );
 									Automator()->insert_trigger_meta( $trigger_meta );
+
 								}
 
 								Automator()->maybe_trigger_complete( $r['args'] );
-							}
-						}
-					}
-				}
-			}
-		}
+
+							} // endif.
+						} // endfor.
+					} // endif.
+				}// endif.
+			}//endfor.
+		}// endif.
+
 	}
+
 }

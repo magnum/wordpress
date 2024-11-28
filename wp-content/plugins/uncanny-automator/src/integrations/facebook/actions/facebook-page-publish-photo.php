@@ -8,20 +8,14 @@ namespace Uncanny_Automator;
  */
 class FACEBOOK_PAGE_PUBLISH_PHOTO {
 
-	use \Uncanny_Automator\Recipe\Actions;
+	use Recipe\Actions;
+	use Recipe\Action_Tokens;
+
+	const AJAX_ENDPOINT = 'fb_pages_wp_ajax_endpoint_post_image';
 
 	public function __construct() {
 
-		$this->fb_pages_wp_ajax_endpoint = 'fb_pages_wp_ajax_endpoint_post_image';
-
-		$this->fb_endpoint_uri = AUTOMATOR_API_URL . 'v2/facebook';
-
-		// Allow overwrite in wp-config.php.
-		if ( DEFINED( 'UO_AUTOMATOR_DEV_FB_ENDPOINT_URL' ) ) {
-			$this->fb_endpoint_uri = UO_AUTOMATOR_DEV_FB_ENDPOINT_URL;
-		}
-
-		add_action( "wp_ajax_{$this->fb_pages_wp_ajax_endpoint}", array( $this, $this->fb_pages_wp_ajax_endpoint ) );
+		add_action( 'wp_ajax_' . self::AJAX_ENDPOINT, array( $this, self::AJAX_ENDPOINT ) );
 
 		$this->setup_action();
 
@@ -49,6 +43,9 @@ class FACEBOOK_PAGE_PUBLISH_PHOTO {
 		$this->set_support_link( Automator()->get_author_support_link( $this->get_action_code(), 'knowledge-base/facebook/' ) );
 		$this->set_requires_user( false );
 
+		// Disables wpautop.
+		$this->set_wpautop( false );
+
 		/* translators: Action - WordPress */
 		$this->set_sentence( sprintf( esc_attr__( 'Publish a post with an image to {{a Facebook page:%1$s}}', 'uncanny-automator' ), $this->get_action_meta() ) );
 
@@ -61,10 +58,10 @@ class FACEBOOK_PAGE_PUBLISH_PHOTO {
 				array(
 					'option_code'           => $this->get_action_meta(),
 					/* translators: Email field */
-					'label'                 => esc_attr__( 'Select a Facebook Page', 'uncanny-automator' ),
+					'label'                 => esc_attr__( 'Facebook Page', 'uncanny-automator' ),
 					'input_type'            => 'select',
 					'is_ajax'               => true,
-					'endpoint'              => $this->fb_pages_wp_ajax_endpoint,
+					'endpoint'              => self::AJAX_ENDPOINT,
 					'supports_custom_value' => false,
 					'required'              => true,
 				),
@@ -72,11 +69,10 @@ class FACEBOOK_PAGE_PUBLISH_PHOTO {
 				array(
 					'option_code' => 'FACEBOOK_PAGE_PUBLISH_PHOTO_IMAGE_URL',
 					/* translators: Email field */
-					'label'       => esc_attr__( 'Image URL', 'uncanny-automator' ),
-					'placeholder' => esc_attr__( 'https://examplewebsite.com/path/to/image.jpg', 'uncanny-automator' ),
+					'label'       => esc_attr__( 'Image URL or Media library ID', 'uncanny-automator' ),
 					'input_type'  => 'url',
 					'required'    => true,
-					'description' => esc_attr__( 'Enter the URL of the image you wish to share. The URL must be publicly accessible.', 'uncanny-automator' ),
+					'description' => esc_attr__( 'Enter the URL or the Media library ID of the image you wish to share. The image must be publicly accessible.', 'uncanny-automator' ),
 				),
 				// The message field.
 				array(
@@ -90,6 +86,18 @@ class FACEBOOK_PAGE_PUBLISH_PHOTO {
 		);
 
 		$this->set_options_group( $options_group );
+
+		$this->set_action_tokens(
+			array(
+				'POST_LINK' => array(
+					'name' => __( 'Link to Facebook post', 'uncanny-automator' ),
+					'type' => 'url',
+				),
+			),
+			$this->get_action_code()
+		);
+
+		$this->set_background_processing( true );
 
 		$this->register_action();
 
@@ -110,75 +118,51 @@ class FACEBOOK_PAGE_PUBLISH_PHOTO {
 	protected function process_action( $user_id, $action_data, $recipe_id, $args, $parsed ) {
 
 		$facebook = Automator()->helpers->recipe->facebook->options;
+		$page_id  = isset( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_META'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_META'] ) : 0;
+		$media    = isset( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_IMAGE_URL'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_IMAGE_URL'] ) : '';
 
-		$page_id = isset( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_META'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_META'] ) : 0;
-
-		$image_url = isset( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_IMAGE_URL'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_PHOTO_IMAGE_URL'] ) : '';
-
+		// Post content editor adds BR tag if shift+enter. Enter key adds paragraph. Support both.
 		$message = isset( $parsed['FACEBOOK_PAGE_PUBLISH_MESSAGE'] ) ? sanitize_textarea_field( $parsed['FACEBOOK_PAGE_PUBLISH_MESSAGE'] ) : '';
 
-		$access_token = $facebook->get_user_page_access_token( $page_id );
-
-		$http_request_query = array(
-			'body' => array(
-				'action'       => 'image-to-page',
-				'access_token' => $access_token,
-				'image_url'    => $image_url,
-				'page_id'      => $page_id,
-				'message'      => $message,
-			),
+		$body = array(
+			'action'    => 'image-to-page',
+			'image_url' => $this->resolve_image_url( $media ),
+			'page_id'   => $page_id,
+			'message'   => $message,
 		);
 
-		if ( DEFINED( 'UO_AUTOMATOR_DEV_FB_ENDPOINT_URL' ) ) {
-			$http_request_query['sslverify'] = false;
-		}
+		try {
 
-		$request = wp_remote_post(
-			$this->fb_endpoint_uri,
-			$http_request_query
-		);
+			$response = $facebook->api_request( $page_id, $body, $action_data );
 
-		if ( ! is_wp_error( $request ) ) {
+			$post_id = isset( $response['data']['id'] ) ? $response['data']['id'] : 0;
 
-			$response = json_decode( wp_remote_retrieve_body( $request ) );
-
-			if ( 200 !== $response->statusCode ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-
-				$action_data['complete_with_errors'] = true;
-				// Log error if there are any error messages.
-				Automator()->complete->action( $user_id, $action_data, $recipe_id, $response->error->description );
-
-			} else {
-
-				// Check if there are any error message.
-
-				if ( isset( $response->data->error ) ) {
-
-					$action_data['complete_with_errors'] = true;
-					$error_message                       = esc_html__( "Unexpected error occured while posting to Facebook. If you're using tokens check if token values are empty or not.", 'uncanny-automator' );
-
-					if ( isset( $response->data->error->message ) ) {
-						$error_message = $response->data->error->message;
-					}
-
-					// Log error if there are any error messages.
-					Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-
-					return;
-
-				}
-
-				// Otherwise, complete the action.
-				Automator()->complete->action( $user_id, $action_data, $recipe_id );
-
+			if ( 0 !== $post_id ) {
+				$this->hydrate_tokens( array( 'POST_LINK' => 'https://www.facebook.com/' . $post_id ) );
 			}
-		} else {
 
-			// Log if there are any http errors.
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
+
 			$action_data['complete_with_errors'] = true;
 
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $request->get_error_message() );
+			// Log error if there are any error messages.
+			Automator()->complete->action( $user_id, $action_data, $recipe_id, $e->getMessage() );
+
 		}
 
 	}
+
+	/**
+	 * Resolves the image URL.
+	 *
+	 * @param mixed $image The public image URL or the Media Library ID.
+	 *
+	 * @return string The URL of the image or false if its failing.
+	 */
+	private function resolve_image_url( $media = '' ) {
+		return is_numeric( $media ) ? wp_get_attachment_url( $media ) : $media;
+	}
+
 }

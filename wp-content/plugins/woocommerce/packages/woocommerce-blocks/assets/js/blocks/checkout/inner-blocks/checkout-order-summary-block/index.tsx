@@ -1,21 +1,21 @@
 /**
  * External dependencies
  */
-import { Icon, totals } from '@woocommerce/icons';
-import { registerFeaturePluginBlockType } from '@woocommerce/block-settings';
+import { totals } from '@woocommerce/icons';
+import { Icon } from '@wordpress/icons';
+import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Edit, Save } from './edit';
 import attributes from './attributes';
-import metadata from './block.json';
 
-registerFeaturePluginBlockType( metadata, {
+registerBlockType( 'woocommerce/checkout-order-summary-block', {
 	icon: {
 		src: (
 			<Icon
-				srcElement={ totals }
+				icon={ totals }
 				className="wc-block-editor-components-block-icon"
 			/>
 		),

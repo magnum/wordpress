@@ -9,6 +9,13 @@ namespace Uncanny_Automator;
 class Facebook_Helpers {
 
 	/**
+	 * The API endpoint address.
+	 *
+	 * @var API_ENDPOINT The endpoint adress.
+	 */
+	const API_ENDPOINT = 'v2/facebook';
+
+	/**
 	 * The options.
 	 *
 	 * @var $options
@@ -28,6 +35,12 @@ class Facebook_Helpers {
 	 * @var $fb_endpoint_uri
 	 */
 	public $fb_endpoint_uri = '';
+
+	protected $setting_tab = '';
+
+	protected $wp_ajax_action = '';
+
+	protected $pro = null;
 
 	/**
 	 * The option key.
@@ -67,10 +80,47 @@ class Facebook_Helpers {
 			)
 		);
 
-		// Load the settings page.
-		require_once __DIR__ . '/../settings/settings-facebook.php';
+		// Defer loading of settings page to current_screen so we can check if its recipe page.
+		add_action(
+			'current_screen',
+			function() {
+				// Load the settings page.
+				require_once __DIR__ . '/../settings/settings-facebook.php';
+				new Facebook_Settings( $this );
+			}
+		);
 
-		new Facebook_Settings( $this );
+		// Fixes the credentials that are sent into our API when the re-send button if clicked.
+		add_filter( 'automator_facebook_api_call', array( $this, 'resend_with_current_credentials' ) );
+
+	}
+
+	/**
+	 * Resend the credentials with current values stored in the db.
+	 *
+	 * @param array $params The action parameters.
+	 *
+	 * @return array The action parameters.
+	 */
+	public function resend_with_current_credentials( $params ) {
+
+		// Bail when request is not coming from the re-send button.
+		if ( empty( $params['resend'] ) ) {
+			return $params;
+		}
+
+		// Bail when access token is empty.
+		if ( empty( $params['body']['access_token'] ) || empty( $params['body']['page_id'] ) ) {
+			return $params;
+		}
+
+		$access_token = $this->get_user_page_access_token( $params['body']['page_id'] );
+
+		if ( ! empty( $access_token ) ) {
+			$params['body']['access_token'] = $access_token;
+		}
+
+		return $params;
 
 	}
 
@@ -117,7 +167,8 @@ class Facebook_Helpers {
 	 */
 	public function has_connection_data() {
 
-		$facebook_options_user  = get_option( '_uncannyowl_facebook_settings', array() );
+		$facebook_options_user = get_option( self::OPTION_KEY, array() );
+
 		$facebook_options_pages = get_option( '_uncannyowl_facebook_pages_settings', array() );
 
 		if ( ! empty( $facebook_options_user ) && ! empty( $facebook_options_pages ) ) {
@@ -132,26 +183,54 @@ class Facebook_Helpers {
 	 */
 	public function automator_integration_facebook_capture_token() {
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+
+			wp_safe_redirect( $this->get_settings_page_uri() . '&status=error' );
+
+			exit;
+
+		}
+
+		if ( ! wp_verify_nonce( automator_filter_input( 'state' ), self::OPTION_KEY ) ) {
+
+			wp_safe_redirect( $this->get_settings_page_uri() . '&status=error' );
+
+			exit;
+
+		}
+
 		$settings = array(
 			'user' => array(
-				'id'    => filter_input( INPUT_GET, 'fb_user_id', FILTER_SANITIZE_NUMBER_INT ),
-				'token' => filter_input( INPUT_GET, 'fb_user_token', FILTER_SANITIZE_STRING ),
+				'id'    => absint( automator_filter_input( 'fb_user_id' ) ),
+				'token' => automator_filter_input( 'fb_user_token' ),
 			),
 		);
 
 		$error_status = filter_input( INPUT_GET, 'status', FILTER_DEFAULT );
 
 		if ( 'error' === $error_status ) {
+
 			wp_safe_redirect( $this->get_settings_page_uri() . '&status=error' );
+
 			exit;
+
 		}
 
 		// Only update the record when there is a valid user.
 		if ( isset( $settings['user']['id'] ) && isset( $settings['user']['token'] ) ) {
+
+			// Append user info to settings option.
+			$settings['user-info'] = $this->get_user_information( $settings['user']['id'], $settings['user']['token'] );
+
 			// Updates the option value to settings.
-			update_option( self::OPTION_KEY, $settings );
-			// Delete any settings left.
+			update_option( self::OPTION_KEY, $settings, false );
+
+			// Updates the option value to settings.
+			update_option( self::OPTION_KEY, $settings, false );
+
+			// Delete any user info left.
 			delete_option( '_uncannyowl_facebook_pages_settings' );
+
 		}
 
 		wp_safe_redirect( $this->get_settings_page_uri() . '&connection=new' );
@@ -169,11 +248,13 @@ class Facebook_Helpers {
 	public function automator_integration_facebook_capture_token_disconnect() {
 
 		if ( wp_verify_nonce( filter_input( INPUT_GET, 'nonce', FILTER_DEFAULT ), self::OPTION_KEY ) ) {
-			delete_option( self::OPTION_KEY );
-			delete_option( '_uncannyowl_facebook_pages_settings' );
-			delete_transient( 'uo-fb-transient-user-connected' );
+
+			$this->remove_credentials();
+
 			wp_safe_redirect( $this->get_settings_page_uri() );
+
 			exit;
+
 		}
 
 		wp_die( esc_html__( 'Nonce Verification Failed', 'uncanny-automator' ) );
@@ -224,59 +305,56 @@ class Facebook_Helpers {
 	 */
 	public function fetch_pages_from_api() {
 
-		$settings = get_option( '_uncannyowl_facebook_settings' );
+		$settings = get_option( self::OPTION_KEY );
 
-		if ( ! isset( $settings['user']['token'] ) ) {
-			return array(
-				'status'  => 403,
-				'message' => esc_html__( 'Forbidden. User access token is required but empty.', 'uncanny-automator' ),
-				'pages'   => array(),
-			);
-		}
-
-		$remote = wp_remote_post(
-			$this->fb_endpoint_uri,
-			array(
-				'body' => array(
-					'action'       => 'list-user-pages',
-					'access_token' => $settings['user']['token'],
-				),
-			)
-		);
+		$message = '';
 
 		$pages = array();
 
-		if ( ! is_wp_error( $remote ) ) {
+		$status = 200;
 
-			$response = wp_remote_retrieve_body( $remote );
+		try {
 
-			$response = json_decode( $response );
-
-			$status = isset( $response->statusCode ) ? $response->statusCode : ''; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-
-			$message = isset( $response->data->error->message ) ? $response->data->error->message : '';
-
-			if ( 200 === $status ) {
-
-				foreach ( $response->data->data as $page ) {
-
-					$pages[] = array(
-						'value'             => $page->id,
-						'text'              => $page->name,
-						'tasks'             => $page->tasks,
-						'page_access_token' => $page->access_token,
-					);
-				}
-
-				$message = esc_html__( 'Pages are fetched successfully', 'automator-pro' );
-
-				// Save the pages.
-				update_option( '_uncannyowl_facebook_pages_settings', $pages );
-
+			// Throw error if access token is empty.
+			if ( ! isset( $settings['user']['token'] ) ) {
+				// Invoke 403 status code.
+				throw new \Exception( esc_html__( 'Forbidden. User access token is required but empty.', 'uncanny-automator' ), 403 );
 			}
-		} else {
-			$message = $remote->get_error_message();
-			$status  = 500;
+
+			// Request from API.
+			$request = $this->api_request_null(
+				array(
+					'action'       => 'list-user-pages',
+					'access_token' => $settings['user']['token'],
+				)
+			);
+
+			// Throw error if status code is invalid.
+			if ( 200 !== $request['statusCode'] ) {
+				throw new \Exception( esc_html__( 'Invalid status code.', 'uncanny-automator' ), $request['statusCode'] );
+			}
+
+			foreach ( $request['data']['data'] as $page ) {
+				$pages[] = array(
+					'value'             => $page['id'],
+					'text'              => $page['name'],
+					'tasks'             => $page['tasks'],
+					'page_access_token' => $page['access_token'],
+				);
+			}
+
+			$message = esc_html__( 'Pages are fetched successfully', 'uncanny-automator' );
+
+			// Save the option.
+			update_option( '_uncannyowl_facebook_pages_settings', $pages, false );
+
+		} catch ( \Exception $e ) {
+
+			// Assign the exception code as status code.
+			$status = $e->getCode();
+			// Assign the exception message as the message.
+			$message = $e->getMessage();
+
 		}
 
 		$response = array(
@@ -359,76 +437,62 @@ class Facebook_Helpers {
 	}
 
 	/**
-	 * Retrieve the connected user.
+	 * Get the user connected.
+	 *
+	 * Gets called on the settings page.
 	 *
 	 * @return array|mixed
 	 */
 	public function get_user_connected() {
 
-		$graph = get_option( self::OPTION_KEY );
-
-		$response = array(
-			'user_id' => 0,
-			'picture' => false,
-			'name'    => false,
-		);
-
-		if ( ! empty( $graph ) ) {
-			$response = $this->transient_get_user_connected( $graph['user']['id'], $graph['user']['token'] );
+		// Bail out if we dont need user request.
+		if ( ! $this->is_user_request_needed() ) {
+			return false;
 		}
 
-		return $response;
+		return get_option( self::OPTION_KEY );
+
 	}
 
 	/**
-	 * Retrieve the connected user from the transient.
+	 * Retrieves user information.
 	 *
 	 * @param $user_id
 	 * @param $token
 	 *
 	 * @return array|mixed
 	 */
-	private function transient_get_user_connected( $user_id, $token ) {
+	public function get_user_information( $user_id, $token ) {
 
-		$response = array(
-			'user_id' => 0,
-			'name'    => '',
-			'picture' => '',
-		);
+		try {
 
-		$transient_key = 'uo-fb-transient-user-connected';
+			$params = array(
+				'action'       => 'get_user',
+				'user_id'      => $user_id,
+				'access_token' => $token,
+			);
 
-		$transient_user_connected = get_transient( $transient_key );
+			$response = $this->api_request_null( $params );
 
-		if ( false !== $transient_user_connected ) {
-			return $transient_user_connected;
-		}
+			$response['user_id'] = isset( $response['data']['id'] ) ? $response['data']['id'] : '';
+			$response['name']    = isset( $response['data']['name'] ) ? $response['data']['name'] : '';
+			$response['picture'] = isset( $response['data']['picture']['data']['url'] )
+				? $response['data']['picture']['data']['url'] :
+				'';
 
-		$request = wp_remote_get(
-			'https://graph.facebook.com/v11.0/' . $user_id,
-			array(
-				'body' => array(
-					'access_token' => $token,
-					'fields'       => 'id,name,picture',
-				),
-			)
-		);
+		} catch ( \Exception $e ) {
 
-		$graph_response = wp_remote_retrieve_body( $request );
+			// Reset the connection if something is wrong.
+			$this->remove_credentials();
 
-		if ( ! is_wp_error( $graph_response ) ) {
+			wp_safe_redirect( $this->get_settings_page_uri() . '&status=error' );
 
-			$graph_response = json_decode( $graph_response );
-
-			$response['user_id'] = isset( $graph_response->id ) ? $graph_response->id : '';
-			$response['name']    = isset( $graph_response->name ) ? $graph_response->name : '';
-			$response['picture'] = isset( $graph_response->picture->data->url ) ? $graph_response->picture->data->url : '';
-
-			set_transient( $transient_key, $response, DAY_IN_SECONDS );
+			die;
 
 		}
 
 		return $response;
+
 	}
 
 
@@ -471,7 +535,7 @@ class Facebook_Helpers {
 			}
 		}
 
-		return '';
+		throw new \Exception( __( 'Facebook is not connected', 'uncanny-automator' ) );
 	}
 
 	/**
@@ -485,5 +549,117 @@ class Facebook_Helpers {
 
 	}
 
+	/**
+	 * Method api_request
+	 *
+	 * @param $params
+	 *
+	 * @return void
+	 */
+	public function api_request( $page_id, $body, $action_data = null ) {
+
+		$access_token = $this->get_user_page_access_token( $page_id );
+
+		$body['access_token'] = $access_token;
+
+		$params = array(
+			'endpoint' => self::API_ENDPOINT,
+			'body'     => $body,
+			'action'   => $action_data,
+			'timeout'  => 10,
+		);
+
+		$response = Api_Server::api_call( $params );
+
+		$this->check_for_errors( $response );
+
+		return $response;
+
+	}
+
+	/**
+	 * Method api_request_null.
+	 *
+	 * @param $body
+	 *
+	 * @return void
+	 */
+	public function api_request_null( $body = array() ) {
+
+		$params = array(
+			'endpoint' => self::API_ENDPOINT,
+			'body'     => $body,
+			'action'   => null,
+			'timeout'  => 10,
+		);
+
+		return Api_Server::api_call( $params );
+	}
+
+	public function check_for_errors( $response ) {
+
+		if ( isset( $response['data']['error']['message'] ) ) {
+			throw new \Exception( $response['data']['error']['message'], $response['statusCode'] );
+		}
+	}
+
+	/**
+	 * Wrapper for completing the action with err message.
+	 *
+	 * @param $response
+	 * @param $user_id
+	 * @param $action_data
+	 * @param $recipe_id
+	 *
+	 * @return void
+	 */
+	public function complete_with_error( $error_msg, $user_id, $action_data, $recipe_id ) {
+		$action_data['complete_with_errors'] = true;
+		Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
+	}
+
+	/**
+	 * Determines if user request is needed or not.
+	 *
+	 * @return bool True if user info request is needed. Returns false, otherwise.
+	 */
+	private function is_user_request_needed() {
+
+		// Bail immediately if on front-end screen.
+		if ( ! is_admin() ) {
+			return false;
+		}
+
+		// Checks if on Facebook Groups settings (e.g. Premium Integrations).
+		$is_facebook_pages_settings = 'uncanny-automator-config' === automator_filter_input( 'page' );
+
+		// Determine if user is connecting Facebook groups.
+		$is_capturing_token = wp_doing_ajax()
+			&& $this->wp_ajax_action === automator_filter_input( 'action' );
+
+		// Checks if from recipe edit page.
+		$current_screen           = get_current_screen();
+		$is_automator_recipe_page = isset( $current_screen->id )
+			&& 'uo-recipe' === $current_screen->id
+			&& 'edit' === automator_filter_input( 'action' );
+
+		return $is_facebook_pages_settings || $is_capturing_token || $is_automator_recipe_page;
+
+	}
+
+	/**
+	 * Removes credentials and attempts from options table.
+	 *
+	 * @return bool True. always.
+	 */
+	private function remove_credentials() {
+
+		// Delete the credentials
+		delete_option( self::OPTION_KEY );
+		// Delete settings info.
+		delete_option( '_uncannyowl_facebook_pages_settings' );
+
+		return true;
+	}
 
 }

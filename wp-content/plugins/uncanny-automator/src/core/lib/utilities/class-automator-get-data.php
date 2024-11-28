@@ -423,7 +423,7 @@ class Automator_Get_Data {
 	 *
 	 * @param null $action_code
 	 *
-	 * @return null|            |array String is the function is not within a class and array if it is
+	 * @return null|string|array String is the function is not within a class and array if it is
 	 */
 	public function action_execution_function_from_action_code( $action_code = null ) {
 
@@ -686,8 +686,8 @@ class Automator_Get_Data {
 	/**
 	 * Get the trigger log ID for the user
 	 *
-	 * @param      $user_id       null
-	 * @param      $trigger_id    null
+	 * @param null $user_id
+	 * @param null $trigger_id
 	 * @param null $recipe_id null
 	 * @param null $recipe_log_id null
 	 *
@@ -787,7 +787,7 @@ class Automator_Get_Data {
 					"SELECT MAX(run_number)
 						FROM {$wpdb->prefix}uap_recipe_log
 						WHERE 1=1
-						AND completed NOT IN (2,9)
+						AND completed NOT IN (2,9,10)
 						AND automator_recipe_id = %d
 						AND user_id = %d",
 					$recipe_id,
@@ -1039,7 +1039,7 @@ class Automator_Get_Data {
 					if ( 'automator_custom_value' === $value ) {
 						$value = $trigger['meta'][ $trigger_meta . '_custom' ];
 					}
-					
+
 					$metas[ $recipe_id ][ $trigger['ID'] ] = $value;
 				}
 			}
@@ -1284,7 +1284,7 @@ WHERE t.automator_trigger_id = %d
 	/**
 	 * total_completed_runs
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function total_completed_runs() {
 		global $wpdb;
@@ -1301,7 +1301,7 @@ WHERE t.automator_trigger_id = %d
 	 *
 	 * @param mixed $seconds_to_include
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function completed_runs( $seconds_to_include = null ) {
 		global $wpdb;
@@ -1346,6 +1346,195 @@ WHERE t.automator_trigger_id = %d
 	public function recipe_completed_times_by_user( $recipe_id, $user_id ) {
 		global $wpdb;
 		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed=%d AND user_id=%d", $recipe_id, 1, $user_id ) );
+
+		return is_numeric( $count ) ? $count : 0;
+	}
+
+	/**
+	 * Return all integration published actions.
+	 *
+	 * @param mixed $integration The integration.
+	 *
+	 * @return array The recipe data.
+	 */
+	public function get_integration_publish_actions( $integration = '' ) {
+
+		// Get all published recipes.
+		$published_recipes = array_filter(
+			Automator()->get_recipes_data(),
+			function ( $recipe ) {
+				return 'publish' === $recipe['post_status'];
+			}
+		);
+
+		// Map all published integration actions.
+		$published_actions = array_map(
+			function ( $published_recipe ) use ( $integration ) {
+				// Filter the actions by integration and publish staus.
+				$published_actions = array_filter(
+					$published_recipe['actions'],
+					function ( $action ) use ( $integration ) {
+						return 'publish' === $action['post_status'] && $integration === $action['meta']['integration'];
+					}
+				);
+
+				// Return the specific integration actions that are published.
+				return $published_actions;
+			},
+			$published_recipes
+		);
+
+		// Automatically remove empty elements.
+		return array_filter( $published_actions );
+
+	}
+
+	/**
+	 * @param $action_code
+	 *
+	 * @return bool|void|null
+	 */
+	public function action_has_background_processing( $action_code = null ) {
+
+		if ( null === $action_code || ! is_string( $action_code ) ) {
+			Automator()->error->add_error( 'action_integration_from_action_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
+
+			return null;
+		}
+
+		// Load all default trigger settings
+		$system_actions = Automator()->get_actions();
+
+		if ( empty( $system_actions ) ) {
+			return null;
+		}
+
+		foreach ( $system_actions as $system_action ) {
+
+			if ( $system_action['code'] === $action_code ) {
+				return isset( $system_action['background_processing'] ) && true === $system_action['background_processing'];
+			}
+		}
+	}
+
+	/**
+	 * @return array|int
+	 */
+	public function recipes_using_credits( $count_only = false ) {
+		global $wpdb;
+		$integration_codes = array(
+			'ACTIVE_CAMPAIGN',
+			'FACEBOOK',
+			'FACEBOOK_GROUPS',
+			'GOOGLESHEET',
+			'GOOGLE_CALENDAR',
+			'GTT',
+			'GTW',
+			'HUBSPOT',
+			'INSTAGRAM',
+			'LINKEDIN',
+			'MAILCHIMP',
+			'SLACK',
+			'TWITTER',
+			'TWILIO',
+			'WHATSAPP',
+			'ZOOM',
+			'ZOOMWEBINAR',
+		);
+
+		$meta          = "'" . implode( "','", $integration_codes ) . "'";
+		$sql           = $wpdb->prepare( "SELECT rp.ID as ID FROM $wpdb->posts cp LEFT JOIN $wpdb->posts rp ON rp.ID = cp.post_parent WHERE cp.ID IN ( SELECT post_id FROM $wpdb->postmeta WHERE meta_value IN ($meta) ) AND cp.post_status LIKE %s AND rp.post_status LIKE %s", 'publish', 'publish' ); //phpcs:ignore
+		$check_recipes = $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		if ( $count_only ) {
+			return count( $check_recipes );
+		}
+		$recipes = array();
+		if ( ! empty( $check_recipes ) ) {
+			foreach ( $check_recipes as $recipe_id ) {
+				// Get the title
+				$recipe_title = get_the_title( $recipe_id );
+				$recipe_title = ! empty( $recipe_title ) ? $recipe_title : sprintf( __( 'ID: %s (no title)', 'uncanny-automator' ), $recipe_id );
+
+				// Get the URL
+				$recipe_edit_url = get_edit_post_link( $recipe_id );
+
+				// Get the recipe type
+				$recipe_type = Automator()->utilities->get_recipe_type( $recipe_id );
+
+				// Get the times per user
+				$recipe_times_per_user = '';
+				if ( 'user' === $recipe_type ) {
+					$recipe_times_per_user = get_post_meta( $recipe_id, 'recipe_completions_allowed', true );
+				}
+
+				// Get the total allowed completions
+				$recipe_allowed_completions_total = get_post_meta( $recipe_id, 'recipe_max_completions_allowed', true );
+
+				// Get the number of runs
+				$recipe_number_of_runs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed = %d", $recipe_id, 1 ) );
+
+				$recipes[] = array(
+					'id'                        => $recipe_id,
+					'title'                     => $recipe_title,
+					'url'                       => $recipe_edit_url,
+					'type'                      => $recipe_type,
+					'times_per_user'            => $recipe_times_per_user,
+					'allowed_completions_total' => $recipe_allowed_completions_total,
+					'completed_runs'            => $recipe_number_of_runs,
+				);
+			}
+		}
+
+		return $recipes;
+	}
+
+	/**
+	 * @return mixed|null
+	 */
+	public function completed_recipes_count() {
+		$cached_n_completion = Automator()->cache->get( 'get_completed_recipes_count' );
+
+		if ( ! empty( $cached_n_completion ) ) {
+
+			return apply_filters( 'automator_review_get_completed_recipes_count', absint( $cached_n_completion ), $this );
+
+		}
+
+		$total_recipe_completion = $this->total_completed_runs();
+
+		Automator()->cache->set( 'get_completed_recipes_count', $total_recipe_completion );
+
+		return apply_filters( 'automator_review_get_completed_recipes_count', absint( $total_recipe_completion ), $this );
+
+	}
+
+	/**
+	 * @param $status
+	 *
+	 * @return float|int|string
+	 */
+	public function total_recipes( $status = 'all' ) {
+		global $wpdb;
+		if ( 'all' === $status ) {
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = %s", 'uo-recipe' ) );
+		}
+		if ( 'all' !== $status ) {
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = %s AND post_status = %s", 'uo-recipe', $status ) );
+		}
+
+		return is_numeric( $count ) ? $count : 0;
+	}
+
+	/**
+	 * @return float|int|string
+	 */
+	public function recipe_log_count( $any = true ) {
+		global $wpdb;
+		if ( $any ) {
+			$count = $wpdb->get_var( "SELECT COUNT(ID) FROM {$wpdb->prefix}uap_recipe_log" );
+		} else {
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM {$wpdb->prefix}uap_recipe_log WHERE completed != %d", 1 ) );
+		}
 
 		return is_numeric( $count ) ? $count : 0;
 	}

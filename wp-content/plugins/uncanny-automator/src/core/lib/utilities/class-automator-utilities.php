@@ -40,6 +40,9 @@ class Automator_Utilities {
 	 */
 	public function keep_order_of_options( $item ) {
 		// Check if it has options
+		if ( ! isset( $item['options'] ) && ! isset( $item['options_group'] ) ) {
+			return $item;
+		}
 		if ( isset( $item['options'] ) ) {
 
 			// Iterate each option
@@ -378,22 +381,38 @@ class Automator_Utilities {
 
 	/**
 	 * @param $data
-	 * @param $type
+	 * @param string $type
+	 * @param string $meta_key
+	 * @param array $options
 	 *
 	 * @return mixed|string
 	 */
-	public function automator_sanitize( $data, $type = 'text' ) {
+	public function automator_sanitize( $data, $type = 'text', $meta_key = '', $options = array() ) {
+		// If it's an array, handle it early and return data
+		if ( is_array( $data ) ) {
+			return $this->automator_sanitize_array( $data, $meta_key, $options );
+		}
+		$type_before = $type;
+		// Maybe identify field type
+		if ( empty( $type ) || 'mixed' === $type ) {
+			$type = $this->maybe_get_field_type( $meta_key, $options );
+		}
+
 		switch ( $type ) {
+			case 'textarea':
+				$data = sanitize_textarea_field( $data );
+				break;
+			case 'html':
+				// not sanitization
+				break;
+			case 'text':
+				$data = sanitize_text_field( $data );
+				break;
 			case 'mixed':
-			case 'array':
-				if ( is_array( $data ) ) {
-					$this->automator_sanitize_array( $data );
-				} else {
+			default:
+				if ( wp_strip_all_tags( $data ) === $data ) {
 					$data = sanitize_text_field( $data );
 				}
-				break;
-			default:
-				$data = sanitize_text_field( $data );
 				break;
 		}
 
@@ -401,17 +420,53 @@ class Automator_Utilities {
 	}
 
 	/**
+	 * @param $data
+	 * @param bool $slash_only
+	 *
+	 * @return array|string
+	 */
+	public function automator_sanitize_json( $data, $slash_only = false ) {
+		if ( $slash_only ) {
+			return wp_slash( $data );
+		}
+		$filters = array(
+			'email'   => FILTER_VALIDATE_EMAIL,
+			'url'     => FILTER_VALIDATE_URL,
+			'name'    => FILTER_UNSAFE_RAW,
+			'address' => FILTER_UNSAFE_RAW,
+		);
+		$options = array(
+			'email' => array(
+				'flags' => FILTER_NULL_ON_FAILURE,
+			),
+			'url'   => array(
+				'flags' => FILTER_NULL_ON_FAILURE,
+			),
+			//... and so on
+		);
+		$inputs   = json_decode( $data );
+		$filtered = array();
+		foreach ( $inputs as $key => $value ) {
+			$filtered[ $key ] = filter_var( $value, $filters[ $key ], $options[ $key ] );
+		}
+
+		return wp_slash( wp_json_encode( $filtered ) );
+	}
+
+	/**
 	 * Recursively calls itself if children has arrays as well
 	 *
 	 * @param $data
+	 * @param string $meta_key
+	 * @param array $options
 	 *
 	 * @return mixed
 	 */
-	public function automator_sanitize_array( $data ) {
+	public function automator_sanitize_array( $data, $meta_key = '', $options = array() ) {
 		foreach ( $data as $k => $v ) {
 			$k = esc_attr( $k );
 			if ( is_array( $v ) ) {
-				$data[ $k ] = $this->automator_sanitize( $v, 'array' );
+				$data[ $k ] = $this->automator_sanitize( $v, 'array', $meta_key, $options );
 			} else {
 				switch ( $k ) {
 					case 'EMAILFROM':
@@ -419,19 +474,15 @@ class Automator_Utilities {
 					case 'EMAILCC':
 					case 'EMAILBCC':
 					case 'WPCPOSTAUTHOR':
-						$regex = '/[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})/';
-						if ( preg_match( $regex, $v, $email_is ) ) {
-							$data[ $k ] = sanitize_email( $v );
-						} else {
-							$data[ $k ] = sanitize_text_field( $v );
-						}
+						$data[ $k ] = sanitize_text_field( $v );
 						break;
 					case 'EMAILBODY':
 					case 'WPCPOSTCONTENT':
 						$data[ $k ] = wp_kses_post( $v );
 						break;
 					default:
-						$data[ $k ] = sanitize_text_field( $v );
+						$field_type = $this->maybe_get_field_type( $k, $options );
+						$data[ $k ] = $this->automator_sanitize( $v, $field_type );
 						break;
 				}
 			}
@@ -472,10 +523,119 @@ class Automator_Utilities {
 	 */
 	public function is_from_modal_action() {
 
-		$minimal = filter_input( INPUT_GET, 'minimal', FILTER_DEFAULT );
+		$minimal = filter_input( INPUT_GET, 'automator_minimal', FILTER_DEFAULT );
 
-		$hide_settings_tabs = filter_input( INPUT_GET, 'hide_settings_tabs', FILTER_DEFAULT );
+		$hide_settings_tabs = filter_input( INPUT_GET, 'automator_hide_settings_tabs', FILTER_DEFAULT );
 
 		return ! empty( $minimal ) && ! empty( $hide_settings_tabs );
+	}
+
+	/**
+	 * @param $tokens
+	 *
+	 * @return array|mixed
+	 */
+	public function remove_duplicate_token_ids( $tokens ) {
+		$new_tokens = array();
+		if ( empty( $tokens ) ) {
+			return $tokens;
+		}
+		foreach ( $tokens as $token ) {
+			if ( ! array_key_exists( $token['tokenId'], $new_tokens ) ) {
+				$new_tokens[ $token['tokenId'] ] = $token;
+			}
+		}
+
+		return array_values( $new_tokens );
+	}
+
+
+	/**
+	 * @param $string
+	 *
+	 * @return bool
+	 */
+	public function is_json_string( $string ) {
+		return is_string( $string ) && is_array( json_decode( $string, true ) ) && ( JSON_ERROR_NONE === json_last_error() ) ? true : false;
+	}
+
+	/**
+	 * @param $meta_value
+	 * @param bool $slash_only
+	 *
+	 * @return array|mixed|string
+	 */
+	public function maybe_slash_json_value( $meta_value, $slash_only = false ) {
+		if ( $this->is_json_string( $meta_value ) ) {
+			$meta_value = Automator()->utilities->automator_sanitize_json( $meta_value, $slash_only );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * @param $meta_value
+	 *
+	 * @return array|mixed|string
+	 */
+	public function maybe_unslash_value( $meta_value ) {
+		if ( $this->is_json_string( wp_unslash( $meta_value ) ) ) {
+			return wp_unslash( $meta_value );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * @param $option_code
+	 * @param $options
+	 *
+	 * @return string
+	 */
+	public function maybe_get_field_type( $option_code, $options ) {
+		// if nothing is set, return text
+		if ( empty( $options ) || ! isset( $options['fields'] ) || ! isset( $options['fields'][ $option_code ] ) ) {
+			return 'text';
+		}
+
+		// if tinymce is set to yes, return HTML
+		if ( isset( $options['fields'][ $option_code ]['supports_tinymce'] ) && 'true' === (string) $options['fields'][ $option_code ]['supports_tinymce'] ) {
+			return 'html';
+		}
+
+		// No type found
+		if ( ! isset( $options['fields'][ $option_code ]['type'] ) || empty( $options['fields'][ $option_code ]['type'] ) ) {
+			return 'text';
+		}
+
+		// Return type
+		return (string) $options['fields'][ $option_code ]['type'];
+	}
+
+	/**
+	 * @param $post_id
+	 * @param $length
+	 *
+	 * @return mixed|null
+	 */
+	public function automator_get_the_excerpt( $post_id, $length = 25 ) {
+		$post = get_post( $post_id );
+		if ( ! $post instanceof \WP_Post ) {
+			return '';
+		}
+		$post_content = $post->post_content;
+		$post_excerpt = $post->post_excerpt;
+		if ( ! empty( $post_excerpt ) ) {
+			// If custom excerpt is defined, return the same
+			return apply_filters( 'automator_get_the_excerpt', $post_excerpt, $post_content, $post_id, $length );
+		}
+		$length  = apply_filters( 'automator_get_the_excerpt_length', $length );
+		$excerpt = sanitize_text_field( strip_shortcodes( wp_strip_all_tags( $post_content ) ) );
+		$words   = explode( apply_filters( 'automator_get_the_excerpt_separator', ' ' ), $excerpt );
+		$len     = min( $length, count( $words ) );
+		$excerpt = array_slice( $words, 0, $len );
+		$excerpt = join( ' ', $excerpt ) . apply_filters( 'automator_get_the_excerpt_continuity', '...', $post_id );
+
+		return apply_filters( 'automator_get_the_excerpt', $excerpt, $post_content, $post_id, $length );
 	}
 }

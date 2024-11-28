@@ -208,7 +208,7 @@ abstract class GFPaymentAddOn extends GFFeedAddOn {
 
 		add_filter( 'gform_confirmation', array( $this, 'confirmation' ), 20, 4 );
 
-		add_filter( 'gform_validation', array( $this, 'maybe_validate' ), 20 );
+		add_filter( 'gform_validation', array( $this, 'maybe_validate' ), 20, 2 );
 		add_filter( 'gform_entry_post_save', array( $this, 'entry_post_save' ), 10, 2 );
 
 		if ( $this->_requires_credit_card ) {
@@ -526,33 +526,26 @@ abstract class GFPaymentAddOn extends GFFeedAddOn {
 	/**
 	 * Check if the rest of the form has passed validation, is the last page, and that the honeypot field has not been completed.
 	 *
-	 * @since  Unknown
-	 * @access public
+	 * @since Unknown
+	 * @since 2.6.4 Added the $context param.
 	 *
-	 * @used-by GFPaymentAddOn::init()
-	 * @uses    GFFormDisplay::is_last_page()
-	 * @uses    GFFormDisplay::get_max_field_id()
-	 * @uses    GFPaymentAddOn::validation()
-	 *
-	 * @param array $validation_result Contains the validation result, the Form Object, and the failed validation page number.
+	 * @param array  $validation_result Contains the validation result, the Form Object, and the failed validation page number.
+	 * @param string $context           The context for the current submission. Possible values: form-submit, api-submit, api-validate.
 	 *
 	 * @return array $validation_result
 	 */
-	public function maybe_validate( $validation_result ) {
+	public function maybe_validate( $validation_result, $context = 'api-submit' ) {
+		if ( $context === 'api-validate' || ! $validation_result['is_valid'] ) {
+			return $validation_result;
+		}
 
 		$form            = $validation_result['form'];
 		$is_last_page    = GFFormDisplay::is_last_page( $form );
-		$failed_honeypot = false;
-
-		if ( $is_last_page && rgar( $form, 'enableHoneypot' ) ) {
-			$honeypot_id     = GFFormDisplay::get_max_field_id( $form ) + 1;
-			$failed_honeypot = ! rgempty( "input_{$honeypot_id}" );
-		}
 
 		// Validation called by partial entries feature via the heartbeat API.
 		$is_heartbeat = rgpost('action') == 'heartbeat';
 
-		if ( ! $validation_result['is_valid'] || ! $is_last_page || $failed_honeypot || $is_heartbeat ) {
+		if ( ! $is_last_page || $is_heartbeat ) {
 			return $validation_result;
 		}
 
@@ -590,19 +583,19 @@ abstract class GFPaymentAddOn extends GFFeedAddOn {
 			return $validation_result;
 		}
 
-		$form  = $validation_result['form'];
-		$entry = GFFormsModel::create_lead( $form );
-		$feed  = $this->get_payment_feed( $entry, $form );
-
-		if ( ! $feed ) {
-			return $validation_result;
-		}
-
 		global $gf_payment_gateway;
 
 		if ( $gf_payment_gateway && $gf_payment_gateway !== $this->get_slug() ) {
 			$this->log_debug( __METHOD__ . '() Aborting. Submission already processed by ' . $gf_payment_gateway );
 
+			return $validation_result;
+		}
+
+		$form  = $validation_result['form'];
+		$entry = GFFormsModel::get_current_lead( $form );
+		$feed  = $this->get_payment_feed( $entry, $form );
+
+		if ( ! $feed ) {
 			return $validation_result;
 		}
 
@@ -1178,7 +1171,7 @@ abstract class GFPaymentAddOn extends GFFeedAddOn {
 		$submission_feed = false;
 
 		// Only occurs if entry has already been processed and feed has been stored in entry meta.
-		if ( $entry['id'] ) {
+		if ( ! empty( $entry['id'] ) ) {
 			$feeds           = $this->get_feeds_by_entry( $entry['id'] );
 			$submission_feed = empty( $feeds ) ? false : $this->get_feed( $feeds[0] );
 		} elseif ( $form ) {

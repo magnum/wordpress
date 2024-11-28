@@ -56,3 +56,40 @@
 #pys .custom-switch.disabled {
     opacity: .6;
 }
+#pys .bg-gray {
+    background-color: #f6f6f6;
+}
+#pys .copy_text {
+    padding: 15px 20px 15px 15px;
+    background: #f6f6f6;
+    line-break: anywhere;
+    position: relative;
+    cursor: pointer;
+}
+#pys .copy_text:after {
+    content: "";
+    background-image: url(images/ic_copy.png);
+    opacity: 0.5;
+    position: absolute;
+    display: block;
+    width: 15px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    top: 5px;
+    right: 5px;
+}
+#pys .pys_utm_builder > div {
+    padding: 5px;
+    margin-bottom:15px;
+}
+#pys .panel-primary.link_youtube {
+    color: #fff;
+    background-color: #FF0000;
+    border-color: #FF0000;
+}
+#pys .panel-primary.link_youtube .btn-save {
+    color: #000;
+    background-color: #fff;
+    border-color: #FF0000;
+}

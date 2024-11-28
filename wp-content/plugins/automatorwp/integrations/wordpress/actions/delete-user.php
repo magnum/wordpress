@@ -31,7 +31,7 @@ class AutomatorWP_WordPress_Delete_User extends AutomatorWP_Integration_Action {
             'log_label'         => sprintf( __( 'Delete a %1$s', 'automatorwp' ), '{user}' ),
             'options'           => array(
                 'user' => array(
-                    'default' => __ ('user', 'automatorwp'),
+                    'default' => __ ( 'user', 'automatorwp' ),
                     'fields' => array(
                         'user_id' => array(
                             'name' => __( 'User ID:', 'automatorwp' ),
@@ -72,7 +72,7 @@ class AutomatorWP_WordPress_Delete_User extends AutomatorWP_Integration_Action {
             $user_id_to_delete = $user_id;
         }
 
-        $user = get_userdata( $user_id );
+        $user = get_userdata( $user_id_to_delete );
 
         // Bail if user to delete does not exists
         if ( ! $user ) {

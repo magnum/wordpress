@@ -18,6 +18,8 @@ use PYS_PRO_GLOBAL\Psr\Http\Message\StreamInterface;
 final class InflateStream implements \PYS_PRO_GLOBAL\Psr\Http\Message\StreamInterface
 {
     use StreamDecoratorTrait;
+    /** @var StreamInterface */
+    private $stream;
     public function __construct(\PYS_PRO_GLOBAL\Psr\Http\Message\StreamInterface $stream)
     {
         $resource = \PYS_PRO_GLOBAL\GuzzleHttp\Psr7\StreamWrapper::getResource($stream);

@@ -10,33 +10,19 @@
 
 namespace Uncanny_Automator;
 
-class Twitter_Settings {
-	/**
-	 * This trait defines properties and methods shared across all the
-	 * settings pages of Premium Integrations
-	 */
-	use Settings\Premium_Integrations;
+class Twitter_Settings extends Settings\Premium_Integration_Settings {
 
-	/**
-	 * Creates the settings page
-	 */
-	public function __construct() {
-		// Register the tab
-		$this->setup_settings();
-
-		// The methods above load even if the tab is not selected
-		if ( ! $this->is_current_page_settings() ) {
-			return;
-		}
-
-		// Capture oauth tokens after the redirect from Twitter
-		$this->twitter_capture_oauth_tokens();
-	}
+	protected $functions;
+	protected $client;
+	protected $is_connected;
 
 	/**
 	 * Sets up the properties of the settings page
 	 */
-	private function set_properties() {
+	public function set_properties() {
+
+		$this->functions = new Twitter_Functions();
+
 		// Define the ID
 		// This should go first
 		$this->set_id( 'twitter-api' );
@@ -44,174 +30,97 @@ class Twitter_Settings {
 		// Set the icon
 		// This expects a valid <uo-icon> ID
 		// Check the Design Guidelines to see the list of valid IDs
-		$this->set_icon( 'twitter' );
+		$this->set_icon( 'TWITTER' );
 
 		// Set the name
 		// As this is the brand name, it probably shouldn't be translatable
 		$this->set_name( 'Twitter' );
 
+		$this->register_option( 'automator_twitter_api_key' );
+		$this->register_option( 'automator_twitter_api_secret' );
+		$this->register_option( 'automator_twitter_access_token' );
+		$this->register_option( 'automator_twitter_access_token_secret' );
+
+	}
+
+	public function get_status() {
+
+		try {
+			$this->client       = $this->functions->get_client();
+			$this->is_connected = true;
+		} catch ( \Exception $th ) {
+			$this->client       = false;
+			$this->is_connected = false;
+		}
+
 		// Set the status
 		// This expects a valid <uo-tab> status
 		// Check the Design Guidelines to see the list of valid statuses
-		$this->set_status( Twitter_Helpers::get_is_connected() ? 'success' : '' );
+		return $this->is_connected ? 'success' : '';
 	}
 
 	/**
 	 * Creates the output of the settings page
 	 */
 	public function output() {
-		// Get data about the connected Twitter
-		$twitter_user_data = Twitter_Helpers::get_client();
 
-		// Get the Twitter username
-		$twitter_username = ! empty( $twitter_user_data['screen_name'] ) ? $twitter_user_data['screen_name'] : '';
+		if ( '1' === automator_filter_input( 'allow-user-app' ) || $this->functions->is_user_app_connected() ) {
 
-		// Get the Twitter ID
-		$twitter_id = ! empty( $twitter_user_data['user_id'] ) ? $twitter_user_data['user_id'] : '';
-
-		// Check if Twitter is connected
-		$twitter_is_connected = Twitter_Helpers::get_is_connected();
-
-		// Get the link to connect Twitter
-		$connect_twitter_url = $this->twitter_get_connect_url();
-
-		// Get the link to disconnect Twitter
-		$disconnect_twitter_url = $this->twitter_get_disconnect_url();
-
-		// Check if the user JUST connected the workspace and returned
-		// from the Slack connection page
-		$user_just_connected_site = automator_filter_input( 'connect' ) === '1';
+			include_once 'view-twitter-user-app.php';
+			return;
+		}
 
 		// Load view
 		include_once 'view-twitter.php';
 	}
 
 	/**
-	 * Returns the link to connect to Twitter
+	 * settings_updated
 	 *
-	 * @return string The link to connect the site
+	 * @return void
 	 */
-	private function twitter_get_connect_url( $redirect_url = '' ) {
-		// Check if there is a custom redirect URL defined, otherwise, use the default one
-		$redirect_url = ! empty( $redirect_url ) ? $redirect_url : $this->get_settings_page_url();
+	public function settings_updated() {
 
-		// Define the parameters of the URL
-		$parameters = array(
-			// Authentication nonce
-			'nonce'        => wp_create_nonce( 'automator_twitter_api_authentication' ),
+		try {
+			$client = array(
+				'api_key'            => get_option( 'automator_twitter_api_key', '' ),
+				'api_secret'         => get_option( 'automator_twitter_api_secret', '' ),
+				'oauth_token'        => get_option( 'automator_twitter_access_token', '' ),
+				'oauth_token_secret' => get_option( 'automator_twitter_access_token_secret', '' ),
+			);
 
-			// Plugin version
-			'plugin_ver'   => AUTOMATOR_PLUGIN_VERSION,
+			$user = $this->functions->verify_credentials( $client );
 
-			// API version
-			'api_ver'      => '1.0',
+			update_option( '_uncannyowl_twitter_settings', $client );
+			update_option( 'automator_twitter_user', $user );
 
-			// Action
-			'action'       => 'authorization_request',
+			$this->add_alert(
+				array(
+					'type'    => 'success',
+					'heading' => __( 'You have successfully connected your Twitter account.', 'uncanny-automator' ),
+				)
+			);
 
-			// Redirect URL
-			'redirect_url' => rawurlencode( $redirect_url ),
-		);
+			$this->is_connected = true;
 
-		// Return the URL
-		return add_query_arg(
-			$parameters,
-			Twitter_Helpers::$automator_api
-		);
-	}
+		} catch ( \Exception $e ) {
+			$error              = $this->functions->parse_errors( $e->getMessage() );
+			$this->is_connected = false;
+			$this->set_status( '' );
+			$this->add_alert(
+				array(
+					'type'    => 'error',
+					'heading' => 'Connection error',
+					'content' => __( 'There was an error connecting your Twitter account: ', 'uncanny-automator' ) . $error,
+				)
+			);
 
-	/**
-	 * Returns the link to disconnect Twitter
-	 *
-	 * @return string The link to disconnect the site
-	 */
-	private function twitter_get_disconnect_url() {
-		// Define the parameters of the URL
-		$parameters = array(
-			// Parameter used to detect the request
-			'disconnect' => '1',
-		);
+			delete_option( '_uncannyowl_twitter_settings' );
+			delete_option( 'automator_twitter_user' );
 
-		// Return the URL
-		return add_query_arg(
-			$parameters,
-			$this->get_settings_page_url()
-		);
-	}
-
-	/**
-	 * Captures oauth tokens after the redirect from Twitter
-	 */
-	private function twitter_capture_oauth_tokens() {
-		// Add callback on init
-		add_action(
-			'init',
-			function () {
-				// Check if the user is in the premium integrations settings page
-				if ( $this->is_current_page_settings() ) {
-
-					// Check if the API returned the tokens
-					// If this exists, then we can assume the user is trying to connect his account
-					$automator_api_response = automator_filter_input( 'automator_api_message' );
-
-					// Check if the user is rather trying to disconnect his account
-					$is_user_disconnecting_account = ! empty( automator_filter_input( 'disconnect' ) );
-
-					// Check if the user is trying to connect his account
-					if ( ! empty( $automator_api_response ) ) {
-						// Parse the tokens
-						$tokens = Automator_Helpers_Recipe::automator_api_decode_message(
-							$automator_api_response,
-							wp_create_nonce( 'automator_twitter_api_authentication' )
-						);
-
-						// Check is the parsed tokens are valid
-						if ( $tokens ) {
-
-							// Save them
-							update_option( '_uncannyowl_twitter_settings', $tokens );
-
-							// Reload
-							wp_safe_redirect(
-								add_query_arg(
-									array(
-										'connect' => 1,
-									),
-									$this->get_settings_page_url()
-								)
-							);
-
-							die;
-
-						} else {
-
-							// Reload and add a parameter to catch the error
-							wp_safe_redirect(
-								add_query_arg(
-									array(
-										'connect' => 2,
-									),
-									$this->get_settings_page_url()
-								)
-							);
-
-							die;
-
-						}
-					} elseif ( $is_user_disconnecting_account ) {
-						// Delete the saved data
-						delete_option( '_uncannyowl_twitter_settings' );
-
-						// Reload the page
-						wp_safe_redirect( $this->get_settings_page_url() );
-
-						die;
-					}
-				}
-
-			}
-		);
+			return;
+		}
 	}
 }
 
-new Twitter_Settings();
+

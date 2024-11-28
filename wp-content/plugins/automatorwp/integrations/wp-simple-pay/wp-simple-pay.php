@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:           AutomatorWP - WP Simple Pay integration
- * Plugin URI:            https://wordpress.org/plugins/automatorwp-wp-simple-pay-integration/
+ * Plugin URI:            https://automatorwp.com/add-ons/wp-simple-pay/
  * Description:           Connect AutomatorWP with WP Simple Pay.
  * Version:               1.0.0
  * Author:                AutomatorWP
@@ -81,6 +81,10 @@ final class AutomatorWP_Integration_WP_Simple_Pay {
 
         if( $this->meets_requirements() && ! $this->pro_installed()  ) {
 
+            // Includes
+            require_once AUTOMATORWP_WP_SIMPLE_PAY_DIR . 'includes/functions.php';
+            require_once AUTOMATORWP_WP_SIMPLE_PAY_DIR . 'includes/ajax-functions.php';
+            
             if( SIMPLE_PAY_PLUGIN_NAME === 'WP Simple Pay Pro' ) {
 
                 // Triggers

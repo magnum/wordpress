@@ -46,23 +46,35 @@ class UC_CODESPREFIX {
 			'action'              => 'ulc_user_redeemed_code',
 			'priority'            => 20,
 			'accepted_args'       => 3,
-			'validation_function' => array( $this, 'user_redeemed_code_prefix' ),
-			'options'             => array(
-				Automator()->helpers->recipe->uncanny_codes->options->get_all_code_prefix( esc_attr__( 'Prefix', 'uncanny-automator' ), $this->trigger_meta ),
+			'validation_function' => array(
+				$this,
+				'user_redeemed_code_prefix',
 			),
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->uncanny_codes->options->get_all_code_prefix( esc_attr__( 'Prefix', 'uncanny-automator' ), $this->trigger_meta ),
+				),
+			)
+		);
 	}
 
 	/**
 	 * @param $user_id
 	 * @param $coupon_id
-	 * @param $result
+	 * @param $res
 	 */
-	public function user_redeemed_code_prefix( $user_id, $coupon_id, $result ) {
+	public function user_redeemed_code_prefix( $user_id, $coupon_id, $res ) {
 		global $wpdb;
 		if ( ! $user_id ) {
 			$user_id = get_current_user_id();
@@ -105,6 +117,9 @@ class UC_CODESPREFIX {
 											'run_number' => $result['args']['run_number'],
 										);
 
+										$code = Automator()->helpers->recipe->uncanny_codes->options->uc_get_code_redeemed( $coupon_id );
+										Automator()->db->token->save( 'CODE_REDEEMED', $code, $trigger_meta );
+
 										$trigger_meta['meta_key']   = $result['args']['trigger_id'] . ':' . $this->trigger_code . ':' . $this->trigger_meta;
 										$trigger_meta['meta_value'] = maybe_serialize( $prefix );
 										Automator()->insert_trigger_meta( $trigger_meta );
@@ -122,4 +137,5 @@ class UC_CODESPREFIX {
 		return;
 
 	}
+
 }

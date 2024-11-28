@@ -4,12 +4,14 @@ namespace Uncanny_Automator;
 
 /**
  * Class LF_QUIZFAILED
+ *
  * @package Uncanny_Automator
  */
 class LF_QUIZFAILED {
 
 	/**
 	 * Integration code
+	 *
 	 * @var string
 	 */
 	public static $integration = 'LF';
@@ -31,8 +33,6 @@ class LF_QUIZFAILED {
 	 */
 	public function define_trigger() {
 
-
-
 		$trigger = array(
 			'author'              => Automator()->get_author_name( $this->trigger_code ),
 			'support_link'        => Automator()->get_author_support_link( $this->trigger_code, 'integration/lifterlms/' ),
@@ -46,15 +46,24 @@ class LF_QUIZFAILED {
 			'priority'            => 20,
 			'accepted_args'       => 3,
 			'validation_function' => array( $this, 'lf_quiz_failed' ),
-			'options'             => [
-				Automator()->helpers->recipe->lifterlms->options->all_lf_quizs( null, $this->trigger_meta ),
-				Automator()->helpers->recipe->options->number_of_times(),
-			],
+			'options_callback'    => array( $this, 'load_options' ),
 		);
 
 		Automator()->register->trigger( $trigger );
+	}
 
-		return;
+	/**
+	 * @return array[]
+	 */
+	public function load_options() {
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options' => array(
+					Automator()->helpers->recipe->lifterlms->options->all_lf_quizs( null, $this->trigger_meta ),
+					Automator()->helpers->recipe->options->number_of_times(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -70,15 +79,15 @@ class LF_QUIZFAILED {
 			return;
 		}
 
-
-
-		$args = [
-			'code'    => $this->trigger_code,
-			'meta'    => $this->trigger_meta,
-			'post_id' => intval( $quiz_id ),
-			'user_id' => $user_id,
-		];
+		$args = array(
+			'code'         => $this->trigger_code,
+			'meta'         => $this->trigger_meta,
+			'post_id'      => intval( $quiz_id ),
+			'user_id'      => $user_id,
+			'is_signed_in' => true,
+		);
 
 		Automator()->maybe_add_trigger_entry( $args );
 	}
+
 }

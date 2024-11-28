@@ -43,20 +43,25 @@ use PixelYourSite\Facebook\Helpers;
                     will be enabled for Google Analytics.</p>
             </div>
         </div>
-        <div class="row">
+
+
+        <div class="row mt-2">
             <div class="col">
-	            <?php PYS()->render_switcher_input( 'woo_enabled' ); ?>
-                <h4 class="switcher-label">Enable WooCommerce set-up</h4>
+                <?php PYS()->render_switcher_input( 'woo_enabled_save_data_to_orders' ); ?>
+                <h4 class="switcher-label">Save data to orders</h4>
+                <small class="form-check">Save the <i>landing page, UTMs, client's browser's time, day, and month, the number of orders, lifetime value, and average order</i>. You can view this data when you edit an order. With the professional version you can view it under the <a href="<?=admin_url("admin.php?page=pixelyoursite_woo_reports")?>">WooCommerce Reports</a> section.</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col">
-                <?php PYS()->render_switcher_input( 'woo_enabled_save_data_to_orders',false,true ); ?>
-                <h4 class="switcher-label">Save data to orders</h4> <?php renderProBadge(); ?>
-                <small class="form-text">Save the <i> landing page, UTMs, client's browser's time, day, and month, the number of orders, lifetime value, and average order.</i></small>
+                <?php PYS()->render_switcher_input('woo_add_enrich_to_admin_email'); ?>
+                <h4 class="switcher-label">Send reports data to the New Order email</h4>
+                <small class="form-text">You will see the landing page, UTMs, client's browser's time, day, and month, the number of orders, lifetime value, and average order in your WooCommerce's default "New Order" email.
+                    Your clients will NOT get this info.</small>
             </div>
         </div>
-        <div class="row">
+
+        <div class="row mt-2">
             <div class="col">
                 <?php PYS()->render_switcher_input( 'woo_enabled_save_data_to_user',false,true ); ?>
                 <h4 class="switcher-label">Display data to the user's profile</h4> <?php renderProBadge(); ?>
@@ -91,7 +96,12 @@ use PixelYourSite\Facebook\Helpers;
             <div class="col">
                 <p>WooCommerce AddToCart Event FIX (4:46 min) - <a href="https://www.youtube.com/watch?v=oZoAu8a0PNg" target="_blank">watch now</a></p>
                 <p>Improve WooCommerce Facebook Ads performance with OFFLINE CONVERSIONS (11:38) - <a href="https://www.youtube.com/watch?v=vNsiWh0cakA" target="_blank">watch now</a></p>
-
+                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch now</a></p>
+                <p>Google Analytic 4 (GA4) & WooCommerce: Transaction Reports (6:51) - <a href="https://www.youtube.com/watch?v=zLtXHbp_DDU" target="_blank">watch now</a></p>
+                <p>Google Analytics 4 (GA4) FUNNELS for WooCommerce (6:13)  - <a href="https://www.youtube.com/watch?v=c6L1XMYzuMM" target="_blank">watch now</a></p>
+                <p>Same Facebook (Meta) pixel or Google tag on multiple WooCommerce websites? (4:43) - <a href="https://www.youtube.com/watch?v=3Ugwlq1EVO4" target="_blank">watch now</a></p>
+                <p>WooCommerce First-Party Reports: Track UTMs, Traffic Source, Landing Page (13:15) - <a href="https://www.youtube.com/watch?v=4VpVf9llfkU" target="_blank">watch video</a></p>
+                <p>Find out your ads PROFIT - Meta, Google, TikTok, Pinterest, etc (5:48) - <a href="https://www.youtube.com/watch?v=ydqyp-iW9Ko" target="_blank">watch video</a></p>
             </div>
         </div>
     </div>
@@ -1486,8 +1496,8 @@ e&utm_campaign=pro-feature' ); ?>
         </div>
         <div class="row">
             <div class="col">
-                <?php PYS()->render_switcher_input( 'enable_woo_product_price_param' ); ?>
-                <h4 class="switcher-label">product_price</h4>
+                <?php PYS()->render_switcher_input( 'enable_woo_tags_param' ); ?>
+                <h4 class="switcher-label">tags</h4>
                 <hr>
             </div>
         </div>
@@ -1496,6 +1506,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">total (PRO)</h4>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">tax (PRO)</h4>
                 <hr>
             </div>
         </div>
@@ -1528,6 +1545,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">coupon_used (PRO)</h4>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">coupon_code (PRO)</h4>
                 <hr>
             </div>
         </div>

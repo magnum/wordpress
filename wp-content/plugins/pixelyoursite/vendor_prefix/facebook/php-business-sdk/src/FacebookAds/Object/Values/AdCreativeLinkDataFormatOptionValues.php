@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class AdCreativeLinkDataFormatOptionValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
+    const CAROUSEL_AR_EFFECTS = 'carousel_ar_effects';
     const CAROUSEL_IMAGES_MULTI_ITEMS = 'carousel_images_multi_items';
     const CAROUSEL_IMAGES_SINGLE_ITEM = 'carousel_images_single_item';
     const CAROUSEL_SLIDESHOWS = 'carousel_slideshows';

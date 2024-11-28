@@ -30,6 +30,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogDiagnosticGroupFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedChannelsValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntitiesValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedFeaturesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeveritiesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeverityValues;
@@ -56,9 +58,11 @@ class ProductCatalogDiagnosticGroup extends \PYS_PRO_GLOBAL\FacebookAds\Object\A
     {
         $ref_enums = array();
         $ref_enums['AffectedChannels'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedChannelsValues::getInstance()->getValues();
+        $ref_enums['AffectedEntity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntityValues::getInstance()->getValues();
         $ref_enums['AffectedFeatures'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedFeaturesValues::getInstance()->getValues();
         $ref_enums['Severity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeverityValues::getInstance()->getValues();
         $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypeValues::getInstance()->getValues();
+        $ref_enums['AffectedEntities'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntitiesValues::getInstance()->getValues();
         $ref_enums['Severities'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeveritiesValues::getInstance()->getValues();
         $ref_enums['Types'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypesValues::getInstance()->getValues();
         return $ref_enums;

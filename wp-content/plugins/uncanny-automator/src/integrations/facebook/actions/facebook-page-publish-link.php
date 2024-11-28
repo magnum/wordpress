@@ -8,20 +8,14 @@ namespace Uncanny_Automator;
  */
 class FACEBOOK_PAGE_PUBLISH_LINK {
 
-	use \Uncanny_Automator\Recipe\Actions;
+	use Recipe\Actions;
+	use Recipe\Action_Tokens;
+
+	const AJAX_ENDPOINT = 'fb_pages_wp_ajax_endpoint_post_link';
 
 	public function __construct() {
 
-		$this->fb_pages_wp_ajax_endpoint = 'fb_pages_wp_ajax_endpoint_post_link';
-
-		$this->fb_endpoint_uri = AUTOMATOR_API_URL . 'v2/facebook';
-
-		// Allow overwrite in wp-config.php.
-		if ( DEFINED( 'UO_AUTOMATOR_DEV_FB_ENDPOINT_URL' ) ) {
-			$this->fb_endpoint_uri = UO_AUTOMATOR_DEV_FB_ENDPOINT_URL;
-		}
-
-		add_action( "wp_ajax_{$this->fb_pages_wp_ajax_endpoint}", array( $this, $this->fb_pages_wp_ajax_endpoint ) );
+		add_action( 'wp_ajax_' . self::AJAX_ENDPOINT, array( $this, self::AJAX_ENDPOINT ) );
 
 		$this->setup_action();
 
@@ -61,10 +55,10 @@ class FACEBOOK_PAGE_PUBLISH_LINK {
 				array(
 					'option_code'           => $this->get_action_meta(),
 					/* translators: Email field */
-					'label'                 => esc_attr__( 'Select a Facebook Page', 'uncanny-automator' ),
+					'label'                 => esc_attr__( 'Facebook Page', 'uncanny-automator' ),
 					'input_type'            => 'select',
 					'is_ajax'               => true,
-					'endpoint'              => $this->fb_pages_wp_ajax_endpoint,
+					'endpoint'              => self::AJAX_ENDPOINT,
 					'supports_custom_value' => false,
 					'required'              => true,
 				),
@@ -90,7 +84,21 @@ class FACEBOOK_PAGE_PUBLISH_LINK {
 			),
 		);
 
+		$this->set_wpautop( false );
+
 		$this->set_options_group( $options_group );
+
+		$this->set_background_processing( true );
+
+		$this->set_action_tokens(
+			array(
+				'POST_LINK' => array(
+					'name' => __( 'Link to Facebook post', 'uncanny-automator' ),
+					'type' => 'url',
+				),
+			),
+			$this->get_action_code()
+		);
 
 		$this->register_action();
 
@@ -98,6 +106,8 @@ class FACEBOOK_PAGE_PUBLISH_LINK {
 
 
 	/**
+	 * Process Facebook action.
+	 *
 	 * @param $user_id
 	 * @param $action_data
 	 * @param $recipe_id
@@ -109,56 +119,35 @@ class FACEBOOK_PAGE_PUBLISH_LINK {
 	protected function process_action( $user_id, $action_data, $recipe_id, $args, $parsed ) {
 
 		$facebook = Automator()->helpers->recipe->facebook->options;
+		$page_id  = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_PAGE'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_PAGE'] ) : 0;
+		$message  = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_MESSAGE'] ) ? sanitize_textarea_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_MESSAGE'] ) : '';
+		$link     = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_URL'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_URL'] ) : '';
 
-		$page_id = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_PAGE'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_PAGE'] ) : 0;
-
-		$message = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_MESSAGE'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_MESSAGE'] ) : '';
-
-		$link = isset( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_URL'] ) ? sanitize_text_field( $parsed['FACEBOOK_PAGE_PUBLISH_LINK_URL'] ) : '';
-
-		$access_token = $facebook->get_user_page_access_token( $page_id );
-
-		$http_request_query = array(
-			'body' => array(
-				'access_token' => $access_token,
-				'action'       => 'link-to-page',
-				'page_id'      => $page_id,
-				'message'      => $message,
-				'link'         => $link,
-			),
+		$body = array(
+			'action'  => 'link-to-page',
+			'page_id' => $page_id,
+			'message' => $message,
+			'link'    => $link,
 		);
 
-		if ( DEFINED( 'UO_AUTOMATOR_DEV_FB_ENDPOINT_URL' ) ) {
-			$http_request_query['sslverify'] = false;
-		}
+		try {
 
-		$request = wp_remote_post(
-			$this->fb_endpoint_uri,
-			$http_request_query
-		);
+			$response = $facebook->api_request( $page_id, $body, $action_data );
 
-		if ( ! is_wp_error( $request ) ) {
+			$post_id = isset( $response['data']['id'] ) ? $response['data']['id'] : 0;
 
-			$response = json_decode( wp_remote_retrieve_body( $request ) );
-
-			if ( 200 !== $response->statusCode ) {
-
-				$action_data['complete_with_errors'] = true;
-
-				// Log error if there are any error messages.
-				Automator()->complete->action( $user_id, $action_data, $recipe_id, $response->error->description );
-
-			} else {
-
-				Automator()->complete->action( $user_id, $action_data, $recipe_id );
-
+			if ( 0 !== $post_id ) {
+				$this->hydrate_tokens( array( 'POST_LINK' => 'https://www.facebook.com/' . $post_id ) );
 			}
-		} else {
 
-			// Log if there are any http errors.
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
+
 			$action_data['complete_with_errors'] = true;
 
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $request->get_error_message() );
+			// Log error if there are any error messages.
+			Automator()->complete->action( $user_id, $action_data, $recipe_id, $e->getMessage() );
 		}
 
 	}

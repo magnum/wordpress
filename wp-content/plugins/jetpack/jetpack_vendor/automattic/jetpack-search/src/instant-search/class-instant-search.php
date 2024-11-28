@@ -18,12 +18,15 @@ use WP_REST_Templates_Controller;
  */
 class Instant_Search extends Classic_Search {
 	/**
-	 * The name of instant search sidebar
+	 * The name of instant search sidebar.
+	 *
+	 * 'sidebar' is broken to 'side-bar' on purpose to walk around the mechanism that WP automatically adds widgets to it.
 	 *
 	 * @since 9.8.0
 	 * @var string
 	 */
-	const INSTANT_SEARCH_SIDEBAR = 'jetpack-instant-search-sidebar';
+	const INSTANT_SEARCH_SIDEBAR     = 'jetpack-instant-search-side-bar';
+	const OLD_INSTANT_SEARCH_SIDEBAR = 'jetpack-instant-search-sidebar';
 
 	const AUTO_CONFIG_SIDEBAR = 'sidebar-1';
 
@@ -82,16 +85,6 @@ class Instant_Search extends Classic_Search {
 			add_action( 'update_option', array( $this, 'track_widget_updates' ), 10, 3 );
 		}
 
-		/**
-		 * Note:
-		 * 1. The priority has to be lower than 10 to run before _wp_sidebars_changed.
-		 *      Which migrates widgets from old theme to the new one.
-		 * 2. WP.com runs after_switch_theme hook from the frontend, so we'll need to hook it.
-		 *      No matter it's admin or frontend.
-		 */
-		add_action( 'after_switch_theme', array( $this, 'save_old_sidebars_widgets' ), 5, 0 );
-		add_action( 'pre_update_option_sidebars_widgets', array( $this, 'remove_wp_migrated_widgets' ) );
-
 		add_action( 'widgets_init', array( $this, 'register_jetpack_instant_sidebar' ) );
 		add_action( 'jetpack_deactivate_module_search', array( $this, 'move_search_widgets_to_inactive' ) );
 	}
@@ -100,7 +93,7 @@ class Instant_Search extends Classic_Search {
 	 * Loads assets for Jetpack Instant Search Prototype featuring Search As You Type experience.
 	 */
 	public function load_assets() {
-		$this->load_assets_with_parameters( constant( 'JETPACK_SEARCH_PKG__DIR' ) );
+		$this->load_assets_with_parameters( Package::get_installed_path() );
 	}
 
 	/**
@@ -243,7 +236,7 @@ class Instant_Search extends Classic_Search {
 
 		$request_args = array(
 			'timeout'    => 10,
-			'user-agent' => "WordPress/{$wp_version} | Jetpack-Search/" . constant( 'JETPACK_SEARCH_PKG__VERSION' ),
+			'user-agent' => "WordPress/{$wp_version} | Jetpack-Search/" . Package::VERSION,
 		);
 
 		$request  = wp_remote_get( esc_url_raw( $service_url ), $request_args );
@@ -312,7 +305,7 @@ class Instant_Search extends Classic_Search {
 		do_action( 'did_jetpack_search_query', $query );
 
 		// Update local cache.
-		set_transient( $transient_name, $response, 1 * HOUR_IN_SECONDS );
+		set_transient( $transient_name, $response, 4 * HOUR_IN_SECONDS );
 
 		return $response;
 	}
@@ -620,7 +613,10 @@ class Instant_Search extends Classic_Search {
 	 * @param {string} $block_content - the content to append the search block.
 	 */
 	public static function inject_search_widget_to_block( $block_content ) {
-		$search_block = '<!-- wp:search {"label":"Jetpack Search","buttonText":"Search"} /-->';
+		$search_block = sprintf(
+			'<!-- wp:search {"label":"","buttonText":"%s"} /-->',
+			__( 'Search', 'jetpack-search-pkg' )
+		);
 
 		// Place the search block on bottom of the first column if there's any.
 		$column_end_pattern = '/(<\s*\/div[^>]*>\s*<!--\s*\/wp:column\s+[^>]*-->)/';
@@ -718,6 +714,10 @@ class Instant_Search extends Classic_Search {
 	 * @since  8.8.0
 	 */
 	public function auto_config_excluded_post_types() {
+		// if `excluded_post_types` exists, then we do nothing.
+		if ( false !== get_option( Options::OPTION_PREFIX . 'excluded_post_types', false ) ) {
+			return;
+		}
 		$post_types         = get_post_types(
 			array(
 				'exclude_from_search' => false,
@@ -740,7 +740,8 @@ class Instant_Search extends Classic_Search {
 
 		if ( ! empty( $enabled_post_types ) ) {
 			$post_types_to_disable = array_diff( $post_types, $enabled_post_types );
-			update_option( Options::OPTION_PREFIX . 'excluded_post_types', join( ',', $post_types_to_disable ) );
+			// better to use `add_option` which wouldn't override option value if exists.
+			add_option( Options::OPTION_PREFIX . 'excluded_post_types', join( ',', $post_types_to_disable ) );
 		}
 	}
 
@@ -770,55 +771,6 @@ class Instant_Search extends Classic_Search {
 
 		update_option( $result_format_option_name, $result_format_option_value );
 		return true;
-	}
-
-	/**
-	 * Save sidebars_widgets option before it's migrated by WordPress
-	 *
-	 * @since 9.8.0
-	 *
-	 * @param array $old_sidebars_widgets The sidebars_widgets option value to be saved.
-	 */
-	public function save_old_sidebars_widgets( $old_sidebars_widgets = null ) {
-		// The function should only run before _wp_sidebars_changed which migrates the sidebars.
-		// So when _wp_sidebars_changed doesn't exist, we should skip the logic.
-		if ( has_filter( 'after_switch_theme', '_wp_sidebars_changed' ) !== false ) {
-			$this->old_sidebars_widgets = ! is_null( $old_sidebars_widgets ) ? $old_sidebars_widgets : wp_get_sidebars_widgets();
-		}
-	}
-
-	/**
-	 * Clean WordPress auto-migrated sidebar widgets from instant search sidebar before saving option sidebars_widgets
-	 *
-	 * @since 9.8.0
-	 *
-	 * @param array $sidebars_widgets The sidebars_widgets option value to be filtered.
-	 * @return array The sidebars_widgets option value to be saved
-	 */
-	public function remove_wp_migrated_widgets( $sidebars_widgets ) {
-		// Hook the action only when it is a theme switch i.e. $this->old_sidebars_widgets is not empty.
-		// Ensure that the hook only runs when necessary.
-		if (
-			empty( $this->old_sidebars_widgets )
-			|| ! is_array( $this->old_sidebars_widgets )
-			|| ! is_array( $sidebars_widgets )
-			|| ! array_key_exists( static::INSTANT_SEARCH_SIDEBAR, $sidebars_widgets )
-			|| ! array_key_exists( static::INSTANT_SEARCH_SIDEBAR, $this->old_sidebars_widgets )
-			// If the new Jetpack sidebar already has fewer widgets, skip execution.
-			// Uses less than comparison for defensive programming.
-			|| count( $sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ] ) <= count( $this->old_sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ] )
-		) {
-			return $sidebars_widgets;
-		}
-
-		$lost_widgets                                       = array_diff( $sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ], $this->old_sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ] );
-		$sidebars_widgets['wp_inactive_widgets']            = array_merge( $lost_widgets, (array) $sidebars_widgets['wp_inactive_widgets'] );
-		$sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ] = $this->old_sidebars_widgets[ static::INSTANT_SEARCH_SIDEBAR ];
-
-		// Reset $this->old_sidebars_widgets because we want to run the function only once after theme switch.
-		$this->old_sidebars_widgets = null;
-
-		return $sidebars_widgets;
 	}
 
 	/**

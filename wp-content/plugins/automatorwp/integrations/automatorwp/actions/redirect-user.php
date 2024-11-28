@@ -15,6 +15,15 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
     public $action = 'automatorwp_redirect_user';
 
     /**
+     * URL to redirect
+     *
+     * @since 1.0.0
+     *
+     * @var string $url
+     */
+    public $url = '';
+
+    /**
      * The action result
      *
      * @since 1.0.0
@@ -72,22 +81,55 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
      */
     public function execute( $action, $user_id, $action_options, $automation ) {
 
-        // Setup user fields
-        $url = esc_url( $action_options['url'] );
+        // Setup URL
+        $this->url = esc_url( $action_options['url'] );
 
-        if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
-            $this->result = sprintf( __( '%s is not a valid URL.', 'automatorwp' ), $url );
+        // Restore replaced ampersands (&)
+        $this->url = str_replace('#038;', '&', $this->url);
+        $this->url = str_replace('&&', '&', $this->url);
+
+        // Validate last URL
+        if ( ! filter_var( $this->url, FILTER_VALIDATE_URL ) ) {
+            $this->result = sprintf( __( '%s is not a valid URL.', 'automatorwp' ), $this->url );
+            $this->url = '';
             return;
         }
 
-        if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-            // If doing an ajax or rest request, update an internal option for this user
-            update_option( 'automatorwp_redirect_url_' . $user_id, $url, false );
+        // Override others wp_redirect() calls
+        add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
+
+        if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {           
+            // If doing an ajax, cron or rest request, update an internal option for this user
+            update_option( 'automatorwp_redirect_url_' . $user_id, $this->url, false );       
         } else { ?>
-            <script type="text/javascript">document.location.href = '<?php echo $url ?>';</script>
+            <script type="text/javascript">
+                setTimeout( function () {
+                    document.location.href = '<?php echo $this->url ?>';
+                }, 100 );
+            </script>
         <?php }
 
         $this->result = __( 'User redirected successfully.', 'automatorwp' );
+
+    }
+
+    /**
+     * Override others wp_redirect() calls
+     *
+     * @since 1.0.0
+     *
+     * @param string $location The path or URL to redirect to.
+     * @param int    $status   The HTTP response status code to use.
+     *
+     * @return string
+     */
+    public function wp_redirect( $location, $status ) {
+
+        if( ! empty( $this->url ) && filter_var( $this->url, FILTER_VALIDATE_URL ) ) {
+            $location = $this->url;
+        }
+
+        return $location;
 
     }
 
@@ -116,15 +158,15 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
      * @since 1.0.0
      */
     public function ajax_check_for_redirect() {
-
+        
         // Security check, forces to die if not security passed
         check_ajax_referer( 'automatorwp', 'nonce' );
 
         $user_id = absint( $_REQUEST['user_id'] );
-
+        
         // Get the redirect URL for this user
         $url = get_option( 'automatorwp_redirect_url_' . $user_id, '' );
-
+        
         $url = esc_url( $url );
 
         if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {

@@ -44,6 +44,9 @@ class UOTC_Tokens {
 	 * @return array
 	 */
 	public function possible_tokens( $tokens = array(), $args = array() ) {
+		if ( ! automator_do_identify_tokens() ) {
+			return $tokens;
+		}
 
 		if ( ! isset( $args['value'] ) || ! isset( $args['meta'] ) ) {
 			return $tokens;
@@ -131,7 +134,7 @@ class UOTC_Tokens {
 	 *
 	 * @return string|null
 	 */
-	public function uotc_tokens( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args = array() ) {
+	public function uotc_tokens( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
 		if ( ! is_array( $trigger_data ) ) {
 			return $value;
 		}

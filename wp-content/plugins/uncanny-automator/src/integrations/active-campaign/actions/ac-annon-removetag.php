@@ -80,6 +80,8 @@ class AC_ANNON_REMOVETAG {
 
 		$this->set_options_group( $options_group );
 
+		$this->set_background_processing( true );
+
 		$this->register_action();
 
 	}
@@ -101,97 +103,28 @@ class AC_ANNON_REMOVETAG {
 		$contact_email = isset( $parsed[ $this->prefix . '_CONTACT_ID' ] ) ? sanitize_text_field( $parsed[ $this->prefix . '_CONTACT_ID' ] ) : 0;
 		$tag_id        = isset( $parsed[ $this->get_action_meta() ] ) ? sanitize_text_field( $parsed[ $this->get_action_meta() ] ) : 0;
 
-		$contact = $ac_helper->get_user_by_email( $contact_email );
+		try {
 
-		// Get the contact id from email.
-		if ( true === $contact['error'] ) {
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $contact['message'] );
+			$contact_id = $ac_helper->get_email_id( $contact_email );
 
-			return;
-		}
+			$contact_tag_id = $ac_helper->get_tag_id( $contact_id, $tag_id );
 
-		$contact_id = isset( $contact['message']->id ) ? $contact['message']->id : 0;
+			// Delete the tag.
+			$body = array(
+				'action'       => 'delete_contact_tag',
+				'contactTagId' => $contact_tag_id,
+			);
 
-		$form_data = array(
-			'action'    => 'get_contact_tags',
-			'url'       => get_option( 'uap_active_campaign_api_url', '' ),
-			'token'     => get_option( 'uap_active_campaign_api_key', '' ),
-			'contactId' => $contact_id,
-		);
+			$response = $ac_helper->api_request( $body, $action_data );
 
-		$response = wp_remote_post(
-			$this->ac_endpoint_uri,
-			array(
-				'body' => $form_data,
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $response->get_error_message() );
-
-			return;
-		}
-
-		$body = json_decode( wp_remote_retrieve_body( $response ) );
-
-		$contact_tags = isset( $body->data->contactTags ) ? $body->data->contactTags : '';
-
-		$contact_tag_id = 0;
-
-		if ( ! empty( $contact_tags ) ) {
-
-			foreach ( $contact_tags as $contact_tag ) {
-				if ( $tag_id === $contact_tag->tag ) {
-					$contact_tag_id = $contact_tag->id;
-				}
+			if ( ! empty( $response['data']['message'] ) ) {
+				throw new \Exception( $response['data']['message'], $response['statusCode'] );
 			}
+
+			Automator()->complete->action( $user_id, $action_data, $recipe_id );
+
+		} catch ( \Exception $e ) {
+			$ac_helper->complete_with_errors( $user_id, $action_data, $recipe_id, $e->getMessage() );
 		}
-
-		// Delete the tag.
-		$form_data = array(
-			'action'       => 'delete_contact_tag',
-			'url'          => get_option( 'uap_active_campaign_api_url', '' ),
-			'token'        => get_option( 'uap_active_campaign_api_key', '' ),
-			'contactTagId' => $contact_tag_id,
-		);
-
-		$response = wp_remote_post(
-			$this->ac_endpoint_uri,
-			array(
-				'body' => $form_data,
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $response->get_error_message() );
-
-			return;
-		}
-
-		$body = json_decode( wp_remote_retrieve_body( $response ) );
-
-		$message = isset( $body->data->message ) ? $body->data->message : '';
-
-		if ( 0 === $contact_tag_id ) {
-			$action_data['complete_with_errors'] = true;
-
-			$message = __( 'Cannot find the tag. Please check to see if the tag exists.', 'uncanny-automator' );
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $message );
-
-			return;
-		}
-
-		if ( ! empty( $message ) ) {
-			$action_data['complete_with_errors'] = true;
-			Automator()->complete->action( $user_id, $action_data, $recipe_id, $message );
-
-			return;
-		}
-
-		Automator()->complete->action( $user_id, $action_data, $recipe_id );
-
 	}
 }

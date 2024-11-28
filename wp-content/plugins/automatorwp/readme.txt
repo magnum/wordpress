@@ -1,13 +1,13 @@
-=== AutomatorWP ===
+=== AutomatorWP - The most flexible and powerful no-code automation plugin for WordPress ===
 Contributors: automatorwp, rubengc, eneribs, pacogon, dioni00, flabernardez
 Tags: automator, automation, zapier, webhook, marketing
 Requires at least: 4.4
-Tested up to: 5.9
-Stable tag: 2.0.7
+Tested up to: 6.1
+Stable tag: 2.5.9.1
 License: GNU AGPL v3.0
 License URI: http://www.gnu.org/licenses/agpl-3.0.html
 
-Connect your WordPress plugins together and create automated workflows with no code!
+Automate and connect your WordPress plugins, sites and apps together to create automated workflows with no-code automations!
 
 == Description ==
 
@@ -68,6 +68,12 @@ Configure as many triggers and actions per automation as you want.
 **Logged-in and anonymous automations:**
 Create automations for logged-in users or for not logged-in visitors.
 
+**Scheduled and recurring automations:**
+Automations to run actions on all or on a filtered group of users manually, on a specific date or on a recurring basis.
+
+**All posts automations:**
+Create automated tasks that check your site posts and process actions on them like clean up the older posts or email administrators about pending ones.
+
 **Filters:**
 Filter any trigger or action with the conditions of your choice.
 
@@ -92,17 +98,21 @@ AutomatorWP works with different WordPress plugins, including:
 
 * [ActiveMember360](https://automatorwp.com/add-ons/activemember360/)
 * [Advanced Ads](https://automatorwp.com/add-ons/advanced-ads/)
+* [Advanced Custom Fields (ACF)](https://automatorwp.com/add-ons/advanced-custom-fields/)
 * [AffiliateWP](https://automatorwp.com/add-ons/affiliatewp/)
 * [Amelia](https://automatorwp.com/add-ons/ameliabooking/)
 * [AnsPress](https://automatorwp.com/add-ons/anspress/)
+* [Autonami](https://automatorwp.com/add-ons/autonami/)
 * [Awesome Support](https://automatorwp.com/add-ons/awesome-support/)
 * [bbPress](https://automatorwp.com/add-ons/bbpress/)
+* [Blockli](https://automatorwp.com/add-ons/blockli/)
 * [BuddyBoss](https://automatorwp.com/add-ons/buddyboss/)
 * [BuddyPress](https://automatorwp.com/add-ons/buddypress/)
 * [Caldera Forms](https://automatorwp.com/add-ons/caldera-forms/)
 * [Contact Form 7](https://automatorwp.com/add-ons/contact-form-7/)
 * [DigiMember](https://automatorwp.com/add-ons/digimember/)
 * [Divi](https://automatorwp.com/add-ons/divi/)
+* [Download Manager](https://automatorwp.com/add-ons/download-manager/)
 * [Easy Digital Downloads](https://automatorwp.com/add-ons/easy-digital-downloads/)
 * [Elementor](https://automatorwp.com/add-ons/elementor-forms/)
 * [Favorites](https://automatorwp.com/add-ons/favorites/)
@@ -117,12 +127,15 @@ AutomatorWP works with different WordPress plugins, including:
 * [HappyForms](https://automatorwp.com/add-ons/happyforms/)
 * [iMember360](https://automatorwp.com/add-ons/imember360/)
 * [Invite Anyone](https://automatorwp.com/add-ons/invite-anyone/)
+* [Jetpack CRM](https://automatorwp.com/add-ons/jetpack-crm/)
+* [JetFormBuilder](https://automatorwp.com/add-ons/jetformbuilder/)
 * [LearnDash](https://automatorwp.com/add-ons/learndash/)
 * [LearnPress](https://automatorwp.com/add-ons/learnpress/)
 * [LifterLMS](https://automatorwp.com/add-ons/lifterlms/)
 * [MailPoet](https://automatorwp.com/add-ons/mailpoet/)
 * [MasterStudy LMS](https://automatorwp.com/add-ons/masterstudy-lms/)
 * [MemberPress](https://automatorwp.com/add-ons/memberpress/)
+* [Meta Box](https://automatorwp.com/add-ons/meta-box/)
 * [Modern Events Calendar](https://automatorwp.com/add-ons/modern-events-calendar/)
 * [Newsletter](https://automatorwp.com/add-ons/newsletter/)
 * [Ninja Forms](https://automatorwp.com/add-ons/ninja-forms/)
@@ -133,7 +146,10 @@ AutomatorWP works with different WordPress plugins, including:
 * [Restrict Content Pro](https://automatorwp.com/add-ons/restrict-content-pro/)
 * [Sensei LMS](https://automatorwp.com/add-ons/sensei-lms/)
 * [SliceWP](https://automatorwp.com/add-ons/slicewp/)
+* [Studiocart](https://automatorwp.com/add-ons/studiocart/)
 * [The Events Calendar](https://automatorwp.com/add-ons/the-events-calendar/)
+* [Thrive Apprentice](https://automatorwp.com/add-ons/thrive-apprentice/)
+* [Thrive Quiz Builder](https://automatorwp.com/add-ons/thrive-quiz-builder/)
 * [Tutor LMS](https://automatorwp.com/add-ons/tutor/)
 * [Ultimate Member](https://automatorwp.com/add-ons/ultimate-member/)
 * [Upsell Plugin](https://automatorwp.com/add-ons/upsell-plugin/)
@@ -158,11 +174,17 @@ AutomatorWP works with different WordPress plugins, including:
 AutomatorWP can also work with external platforms, furthermore WordPress plugins, like these below:
 
 * [ActiveCampaign](https://automatorwp.com/add-ons/activecampaign/)
+* [Airtable](https://automatorwp.com/add-ons/airtable/)
+* [Facebook](https://automatorwp.com/add-ons/facebook/)
 * [HubSpot](https://automatorwp.com/add-ons/hubspot/)
+* [Google Calendar](https://automatorwp.com/add-ons/google-calendar/)
 * [Google Sheets](https://automatorwp.com/add-ons/google-sheets/)
 * [IFTTT](https://automatorwp.com/add-ons/ifttt/)
 * [Integrately](https://automatorwp.com/add-ons/integrately/)
 * [Integromat](https://automatorwp.com/add-ons/integromat/)
+* [KonnectzIT](https://automatorwp.com/add-ons/konnectzit/)
+* [Mailchimp](https://automatorwp.com/add-ons/mailchimp/)
+* [Make](https://automatorwp.com/add-ons/make/)
 * [Notion](https://automatorwp.com/add-ons/notion/)
 * [Twilio](https://automatorwp.com/add-ons/twilio/)
 * [Twitter](https://automatorwp.com/add-ons/twitter/)
@@ -248,11 +270,11 @@ The most recommended is remove first all triggers and actions from this plugin i
 
 = Will AutomatorWP slow down my website? =
 
-This depends heavily on how you use AutomatorWP.
+No, AutomatorWP is well optimized and maintained by a professional team with years of experience in the WordPress ecosystem.
 
-You shouldn't notice any performance impact while using AutomatorWP but, if you have dozens of automations, thousands of users, and your automations are configured with many triggers and actions, then yes, there could be a performance hit.
+We tested AutomatorWP performance in different environments with different amount of resources and we have tuned it so that even servers with fewer resources can use AutomatorWP without noticing any slowdowns.
 
-Try to configure automations only for real needs, for example, we discourage using AutomatorWP as an analytics tool (setting up automations to track page visits).
+AutomatorWP includes a built-in caching and performance oriented workflows that will perform any automation execution in no time.
 
 = Is AutomatorWP compatible with any theme? =
 
@@ -268,62 +290,67 @@ No, We're unable to provide custom development services, as our focus is develop
 
 == Changelog ==
 
-= 2.0.7 =
-
-* **New Features**
-* New Integration: Amelia.
-* Amelia: New trigger: User books an appointment.
-* Amelia: New anonymous trigger: Guest books an appointment.
-* **Improvements**
-* Added support for datetime fields.
-
-= 2.0.6 =
-
-* **New Features**
-* New integration: ActiveCampaign.
-* ActiveCampaign: New trigger: User added to ActiveCampaign.
-* ActiveCampaign: New trigger: Tag added to user.
-* ActiveCampaign: New action: Add user to ActiveCampaign.
-* ActiveCampaign: New action: Add tag to user.
-* **Improvements**
-* Update code to prevent PHP warnings caused by old PHP versions.
-* TutorLMS: Updated code to match with TutorLMS 2.0.
-
-= 2.0.5 =
-
-* **Developer Notes**
-* Added the object_id parameter when parsing the automation item label.
-
-= 2.0.4 =
+= 2.5.9.1 =
 
 * **Improvements**
-* Added support to render options with multiples values in triggers or actions labels.
+* Improved escaping of SQL queries.
 
-= 2.0.3 =
-
-* **Improvements**
-* LearnPress: Updated enroll user to course action to match with the latest LearnPress version.
-* WPLMS: Updated check to meet if WPLMS is installed to match latest WPLMS v4.3.
-
-= 2.0.2 =
-
-* **Developer Notes**
-* Updated CMB2 library to 2.10.1.
-
-= 2.0.1 =
+= 2.5.9 =
 
 * **Improvements**
-* Dashboard updated with new links to documentation.
+* Added more nonce checks to prevent CSRF attacks.
+* Added more sanitization checks to database queries.
+
+= 2.5.8 =
+
+* **Improvements**
+* AffiliateWP: Updated "User becomes an affiliate" trigger to adapt to AffiliateWP new version.
+
+= 2.5.7 =
+
+* **Improvements**
+* WordPress: New field to update Display Name on action "Update User".
+
+= 2.5.6 =
+
 * **Bug Fixes**
-* Fixed issue with the reset password link and URL replacement.
+* Fixed logs clean up recurring schedule when Action Scheduler is active.
 
-= 2.0.0 =
+= 2.5.5 =
 
-* **New Features**
-* Added the "Dashboard" page.
-* New tag: Added the {date} tag to render the current date & time with support for custom formats using the is as {date:FORMAT}.
-* New tag: Added the {timestamp} tag to render the current timestamp.
 * **Improvements**
-* WooCommerce: Added support to detect manual memberships assignations.
+* Performance improvements while loading integrations.
+* Added an extra check to prevent issues if an old integration is active.
+* Removed backward compatibility for free integrations since they have been removed 1 year ago.
+
+= 2.5.4 =
+
+* **Developer Notes**
+* Added new hooks to extend the automation clone functionality.
+* **Bug Fixes**
+* ActiveCampaign: Fixed a PHP warning related to webhooks.
+
+= 2.5.3 =
+
+* **Improvements**
+* Improved the auto logs cleanup to work even with large amounts of logs entries.
+
+= 2.5.2 =
+
+* **Improvements**
+* BuddyBoss: Added check for updated activities to avoid send notifications.
+
+= 2.5.1 =
+
+* **Improvements**
+* Added more nonce checks to prevent CSRF attacks.
+
+= 2.5.0 =
+
+* **Improvements**
+* Meta Box: Added support for custom types.
+* **Bug Fixes**
+* FluentCRM: Fixed function to get the WordPress user ID.
+* WP Fusion: Fixed triggers to handle "Any" tag.
 * **Developer Notes**
 * Moved old changelog to changelog.txt.

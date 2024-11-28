@@ -90,10 +90,10 @@ abstract class Base_Cookiebot_Addon {
 	}
 
 	/**
-	 * @param Settings_Service_Interface $settings
+	 * @param Settings_Service_Interface  $settings
 	 * @param Script_Loader_Tag_Interface $script_loader_tag
-	 * @param Cookie_Consent_Interface $cookie_consent
-	 * @param Buffer_Output_Interface $buffer_output
+	 * @param Cookie_Consent_Interface    $cookie_consent
+	 * @param Buffer_Output_Interface     $buffer_output
 	 *
 	 * @return Base_Cookiebot_Addon
 	 * @throws Exception
@@ -118,7 +118,7 @@ abstract class Base_Cookiebot_Addon {
 	/**
 	 * @throws InvalidArgumentException
 	 */
-	final private function validate_alternative_addon_versions() {
+	private function validate_alternative_addon_versions() {
 		foreach ( static::ALTERNATIVE_ADDON_VERSIONS as $version_string => $alternative_version_addon_class ) {
 			if ( ! version_compare( $version_string, '0.0.1', '>=' ) ) {
 				throw new InvalidArgumentException( 'Invalid version number "' . $version_string . '"' );
@@ -192,6 +192,7 @@ abstract class Base_Cookiebot_Addon {
 
 	/**
 	 * Returns checked cookie types
+	 *
 	 * @return array
 	 *
 	 * @since 1.3.0
@@ -311,7 +312,7 @@ abstract class Base_Cookiebot_Addon {
 	 * @return string
 	 * @throws Exception
 	 */
-	final private static function get_svn_url( $path = '' ) {
+	private static function get_svn_url( $path = '' ) {
 		if ( ! is_string( $path ) || $path === '' ) {
 			$path = static::SVN_URL_DEFAULT_SUB_PATH;
 		}

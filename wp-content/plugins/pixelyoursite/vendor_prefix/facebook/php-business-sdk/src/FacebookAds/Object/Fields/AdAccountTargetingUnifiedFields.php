@@ -35,7 +35,6 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  */
 class AdAccountTargetingUnifiedFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
-    const AUDIENCE_SIZE = 'audience_size';
     const AUDIENCE_SIZE_LOWER_BOUND = 'audience_size_lower_bound';
     const AUDIENCE_SIZE_UPPER_BOUND = 'audience_size_upper_bound';
     const CONVERSION_LIFT = 'conversion_lift';
@@ -61,6 +60,6 @@ class AdAccountTargetingUnifiedFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\A
     const VALID = 'valid';
     public function getFieldTypes()
     {
-        return array('audience_size' => 'unsigned int', 'audience_size_lower_bound' => 'unsigned int', 'audience_size_upper_bound' => 'unsigned int', 'conversion_lift' => 'float', 'description' => 'string', 'id' => 'string', 'img' => 'string', 'info' => 'string', 'info_title' => 'string', 'is_recommendation' => 'bool', 'key' => 'string', 'link' => 'string', 'name' => 'string', 'parent' => 'string', 'partner' => 'string', 'path' => 'list<string>', 'performance_rating' => 'unsigned int', 'raw_name' => 'string', 'recommendation_model' => 'string', 'search_interest_id' => 'string', 'source' => 'string', 'spend' => 'float', 'type' => 'string', 'valid' => 'bool');
+        return array('audience_size_lower_bound' => 'unsigned int', 'audience_size_upper_bound' => 'unsigned int', 'conversion_lift' => 'float', 'description' => 'string', 'id' => 'string', 'img' => 'string', 'info' => 'string', 'info_title' => 'string', 'is_recommendation' => 'bool', 'key' => 'string', 'link' => 'string', 'name' => 'string', 'parent' => 'string', 'partner' => 'string', 'path' => 'list<string>', 'performance_rating' => 'unsigned int', 'raw_name' => 'string', 'recommendation_model' => 'string', 'search_interest_id' => 'string', 'source' => 'string', 'spend' => 'float', 'type' => 'string', 'valid' => 'bool');
     }
 }

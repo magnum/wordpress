@@ -24,15 +24,18 @@ class Automator_Translations {
 	 *
 	 */
 	public function __construct() {
-		$this->set_strings();
-		do_action_deprecated( 'uap_localized_string_after', array(), '3.0', 'automator_localized_string_after' );
-		do_action( 'automator_localized_string_after' );
+
 	}
 
 	/**
 	 *
 	 */
 	private function set_strings() {
+
+		// if it is already initilized?
+		if ( ! empty( $this->ls ) ) {
+			return;
+		}
 
 		// Localized strings
 		$this->ls = array(
@@ -41,6 +44,23 @@ class Automator_Translations {
 				// UncannyAutomator.i18n.trigger.name
 				'singularName'    => esc_attr__( 'Trigger', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.trigger.singularName
+				/* translators: 1. A condition */
+				'logic'           => array(
+					'runWhen'    => esc_html_x( 'Run recipe when', 'Triggers logic', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.trigger.logic.runWhen
+					/* translators: This string is appended after a dropdown that has the option "Any" selected */
+					'runWhenAny' => esc_html_x( 'of the following triggers is completed', 'Triggers logic', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.trigger.logic.runWhenAny
+					/* translators: This string is appended after a dropdown that has the option "All" selected */
+					'runWhenAll' => esc_html_x( 'of the following triggers are completed', 'Triggers logic', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.trigger.logic.runWhenAll
+					/* translators: Text of the "any" option. Full sentence: "ANY" of the following triggers is completed */
+					'any'        => esc_html_x( 'Any', 'Triggers logic', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.trigger.logic.any
+					/* translators: Text of the "all" option. Full sentence: "ALL" of the following triggers are completed */
+					'all'        => esc_html_x( 'All', 'Triggers logic', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.trigger.logic.all
+				),
 				/* translators: Trigger type. Logged-in triggers are triggered only by logged-in users */
 				'userTriggers'    => esc_attr__( 'Logged-in triggers', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.trigger.userTriggers
@@ -50,7 +70,7 @@ class Automator_Translations {
 				'add'             => esc_attr__( 'Add trigger', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.trigger.add
 				/* translators: Non-personal infinitive verb */
-				'addAnother'      => esc_attr__( 'Add another trigger', 'uncanny-automator' ),
+				'addAnother'      => esc_attr__( 'Add trigger', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.trigger.addAnother
 				/* translators: Verb conjugated in present-tense second-person singular */
 				'select'          => esc_attr__( 'Select a trigger', 'uncanny-automator' ),
@@ -71,7 +91,7 @@ class Automator_Translations {
 				'add'          => esc_attr__( 'Add action', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.action.add
 				/* translators: Non-personal infinitive verb */
-				'addAnother'   => esc_attr__( 'Add another action', 'uncanny-automator' ),
+				'addAnother'   => esc_attr__( 'Add action', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.action.addAnother
 				/* translators: Verb conjugated in present-tense second-person singular */
 				'select'       => esc_attr__( 'Select an action', 'uncanny-automator' ),
@@ -138,13 +158,14 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.action.asyncActions.modal.scheduleNotice2
 						'timezone'        => esc_attr__( 'Timezone', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.action.asyncActions.modal.timezone
-						'timezoneString'  => wp_timezone_string(),
+						'timezoneString'  => Automator()->get_timezone_string(),
 						// UncannyAutomator.i18n.action.asyncActions.modal.timezoneString
 						'timezoneLink'    => admin_url( 'options-general.php#timezone_string' ),
 						// UncannyAutomator.i18n.action.asyncActions.modal.timezoneLink
 						'dateFormat'      => get_option( 'date_format' ),
 						// UncannyAutomator.i18n.action.asyncActions.modal.dateFormat
 						'today'           => date( get_option( 'date_format' ) ),
+						//phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						// UncannyAutomator.i18n.action.asyncActions.modal.today
 						'timeFormat'      => get_option( 'time_format' ),
 						// UncannyAutomator.i18n.action.asyncActions.modal.timeFormat
@@ -158,62 +179,115 @@ class Automator_Translations {
 						),
 
 					),
+					/* translators: Uncanny Automator Pro */
+					'unlockSchedule'         => sprintf( esc_attr__( 'Get %s to unlock delays/schedules', 'uncanny-automator' ), 'Uncanny Automator Pro' ),
+					// UncannyAutomator.i18n.action.asyncActions.unlockSchedule
 				),
 			),
 			'closure'             => array(
 				'name' => 'Closures', // UncannyAutomator.i18n.closure.name
 			),
 			'conditions'          => array(
-				'filter' => esc_html__( 'Filter', 'uncanny-automator' ),
+				'filter'                               => esc_html__( 'Filter', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.filter
 
-				'unlockConditions' => sprintf( esc_attr__( 'Get %s to unlock conditions', 'uncanny-automator' ), 'Uncanny Automator Pro' ),
+				'hasConditions'                        => esc_html__( 'Filtered', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.hasConditions
+				'hasConditionsTokensDisclaimer'        => esc_html__( "These tokens may be empty if the associated action's filter conditions are not met.", 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.hasConditionsTokensDisclaimer
+
+				'addFilter'                            => esc_html__( 'Add filter', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.addFilter
+
+				'unlockConditions'                     => sprintf( esc_attr__( 'Get %s to unlock conditions', 'uncanny-automator' ), 'Uncanny Automator Pro' ),
 				// UncannyAutomator.i18n.conditions.unlockConditions
 
-				'addBtnLabel' => esc_html__( 'Add', 'uncanny-automator' ),
+				'addBtnLabel'                          => esc_html__( 'Add condition', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.addBtnLabel
 
-				'noConditions' => esc_html__( 'No conditions', 'uncanny-automator' ),
+				'noConditions'                         => esc_html__( 'No conditions', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.noConditions
 
 				/* translators: 1. Either "any" or "all". Code inside the curly brackets is not as prominent as the text outside it. */
-				'runIfAnyFull' => esc_html_x( 'Run if %1$s {{of the following conditions are met}}', 'Conditions - Logic sentence', 'uncanny-automator' ),
+				'runIfAnyFull'                         => esc_html_x( 'Run if %1$s {{of the following conditions are met}}', 'Conditions - Logic sentence', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.runIfAnyFull
 
 				/* translators: Used in "Run if %1$s of the following conditions are met" */
-				'any'          => esc_html_x( 'Any', 'Conditions - Logic sentence', 'uncanny-automator' ),
+				'any'                                  => esc_html_x( 'Any', 'Conditions - Logic sentence', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.any
 
 				/* translators: Used in "Run if %1$s of the following conditions are met" */
-				'all'          => esc_html_x( 'All', 'Conditions - Logic sentence', 'uncanny-automator' ),
+				'all'                                  => esc_html_x( 'All', 'Conditions - Logic sentence', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.all
 
-				'runIf' => esc_html_x( 'Run if', 'Conditions - Logic sentence', 'uncanny-automator' ),
+				'runIf'                                => esc_html_x( 'Run if', 'Conditions - Logic sentence', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.runIf
 
-				'options' => array(
+				'options'                              => array(
 					'modalTitle'    => esc_html__( 'Configure the rule', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.conditions.options.modalTitle
 					'saveCondition' => esc_html__( 'Save condition', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.conditions.options.saveCondition
 				),
 
-				'actionWontRun' => esc_html__( "This action won't run", 'uncanny-automator' ),
+				'actionWontRun'                        => esc_html__( "This action won't run", 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.actionWontRun
 
-				'actionsWontRun'        => esc_html__( "These actions won't run", 'uncanny-automator' ),
+				'actionsWontRun'                       => esc_html__( "These actions won't run", 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.actionsWontRun
 
 				/* translators: 1. Trademarked term. */
-				'actionWontRunContent'  => esc_html__( 'Conditions/Filters are a feature of %1$s. Please re-activate Uncanny Automator Pro to enable this action.', 'uncanny-automator' ),
+				'actionWontRunContent'                 => esc_html__( 'Conditions/Filters are a feature of %1$s. Please re-activate Uncanny Automator Pro to enable this action.', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.actionWontRunContent
 
 				/* translators: 1. Trademarked term. */
-				'actionsWontRunContent' => esc_html__( 'Conditions/Filters are a feature of %1$s. Please re-activate Uncanny Automator Pro to enable these actions.', 'uncanny-automator' ),
+				'actionsWontRunContent'                => esc_html__( 'Conditions/Filters are a feature of %1$s. Please re-activate Uncanny Automator Pro to enable these actions.', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.actionsWontRunContent
 
-				'pleaseSaveActionFirst' => esc_attr__( 'Please save the action first', 'uncanny-automator' ),
+				'otherActionsMightRunBefore'           => esc_html__( 'Other actions in this recipe may run before the actions below.', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.otherActionsMightRunBefore
+
+				'pleaseSaveActionFirst'                => esc_attr__( 'Please save the action first', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.conditions.pleaseSaveActionFirst
+
+				'saveFilter'                           => esc_html__( 'Save filter', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.saveFilter
+
+				'configureTheRule'                     => esc_html__( 'Configure the rule', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.configureTheRule
+
+				'errorCouldNotGetFields'               => esc_html__( "Something went wrong. We couldn't get the fields.", 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.errorCouldNotGetFields
+
+				'requiresUserData'                     => esc_html__( 'Requires user data', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.requiresUserData
+
+				'conditionRequiresUserData'            => esc_html__( 'This condition requires WordPress user data', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.conditionRequiresUserData
+
+				'conditionRequiresUserDataDescription' => esc_html__( "Since this is a recipe that runs for everyone, including logged-out users, you'll need to select a new or existing user that the condition can be validated against.", 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.conditionRequiresUserDataDescription
+
+				'condition'                            => esc_html__( 'Condition', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.condition
+
+				'searchConditions'                     => esc_html__( 'Search conditions', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.searchConditions
+
+				'noConditionsFound'                    => esc_html__( 'No conditions found', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.noConditionsFound
+
+				'missingCondition'                     => esc_html__( 'Missing condition', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.conditions.missingCondition
+
+				'wantToRemoveConditionsGroup'          => array(
+					'heading'            => esc_attr__( 'Remove empty conditions block?', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.conditions.wantToRemoveConditionsGroup.heading
+					'confirmButtonLabel' => esc_attr__( 'Remove', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.conditions.wantToRemoveConditionsGroup.confirmButtonLabel
+					'cancelButtonLabel'  => esc_attr__( 'Keep', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.conditions.wantToRemoveConditionsGroup.cancelButtonLabel
+				),
 			),
 			'validation'          => array(
 				'recipe' => array(
@@ -261,6 +335,12 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.validation.field.int.invalid
 						'multipleTokens' => esc_attr__( 'This field only supports one token at a time.', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.validation.field.int.multipleTokens
+						/* translators: 1. The min number */
+						'minValue'       => esc_attr__( 'Value must be greater than or equal to %1$s', 'uncanny-automator' ),
+						// UncannyAutomator.i18n.validation.field.int.minValue
+						/* translators: 1. The max number */
+						'maxValue'       => esc_attr__( 'Value must be less than or equal to %1$s', 'uncanny-automator' ),
+						// UncannyAutomator.i18n.validation.field.int.maxValue
 					),
 					'float'       => array(
 						'empty'          => esc_attr__( 'Please enter a number.', 'uncanny-automator' ),
@@ -269,6 +349,12 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.validation.field.float.invalid
 						'multipleTokens' => esc_attr__( 'This field only supports one token at a time.', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.validation.field.float.multipleTokens
+						/* translators: 1. The min number */
+						'minValue'       => esc_attr__( 'Value must be greater than or equal to %1$s', 'uncanny-automator' ),
+						// UncannyAutomator.i18n.validation.field.float.minValue
+						/* translators: 1. The max number */
+						'maxValue'       => esc_attr__( 'Value must be less than or equal to %1$s', 'uncanny-automator' ),
+						// UncannyAutomator.i18n.validation.field.float.maxValue
 					),
 					'email'       => array(
 						'empty'    => esc_attr__( 'Please enter an email address.', 'uncanny-automator' ),
@@ -366,7 +452,15 @@ class Automator_Translations {
 					// UncannyAutomator.i18n.tokens.global.common
 					/* translators: Token name */
 					'siteName'                   => esc_attr_x( 'Site name', 'Token', 'uncanny-automator' ),
+					/* translators: Token name */
+					'siteTagline'                => esc_attr_x( 'Site tagline', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.siteName
+					/* translators: Token name */
+					'currentSiteName'            => esc_attr_x( 'Current site name', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.currentSiteDescription
+					/* translators: Token name */
+					'currentSiteTagline'         => esc_attr_x( 'Current site tagline', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.currentSiteName
 					/* translators: Token name */
 					'userID'                     => esc_attr_x( 'User ID', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.userId
@@ -397,6 +491,8 @@ class Automator_Translations {
 					/* translators: Token name */
 					'siteUrl'                    => esc_attr_x( 'Site URL', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.siteUrl
+					'currentSiteUrl'             => esc_attr_x( 'Current site URL', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.currentSiteUrl
 					/* translators: Token name */
 					'recipeName'                 => esc_attr_x( 'Recipe name', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.recipeName
@@ -411,6 +507,10 @@ class Automator_Translations {
 					/* translators: Token category. It refers to advanced tokens. */
 					'advanced'                   => esc_attr_x( 'Advanced', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.advanced
+					'date'                       => esc_attr_x( 'Date', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.date
+					'formulas'                   => esc_attr_x( 'Modifiers', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.formulas
 					/* translators: Token name */
 					'userMetaKey'                => esc_attr_x( 'User meta', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.userMetaKey
@@ -423,19 +523,27 @@ class Automator_Translations {
 					/* translators: 1. The post. 2. The meta key */
 					'postMetaKeyTemplate'        => esc_attr_x( 'Post: %1$s meta: %2$s', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.postMetaKeyTemplate
+					'calculation'                => esc_attr_x( 'Calculation', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.calculationKey
+					'calculationTemplate'        => esc_attr_x( 'Calculation: %1$s', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.userMetaKeyTemplate
 					'currentDate'                => esc_attr_x( 'Current date', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.currentDate
 					'currentTime'                => esc_attr_x( 'Current time', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.currentTime
+					'currentDateAndTime'         => esc_attr_x( 'Current date and time', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.currentDateAndTime
 					'current_unix_timestamp'     => esc_attr_x( 'Current Unix timestamp', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.current_unix_timestamp
-					'currentdate_unix_timestamp' => esc_attr_x( 'Current date (Unix timestamp)', 'Token', 'uncanny-automator' ),
+					'currentdate_unix_timestamp' => esc_attr_x( 'Current Unix timestamp (date only)', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.currentdate_unix_timestamp
+					'currentBlogId'              => esc_attr_x( 'Current site ID', 'Token', 'uncanny-automator' ),
+					// UncannyAutomator.i18n.tokens.global.current_blog_id
 					'user_ip_address'            => esc_attr_x( 'User IP address', 'Token', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.tokens.global.user_ip_address
 				),
 				'specialTokens'                  => array(
-					'userMeta' => array(
+					'userMeta'    => array(
 						'modal' => array(
 							'title'                  => esc_attr__( "What's the key of the meta you want to retrieve?", 'uncanny-automator' ),
 							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.title
@@ -447,7 +555,7 @@ class Automator_Translations {
 							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.userMetaKeyDescription
 						),
 					),
-					'postMeta' => array(
+					'postMeta'    => array(
 						'modal' => array(
 							'title'                => esc_attr__( 'Token data', 'uncanny-automator' ),
 							// UncannyAutomator.i18n.tokens.specialTokens.postMeta.modal.title
@@ -461,6 +569,18 @@ class Automator_Translations {
 							// UncannyAutomator.i18n.tokens.specialTokens.postMeta.modal.keyFieldLabel
 							'keyFieldDescription'  => esc_attr__( 'The meta key associated with the data you want to retrieve. Only one meta key can be entered per token.', 'uncanny-automator' ),
 							// UncannyAutomator.i18n.tokens.specialTokens.postMeta.modal.keyFieldDescription
+						),
+					),
+					'calculation' => array(
+						'modal' => array(
+							'title'                   => esc_attr__( 'Calculation', 'uncanny-automator' ),
+							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.title
+							'confirmButton'           => esc_attr__( 'Add token', 'uncanny-automator' ),
+							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.confirmButton
+							'formulaFieldLabel'       => esc_attr_x( 'Formula', 'Token', 'uncanny-automator' ),
+							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.userMetaKey
+							'formulaFieldDescription' => esc_attr__( 'Use + for addition, - for subtraction, / for division and * for multiplication.  Use tokens that output numerical values.  If a token outputs a string, it will be replaced with zero (0).  Example: [Some token] + 1.', 'uncanny-automator' ),
+							// UncannyAutomator.i18n.tokens.specialTokens.userMeta.modal.userMetaKeyDescription
 						),
 					),
 				),
@@ -477,6 +597,16 @@ class Automator_Translations {
 				// UncannyAutomator.i18n.tokens.addTokens
 				'addAllDescription'              => esc_attr__( 'On confirmation, all the tokens in the group "%1$s" will be added to the field  "%2$s".', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.tokens.addAllDescription
+
+				'isDelayed'                      => esc_html__( 'Delayed', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.tokens.isDelayed
+				'isDelayedTokensDisclaimer'      => esc_html__( 'These tokens may be empty if the associated action has not yet run when this action runs.', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.tokens.isDelayedTokensDisclaimer
+
+				'isScheduled'                    => esc_html__( 'Scheduled', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.tokens.isScheduled
+				'isScheduledTokensDisclaimer'    => esc_html__( 'These tokens may be empty if the associated action has not yet run when this action runs.', 'uncanny-automator' ),
+				// UncannyAutomator.i18n.tokens.isScheduledTokensDisclaimer
 			),
 			'integration'         => array(
 				/* translators: Verb conjugated in present-tense second-person singular */
@@ -609,7 +739,7 @@ class Automator_Translations {
 				// UncannyAutomator.i18n.recipeType.userRecipeName
 				'userRecipeDescription'       => esc_attr__( 'Recipe will be triggered by logged-in WordPress users.', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.recipeType.userRecipeDescription
-				'cantChangeLaterNotice'       => esc_attr__( 'Note: Recipe type cannot be changed later.', 'uncanny-automator' ),
+				'cantChangeLaterNotice'       => esc_attr__( 'Recipe type cannot be changed later.', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.recipeType.cantChangeLaterNotice
 				'errorDidNotSelectType'       => esc_attr__( 'Please select an option.', 'uncanny-automator' ),
 				// UncannyAutomator.i18n.recipeType.errorDidNotSelectType
@@ -707,7 +837,7 @@ class Automator_Translations {
 					'passwordDescription'              => sprintf( esc_attr__( 'If left empty, the user will need to reset their password to log in. Send an email containing the %1$s token to simplify the process.', 'uncanny-automator' ), '<em>' . esc_attr__( 'User reset password link', 'uncanny-automator' ) . '</em>' ),
 					// UncannyAutomator.i18n.userSelector.newUser.passwordDescription
 					/* translators: WordPress roles */
-					'roles'                            => esc_attr__( 'Roles', 'uncanny-automator' ),
+					'role'                             => esc_attr__( 'Role', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.userSelector.newUser.role
 					'existingUserFieldLabel'           => esc_attr__( 'What to do if the user already exists', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.userSelector.newUser.existingUserFieldLabel
@@ -797,9 +927,9 @@ class Automator_Translations {
 			),
 			'debugging'           => array(
 				'fatalErrorHandler'   => array(
-					'title'   => esc_html__( 'Sorry, something went wrong', 'uncanny-automator' ),
+					'title'        => esc_html__( 'Sorry, something went wrong', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.debugging.fatalErrorHandler.title
-					'content' => esc_html__( 'Click "Learn more" for steps you can take to resolve this issue.', 'uncanny-automator' ),
+					'content'      => esc_html__( 'Click "Learn more" for steps you can take to resolve this issue.', 'uncanny-automator' ),
 					// UncannyAutomator.i18n.debugging.fatalErrorHandler.content
 
 					'accessDenied' => array(
@@ -810,8 +940,9 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.accessDenied.content
 					),
 
-					'notFound' => array(
-						'title'          => esc_html__( 'Not found', 'uncanny-automator' ),
+					'notFound'     => array(
+						/* translators: 1. The name of the endpoint */
+						'title'          => esc_html__( 'Endpoint %1$s not found', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.notFound.title
 						/* translators: 1. Link to "Site permalinks". 2. Link to "Uncanny Automator support" */
 						'content'        => esc_html__( 'A endpoint that Automator requires is missing. If your %1$s are set to Plain, please change them to something else. Otherwise, removing and reinstalling Automator plugins to rule out an upload issue is recommended, otherwise please contact %2$s.', 'uncanny-automator' ),
@@ -820,14 +951,14 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.notFound.sitePermalinks=
 					),
 
-					'timeout' => array(
+					'timeout'      => array(
 						'title'   => esc_html__( 'Request timeout', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.timeout.title
 						'content' => esc_html__( 'The Automator request timed out, likely due to insufficient server resources. Please contact your host.', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.timeout.content
 					),
 
-					'serverError' => array(
+					'serverError'  => array(
 						'title'   => esc_html__( 'Internal error', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.serverError.title
 						/* translators: 1. Link to "Uncanny Automator support" */
@@ -835,14 +966,14 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.serverError.content
 					),
 
-					'parserError' => array(
+					'parserError'  => array(
 						'title'   => esc_html__( 'Parser error', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.parserError.title
 						'content' => esc_html__( "We have detected a conflict with another plugin. Try testing in a Staging environment with only Automator plugins active, then gradually reactivate plugins until things break again to trace what's causing it.", 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.parserError.content
 					),
 
-					'dataMissing' => array(
+					'dataMissing'  => array(
 						'title'          => esc_html__( 'Data missing', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.dataMissing.title
 						/* translators: 1. Link to contact support. 2. Link to the "Automator Tools" page */
@@ -854,7 +985,7 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.dataMissing.automatorTools
 					),
 
-					'generic' => array(
+					'generic'      => array(
 						'title'   => esc_html__( 'Unknown error', 'uncanny-automator' ),
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.generic.title
 						/* translators: 1. Link to contact support */
@@ -862,7 +993,7 @@ class Automator_Translations {
 						// UncannyAutomator.i18n.debugging.fatalErrorHandler.generic.content
 					),
 
-					'exceptions' => array(
+					'exceptions'   => array(
 						'tags' => array(
 							'couldNotSave' => esc_html__( "We couldn't save the tags", 'uncanny-automator' ),
 							// UncannyAutomator.i18n.debugging.fatalErrorHandler.exceptions.tags.couldNotSave
@@ -990,6 +1121,10 @@ class Automator_Translations {
 					'minute'           => esc_attr_x( 'Minute', 'Date format', 'uncanny-automator' ),
 				),
 			),
+			'refresh'             => esc_attr__( 'Refresh', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.refresh
+			'refreshOptions'      => esc_attr__( 'Refresh options', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.refreshOptions
 			'noResults'           => esc_attr__( 'No results found', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.noResults
 			/* translators: Character to separate items */
@@ -1001,14 +1136,21 @@ class Automator_Translations {
 			/* translators: Non-personal infinitive verb */
 			'search'              => esc_attr__( 'Search', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.search
+			'searchEllipsis'      => esc_attr__( 'Search...', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.searchEllipsis
 			'searching'           => esc_attr__( 'Searching', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.searching
 			/* translators: Non-personal infinitive verb */
 			'confirm'             => esc_attr__( 'Confirm', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.confirm
+			'somethingWentWrong'  => esc_attr__( 'Something went wrong', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.somethingWentWrong
 			/* translators: Non-personal infinitive verb */
 			'cancel'              => esc_attr__( 'Cancel', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.cancel
+			/* translators: Non-personal infinitive verb */
+			'duplicate'           => esc_attr__( 'Duplicate', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.duplicate
 			/* translators: Non-personal infinitive verb */
 			'delete'              => esc_attr__( 'Delete', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.delete
@@ -1056,13 +1198,11 @@ class Automator_Translations {
 			// UncannyAutomator.i18n.removeRow
 			/* translators: 1. Row number */
 			'rowNumber'           => esc_attr__( 'Row %1$s', 'uncanny-automator' ),
-			// UncannyAutomator.i18n.rowNumber
-			'yes'                 => esc_attr__( 'Yes', 'uncanny-automator' ),
-			// UncannyAutomator.i18n.yes
-			'no'                  => esc_attr__( 'No', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.no
 			'close'               => esc_attr_x( 'Close', 'Verb', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.close
+			'areYouSure'          => esc_attr__( 'Are you sure?', 'uncanny-automator' ),
+			// UncannyAutomator.i18n.areYouSure
 			'needsUserData'       => esc_attr__( 'Needs user data', 'uncanny-automator' ),
 			// UncannyAutomator.i18n.needsUserData
 			'scrollToIncrement'   => esc_attr__( 'Scroll to increment', 'uncanny-automator' ),
@@ -1076,6 +1216,9 @@ class Automator_Translations {
 			// Don't translate this string
 			// UncannyAutomator.i18n.uncannyAutomatorPro
 		);
+
+		do_action_deprecated( 'uap_localized_string_after', array(), '3.0', 'automator_localized_string_after' );
+		do_action( 'automator_localized_string_after' );
 	}
 
 	/**
@@ -1117,9 +1260,8 @@ class Automator_Translations {
 			'3.0',
 			'automator_localized_string'
 		);
-		$localized_string = apply_filters( 'automator_localized_string', $localized_string, $string_key );
 
-		return $localized_string;
+		return apply_filters( 'automator_localized_string', $localized_string, $string_key );
 	}
 
 	/**
@@ -1128,9 +1270,11 @@ class Automator_Translations {
 	 * @return array
 	 */
 	public function get_all() {
+		$this->set_strings();
 		$this->ls          = apply_filters_deprecated( 'uap_localized_strings', array( $this->ls ), '3.0', 'automator_localized_strings' );
 		$localized_strings = apply_filters( 'automator_localized_strings', $this->ls );
 
 		return $localized_strings;
 	}
+
 }

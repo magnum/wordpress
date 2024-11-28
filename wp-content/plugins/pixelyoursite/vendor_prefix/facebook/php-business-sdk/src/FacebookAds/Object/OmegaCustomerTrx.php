@@ -58,7 +58,7 @@ class OmegaCustomerTrx extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudOb
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/campaigns', new \PYS_PRO_GLOBAL\FacebookAds\Object\InvoiceCampaign(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\InvoiceCampaign::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/campaigns', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

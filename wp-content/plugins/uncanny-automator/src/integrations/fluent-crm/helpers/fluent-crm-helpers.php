@@ -14,6 +14,9 @@ use Uncanny_Automator_Pro\Fluent_Crm_Pro_Helpers;
  */
 class Fluent_Crm_Helpers {
 
+	/**
+	 * @var bool
+	 */
 	public static $has_run = false;
 
 	/**
@@ -36,7 +39,7 @@ class Fluent_Crm_Helpers {
 	 */
 	public function __construct() {
 
-		$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
+		$this->load_options = true;
 
 		$fluent_crm_targetted_actions = array(
 			'fluentcrm_subscriber_status_to_subscribed',
@@ -69,8 +72,8 @@ class Fluent_Crm_Helpers {
 	/**
 	 * Our callback function to attach the trigger 'automator_fluentcrm_status_update'.
 	 *
-	 * @param  mixed  $subscriber The accepted subscriber object from status_action.
-	 * @param  string $old_status The old status.
+	 * @param mixed $subscriber The accepted subscriber object from status_action.
+	 * @param string $old_status The old status.
 	 *
 	 * @return void
 	 */
@@ -85,7 +88,7 @@ class Fluent_Crm_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -102,13 +105,14 @@ class Fluent_Crm_Helpers {
 		$token                    = key_exists( 'token', $args ) ? $args['token'] : false;
 		$is_ajax                  = key_exists( 'is_ajax', $args ) ? $args['is_ajax'] : false;
 		$is_any                   = key_exists( 'is_any', $args ) ? $args['is_any'] : false;
+		$is_required              = key_exists( 'is_required', $args ) ? $args['is_required'] : true;
 		$target_field             = key_exists( 'target_field', $args ) ? $args['target_field'] : '';
 		$end_point                = key_exists( 'endpoint', $args ) ? $args['endpoint'] : '';
 		$supports_multiple_values = key_exists( 'supports_multiple_values', $args ) ? $args['supports_multiple_values'] : false;
 
 		$options = array();
 
-		if ( $is_any !== false ) {
+		if ( false !== $is_any ) {
 			$options['0'] = esc_attr_x( 'Any list', 'FluentCRM', 'uncanny-automator' );
 		}
 
@@ -131,7 +135,7 @@ class Fluent_Crm_Helpers {
 			'label'                    => $label,
 			'input_type'               => $type,
 			'supports_multiple_values' => $supports_multiple_values,
-			'required'                 => true,
+			'required'                 => $is_required,
 			'supports_tokens'          => $token,
 			'is_ajax'                  => $is_ajax,
 			'fill_values_in'           => $target_field,
@@ -146,14 +150,16 @@ class Fluent_Crm_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array  $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
 	public function fluent_crm_tags( $label = null, $option_code = 'FCRMTAG', $args = array() ) {
+
 		if ( ! $this->load_options ) {
 
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
+
 		}
 
 		if ( ! $label ) {
@@ -162,13 +168,17 @@ class Fluent_Crm_Helpers {
 
 		$token                    = key_exists( 'token', $args ) ? $args['token'] : false;
 		$is_ajax                  = key_exists( 'is_ajax', $args ) ? $args['is_ajax'] : false;
+		$is_required              = key_exists( 'is_required', $args ) ? $args['is_required'] : true;
+		$is_any                   = key_exists( 'is_any', $args ) ? $args['is_any'] : false;
 		$target_field             = key_exists( 'target_field', $args ) ? $args['target_field'] : '';
 		$end_point                = key_exists( 'endpoint', $args ) ? $args['endpoint'] : '';
 		$supports_multiple_values = key_exists( 'supports_multiple_values', $args ) ? $args['supports_multiple_values'] : false;
 
 		$options = array();
 
-		$options['0'] = esc_attr_x( 'Any tag', 'FluentCRM', 'uncanny-automator' );
+		if ( $is_any ) {
+			$options['0'] = esc_attr_x( 'Any tag', 'FluentCRM', 'uncanny-automator' );
+		}
 
 		if ( Automator()->helpers->recipe->load_helpers ) {
 
@@ -188,7 +198,7 @@ class Fluent_Crm_Helpers {
 			'label'                    => $label,
 			'input_type'               => $type,
 			'supports_multiple_values' => $supports_multiple_values,
-			'required'                 => true,
+			'required'                 => $is_required,
 			'supports_tokens'          => $token,
 			'is_ajax'                  => $is_ajax,
 			'fill_values_in'           => $target_field,
@@ -202,10 +212,10 @@ class Fluent_Crm_Helpers {
 
 	/**
 	 * @param null|array|string $to_match
-	 * @param null              $match_type
-	 * @param null              $recipes
-	 * @param null              $trigger_meta
-	 * @param null              $trigger_code
+	 * @param null $match_type
+	 * @param null $recipes
+	 * @param null $trigger_meta
+	 * @param null $trigger_code
 	 *
 	 * @return array
 	 */
@@ -213,13 +223,9 @@ class Fluent_Crm_Helpers {
 
 		$recipe_ids = array();
 
-		if (
-			null === $to_match ||
-			null === $trigger_meta ||
-			null === $trigger_code
-		) {
+		if ( null === $to_match || null === $trigger_meta || null === $trigger_code ) {
 			// Sanity check
-			return $recipe_ids;
+			return array();
 		}
 
 		$matched_recipe_ids = array();
@@ -254,16 +260,16 @@ class Fluent_Crm_Helpers {
 								break;
 						}
 
-						if (
-							$trigger_value === $match ||
-							0 === $trigger_value || // handle "any" selection
-							'0' === $trigger_value // handle "any" selection
-						) {
+						// @todo: This logic can be improved.
+						if ( $trigger_value === $match || 0 === $trigger_value || '0' === $trigger_value ) {
+
 							$matched_recipe_ids[] = (object) array(
 								'recipe_id'     => $recipe['ID'],
 								'trigger_value' => $trigger_value,
 								'matched_value' => $to_match,
+								'trigger_id'    => $trigger['ID'],
 							);
+
 							break;
 						}
 					}//end foreach
@@ -334,11 +340,26 @@ class Fluent_Crm_Helpers {
 	 */
 	public function get_attached_list_ids( $attachedListIds ) {
 
+		/**
+		 * SubscriberPivot::whereIn is causing the list ids to return an empty array.
+		 *
+		 * @since 4.4
+		 */
+		$disable_pivot_check = apply_filters( 'automator_fluentcrm_subscriber_pivot_list', true, $attachedListIds );
+
+		// Disable the pivot check by default since $attachedListIds already returns the ids.
+		if ( $disable_pivot_check ) {
+
+			return $attachedListIds;
+
+		}
+
 		/*
 		 * This action is triggered by three different processes and returns either list ids
 		 * or pivot ids(table: wp_fc_subscriber_pivot)
 		 */
-		$list_ids     = array();
+		$list_ids = array();
+
 		$request_type = automator_filter_input( 'type', INPUT_POST );
 
 		if ( ! empty( $request_type ) ) {
@@ -362,6 +383,20 @@ class Fluent_Crm_Helpers {
 	 * @return array
 	 */
 	public function get_attached_tag_ids( $attachedTagIds ) {
+
+		/**
+		 * SubscriberPivot::whereIn is causing the list ids to return an empty array.
+		 *
+		 * @since 4.4
+		 */
+		$disable_pivot_check = apply_filters( 'automator_fluentcrm_subscriber_pivot_tags', true, $attachedTagIds );
+
+		// Disable the pivot check by default since $attachedListIds already returns the ids.
+		if ( $disable_pivot_check ) {
+
+			return $attachedTagIds;
+
+		}
 
 		/*
 		 * This action is triggered by three different processes and returns either list ids
@@ -396,7 +431,7 @@ class Fluent_Crm_Helpers {
 	 *
 	 * @return array The list of subscribers statuses.
 	 */
-	public function get_subscriber_statuses() {
+	public function get_subscriber_statuses( $any = true ) {
 
 		if ( ! function_exists( 'fluentcrm_subscriber_statuses' ) ) {
 			return array();
@@ -404,9 +439,9 @@ class Fluent_Crm_Helpers {
 
 		$statuses = fluentcrm_subscriber_statuses();
 
-		$formattedStatues = array();
+		$formatted_statues = array();
 
-		$transMaps = array(
+		$trans_maps = array(
 			'subscribed'   => __( 'Subscribed', 'uncanny-automator' ),
 			'pending'      => __( 'Pending', 'uncanny-automator' ),
 			'unsubscribed' => __( 'Unsubscribed', 'uncanny-automator' ),
@@ -414,13 +449,15 @@ class Fluent_Crm_Helpers {
 			'complained'   => __( 'Complained', 'uncanny-automator' ),
 		);
 
-		$formattedStatues['-1'] = esc_html__( 'Any status', 'uncanny-automator' );
-
-		foreach ( $statuses as $status ) {
-			$formattedStatues[ $status ] = isset( $transMaps[ $status ] ) ? $transMaps[ $status ] : ucfirst( $status );
+		if ( true === $any ) {
+			$formatted_statues['-1'] = esc_html__( 'Any status', 'uncanny-automator' );
 		}
 
-		return $formattedStatues;
+		foreach ( $statuses as $status ) {
+			$formatted_statues[ $status ] = isset( $trans_maps[ $status ] ) ? $trans_maps[ $status ] : ucfirst( $status );
+		}
+
+		return $formatted_statues;
 
 	}
 
@@ -462,5 +499,90 @@ class Fluent_Crm_Helpers {
 
 	}
 
+	/**
+	 * @return array
+	 */
+	public function get_custom_field() {
+		$custom_fields = fluentcrm_get_custom_contact_fields();
 
+		$field_types = array(
+			'text'         => 'text',
+			'textarea'     => 'textarea',
+			'checkbox'     => 'checkbox',
+			'radio'        => 'radio',
+			'date'         => 'date',
+			'date_time'    => 'text',
+			'select-multi' => 'select',
+			'select-one'   => 'select',
+			'number'       => 'int',
+		);
+
+		$placeholder = array(
+			'date_time' => esc_html__( 'yyyy-mm-dd hh:mm:ss', 'uncanny-automator' ),
+		);
+
+		$fields = array();
+		foreach ( $custom_fields as $k => $custom_field ) {
+			$options                  = null;
+			$supports_multiple_values = false;
+			if ( 'select-multi' === $custom_field['type'] ) {
+				$supports_multiple_values = true;
+			}
+
+			if (
+				'select-multi' === $custom_field['type'] ||
+				'select-one' === $custom_field['type'] ||
+				'radio' === $custom_field['type']
+			) {
+				$options = array();
+				foreach ( $custom_field['options'] as $option ) {
+					$options[ $option ] = $option;
+				}
+			}
+
+			if ( 'checkbox' === $custom_field['type'] ) {
+				foreach ( $custom_field['options'] as $option ) {
+					$fields[] = array(
+						'input_type'  => $field_types[ $custom_field['type'] ],
+						'option_code' => 'FLUENTCRM_CUSTOMFIELD_' . $k . '_' . $option,
+						'options'     => $option,
+						'required'    => false,
+						'label'       => $custom_field['label'] . ' - ' . $option,
+					);
+				}
+			} else {
+				$fields[] = array(
+					'input_type'               => $field_types[ $custom_field['type'] ],
+					'option_code'              => 'FLUENTCRM_CUSTOMFIELD_' . $k,
+					'options'                  => $options,
+					'required'                 => false,
+					'label'                    => $custom_field['label'],
+					'supports_token'           => true,
+					'placeholder'              => isset( $placeholder[ $custom_field['type'] ] ) ? $placeholder[ $custom_field['type'] ] : '',
+					'supports_multiple_values' => $supports_multiple_values,
+					'supports_custom_value'    => false,
+				);
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Returns the option field for email address.
+	 *
+	 * @return array
+	 */
+	public function get_email_field() {
+		return array(
+			'option_code' => 'EMAIL',
+			'input_type'  => 'text',
+			'label'       => esc_attr__( 'Email address', 'uncanny-automator' ),
+			'placeholder' => '',
+			'description' => '',
+			'required'    => true,
+			'tokens'      => true,
+			'default'     => '',
+		);
+	}
 }
