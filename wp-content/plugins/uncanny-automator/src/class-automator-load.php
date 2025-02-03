@@ -13,6 +13,8 @@
 
 namespace Uncanny_Automator;
 
+use Uncanny_Automator\Services\CLI\Logs\Prune_Command;
+
 /**
  * Class Automator_Load
  *
@@ -45,34 +47,38 @@ class Automator_Load {
 	public static $active_integrations = array();
 
 	/**
+	 * @var bool
+	 */
+	public static $any_recipes_active = false;
+	/**
+	 * @var bool
+	 */
+	public static $is_admin_sect = false;
+
+	/**
 	 * class constructor
 	 */
 	public function __construct() {
 
+		add_action( 'upgrader_process_complete', array( $this, 'flag_last_updated' ), 20, 2 );
+
 		// Load text domain
 		add_action(
 			'init',
-			function () {
+			function() {
 				Automator()->automator_load_textdomain();
 			}
 		);
-
-		// Bailout if not php8 compatible.
-		if ( ! $this->is_php8_compat() ) {
-			return;
-		}
 
 		if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'favicon' ) ) {
 			// bail out if it's favicon.ico
 			return;
 		}
-		// Show upgrade notice from readme.txt.
-		add_action(
-			'in_plugin_update_message-' . plugin_basename( AUTOMATOR_BASE_FILE ),
-			array( $this, 'in_plugin_update_message' ),
-			10,
-			2
-		);
+
+		self::$is_admin_sect = is_admin();
+
+		// Check if any recipes are active;
+		self::$any_recipes_active = $this->any_active_recipe();
 
 		// Load both admin & non-admin files.
 		add_filter( 'automator_core_files', array( $this, 'global_classes' ) );
@@ -82,6 +88,9 @@ class Automator_Load {
 
 		// Load Custom Post Types only files.
 		add_filter( 'automator_core_files', array( $this, 'custom_post_types_classes' ) );
+
+		// Load Gutenberg Block files.
+		add_filter( 'automator_core_files', array( $this, 'gutenberg_block_classes' ) );
 
 		// Load non-admin files.
 		add_filter( 'automator_core_files', array( $this, 'front_only_classes' ) );
@@ -103,65 +112,148 @@ class Automator_Load {
 
 		add_action( 'admin_init', array( $this, 'automator_schedule_healthchecks' ) );
 
+		add_action( 'admin_notices', array( $this, 'check_runtime_environment' ) );
+
 		$this->load_automator();
 
 		// Show set-up wizard.
 		$this->initiate_setup_wizard();
 
+		// Show upgrade notice from readme.txt.
+		if ( self::$is_admin_sect ) {
+			add_action(
+				'in_plugin_update_message-' . plugin_basename( AUTOMATOR_BASE_FILE ),
+				array( $this, 'in_plugin_update_message' ),
+				10,
+				2
+			);
+			$this->load_deactivation_survey();
+		}
+
+		// Load logs auto prune.
+		$this->load_logs_autoremoval();
+
+		// Load restore trigger status.
+		$this->load_logs_multiple_trigger_status_restore();
+
+		// Loads all cli commands.
+		$this->load_cli_commands();
+
+		// Auto-delete user logs.
+		add_action( 'deleted_user', array( $this, 'auto_prune_user_logs_handler' ), 10, 3 );
 	}
 
 	/**
-	 * is_php8_compat
-	 *
-	 * Checks and displays an admin notices if php is version 8
-	 * or above and both automator free and pro is version 3.2 or above.
-	 *
-	 * @return boolean True if version is 8 and both free or pro is less than 3.2. Otherwise, false.
-	 */
-	public function is_php8_compat() {
-
-		// if Pro is not active, bail
-		if ( ! defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ) {
-			return true;
-		}
-
-		// Check if the php version is 8.0 and above.
-		if ( ! version_compare( PHP_VERSION, '8.0.0', '>=' ) ) {
-			return true;
-		}
-
-		$automator_pro_version_is_less_than_3_2 = version_compare( AUTOMATOR_PRO_PLUGIN_VERSION, '3.2', '<' );
-
-		// If > php8.
-		// If either of free and pro is < 3.2.
-		if ( $automator_pro_version_is_less_than_3_2 ) {
-			add_action( 'admin_notices', array( $this, 'check_automator32_php8_compat_message' ) );
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * check_automator32_php8_compat_message
-	 *
-	 * Callback function from check_automator32_php8_compat. Shows an admin notice.
+	 * Loads all WP-CLI Commands.
 	 *
 	 * @return void
 	 */
-	public function check_automator32_php8_compat_message() {
-		$class   = 'notice notice-error';
-		$version = '3.2';
-		// An old version of Uncanny Automator is running
-		$url = admin_url( 'plugins.php#uncanny-automator-pro-update' );
+	public function load_cli_commands() {
 
-		/* translators: 2. Recipes. 3. PHP version */
-		$message = sprintf( __( "%2\$s recipes have been disabled because your version of PHP (%3\$s) is not fully compatible with the version of %1\$s that's installed.", 'uncanny-automator' ), 'Uncanny Automator Pro', 'Uncanny Automator', PHP_VERSION );
-		/* translators: 1. Trademarked term. 2. Version number */
-		$message_update = sprintf( __( 'Please update %1$s to version %2$s or later.', 'uncanny-automator' ), 'Uncanny Automator Pro', $version );
+		// Only loads in WP_CLI.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$dependecy      = new Prune_Logs( false );
+			$prune_commands = new Prune_Command( $dependecy );
+			$prune_commands->register_command();
+		}
+	}
 
-		printf( '<div class="%1$s"><h3 style="font-weight: bold; color: red"><span class="dashicons dashicons-warning"></span>%2$s <a href="%3$s">' . esc_html( $message_update ) . '</a></h3></div>', esc_attr( $class ), esc_html( $message ), esc_url_raw( $url ) );
+	/**
+	 * Flags the last automator pro update time.
+	 *
+	 * @return void
+	 * @var string[] $options
+	 *
+	 * @var object $upgrader_object
+	 */
+	public function flag_last_updated( $upgrader_object, $options ) {
+		// Bail if the options are not set.
+		if ( ! isset( $options['action'] ) || ! isset( $options['type'] ) ) {
+			return;
+		}
+
+		// Check if it's a plugin update.
+		if ( 'update' !== $options['action'] || 'plugin' !== $options['type'] ) {
+			return;
+		}
+
+		// The plugins being updated are stored in the 'plugins' key of the options array.
+		if ( ! isset( $options['plugins'] ) || ! is_array( $options['plugins'] ) ) {
+			return;
+		}
+
+		// The path to the specific plugin to check for, relative to the wp-content/plugins directory.
+		$specific_plugin_path = plugin_basename( AUTOMATOR_BASE_FILE );
+
+		foreach ( $options['plugins'] as $plugin_path ) {
+			if ( $plugin_path !== $specific_plugin_path ) {
+				continue;
+			}
+			// Update an option with the current time for the specific plugin
+			automator_update_option( 'automator_last_updated', current_time( 'mysql' ) );
+			break; // No need to continue the loop
+		}
+	}
+
+	/**
+	 * Checks runtime environment.
+	 *
+	 * - Displays some message on web assembly.
+	 *
+	 * @return void
+	 */
+	public function check_runtime_environment() {
+
+		if ( is_array( $_SERVER ) && isset( $_SERVER['SERVER_SOFTWARE'] ) && 'php.wasm' === strtolower( trim( $_SERVER['SERVER_SOFTWARE'] ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+
+			echo '<div class="notice notice-error"><p>'
+				 . esc_html_x( 'Uncanny Automator cannot currently run in WP Playground environments because Playground cannot support custom tables, cURL or SSL PHP functions. Please consider trying the free Uncanny Automator plugin in your own environment instead.', 'Uncanny Automator', 'uncanny-automator' ) //phpcs:ignore WordPress.WhiteSpace.PrecisionAlignment.Found
+				 . '</p></div>'; //phpcs:ignore WordPress.WhiteSpace.PrecisionAlignment.Found
+		}
+
+	}
+
+	/**
+	 * @return void
+	 */
+	public function load_deactivation_survey() {
+
+		require_once UA_ABSPATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'deactivation-survey' . DIRECTORY_SEPARATOR . 'class-automator-deactivation-survey.php';
+
+		add_action(
+			'admin_menu',
+			function () {
+				// See Usage instructions below for more information.
+				define(
+					'AUTOMATOR_DEACTIVATION_SURVEY_URL',
+					'https://survey.automatorplugin.com/wp-json/am-deactivate-survey/v1/deactivation-data/'
+				);
+				new \Automator_Deactivation_Survey(
+					'Uncanny Automator',
+					'uncanny-automator'
+				);
+			},
+			100
+		);
+
+	}
+
+	/**
+	 * Loads logs auto removal class to register the hooks.
+	 *
+	 * @return void
+	 */
+	public function load_logs_autoremoval() {
+		( new \Uncanny_Automator\Services\Logger_Auto_Removal() )->register_hooks();
+	}
+
+	/**
+	 * Lods log multiple trigger status retoration.
+	 *
+	 * @return void
+	 */
+	public function load_logs_multiple_trigger_status_restore() {
+		( new \Uncanny_Automator\Services\Multiple_Triggers_Restore_Failed_Logs() )->restore_once();
 	}
 
 	/**
@@ -169,41 +261,72 @@ class Automator_Load {
 	 */
 	public function automator_activated( $plugin ) {
 
-		if ( plugin_basename( AUTOMATOR_BASE_FILE ) === $plugin && true === apply_filters( 'automator_on_activate_redirect_to_dashboard', true ) ) {
+		// If it's not Automator, bail
+		if ( plugin_basename( AUTOMATOR_BASE_FILE ) !== $plugin ) {
+			return;
+		}
 
-			$checked = filter_input( INPUT_POST, 'checked', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		// If disbaled by filter
+		if ( false === apply_filters( 'automator_on_activate_redirect_to_dashboard', true ) ) {
+			return;
+		}
 
-			// Bail if bulked activated and there are more than 1 plugin.
-			if ( is_array( $checked ) && count( $checked ) >= 2 ) {
-				return;
-			}
+		// Check if the current user can activate plugin
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
 
-			// Bail if not from `wp-admin/plugins.php` (e.g coming from an ajax, or unit test)
-			if ( false !== wp_get_referer() && ! strpos( wp_get_referer(), 'wp-admin/plugins.php' ) ) {
-				return;
-			}
+		// If activated via AJAX or REST
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return;
+		}
 
-			// Bail if from Codeception WPTestCase.
-			if ( class_exists( '\Codeception\TestCase\WPTestCase' ) ) {
-				return;
-			}
+		// If activated via CRON
+		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+			return;
+		}
 
-			// Bail if in WP CLI mode.
-			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				return;
-			}
+		// If not defined cli
+		if ( function_exists( 'php_sapi_name' ) && php_sapi_name() === 'cli' ) {
+			return;
+		}
 
-			// If the site is not previously connected, let's redirect to Setup Wizard
-			if ( class_exists( '\Uncanny_Automator\Api_Server' ) && empty( Api_Server::get_license_key() ) ) {
-				wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-setup-wizard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
-				exit();
+		// Bail if from Codeception WPTestCase.
+		if ( class_exists( '\Codeception\TestCase\WPTestCase' ) ) {
+			return;
+		}
 
-			}
+		// Bail if in WP CLI mode.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return;
+		}
 
-			// Else, redirect back to Dashboard
-			wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-dashboard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+		// If HTTP_USER_AGENT is missing for an automated script
+		if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return;
+		}
+
+		$checked = filter_input( INPUT_POST, 'checked', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+
+		// Bail if bulked activated and there are more than 1 plugin.
+		if ( is_array( $checked ) && count( $checked ) >= 2 ) {
+			return;
+		}
+
+		// Bail if not from `wp-admin/plugins.php` (e.g coming from an ajax, or unit test)
+		if ( ! check_admin_referer( 'activate-plugin_' . $plugin ) ) {
+			return;
+		}
+
+		// If the site is not previously connected, let's redirect to Setup Wizard
+		if ( class_exists( '\Uncanny_Automator\Api_Server' ) && empty( Api_Server::get_license_key() ) ) {
+			wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-setup-wizard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit();
 		}
+
+		// Else, redirect back to Dashboard
+		wp_redirect( esc_url_raw( admin_url( 'admin.php?page=uncanny-automator-dashboard' ) ) ); //phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+		exit();
 	}
 
 	/**
@@ -220,7 +343,7 @@ class Automator_Load {
 
 			$link = 'https://automatorplugin.com/pricing/?utm_source=uncanny_automator&utm_medium=plugins_page&utm_content=update_to_pro';
 
-			$settings_link = sprintf( '<a href="%s" target="_blank" style="font-weight: bold;">%s</a>', $link, __( 'Upgrade to Pro', 'uncanny-learndash-toolkit' ) );
+			$settings_link = sprintf( '<a href="%s" target="_blank" style="color: rgb(0, 163, 42); font-weight: 700;">%s</a>', $link, __( 'Upgrade to Pro', 'uncanny-automator' ) );
 
 			array_unshift( $links, $settings_link );
 
@@ -253,9 +376,83 @@ class Automator_Load {
 		// Load the core files
 		$this->initialize_core_automator();
 
+		// Load the services.
+		$this->load_services();
+
+		// Load system overwrites.
+		$this->load_overwrites();
+
 		do_action( 'automator_configuration_complete' );
 
 		add_action( 'wpforms_loaded', array( $this, 'wpforms_integration' ) );
+	}
+
+	/**
+	 * Load constant overwrites or early filters.
+	 *
+	 * Adds filters for enabling debug mode and determining whether Automator should load.
+	 *
+	 * @return void
+	 */
+	public function load_overwrites() {
+		add_filter( 'automator_should_enable_debug_mode', array( $this, 'should_enable_debug_mode_handler' ) );
+		add_filter( 'automator_should_load_automator', array( $this, 'should_load_automator' ) );
+	}
+
+	/**
+	 * Check if debug mode should be enabled.
+	 *
+	 * @return bool True if debug mode is enabled, false otherwise.
+	 */
+	public function should_enable_debug_mode_handler() {
+		return ! empty( automator_get_option( 'automator_settings_debug_notices_enabled', false ) );
+	}
+
+	/**
+	 * Check if Automator should load.
+	 *
+	 * @return bool True if Automator should load, false otherwise.
+	 */
+	public function should_load_automator() {
+		return filter_var( automator_get_option( 'load_automator', true ), FILTER_VALIDATE_BOOLEAN );
+	}
+
+	/**
+	 * Loads the RESTful API services.
+	 *
+	 * @since 4.15
+	 */
+	public function load_services() {
+
+		// Rest services.
+		add_action(
+			'rest_api_init',
+			function ( \WP_REST_Server $wp_rest_server ) {
+				// Register our routes when 'rest_api_init' is called.
+				// Only require the route when needed.
+				require_once UA_ABSPATH . 'src/core/services/rest-routes.php';
+				Rest\Log_Endpoint\rest_api_init( $wp_rest_server );
+			},
+			10,
+			1
+		);
+
+		$this->register_fields_logger();
+
+		require_once UA_ABSPATH . 'src/core/services/logger/async-logger.php';
+	}
+
+	/**
+	 * Registers the fields logger.
+	 *
+	 * @return void
+	 */
+	public function register_fields_logger() {
+
+		require_once UA_ABSPATH . 'src/core/services/logger.php';
+
+		\Uncanny_Automator\Logger\fields_logger_register_listeners();
+
 	}
 
 	/**
@@ -265,9 +462,11 @@ class Automator_Load {
 		if ( ! class_exists( 'WPForms' ) ) {
 			return;
 		}
+
 		if ( version_compare( WPFORMS_VERSION, '1.7.0', '<' ) ) {
 			return;
 		}
+
 		add_filter(
 			'wpforms_load_providers',
 			function ( $providers ) {
@@ -292,10 +491,10 @@ class Automator_Load {
 	 *
 	 */
 	public function initialize_assets() {
-		// Load same script for free and pro
-		add_action( 'admin_enqueue_scripts', array( $this, 'automator_license_style' ) );
-		// Load script front-end
-		add_action( 'wp_enqueue_scripts', array( $this, 'automator_closure_scripts' ) );
+		if ( self::$is_admin_sect ) {
+			// Load same script for free and pro
+			add_action( 'admin_enqueue_scripts', array( $this, 'automator_license_style' ) );
+		}
 	}
 
 	/**
@@ -305,9 +504,8 @@ class Automator_Load {
 	 */
 	public function initialize_utilities() {
 
-		require UA_ABSPATH . 'src/core/class-utilities.php';
+		require_once UA_ABSPATH . 'src/core/class-utilities.php';
 		Utilities::get_instance();
-
 	}
 
 	/**
@@ -330,14 +528,14 @@ class Automator_Load {
 			)
 		);
 
-		$db_version = get_option( 'uap_database_version', null );
+		$db_version = automator_get_option( 'uap_database_version', null );
 
 		if ( null === $db_version || (string) AUTOMATOR_DATABASE_VERSION !== (string) $db_version ) {
 			Automator_DB::activation();
 			$config_instance->mysql_8_auto_increment_fix();
 		}
 
-		if ( (string) AUTOMATOR_DATABASE_VIEWS_VERSION !== (string) get_option( 'uap_database_views_version', 0 ) ) {
+		if ( (string) AUTOMATOR_DATABASE_VIEWS_VERSION !== (string) automator_get_option( 'uap_database_views_version', 0 ) ) {
 			$config_instance->automator_generate_views();
 		}
 	}
@@ -354,6 +552,7 @@ class Automator_Load {
 			return;
 		}
 
+		// only load if it's admin
 		$this->load_traits();
 
 		foreach ( $classes as $class_name => $file ) {
@@ -384,18 +583,6 @@ class Automator_Load {
 	}
 
 	/**
-	 *
-	 */
-	public static function maybe_load_automator() {
-
-		$run_automator = true;
-
-		$run_automator = apply_filters_deprecated( 'uap_run_automator_actions', array( $run_automator ), '3.0', 'automator_run_automator_actions' );
-
-		return apply_filters( 'automator_run_automator_actions', $run_automator );
-	}
-
-	/**
 	 * @param $args
 	 * @param $response
 	 */
@@ -423,52 +610,6 @@ class Automator_Load {
 	}
 
 	/**
-	 * Enqueue script
-	 */
-	public function automator_closure_scripts() {
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
-		// check if there is a recipe and closure with publish status
-		$check_closure = Automator()->db->closure->get_all();
-		if ( empty( $check_closure ) ) {
-			return;
-		}
-		$user_id = wp_get_current_user()->ID;
-
-		// Filter to optionally bail out
-		global $post;
-		$is_uoa_redirect = (bool) apply_filters( 'automator_run_closure_uoa_redirect', true, $post, $user_id );
-
-		if ( true !== $is_uoa_redirect ) {
-			return;
-		}
-
-		$api_setup = array(
-			'root'              => esc_url_raw( rest_url() . AUTOMATOR_REST_API_END_POINT . '/uoa_redirect/' ),
-			'nonce'             => wp_create_nonce( 'wp_rest' ),
-			'user_id'           => $user_id,
-			'client_secret_key' => md5( 'l6fsX3vAAiJbSXticLBd' . $user_id ),
-		);
-		wp_register_script( 'uoapp-client', Utilities::automator_get_asset( 'legacy/js/uo-sseclient.js' ), array(), AUTOMATOR_PLUGIN_VERSION ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NotInFooter
-		wp_localize_script( 'uoapp-client', 'uoAppRestApiSetup', $api_setup );
-		wp_enqueue_script( 'uoapp-client' );
-	}
-
-	/**
-	 * @return mixed|void
-	 */
-	public function include_core_files() {
-		/**
-		 * Abstracts.
-		 */
-		do_action( 'automator_before_abstract_init' );
-
-		do_action( 'automator_after_abstract_init' );
-
-	}
-
-	/**
 	 * @param array $classes
 	 *
 	 * @return array|mixed
@@ -477,18 +618,23 @@ class Automator_Load {
 		/**
 		 * Admin.
 		 */
-		if ( ! is_admin() ) {
+		if ( ! self::$is_admin_sect && ! Automator()->helpers->recipe->is_automator_ajax() ) {
 			return $classes;
 		}
 
 		do_action( 'automator_before_admin_init' );
 
-		$classes['Admin_Menu']     = UA_ABSPATH . 'src/core/admin/class-admin-menu.php';
-		$classes['Prune_Logs']     = UA_ABSPATH . 'src/core/admin/class-prune-logs.php';
-		$classes['Admin_Logs']     = UA_ABSPATH . 'src/core/admin/admin-logs/admin-logs.php';
-		$classes['Admin_Tools']    = UA_ABSPATH . 'src/core/admin/admin-tools/admin-tools.php';
-		$classes['Admin_Settings'] = UA_ABSPATH . 'src/core/admin/admin-settings/admin-settings.php';
-		$classes['Pro_Upsell']     = UA_ABSPATH . 'src/core/admin/pro-upgrade/class-pro-upsell.php';
+		$classes['Admin_Menu']                     = UA_ABSPATH . 'src/core/admin/class-admin-menu.php';
+		$classes['Prune_Logs']                     = UA_ABSPATH . 'src/core/admin/class-prune-logs.php';
+		$classes['Admin_Logs']                     = UA_ABSPATH . 'src/core/admin/admin-logs/admin-logs.php';
+		$classes['Admin_Tools']                    = UA_ABSPATH . 'src/core/admin/admin-tools/admin-tools.php';
+		$classes['Admin_Settings']                 = UA_ABSPATH . 'src/core/admin/admin-settings/admin-settings.php';
+		$classes['Pro_Upsell']                     = UA_ABSPATH . 'src/core/admin/pro-upgrade/class-pro-upsell.php';
+		$classes['Automator_Review']               = UA_ABSPATH . 'src/core/admin/class-automator-review.php';
+		$classes['Automator_Notifications']        = UA_ABSPATH . 'src/core/admin/notifications/notifications.php';
+		$classes['Automator_Tooltip_Notification'] = UA_ABSPATH . 'src/core/admin/tooltip-notification/class-tooltip-notification.php';
+		$classes['Automator_Tooltip_48hr']         = UA_ABSPATH . 'src/core/admin/tooltip-notification/tooltips/class-create-recipe-reminder.php';
+		$classes['Admin_Template_Library']         = UA_ABSPATH . 'src/core/admin/class-admin-template-library.php';
 
 		$classes['Api_Log'] = UA_ABSPATH . 'src/core/admin/api-log/class-api-log.php';
 
@@ -527,18 +673,37 @@ class Automator_Load {
 	 */
 	public function custom_post_types_classes( $classes = array() ) {
 
+		if ( ! self::$any_recipes_active && ! self::$is_admin_sect && ! Automator()->helpers->recipe->is_automator_ajax() ) {
+			return $classes;
+		}
+
 		do_action( 'automator_before_automator_post_types_init' );
 
 		$classes['Recipe_Post_Type']      = UA_ABSPATH . 'src/core/automator-post-types/uo-recipe/class-recipe-post-type.php';
 		$classes['Recipe_Post_Metabox']   = UA_ABSPATH . 'src/core/automator-post-types/uo-recipe/class-recipe-post-metabox.php';
 		$classes['Recipe_Post_Utilities'] = UA_ABSPATH . 'src/core/automator-post-types/uo-recipe/class-recipe-post-utilities.php';
-		$classes['Recipe_Post_Rest_Api']  = UA_ABSPATH . 'src/core/automator-post-types/uo-recipe/class-recipe-post-rest-api.php';
 		$classes['Triggers_Post_Type']    = UA_ABSPATH . 'src/core/automator-post-types/uo-trigger/class-triggers-post-type.php';
 		$classes['Actions_Post_Type']     = UA_ABSPATH . 'src/core/automator-post-types/uo-action/class-actions-post-type.php';
 		$classes['Closures_Post_Type']    = UA_ABSPATH . 'src/core/automator-post-types/uo-closure/class-closures-post-type.php';
 		$classes['Automator_Taxonomies']  = UA_ABSPATH . 'src/core/automator-post-types/uo-taxonomies/class-automator-taxonomies.php';
 
 		do_action( 'automator_after_automator_post_types_init' );
+
+		return $classes;
+	}
+
+	/**
+	 * @param array $classes
+	 *
+	 * @return array|mixed
+	 */
+	public function gutenberg_block_classes( $classes = array() ) {
+
+		do_action( 'automator_before_blocks_init' );
+
+		$classes['Blocks'] = UA_ABSPATH . 'src/core/blocks/class-blocks.php';
+
+		do_action( 'automator_after_blocks_init' );
 
 		return $classes;
 	}
@@ -574,7 +739,7 @@ class Automator_Load {
 	/**
 	 * @param array $classes
 	 *
-	 * @return array|mixed
+	 * @return array
 	 */
 	public function global_classes( $classes = array() ) {
 		/**
@@ -582,32 +747,106 @@ class Automator_Load {
 		 */
 		do_action( 'automator_before_autoloader' );
 
-		// Load Anon part if Pro is not active
-		if ( ! defined( 'AUTOMATOR_PRO_FILE' ) ) {
-			$classes['Automator_Handle_Anon'] = UA_ABSPATH . 'src/core/anon/automator-handle-anon.php';
-		}
-
 		// Webhooks
 		$classes['Automator_Send_Webhook_Ajax_Handler'] = UA_ABSPATH . 'src/core/lib/webhooks/class-automator-send-webhook-ajax-handler.php';
-		$classes['Automator_Review']                    = UA_ABSPATH . 'src/core/admin/class-automator-review.php';
-		$classes['Automator_Autoloader']                = UA_ABSPATH . 'src/core/lib/autoload/class-ua-autoloader.php';
-		//$classes['Api_Server']                          = UA_ABSPATH . 'src/core/classes/class-api-server.php';
-		$classes['Usage_Reports']           = UA_ABSPATH . 'src/core/classes/class-usage-reports.php';
-		$classes['Set_Up_Automator']        = UA_ABSPATH . 'src/core/classes/class-set-up-automator.php';
-		$classes['Initialize_Automator']    = UA_ABSPATH . 'src/core/classes/class-initialize-automator.php';
-		$classes['Automator_Notifications'] = UA_ABSPATH . 'src/core/admin/notifications/notifications.php';
-		$classes['Calculation_Token']       = UA_ABSPATH . 'src/core/classes/class-calculation-token.php';
-		$classes['Copy_Recipe_Parts']       = UA_ABSPATH . 'src/core/admin/class-copy-recipe-parts.php';
-		$classes['Background_Actions']      = UA_ABSPATH . 'src/core/classes/class-background-actions.php';
+		$classes['Recipe_Post_Rest_Api']                = UA_ABSPATH . 'src/core/automator-post-types/uo-recipe/class-recipe-post-rest-api.php';
+		$classes['Background_Actions']                  = UA_ABSPATH . 'src/core/classes/class-background-actions.php';
+		$classes['Calculation_Token']                   = UA_ABSPATH . 'src/core/classes/class-calculation-token.php';
+		$classes['Copy_Recipe_Parts']                   = UA_ABSPATH . 'src/core/admin/class-copy-recipe-parts.php';
+		$classes['Export_Recipe']                       = UA_ABSPATH . 'src/core/admin/class-export-recipe.php';
+		$classes['Import_Recipe']                       = UA_ABSPATH . 'src/core/admin/class-import-recipe.php';
 
 		require_once UA_ABSPATH . 'src/core/classes/class-api-server.php';
 
 		// Load migrations
 		$this->load_migrations();
 
+		// Only initialize classes if there're any active recipes OR if user is editing recipe
+		$classes = $this->maybe_initialize_automator( $classes );
+
 		do_action( 'automator_after_autoloader' );
 
 		return $classes;
+	}
+
+	/**
+	 * @param $classes
+	 *
+	 * @return mixed
+	 */
+	public function maybe_initialize_automator( $classes ) {
+		// Check if running unit-tests
+		$unit_tests = is_automator_running_unit_tests();
+
+		// check if it's REST endpoint call or running unit tests
+		if ( ! Automator()->helpers->recipe->is_automator_ajax() && ! $unit_tests ) {
+
+			$classes['Usage_Reports'] = UA_ABSPATH . 'src/core/classes/class-usage-reports.php';
+
+			// If there are no active recipes && is not an admin page -- bail
+			if ( ! self::$is_admin_sect && ! self::$any_recipes_active ) {
+				return $classes;
+			}
+
+			global $pagenow;
+
+			$load_on_pages = array(
+				'post.php',
+				'edit.php',
+				'options.php',
+			);
+
+			if ( 'edit.php' === $pagenow && ( ! automator_filter_has_var( 'post_type' ) || 'uo-recipe' !== automator_filter_input( 'post_type' ) ) && ! self::$any_recipes_active ) {
+				return $classes;
+			}
+
+			// if current page is not an edit screen, and none of the recipes are published, return
+			if ( ! self::$any_recipes_active && ! in_array( $pagenow, $load_on_pages, true ) ) {
+				return $classes;
+			}
+		}
+
+		$classes['Set_Up_Automator']     = UA_ABSPATH . 'src/core/classes/class-set-up-automator.php';
+		$classes['Initialize_Automator'] = UA_ABSPATH . 'src/core/classes/class-initialize-automator.php';
+
+		// Load Anon part if Pro is not active
+		if ( ! defined( 'AUTOMATOR_PRO_FILE' ) ) {
+			$classes['Automator_Handle_Anon'] = UA_ABSPATH . 'src/core/anon/class-automator-handle-anon.php';
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function any_active_recipe() {
+		// Check if cache exists
+		$results = Automator()->cache->get( 'automator_any_recipes_active', 'automator' );
+
+		if ( ! empty( $results ) && 'yes' === $results ) {
+			return true;
+		}
+
+		if ( ! empty( $results ) && 'no' === $results ) {
+			return false;
+		}
+
+		if ( empty( $results ) ) {
+			global $wpdb;
+
+			$results = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = %s AND post_status = %s", 'uo-recipe', 'publish' ) );
+			$results = 0 !== absint( $results );
+			$val     = 'yes';
+			if ( false === $results ) {
+				$val = 'no';
+			}
+
+			// Instead of transient, lets use cache
+			Automator()->cache->set( 'automator_any_recipes_active', $val, 'automator', 2 * MINUTE_IN_SECONDS );
+		}
+
+		return $results;
 	}
 
 	/**
@@ -663,22 +902,20 @@ class Automator_Load {
 		$classes['Actions']                    = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-actions.php';
 
 		// Webhooks
-		//$classes['Webhook_Ajax_Handler']        = UA_ABSPATH . 'src/core/lib/recipe-parts/webhooks/trait-webhook-ajax-handler.php';
-		$classes['Webhook_Send_Rest_Handler']   = UA_ABSPATH . 'src/core/lib/recipe-parts/webhooks/trait-webhook-send-rest-handler.php';
-		$classes['Webhook_Send_Sample_Handler'] = UA_ABSPATH . 'src/core/lib/recipe-parts/webhooks/trait-webhook-send-sample-handler.php';
-		$classes['Webhook_Static_Content']      = UA_ABSPATH . 'src/core/lib/recipe-parts/webhooks/trait-webhook-static-content.php';
-		$classes['Webhooks']                    = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-webhooks.php';
+		$classes['Webhooks'] = UA_ABSPATH . 'src/core/lib/recipe-parts/trait-webhooks.php';
 
 		if ( empty( $classes ) ) {
 			return;
 		}
 		// TODO: Generate Class names by filenames
 		foreach ( $classes as $file ) {
-			if ( ! file_exists( $file ) ) {
-				continue;
-			}
-			require $file;
+			require_once $file;
 		}
+
+		require_once UA_ABSPATH . 'src/core/lib/recipe-parts/abstract-integration.php';
+		require_once UA_ABSPATH . 'src/core/lib/recipe-parts/actions/abstract-action.php';
+		require_once UA_ABSPATH . 'src/core/lib/recipe-parts/triggers/abstract-trigger.php';
+
 		do_action( 'automator_after_traits' );
 	}
 
@@ -691,7 +928,7 @@ class Automator_Load {
 
 		$uncanny_automator_enabled_global_utm = apply_filters( 'uncanny_automator_enabled_global_utm', true );
 
-		$uncannyautomator_source = get_option( 'uncannyautomator_source' );
+		$uncannyautomator_source = automator_get_option( 'uncannyautomator_source' );
 
 		if ( false === $uncannyautomator_source || empty( $uncannyautomator_source ) ) {
 			return;
@@ -749,7 +986,7 @@ class Automator_Load {
 	 * Initiate the set-up wizard.
 	 */
 	public function initiate_setup_wizard() {
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+		if ( self::$is_admin_sect && ! defined( 'DOING_AJAX' ) ) {
 			include_once UA_ABSPATH . 'src/core/admin/setup-wizard/setup-wizard.php';
 			$setup_wizard = new Setup_Wizard();
 		}
@@ -781,5 +1018,49 @@ class Automator_Load {
 		if ( ! wp_next_scheduled( 'automator_daily_healthcheck' ) ) {
 			wp_schedule_event( time(), 'daily', 'automator_daily_healthcheck' );
 		}
+	}
+
+	/**
+	 * Callback method to `deleted_user` action hook.
+	 *
+	 * @param int $id
+	 * @param int|null $reassign
+	 * @param \WP_User $user
+	 *
+	 * @return bool True if the purge_logs method has been invoked. Otherwise, false.
+	 */
+	public function auto_prune_user_logs_handler( $id, $reassign, $user ) {
+
+		$should_delete_user_records = automator_get_option( 'automator_delete_user_records_on_user_delete', false );
+
+		// Bail on settings disabled. '0' is considered empty.
+		if ( empty( $should_delete_user_records ) ) {
+			return false;
+		}
+
+		$prune_logs = new Prune_Logs( false );
+		$user_logs  = $prune_logs->get_user_logs( $id );
+
+		foreach ( $user_logs as $user_log ) {
+			$prune_logs->purge_logs( $user_log['automator_recipe_id'], $user_log['ID'], $user_log['run_number'] );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the instance of a core class.
+	 *
+	 * @param string $class_name
+	 *
+	 * @return mixed - The instance of the class if it exists, otherwise null.
+	 */
+	public static function get_core_class_instance( $class_name ) {
+
+		if ( isset( self::$core_class_inits[ $class_name ] ) ) {
+			return self::$core_class_inits[ $class_name ];
+		}
+
+		return null;
 	}
 }

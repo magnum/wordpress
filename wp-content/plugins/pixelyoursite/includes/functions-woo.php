@@ -33,7 +33,9 @@ function wooProductIsType( $product, $type ) {
 
 }
 function wooIsRequestContainOrderId() {
+    global $wp;
     return  isset( $_REQUEST['key'] )  && $_REQUEST['key'] != ""
+        || !empty($wp->query_vars['order-received'])
         || isset( $_REQUEST['referenceCode'] )  && $_REQUEST['referenceCode'] != ""
         || isset( $_REQUEST['ref_venta'] )  && $_REQUEST['ref_venta'] != ""
         || !empty( $_REQUEST['wcf-order'] );
@@ -56,16 +58,51 @@ function getWooProductPriceToDisplay( $product_id, $qty = 1 ) {
     // take min price for variable product
     if($product->get_type() == "variable") {
         $prices = $product->get_variation_prices( true );
-        if(!empty( $prices['price'] )) {
-            $productPrice = current( $prices['price'] );
+        if(empty( $prices['price'] )) {
+            $productPrice = $product->get_price();
+        } else {
+            $variation_id = key($prices['price']); // Getting the variation ID
+            $variation = wc_get_product($variation_id); // Creating a Variation Instance
+
+            if ($variation && is_a($variation, 'WC_Product')) { // Check if $variation is a valid product object
+                $productPrice = current( $prices['price'] ); // Getting the price of the variation
+            } else {
+                // Handle the case where no valid variation is found
+                // For example, fallback to the parent product's price or set a default price
+                $productPrice = $product->get_price(); // Fallback to the parent product's price
+            }
         }
+
+    } else {
+        $productPrice = $product->get_price();
     }
 
     return (float) wc_get_price_to_display( $product, array( 'qty' => $qty,'price'=>$productPrice ) );
 }
+/**
+ * @param SingleEvent $event
+ */
+function getWooEventCartTotal($event) {
 
+    return getWooEventCartSubtotal($event);
+}
+/**
+ * @param SingleEvent $event
+ */
+function getWooEventCartSubtotal($event) {
+    $subTotal = 0;
+    $include_tax = get_option( 'woocommerce_tax_display_cart' ) == 'incl';
+
+    foreach ($event->args['products'] as $product) {
+        $subTotal += $product['subtotal'];
+        if($include_tax) {
+            $subTotal += $product['subtotal_tax'];
+        }
+    }
+    return pys_round($subTotal);
+}
 function getWooCartSubtotal() {
-
+    WC()->cart->calculate_totals();
 	// subtotal is always same value on front-end and depends on PYS options
 	$include_tax = get_option( 'woocommerce_tax_display_cart' ) == 'incl';
 
@@ -126,7 +163,7 @@ function getWooEventValue( $valueOption, $global, $percent, $product_id,$qty ) {
         case 'global': $value = $global; break;
         case 'percent':
             $percents = (float) $percent;
-            $percents = str_replace( '%', null, $percents );
+            $percents = str_replace( '%', '', $percents );
             $percents = (float) $percents / 100;
             $value    = (float) $amount * $percents;
             break;
@@ -161,7 +198,7 @@ function getWooEventValueOrder( $valueOption, $order, $global, $percent = 100 ) 
 
         case 'percent':
             $percents = (float) $percent;
-            $percents = str_replace( '%', null, $percents );
+            $percents = str_replace( '%', '', $percents );
             $percents = (float) $percents / 100;
             $value    = (float) $amount * $percents;
             break;
@@ -174,6 +211,19 @@ function getWooEventValueOrder( $valueOption, $order, $global, $percent = 100 ) 
 
 }
 
+function get_fees($order){
+    $fees = $order->get_fees();
+    $fee_amount = 0;
+
+    foreach ($fees as $fee) {
+        $fee_amount += $fee->get_total();
+    }
+    if($fee_amount > 0){
+        return $fee_amount;
+    }
+
+    return 0;
+}
 function getWooEventValueCart( $valueOption, $global, $percent = 100 ) {
 
     if($valueOption == 'cog' && isPixelCogActive()) {
@@ -198,7 +248,7 @@ function getWooEventValueCart( $valueOption, $global, $percent = 100 ) {
 
         case 'percent':
             $percents = (float) $percent;
-            $percents = str_replace( '%', null, $percents );
+            $percents = str_replace( '%', '', $percents );
             $percents = (float) $percents / 100;
             $value    = (float) $amount * $percents;
             break;
@@ -211,9 +261,33 @@ function getWooEventValueCart( $valueOption, $global, $percent = 100 ) {
 }
 
 function wooGetOrderIdFromRequest() {
+    global $wp;
     if(isset( $_REQUEST['key'] )  && $_REQUEST['key'] != "") {
         $order_key = sanitize_key($_REQUEST['key']);
-        $order_id = (int) wc_get_order_id_by_order_key( $order_key );
+        $cache_key = 'order_id_' . $order_key;
+        $order_id = get_transient( $cache_key );
+        if (PYS()->woo_is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
+
+            $order_id = absint( $wp->query_vars['order-received'] );
+            if ($order_id) {
+                set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
+            }
+        }
+        if ( empty($order_id) ) {
+            $order_id = (int) wc_get_order_id_by_order_key( $order_key );
+            set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
+        }
+        return $order_id;
+    }
+    if(PYS()->woo_is_order_received_page() && !empty($wp->query_vars['order-received'])){
+        $cache_key = 'order_id_' . $wp->query_vars['order-received'];
+        $order_id = get_transient( $cache_key );
+        if (empty($order_id)) {
+            $order_id = absint( $wp->query_vars['order-received'] );
+            if ($order_id) {
+                set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
+            }
+        }
         return $order_id;
     }
     if(isset( $_REQUEST['referenceCode'] )  && $_REQUEST['referenceCode'] != "") {

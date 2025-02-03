@@ -1,6 +1,147 @@
 Changelog
 =========
 
+#### 4.10.0 - Jan 23, 2025
+
+- Bump required PHP version to 7.4 or higher.
+- Obfuscate API key the same way as in the Mailchimp.com interface.
+- Delete all plugin data when plugin is uninstalled / deleted via WP Admin.
+- Fix several PHP 8.4 deprecation warnings.
+- Address warning about translations being loaded too early if using Ninja Forms integration.
+- Run stored setting values related to user-facing textual messages through i18n functions to allow translating them through plugins like Loco Translate or WPML.
+
+
+#### 4.9.21 - Jan 08, 2025
+
+- [Forms] Rename "list choice" to "audience choice" in available form fields.
+- [Ninja Forms] Fix gettext being called too early warning in Ninja Forms base class.
+- [WooCommerce] Allow pre-checking of sign-up checkbox in Checkout Block.
+
+
+#### 4.9.20 - Dec 18, 2024
+
+- Fix Ninja Forms integration field no longer showing up.
+- Fix "link is expired" message because of missing nonce on button to dismiss API key notice.
+- [WPML] Added text_no_lists_selected to the config file so it can be translated. Thanks [Diego Pereira](https://github.com/diiegopereira)!
+
+
+#### 4.9.19 - Nov 11, 2024
+
+- Add integration with [Prosopo](https://prosopo.io/), a GDPR compliant anti-spam solution for protecting your sign-up forms against bot sign-ups. Thanks [Maxim Akimov](https://github.com/light-source)!
+
+
+#### 4.9.18 - Oct 21, 2024
+
+- Bump required PHP version to 7.2.
+- Prevent non-functional checkbox from showing up on WooCommerce my account page if WooCommerce checkout integration is enabled.
+- Update default form content to include a "for" attribute on the label element.
+- Minor performance optimizations to `MC4WP_Form::get_subscriber_tags()`
+- Begrudgingly rename Mailchimp lists to Mailchimp audiences throughout the plugin's admin interfaces.
+
+
+#### 4.9.17 - Sep 17, 2024
+
+- Fix compatibility with WooCommerce versions 8.5 to 8.8 because of private method that was later made public.
+- Fix potential reflected XSS by stripping and escaping all HTML from `{email}` tag replacements. Thanks to kauenavarro for responsibly disclosing.
+- Fix potential stored XSS for attackers with both administrator access and Mailchimp account access by escaping HTML from interest group name. Thanks to Jorge Diaz (ddiax) for responsibly disclosing.
+
+
+#### 4.9.16 - Sep 11, 2024
+
+- Add support for WooCommerce Checkout Block in sign-up checkbox integration.
+
+
+#### 4.9.15 - Aug 13, 2024
+
+- Improved anti-spam measures on the [custom form integration](https://www.mc4wp.com/kb/subscribe-mailchimp-custom-html-form/). If you are using the custom form integration (using the `mc4wp-subscribe` checkbox), please test your forms after upgrading and report any issues to us.
+- Improved anti-spam measures on all sign-up forms.
+- Remove unsupported filter hook from Gravity Forms integration. 
+
+
+#### 4.9.14 - Jul 17, 2024
+
+- Very minor code-size improvements to public forms related JavaScript.
+- Update third-party JS dependencies.
+- Bump tested WordPress version to 6.6.
+
+
+#### 4.9.13 - Apr 25, 2024
+
+- Fix issue with Composer classmap throwing a fatal error when an older version of Composer is already loaded.
+
+
+#### 4.9.12 - Apr 22, 2024 
+
+- Fix last 10 Mailchimp lists not being pulled-in when having more than 10 lists.
+
+
+#### 4.9.11 - Jan 8, 2024
+
+- Update third-party JS dependencies.
+- Bump tested WordPress version.
+
+
+#### 4.9.10 - Nov 20, 2023
+
+- Integrations: Update CheckoutWC hook name for WooCommerce checkbox integration.
+- Forms: Don't show form preview to users without `edit_posts` capability.
+- Forms: Explicitly exclude form preview from search engine indexing.
+- General: Don't unnecessarily go through service contrainer while bootstrapping plugin.
+- General: Remove some unnecessary JavaScript now that browser support has caught up.
+
+
+#### 4.9.9 - Oct 3, 2023 
+
+- Fix class "MC4WP_Usage_Tracking" not found error for WP Cron / WP CLI processes.
+
+
+#### 4.9.8 - Oct 3, 2023
+
+- Remove the opt-in usage tracking functionality as we're not really using it for decision making anymore.
+- Add missing label element to the select element for setting the logging level.
+- Our JavaScript assets are now transpiled to support the same set of browsers as WordPress core. 
+This drops support for some very old browsers, but results in smaller bundle sizes for the supported set of browsers.
+- Update third-party JS dependencies to their latest versions.
+
+
+#### 4.9.7 - Aug 29, 2023
+
+- Update third-party JS dependencies.
+- Minor textual improvements.
+- Bump tested WordPress version.
+
+
+#### 4.9.6 - Jul 12, 2023
+
+- Update third-party JS dependencies.
+- Address some minor codestyle issues.
+
+
+#### 4.9.5 - Jun 7, 2023
+
+- Fix generated HTML for list/audience choice fields.
+- Fix deprecation warning in includes/admin/class-review-notice.php.
+- Update JavaScript dependencies.
+
+
+#### 4.9.4 - May 2, 2023
+
+- Fallback to default checkbox label if none given. Thanks to [Shojib Khan](https://github.com/kshojib).
+- Improve WooCommerce integration settings page by disabling position field if integration is disabled. Thanks to [Shojib Khan](https://github.com/kshojib).
+- Update JavaScript dependencies.
+
+
+#### 4.9.3 - Mar 31, 2023
+
+- Defend against breaking change in latest WPForms update.
+
+
+#### 4.9.2 - Mar 21, 2023
+
+- Add support for a field named `MARKETING_PERMISSIONS` to enable GDPR fields configured in Mailchimp. A [sample code snippet can be found here](https://github.com/ibericode/mailchimp-for-wordpress/blob/main/sample-code-snippets/forms/gdpr-marketing-permissions.md).
+- Remove Google reCaptcha feature. This was already disabled if you were not already using it.
+
+
 #### 4.9.1 - Feb 7, 2023
 
 - Fix generated value attribute for fields of type choice (dropdown, checkboxes, radio fields).

@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Visit_Site extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_visit_site';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_visit_site';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -83,4 +94,5 @@ class AutomatorWP_WordPress_Visit_Site extends AutomatorWP_Integration_Trigger {
 
 }
 
-new AutomatorWP_WordPress_Visit_Site();
+new AutomatorWP_WordPress_Visit_Site( 'wordpress' );
+new AutomatorWP_WordPress_Visit_Site( 'users' );

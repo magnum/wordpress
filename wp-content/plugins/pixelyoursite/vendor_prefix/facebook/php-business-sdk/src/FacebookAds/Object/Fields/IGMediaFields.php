@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,26 +34,44 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class IGMediaFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAPTION = 'caption';
-    const COMMENTS_COUNT = 'comments_count';
-    const ID = 'id';
-    const IG_ID = 'ig_id';
-    const IS_COMMENT_ENABLED = 'is_comment_enabled';
-    const IS_SHARED_TO_FEED = 'is_shared_to_feed';
-    const LIKE_COUNT = 'like_count';
-    const MEDIA_PRODUCT_TYPE = 'media_product_type';
-    const MEDIA_TYPE = 'media_type';
-    const MEDIA_URL = 'media_url';
-    const OWNER = 'owner';
-    const PERMALINK = 'permalink';
-    const SHORTCODE = 'shortcode';
-    const THUMBNAIL_URL = 'thumbnail_url';
-    const TIMESTAMP = 'timestamp';
-    const USERNAME = 'username';
-    public function getFieldTypes()
-    {
-        return array('caption' => 'string', 'comments_count' => 'int', 'id' => 'string', 'ig_id' => 'string', 'is_comment_enabled' => 'bool', 'is_shared_to_feed' => 'bool', 'like_count' => 'int', 'media_product_type' => 'string', 'media_type' => 'string', 'media_url' => 'string', 'owner' => 'IGUser', 'permalink' => 'string', 'shortcode' => 'string', 'thumbnail_url' => 'string', 'timestamp' => 'datetime', 'username' => 'string');
-    }
+
+class IGMediaFields extends AbstractEnum {
+
+  const CAPTION = 'caption';
+  const COMMENTS_COUNT = 'comments_count';
+  const ID = 'id';
+  const IG_ID = 'ig_id';
+  const IS_COMMENT_ENABLED = 'is_comment_enabled';
+  const IS_SHARED_TO_FEED = 'is_shared_to_feed';
+  const LIKE_COUNT = 'like_count';
+  const MEDIA_PRODUCT_TYPE = 'media_product_type';
+  const MEDIA_TYPE = 'media_type';
+  const MEDIA_URL = 'media_url';
+  const OWNER = 'owner';
+  const PERMALINK = 'permalink';
+  const SHORTCODE = 'shortcode';
+  const THUMBNAIL_URL = 'thumbnail_url';
+  const TIMESTAMP = 'timestamp';
+  const USERNAME = 'username';
+
+  public function getFieldTypes() {
+    return array(
+      'caption' => 'string',
+      'comments_count' => 'int',
+      'id' => 'string',
+      'ig_id' => 'string',
+      'is_comment_enabled' => 'bool',
+      'is_shared_to_feed' => 'bool',
+      'like_count' => 'int',
+      'media_product_type' => 'string',
+      'media_type' => 'string',
+      'media_url' => 'string',
+      'owner' => 'IGUser',
+      'permalink' => 'string',
+      'shortcode' => 'string',
+      'thumbnail_url' => 'string',
+      'timestamp' => 'datetime',
+      'username' => 'string',
+    );
+  }
 }

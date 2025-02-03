@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdBidTypeValues getInstance()
  */
-class AdBidTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ABSOLUTE_OCPM = 'ABSOLUTE_OCPM';
-    const CPA = 'CPA';
-    const CPC = 'CPC';
-    const CPM = 'CPM';
-    const MULTI_PREMIUM = 'MULTI_PREMIUM';
+class AdBidTypeValues extends AbstractEnum {
+
+  const ABSOLUTE_OCPM = 'ABSOLUTE_OCPM';
+  const CPA = 'CPA';
+  const CPC = 'CPC';
+  const CPM = 'CPM';
+  const MULTI_PREMIUM = 'MULTI_PREMIUM';
 }

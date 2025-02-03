@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,28 +21,30 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Search;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static DemographicSearchClasses getInstance()
  */
-class DemographicSearchClasses extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LIFE_EVENTS = 'life_events';
-    const POLITICS = 'politics';
-    const MARKETS = 'markets';
-    const INDUSTRIES = 'industries';
-    const INCOME = 'income';
-    const NET_WORTH = 'net_worth';
-    const HOME_TYPE = 'home_type';
-    const HOME_OWNERSHIP = 'home_ownership';
-    const HOME_VALUE = 'home_value';
-    const ETHNIC_AFFINITY = 'ethnic_affinity';
-    const GENERATION = 'generation';
-    const HOUSEHOLD_COMPOSITION = 'household_composition';
-    const MOMS = 'moms';
-    const OFFICE_TYPE = 'office_type';
-    const FAMILY_STATUSES = 'family_statuses';
-    const DEMOGRAPHICS = 'demographics';
+class DemographicSearchClasses extends AbstractEnum {
+
+  const LIFE_EVENTS = 'life_events';
+  const POLITICS = 'politics';
+  const MARKETS = 'markets';
+  const INDUSTRIES = 'industries';
+  const INCOME = 'income';
+  const NET_WORTH = 'net_worth';
+  const HOME_TYPE = 'home_type';
+  const HOME_OWNERSHIP = 'home_ownership';
+  const HOME_VALUE = 'home_value';
+  const ETHNIC_AFFINITY = 'ethnic_affinity';
+  const GENERATION = 'generation';
+  const HOUSEHOLD_COMPOSITION = 'household_composition';
+  const MOMS = 'moms';
+  const OFFICE_TYPE = 'office_type';
+  const FAMILY_STATUSES = 'family_statuses';
+  const DEMOGRAPHICS = 'demographics';
 }

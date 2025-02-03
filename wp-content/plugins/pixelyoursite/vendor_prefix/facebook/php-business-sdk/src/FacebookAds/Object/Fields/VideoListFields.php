@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoListFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATION_TIME = 'creation_time';
-    const DESCRIPTION = 'description';
-    const ID = 'id';
-    const LAST_MODIFIED = 'last_modified';
-    const OWNER = 'owner';
-    const SEASON_NUMBER = 'season_number';
-    const THUMBNAIL = 'thumbnail';
-    const TITLE = 'title';
-    const VIDEOS_COUNT = 'videos_count';
-    public function getFieldTypes()
-    {
-        return array('creation_time' => 'datetime', 'description' => 'string', 'id' => 'string', 'last_modified' => 'datetime', 'owner' => 'Object', 'season_number' => 'int', 'thumbnail' => 'string', 'title' => 'string', 'videos_count' => 'int');
-    }
+
+class VideoListFields extends AbstractEnum {
+
+  const CREATION_TIME = 'creation_time';
+  const DESCRIPTION = 'description';
+  const ID = 'id';
+  const LAST_MODIFIED = 'last_modified';
+  const OWNER = 'owner';
+  const SEASON_NUMBER = 'season_number';
+  const THUMBNAIL = 'thumbnail';
+  const TITLE = 'title';
+  const VIDEOS_COUNT = 'videos_count';
+
+  public function getFieldTypes() {
+    return array(
+      'creation_time' => 'datetime',
+      'description' => 'string',
+      'id' => 'string',
+      'last_modified' => 'datetime',
+      'owner' => 'Object',
+      'season_number' => 'int',
+      'thumbnail' => 'string',
+      'title' => 'string',
+      'videos_count' => 'int',
+    );
+  }
 }

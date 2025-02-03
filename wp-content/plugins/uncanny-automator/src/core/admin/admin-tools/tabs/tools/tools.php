@@ -7,8 +7,14 @@
 
 namespace Uncanny_Automator;
 
+/**
+ *
+ */
 class Admin_Tools_Tabs_Tools {
 
+	/**
+	 *
+	 */
 	public function __construct() {
 
 		// Define the tab.
@@ -16,8 +22,15 @@ class Admin_Tools_Tabs_Tools {
 
 		add_action(
 			'wp_ajax_automator_db_tools',
-			function() {
+			function () {
 				$this->process_request();
+			}
+		);
+
+		add_action(
+			'wp_ajax_automator_db_tools_empty_api_logs',
+			function () {
+				$this->empty_api_logs_tables();
 			}
 		);
 
@@ -50,16 +63,17 @@ class Admin_Tools_Tabs_Tools {
 			case 'repair_tables':
 				Automator_DB::verify_base_tables( true );
 
-				delete_option( 'automator_schema_missing_tables' );
+				automator_delete_option( 'automator_schema_missing_tables' );
 
 				$query_params['database_repaired'] = 'yes';
 
+				do_action( 'automator_repair_tables_after' );
 				break;
 
 			case 'purge_tables':
 				$purged = Automator_DB::purge_tables();
 
-				delete_option( 'automator_schema_missing_tables' );
+				automator_delete_option( 'automator_schema_missing_tables' );
 
 				$query_params['purged'] = $purged ? 'true' : 'false';
 
@@ -73,6 +87,39 @@ class Admin_Tools_Tabs_Tools {
 
 	}
 
+	/**
+	 * Empty api logs related table and views.
+	 *
+	 * @return void
+	 */
+	public function empty_api_logs_tables() {
+
+		$this->validate_request();
+
+		Automator_DB::empty_table( 'uap_api_log' );
+		Automator_DB::empty_table( 'uap_api_log_response' );
+
+		// Update the size of the Database on clear
+		$total_size = Automator_System_Report::get_tables_total_size();
+
+		automator_update_option( 'automator_db_size', $total_size, 'no' );
+
+		$query_params = array(
+			'post_type' => 'uo-recipe',
+			'page'      => 'uncanny-automator-admin-tools',
+			'tab'       => 'tools',
+			'purged'    => 'true',
+		);
+
+		wp_safe_redirect( add_query_arg( $query_params, admin_url( 'edit.php' ) ) );
+
+		die;
+
+	}
+
+	/**
+	 * @return void
+	 */
 	private function validate_request() {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -94,12 +141,13 @@ class Admin_Tools_Tabs_Tools {
 		// Add the tab using the filter.
 		add_filter(
 			'automator_admin_tools_tools_tabs',
-			function( $tabs ) {
+			function ( $tabs ) {
 				$tabs['tools'] = (object) array(
 					'name'     => esc_html__( 'Database', 'uncanny-automator' ),
 					'function' => array( $this, 'tab_output' ),
 					'preload'  => false, // Determines if the content should be loaded even if the tab is not selected
 				);
+
 				return $tabs;
 			},
 			10,

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsBreakdownsValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsDatePresetValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsLevelValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsSummaryActionBreakdownsValues;
+
 /**
  * This class is auto-generated.
  *
@@ -44,32 +45,34 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsSummaryActionBreakdownsV
  * pull request for this class.
  *
  */
-class AdsInsights extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'insights';
-    }
-    /**
-     * @return AdsInsightsFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdsInsightsFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['ActionAttributionWindows'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsActionAttributionWindowsValues::getInstance()->getValues();
-        $ref_enums['ActionBreakdowns'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsActionBreakdownsValues::getInstance()->getValues();
-        $ref_enums['ActionReportTime'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsActionReportTimeValues::getInstance()->getValues();
-        $ref_enums['Breakdowns'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsBreakdownsValues::getInstance()->getValues();
-        $ref_enums['DatePreset'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsDatePresetValues::getInstance()->getValues();
-        $ref_enums['Level'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsLevelValues::getInstance()->getValues();
-        $ref_enums['SummaryActionBreakdowns'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsInsightsSummaryActionBreakdownsValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdsInsights extends AbstractObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'insights';
+  }
+
+  /**
+   * @return AdsInsightsFields
+   */
+  public static function getFieldsEnum() {
+    return AdsInsightsFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['ActionAttributionWindows'] = AdsInsightsActionAttributionWindowsValues::getInstance()->getValues();
+    $ref_enums['ActionBreakdowns'] = AdsInsightsActionBreakdownsValues::getInstance()->getValues();
+    $ref_enums['ActionReportTime'] = AdsInsightsActionReportTimeValues::getInstance()->getValues();
+    $ref_enums['Breakdowns'] = AdsInsightsBreakdownsValues::getInstance()->getValues();
+    $ref_enums['DatePreset'] = AdsInsightsDatePresetValues::getInstance()->getValues();
+    $ref_enums['Level'] = AdsInsightsLevelValues::getInstance()->getValues();
+    $ref_enums['SummaryActionBreakdowns'] = AdsInsightsSummaryActionBreakdownsValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

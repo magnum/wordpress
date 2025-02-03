@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,21 +34,34 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataChildAttachmentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CALL_TO_ACTION = 'call_to_action';
-    const CAPTION = 'caption';
-    const DESCRIPTION = 'description';
-    const IMAGE_CROPS = 'image_crops';
-    const IMAGE_HASH = 'image_hash';
-    const LINK = 'link';
-    const NAME = 'name';
-    const PICTURE = 'picture';
-    const PLACE_DATA = 'place_data';
-    const STATIC_CARD = 'static_card';
-    const VIDEO_ID = 'video_id';
-    public function getFieldTypes()
-    {
-        return array('call_to_action' => 'AdCreativeLinkDataCallToAction', 'caption' => 'string', 'description' => 'string', 'image_crops' => 'AdsImageCrops', 'image_hash' => 'string', 'link' => 'string', 'name' => 'string', 'picture' => 'string', 'place_data' => 'AdCreativePlaceData', 'static_card' => 'bool', 'video_id' => 'string');
-    }
+
+class AdCreativeLinkDataChildAttachmentFields extends AbstractEnum {
+
+  const CALL_TO_ACTION = 'call_to_action';
+  const CAPTION = 'caption';
+  const DESCRIPTION = 'description';
+  const IMAGE_CROPS = 'image_crops';
+  const IMAGE_HASH = 'image_hash';
+  const LINK = 'link';
+  const NAME = 'name';
+  const PICTURE = 'picture';
+  const PLACE_DATA = 'place_data';
+  const STATIC_CARD = 'static_card';
+  const VIDEO_ID = 'video_id';
+
+  public function getFieldTypes() {
+    return array(
+      'call_to_action' => 'AdCreativeLinkDataCallToAction',
+      'caption' => 'string',
+      'description' => 'string',
+      'image_crops' => 'AdsImageCrops',
+      'image_hash' => 'string',
+      'link' => 'string',
+      'name' => 'string',
+      'picture' => 'string',
+      'place_data' => 'AdCreativePlaceData',
+      'static_card' => 'bool',
+      'video_id' => 'string',
+    );
+  }
 }

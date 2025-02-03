@@ -12,9 +12,21 @@ namespace Uncanny_Automator;
 
 class Twitter_Settings extends Settings\Premium_Integration_Settings {
 
+	/**
+	 * @var \Uncanny_Automator\Twitter_Functions
+	 */
 	protected $functions;
+
 	protected $client;
 	protected $is_connected;
+	protected $disconnect_url;
+
+	/**
+	 * The default connection method.
+	 *
+	 * @var string
+	 */
+	protected $default_connection_type = 'hybrid';
 
 	/**
 	 * Sets up the properties of the settings page
@@ -34,13 +46,16 @@ class Twitter_Settings extends Settings\Premium_Integration_Settings {
 
 		// Set the name
 		// As this is the brand name, it probably shouldn't be translatable
-		$this->set_name( 'Twitter' );
+		$this->set_name( 'X/Twitter' );
 
 		$this->register_option( 'automator_twitter_api_key' );
 		$this->register_option( 'automator_twitter_api_secret' );
 		$this->register_option( 'automator_twitter_access_token' );
 		$this->register_option( 'automator_twitter_access_token_secret' );
 
+		// Set assets (optional)
+		$this->set_css( '/twitter/settings/assets/style.css' );
+		$this->set_js( '/twitter/settings/assets/script.js' );
 	}
 
 	public function get_status() {
@@ -63,9 +78,7 @@ class Twitter_Settings extends Settings\Premium_Integration_Settings {
 	 * Creates the output of the settings page
 	 */
 	public function output() {
-
-		if ( '1' === automator_filter_input( 'allow-user-app' ) || $this->functions->is_user_app_connected() ) {
-
+		if ( $this->functions->is_user_app_connected() ) {
 			include_once 'view-twitter-user-app.php';
 			return;
 		}
@@ -83,44 +96,77 @@ class Twitter_Settings extends Settings\Premium_Integration_Settings {
 
 		try {
 			$client = array(
-				'api_key'            => get_option( 'automator_twitter_api_key', '' ),
-				'api_secret'         => get_option( 'automator_twitter_api_secret', '' ),
-				'oauth_token'        => get_option( 'automator_twitter_access_token', '' ),
-				'oauth_token_secret' => get_option( 'automator_twitter_access_token_secret', '' ),
+				'api_key'            => automator_get_option( 'automator_twitter_api_key', '' ),
+				'api_secret'         => automator_get_option( 'automator_twitter_api_secret', '' ),
+				'oauth_token'        => automator_get_option( 'automator_twitter_access_token', '' ),
+				'oauth_token_secret' => automator_get_option( 'automator_twitter_access_token_secret', '' ),
 			);
 
 			$user = $this->functions->verify_credentials( $client );
 
-			update_option( '_uncannyowl_twitter_settings', $client );
-			update_option( 'automator_twitter_user', $user );
+			automator_update_option( '_uncannyowl_twitter_settings', $client );
+			automator_update_option( 'automator_twitter_user', $user );
 
 			$this->add_alert(
 				array(
 					'type'    => 'success',
-					'heading' => __( 'You have successfully connected your Twitter account.', 'uncanny-automator' ),
+					'heading' => __( 'You have successfully connected your X/Twitter account.', 'uncanny-automator' ),
 				)
 			);
 
 			$this->is_connected = true;
 
 		} catch ( \Exception $e ) {
-			$error              = $this->functions->parse_errors( $e->getMessage() );
+
 			$this->is_connected = false;
 			$this->set_status( '' );
 			$this->add_alert(
 				array(
 					'type'    => 'error',
 					'heading' => 'Connection error',
-					'content' => __( 'There was an error connecting your Twitter account: ', 'uncanny-automator' ) . $error,
+					'content' => __( 'There was an error connecting your X/Twitter account: ', 'uncanny-automator' ) . wp_json_encode( $e->getMessage() ),
 				)
 			);
 
-			delete_option( '_uncannyowl_twitter_settings' );
-			delete_option( 'automator_twitter_user' );
+			automator_delete_option( '_uncannyowl_twitter_settings' );
+			automator_delete_option( 'automator_twitter_user' );
+
+			$this->set_default_connection_type( 'self-hosted' );
 
 			return;
 		}
 	}
+
+	/**
+	 * Sets the default connection type.
+	 *
+	 * @param string $type "hybrid"|"self-hosted".
+	 *
+	 * @return void
+	 */
+	public function set_default_connection_type( $type ) {
+
+		if ( ! is_string( $type ) ) {
+			$this->default_connection_type = 'hybrid';
+		}
+
+		if ( ! in_array( $type, array( 'hybrid', 'self-hosted' ), true ) ) {
+			$this->default_connection_type = 'hybrid';
+		}
+
+		$this->default_connection_type = $type;
+
+	}
+
+	/**
+	 * Retrieves the default connection type.
+	 *
+	 * @return string
+	 */
+	public function get_default_connection_type() {
+		return $this->default_connection_type;
+	}
+
 }
 
 

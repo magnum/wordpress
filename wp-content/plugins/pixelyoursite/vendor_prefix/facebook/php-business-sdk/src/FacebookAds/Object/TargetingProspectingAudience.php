@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\TargetingProspectingAudienceFields;
+
 /**
  * This class is auto-generated.
  *
@@ -37,18 +38,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\TargetingProspectingAudienceFields;
  * pull request for this class.
  *
  */
-class TargetingProspectingAudience extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return TargetingProspectingAudienceFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\TargetingProspectingAudienceFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        return $ref_enums;
-    }
+
+class TargetingProspectingAudience extends AbstractObject {
+
+  /**
+   * @return TargetingProspectingAudienceFields
+   */
+  public static function getFieldsEnum() {
+    return TargetingProspectingAudienceFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    return $ref_enums;
+  }
+
+
 }

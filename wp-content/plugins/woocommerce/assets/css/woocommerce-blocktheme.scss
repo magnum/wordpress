@@ -26,19 +26,6 @@
 * General
 */
 .woocommerce {
-
-	/**
-	* Buttons
-	*/
-	a.button,
-	button[name="add-to-cart"],
-	input[name="submit"],
-	button.single_add_to_cart_button,
-	button[type="submit"]:not(.wp-block-search__button) {
-		// Slightly increase CTA size across the board.
-		padding: 0.9rem 1.1rem;
-	}
-
 	button.button,
 	a.button {
 
@@ -113,19 +100,25 @@
 			}
 		}
 
-		.quantity {
-			// Adjust positioning of quantity selector and button.
-			.qty {
-				margin-right: 0.5rem;
+		form.cart {
+			div.quantity {
+				display: inline-block;
+				float: none; // Remove float set by WC core.
+				vertical-align: middle;
+
+				// Adjust positioning of quantity selector and button.
+				.qty {
+					margin-right: 0.5rem;
+				}
 			}
 
-			+ .single_add_to_cart_button {
-				min-height: 51px;
-				// We need to remove top and bottom padding because we are setting a fixed
-				// height. This is to prevent the button from being cut off. !important is
-				// needed to override the Elements API styles, which also use !important.
-				padding-top: 0 !important;
-				padding-bottom: 0 !important;
+			button[name="add-to-cart"],
+			button.single_add_to_cart_button {
+				display: inline-block;
+				float: none; // Remove float set by WC core.
+				margin-top: 0;
+				margin-bottom: 0;
+				vertical-align: middle;
 			}
 		}
 
@@ -153,18 +146,12 @@
 		}
 	}
 
-	.price ins,
-	bdi {
-		// Ensure discounted prices aren't underlined.
-		// For details see https://github.com/woocommerce/woocommerce-blocks/pull/5684.
-		text-decoration: none;
-	}
-
-	a.added_to_cart {
-		// Prevent "View Cart" button from sticking to "Add to Cart" button.
-		// For details see https://github.com/woocommerce/woocommerce-blocks/issues/5285.
-		display: block;
-		margin-top: 1rem;
+	.price, .woocommerce-grouped-product-list-item__price, .wc-block-components-product-price {
+		ins, bdi {
+			// Ensure discounted prices aren't underlined.
+			// For details see https://github.com/woocommerce/woocommerce-blocks/pull/5684.
+			text-decoration: none;
+		}
 	}
 
 	span.onsale {
@@ -177,10 +164,14 @@
 	* Product variations
 	*/
 	table.variations {
+		display: block;
+
 		tr {
-			// Limit variation dropdown width and add block gap.
-			display: block;
-			margin-bottom: var(--wp--style--block-gap);
+			th,
+			td {
+				padding-bottom: var(--wp--style--block-gap);
+				text-align: left;
+			}
 
 			th {
 				// Ensure variation label doesn't stick to dropdown.
@@ -196,10 +187,29 @@
 		}
 	}
 
-	div.product form.cart table.variations th {
-		// Ensure variation label is vertically centered.
-		line-height: 3.5rem;
+	// Ensure variation label is vertically centered.
+	div.product form.cart table.variations td select {
+		min-width: 70%; // Fix for Safari.
 	}
+
+	div.product form.cart table.variations td,
+	div.product form.cart table.variations th {
+		vertical-align: middle;
+	}
+
+	.single_variation_wrap .woocommerce-variation {
+		margin-bottom: var(--wp--style--block-gap);
+	}
+}
+
+/**
+* Products grid
+*/
+a.added_to_cart {
+	// Prevent "View Cart" button from sticking to "Add to Cart" button.
+	// For details see https://github.com/woocommerce/woocommerce-blocks/issues/5285.
+	display: block;
+	margin-top: 1rem;
 }
 
 /**
@@ -231,6 +241,10 @@
 			.select2-search__field {
 				margin-bottom: 1rem;
 			}
+		}
+
+		.select2-results__option:not(.select2-results__option--highlighted) {
+			color: #444;
 		}
 
 		.select2-selection .select2-selection__arrow {
@@ -302,23 +316,19 @@
 			}
 		}
 
+		.coupon {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
 		#coupon_code {
 			// Allow sufficient space for the coupon code.
 			width: auto;
 			margin-right: 0.8rem;
-		}
-
-		#coupon_code,
-		.actions .button {
 			height: 50px;
 			font-size: var(--wp--preset--font-size--small);
-			padding-left: 1.1rem;
-			padding-right: 1.1rem;
-			// We need to remove top and bottom padding because we are setting a fixed
-			// height. This is to prevent the button from being cut off. !important is
-			// needed to override the Elements API styles, which also use !important.
-			padding-top: 0 !important;
-			padding-bottom: 0 !important;
+			padding: 0 1.1rem;
 		}
 
 		@media only screen and ( max-width: 768px ) {
@@ -349,7 +359,8 @@
 	* Order confirmation
 	*/
 	.woocommerce-thankyou-order-received,
-	h2.woocommerce-column__title {
+	.woocommerce-column__title,
+	.woocommerce-customer-details h2 {
 		font-size: var(--wp--preset--font-size--large);
 		font-weight: 300;
 	}
@@ -369,6 +380,13 @@
 			flex-grow: 1;
 			margin-bottom: 1rem;
 			border: none;
+			display: inline;
+			text-transform: uppercase;
+
+			strong {
+				text-transform: none;
+				display: block;
+			}
 		}
 	}
 
@@ -376,7 +394,7 @@
 		// Ensure customer details match order overview.
 		box-sizing: border-box;
 		width: 70%;
-		padding: 2rem;
+		padding: 1rem;
 		border-width: 1px;
 		border-radius: 0;
 	}

@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2024-12-16
+### Changed
+- Internal updates.
+
+## [0.7.1] - 2024-11-25
+### Changed
+- Updated dependencies. [#40286]
+
+## [0.7.0] - 2024-11-18
+### Removed
+- General: Update minimum PHP version to 7.2. [#40147]
+
+## [0.6.5] - 2024-11-04
+### Added
+- Enable test coverage. [#39961]
+
+## [0.6.4] - 2024-10-29
+### Changed
+- Internal updates.
+
+## [0.6.3] - 2024-08-23
+### Changed
+- Updated package dependencies. [#39004]
+
+## [0.6.2] - 2024-04-08
+### Changed
+- Internal updates.
+
+## [0.6.1] - 2024-03-18
+### Changed
+- Internal updates.
+
+## [0.6.0] - 2024-02-26
+### Changed
+- Social Notes: Added the post list enhancements [#35819]
+
+## [0.5.1] - 2023-11-24
+### Changed
+- Replaced usage of substr() with str_starts_with() and str_ends_with(). [#34207]
+
+## [0.5.0] - 2023-11-20
+### Changed
+- Updated required PHP version to >= 7.0. [#34192]
+
+## [0.4.6] - 2023-08-28
+### Changed
+- Updated package dependencies. [#32605]
+
+## [0.4.5] - 2023-04-10
+### Added
+- Add Jetpack Autoloader package suggestion. [#29988]
+
+## [0.4.4] - 2023-02-20
+### Changed
+- Minor internal updates.
+
 ## [0.4.3] - 2022-12-06
 ### Changed
 - Updated package dependencies. [#27688]
@@ -74,6 +130,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the default columns displayed on the post and page list screens
 - Refactored thumbnail preview to function server side. All javascript removed.
 
+[0.7.2]: https://github.com/automattic/jetpack-post-list/compare/v0.7.1...v0.7.2
+[0.7.1]: https://github.com/automattic/jetpack-post-list/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/automattic/jetpack-post-list/compare/v0.6.5...v0.7.0
+[0.6.5]: https://github.com/automattic/jetpack-post-list/compare/v0.6.4...v0.6.5
+[0.6.4]: https://github.com/automattic/jetpack-post-list/compare/v0.6.3...v0.6.4
+[0.6.3]: https://github.com/automattic/jetpack-post-list/compare/v0.6.2...v0.6.3
+[0.6.2]: https://github.com/automattic/jetpack-post-list/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/automattic/jetpack-post-list/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/automattic/jetpack-post-list/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/automattic/jetpack-post-list/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/automattic/jetpack-post-list/compare/v0.4.6...v0.5.0
+[0.4.6]: https://github.com/automattic/jetpack-post-list/compare/v0.4.5...v0.4.6
+[0.4.5]: https://github.com/automattic/jetpack-post-list/compare/v0.4.4...v0.4.5
+[0.4.4]: https://github.com/automattic/jetpack-post-list/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/automattic/jetpack-post-list/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/automattic/jetpack-post-list/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/automattic/jetpack-post-list/compare/v0.4.0...v0.4.1

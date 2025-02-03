@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessAdAccountRequestFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AD_ACCOUNT = 'ad_account';
-    const ID = 'id';
-    public function getFieldTypes()
-    {
-        return array('ad_account' => 'AdAccount', 'id' => 'string');
-    }
+
+class BusinessAdAccountRequestFields extends AbstractEnum {
+
+  const AD_ACCOUNT = 'ad_account';
+  const ID = 'id';
+
+  public function getFieldTypes() {
+    return array(
+      'ad_account' => 'AdAccount',
+      'id' => 'string',
+    );
+  }
 }

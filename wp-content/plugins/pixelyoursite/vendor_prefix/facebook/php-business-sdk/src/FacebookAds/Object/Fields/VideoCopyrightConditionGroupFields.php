@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoCopyrightConditionGroupFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTION = 'action';
-    const CONDITIONS = 'conditions';
-    const VALIDITY_STATUS = 'validity_status';
-    public function getFieldTypes()
-    {
-        return array('action' => 'string', 'conditions' => 'list<Object>', 'validity_status' => 'string');
-    }
+
+class VideoCopyrightConditionGroupFields extends AbstractEnum {
+
+  const ACTION = 'action';
+  const CONDITIONS = 'conditions';
+  const VALIDITY_STATUS = 'validity_status';
+
+  public function getFieldTypes() {
+    return array(
+      'action' => 'string',
+      'conditions' => 'list<Object>',
+      'validity_status' => 'string',
+    );
+  }
 }

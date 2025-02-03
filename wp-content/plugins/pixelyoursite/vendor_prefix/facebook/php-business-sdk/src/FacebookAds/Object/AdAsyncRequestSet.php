@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAsyncRequestSetFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationModeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestStatusesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,66 +40,126 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestStatusesValues;
  * pull request for this class.
  *
  */
-class AdAsyncRequestSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'asyncadrequestsets';
-    }
-    /**
-     * @return AdAsyncRequestSetFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAsyncRequestSetFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['NotificationMode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationModeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getRequests(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('statuses' => 'list<statuses_enum>');
-        $enums = array('statuses_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestStatusesValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/requests', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequest(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequest::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function deleteSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'NODE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequestSet(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequestSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('name' => 'string', 'notification_mode' => 'notification_mode_enum', 'notification_uri' => 'string');
-        $enums = array('notification_mode_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAsyncRequestSetNotificationModeValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequestSet(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdAsyncRequestSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class AdAsyncRequestSet extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'asyncadrequestsets';
+  }
+
+  /**
+   * @return AdAsyncRequestSetFields
+   */
+  public static function getFieldsEnum() {
+    return AdAsyncRequestSetFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['NotificationMode'] = AdAsyncRequestSetNotificationModeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getRequests(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'statuses' => 'list<statuses_enum>',
+    );
+    $enums = array(
+      'statuses_enum' => AdAsyncRequestStatusesValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/requests',
+      new AdAsyncRequest(),
+      'EDGE',
+      AdAsyncRequest::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function deleteSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_DELETE,
+      '/',
+      new AbstractCrudObject(),
+      'NODE',
+      array(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new AdAsyncRequestSet(),
+      'NODE',
+      AdAsyncRequestSet::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function updateSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'name' => 'string',
+      'notification_mode' => 'notification_mode_enum',
+      'notification_uri' => 'string',
+    );
+    $enums = array(
+      'notification_mode_enum' => AdAsyncRequestSetNotificationModeValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/',
+      new AdAsyncRequestSet(),
+      'NODE',
+      AdAsyncRequestSet::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

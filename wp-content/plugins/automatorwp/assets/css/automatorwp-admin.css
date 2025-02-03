@@ -2,7 +2,7 @@
     AutomatorWP Icon
    ------------------------------------------- */
 
-@font-face {
+   @font-face {
     font-family: 'AutomatorWP';
     src:  url('../fonts/automatorwp.eot?6ncb0e');
     src:  url('../fonts/automatorwp.eot?6ncb0e#iefix') format('embedded-opentype'),
@@ -553,7 +553,7 @@ body:not(.edit-anonymous-automation) .automatorwp-automation-ui-anonymous-notice
 
 .automatorwp-action-automatorwp-anonymous-user .automatorwp-anonymous-user-choice {
     display: inline-block;
-    width: 100px;
+    width: 120px;
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
     border-radius: 8px;
@@ -575,7 +575,7 @@ body:not(.edit-anonymous-automation) .automatorwp-automation-ui-anonymous-notice
 
 .automatorwp-action-automatorwp-anonymous-user .automatorwp-anonymous-user-choice img {
     display: block;
-    width: 60%;
+    width: 40%;
     margin: 0 auto 8px;
 }
 
@@ -637,7 +637,10 @@ body.edit-all-users-automation .cmb2-id-times-per-user,
 body.edit-all-users-automation #cmb-field-js-controls-times_per_user-after,
 body.edit-all-users-automation #cmb-field-js-controls-posts_per_loop-before,
 body.edit-all-users-automation .cmb2-id-posts-per-loop,
-body.edit-all-users-automation #cmb-field-js-controls-posts_per_loop-after {
+body.edit-all-users-automation #cmb-field-js-controls-posts_per_loop-after,
+body.edit-all-users-automation #cmb-field-js-controls-lines_per_loop-before,
+body.edit-all-users-automation .cmb2-id-lines-per-loop,
+body.edit-all-users-automation #cmb-field-js-controls-lines_per_loop-after {
     display: none;
 }
 
@@ -652,7 +655,28 @@ body.edit-all-posts-automation .cmb2-id-times-per-user,
 body.edit-all-posts-automation #cmb-field-js-controls-times_per_user-after,
 body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-before,
 body.edit-all-posts-automation .cmb2-id-users-per-loop,
-body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
+body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after,
+body.edit-all-posts-automation #cmb-field-js-controls-lines_per_loop-before,
+body.edit-all-posts-automation .cmb2-id-lines-per-loop,
+body.edit-all-posts-automation #cmb-field-js-controls-lines_per_loop-after {
+    display: none;
+}
+
+/* -------------------------------------------
+    Import File Automations
+   ------------------------------------------- */
+
+body.edit-import-file-automation .automatorwp-sequential-field,
+body.edit-import-file-automation #automatorwp_triggers .automatorwp-add-trigger,
+body.edit-import-file-automation #cmb-field-js-controls-times_per_user-before,
+body.edit-import-file-automation .cmb2-id-times-per-user,
+body.edit-import-file-automation #cmb-field-js-controls-times_per_user-after,
+body.edit-import-file-automation #cmb-field-js-controls-users_per_loop-before,
+body.edit-import-file-automation .cmb2-id-users-per-loop,
+body.edit-import-file-automation #cmb-field-js-controls-users_per_loop-after,
+body.edit-import-file-automation #cmb-field-js-controls-posts_per_loop-before,
+body.edit-import-file-automation .cmb2-id-posts-per-loop,
+body.edit-import-file-automation #cmb-field-js-controls-posts_per_loop-after {
     display: none;
 }
 
@@ -885,6 +909,41 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
 }
 
 /* -------------------------------------------
+    Forms Columns
+   ------------------------------------------- */
+.automatorwp-form .cmb-row[class*="automatorwp-col-"] {
+    float: left;
+}
+
+.automatorwp-form .cmb-row.automatorwp-col-3 {
+    width: 24%;
+}
+
+.automatorwp-form .cmb-row.automatorwp-col-6 {
+    width: 49%;
+}
+
+/*    6    |    6    */
+.automatorwp-form .cmb-row.automatorwp-col-6 + .cmb-row.automatorwp-col-6 {
+    margin-left: 2%;
+}
+
+/*    6    |  3  |  3  */
+.automatorwp-form .cmb-row.automatorwp-col-6 + .cmb-row.automatorwp-col-3,
+.automatorwp-form .cmb-row.automatorwp-col-6 + .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3 {
+    width: 23%;
+    margin-left: 2%;
+}
+
+/*   3  |  3  |  3  |  3  */
+.automatorwp-form .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3,
+.automatorwp-form .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3,
+.automatorwp-form .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3 + .cmb-row.automatorwp-col-3 {
+    width: 23%;
+    margin-left: 2%;
+}
+
+/* -------------------------------------------
     Forms
    ------------------------------------------- */
 .automatorwp-form input:not([type="button"]):not([type="submit"]),
@@ -899,6 +958,12 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
 
 .automatorwp-form select {
     margin-top: 0 !important;
+}
+
+.automatorwp-form input::placeholder,
+.automatorwp-form textarea::placeholder,
+.automatorwp-form select::placeholder {
+    opacity: 0.5;
 }
 
 .automatorwp-select2 .select2-search--dropdown .select2-search__field {
@@ -1081,17 +1146,17 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
     z-index: 1;
 }
 
-.automatorwp-automation-item.automatorwp-action .cmb-td .cmb2-metabox-description {
+.automatorwp-automation-item .cmb-td .cmb2-metabox-description {
     display: inline-block;
 }
 
-.automatorwp-automation-item.automatorwp-action input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="search"]),
-.automatorwp-automation-item.automatorwp-action textarea:not(.wp-editor-area) {
+.automatorwp-automation-item input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="search"]),
+.automatorwp-automation-item textarea:not(.wp-editor-area) {
     width: calc( 100% - 38px ) !important;
     border-radius: 4px 0 0 4px;
 }
 
-.automatorwp-automation-item.automatorwp-action .wp-editor-wrap {
+.automatorwp-automation-item .wp-editor-wrap {
     width: calc( 100% - 44px );
     display: inline-block;
 }
@@ -1248,6 +1313,11 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
     color: rgba(255,255,255,0.7);
 }
 
+.automatorwp-tags-select2 .select2-results__option[aria-disabled=true] {
+    color: #777 !important;
+    font-weight: 500;
+}
+
 /* -------------------------------------------
     Selector Custom Input
    ------------------------------------------- */
@@ -1307,6 +1377,14 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
     margin-top: 0;
     border-top: 0;
     padding: 4px 6px 8px;
+}
+
+/* -------------------------------------------
+    Colorpicker
+   ------------------------------------------- */
+
+.automatorwp-form .wp-picker-container .wp-color-result.button {
+    padding: 0 0 0 17px;
 }
 
 /* -------------------------------------------
@@ -1449,6 +1527,11 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
 .automatorwp-integration-icon .automatorwp-filter-icon-not-passed {
     background: #dc3232;
     border-color: #dc3232;
+}
+
+.automatorwp-clear-all-logs-button {
+    float: right;
+    margin-left: 4px !important;
 }
 
 /* -------------------------------------------
@@ -2260,7 +2343,8 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
     align-self: flex-end;
 }
 
-.automatorwp-plugin-card .name, .automatorwp-plugin-card .desc {
+.automatorwp-plugin-card .name, .automatorwp-plugin-card .desc
+.automatorwp-plugin-card .name, .automatorwp-plugin-card .desc > p {
     margin-left: 0;
     margin-right: 0;
 }
@@ -2329,9 +2413,9 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
 
 @media screen and (min-width: 1200px) and (max-width: 1600px) {
     .automatorwp-plugin-card {
-        width: 33.3333%;
-        width: -webkit-calc( 33.3333% - 16px );
-        width: calc( 33.3333% - 16px );
+        width: 25%;
+        width: -webkit-calc( 25% - 16px );
+        width: calc( 25% - 16px );
     }
 }
 
@@ -2476,7 +2560,7 @@ body.edit-all-posts-automation #cmb-field-js-controls-users_per_loop-after{
 
 @media screen and (min-width: 1200px) and (max-width: 1600px) {
     .automatorwp_licenses .postbox {
-        width: 31%;
+        width: 23%;
     }
 }
 

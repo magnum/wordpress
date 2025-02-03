@@ -64,7 +64,7 @@ class OPTINMONSTER_SHOW_CAMPAIGN {
 
 		$script_uri = plugin_dir_url( __FILE__ ) . '../scripts/show-campaign.js';
 
-		wp_enqueue_script( 'automator-optinmonster', $script_uri, array( 'jquery' ), InitializePlugin::PLUGIN_VERSION, true );
+		wp_enqueue_script( 'automator-optinmonster', $script_uri, array( 'jquery' ), AUTOMATOR_PLUGIN_VERSION, true );
 
 	}
 
@@ -77,28 +77,7 @@ class OPTINMONSTER_SHOW_CAMPAIGN {
 	 */
 	public function optinmonster_action_exists() {
 
-		$recipes_data = Automator()->get_recipes_data();
-
-		// Loop through all actions
-		foreach ( $recipes_data as $recipe ) {
-
-			if ( 'publish' !== $recipe['post_status'] ) {
-				continue;
-			}
-
-			foreach ( $recipe['actions'] as $action ) {
-
-				if ( 'publish' !== $action['post_status'] ) {
-					continue;
-				}
-
-				if ( $this->get_action_code() === $action['meta']['code'] && $this->get_integration() === $action['meta']['integration'] ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return Automator()->helpers->recipe->is_action_or_trigger_active( $this->get_action_meta() );
 	}
 
 	/**
@@ -150,7 +129,8 @@ class OPTINMONSTER_SHOW_CAMPAIGN {
 	 *
 	 * Send the cookie to the UI
 	 *
-	 * @param  string $campaign_id
+	 * @param string $campaign_id
+	 *
 	 * @return void
 	 */
 	public function set_cookie( $campaign_id ) {

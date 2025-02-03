@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class EventSourceGroupFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS = 'business';
-    const EVENT_SOURCES = 'event_sources';
-    const ID = 'id';
-    const NAME = 'name';
-    public function getFieldTypes()
-    {
-        return array('business' => 'Business', 'event_sources' => 'list<ExternalEventSource>', 'id' => 'string', 'name' => 'string');
-    }
+
+class EventSourceGroupFields extends AbstractEnum {
+
+  const BUSINESS = 'business';
+  const EVENT_SOURCES = 'event_sources';
+  const ID = 'id';
+  const NAME = 'name';
+  const OWNER_BUSINESS = 'owner_business';
+
+  public function getFieldTypes() {
+    return array(
+      'business' => 'Business',
+      'event_sources' => 'list<ExternalEventSource>',
+      'id' => 'string',
+      'name' => 'string',
+      'owner_business' => 'Business',
+    );
+  }
 }

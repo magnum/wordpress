@@ -1,204 +1,356 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./assets/dev/js/editor/component.js":
-/*!*******************************************!*\
-  !*** ./assets/dev/js/editor/component.js ***!
-  \*******************************************/
+/***/ 706:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
-eval("\n\nvar _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ \"./node_modules/@babel/runtime/helpers/interopRequireDefault.js\");\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports[\"default\"] = void 0;\n\nvar _classCallCheck2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ \"./node_modules/@babel/runtime/helpers/classCallCheck.js\"));\n\nvar _createClass2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/createClass */ \"./node_modules/@babel/runtime/helpers/createClass.js\"));\n\nvar _assertThisInitialized2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ \"./node_modules/@babel/runtime/helpers/assertThisInitialized.js\"));\n\nvar _inherits2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/inherits */ \"./node_modules/@babel/runtime/helpers/inherits.js\"));\n\nvar _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ \"./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js\"));\n\nvar _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ \"./node_modules/@babel/runtime/helpers/getPrototypeOf.js\"));\n\nvar _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/defineProperty */ \"./node_modules/@babel/runtime/helpers/defineProperty.js\"));\n\nvar _controlsHook = _interopRequireDefault(__webpack_require__(/*! ./hooks/ui/controls-hook */ \"./assets/dev/js/editor/hooks/ui/controls-hook.js\"));\n\nfunction _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2[\"default\"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2[\"default\"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2[\"default\"])(this, result); }; }\n\nfunction _isNativeReflectConstruct() { if (typeof Reflect === \"undefined\" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === \"function\") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }\n\nvar _default = /*#__PURE__*/function (_$e$modules$Component) {\n  (0, _inherits2[\"default\"])(_default, _$e$modules$Component);\n\n  var _super = _createSuper(_default);\n\n  function _default() {\n    var _this;\n\n    (0, _classCallCheck2[\"default\"])(this, _default);\n\n    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {\n      args[_key] = arguments[_key];\n    }\n\n    _this = _super.call.apply(_super, [this].concat(args));\n    (0, _defineProperty2[\"default\"])((0, _assertThisInitialized2[\"default\"])(_this), \"pages\", {});\n    return _this;\n  }\n\n  (0, _createClass2[\"default\"])(_default, [{\n    key: \"getNamespace\",\n    value: function getNamespace() {\n      return 'hello-elementor';\n    }\n  }, {\n    key: \"defaultHooks\",\n    value: function defaultHooks() {\n      return this.importHooks({\n        ControlsHook: _controlsHook[\"default\"]\n      });\n    }\n  }]);\n  return _default;\n}($e.modules.ComponentBase);\n\nexports[\"default\"] = _default;\n\n//# sourceURL=././assets/dev/js/editor/component.js");
+
+
+var _interopRequireDefault = __webpack_require__(994);
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(693));
+var _controlsHook = _interopRequireDefault(__webpack_require__(239));
+class _default extends $e.modules.ComponentBase {
+  constructor() {
+    super(...arguments);
+    (0, _defineProperty2.default)(this, "pages", {});
+  }
+  getNamespace() {
+    return 'hello-elementor';
+  }
+  defaultHooks() {
+    return this.importHooks({
+      ControlsHook: _controlsHook.default
+    });
+  }
+}
+exports["default"] = _default;
 
 /***/ }),
 
-/***/ "./assets/dev/js/editor/hello-editor.js":
-/*!**********************************************!*\
-  !*** ./assets/dev/js/editor/hello-editor.js ***!
-  \**********************************************/
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 239:
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
-eval("\n\nvar _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ \"./node_modules/@babel/runtime/helpers/interopRequireDefault.js\");\n\nvar _component = _interopRequireDefault(__webpack_require__(/*! ./component */ \"./assets/dev/js/editor/component.js\"));\n\n$e.components.register(new _component[\"default\"]());\n\n//# sourceURL=././assets/dev/js/editor/hello-editor.js");
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+class ControlsHook extends $e.modules.hookUI.After {
+  getCommand() {
+    // Command to listen.
+    return 'document/elements/settings';
+  }
+  getId() {
+    // Unique id for the hook.
+    return 'hello-elementor-editor-controls-handler';
+  }
+
+  /**
+   * Get Hello Elementor Theme Controls
+   *
+   * Returns an object in which the keys are control IDs, and the values are the selectors of the elements that need
+   * to be targeted in the apply() method.
+   *
+   * Example return value:
+   *   {
+   *      hello_elementor_show_logo: '.site-header .site-header-logo',
+   *      hello_elementor_show_menu: '.site-header .site-header-menu',
+   *   }
+   */
+  getHelloThemeControls() {
+    return {
+      hello_header_logo_display: {
+        selector: '.site-header .site-logo, .site-header .site-title',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_header_logo_display);
+        }
+      },
+      hello_header_menu_display: {
+        selector: '.site-header .site-navigation, .site-header .site-navigation-toggle-holder',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_header_menu_display);
+        }
+      },
+      hello_header_tagline_display: {
+        selector: '.site-header .site-description',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_header_tagline_display);
+        }
+      },
+      hello_header_logo_type: {
+        selector: '.site-header .site-branding',
+        callback: ($element, args) => {
+          const classPrefix = 'show-',
+            inputOptions = args.container.controls.hello_header_logo_type.options,
+            inputValue = args.settings.hello_header_logo_type;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_header_layout: {
+        selector: '.site-header',
+        callback: ($element, args) => {
+          const classPrefix = 'header-',
+            inputOptions = args.container.controls.hello_header_layout.options,
+            inputValue = args.settings.hello_header_layout;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_header_width: {
+        selector: '.site-header',
+        callback: ($element, args) => {
+          const classPrefix = 'header-',
+            inputOptions = args.container.controls.hello_header_width.options,
+            inputValue = args.settings.hello_header_width;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_header_menu_layout: {
+        selector: '.site-header',
+        callback: ($element, args) => {
+          const classPrefix = 'menu-layout-',
+            inputOptions = args.container.controls.hello_header_menu_layout.options,
+            inputValue = args.settings.hello_header_menu_layout;
+
+          // No matter what, close the mobile menu
+          $element.find('.site-navigation-toggle-holder').removeClass('elementor-active');
+          $element.find('.site-navigation-dropdown').removeClass('show');
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_header_menu_dropdown: {
+        selector: '.site-header',
+        callback: ($element, args) => {
+          const classPrefix = 'menu-dropdown-',
+            inputOptions = args.container.controls.hello_header_menu_dropdown.options,
+            inputValue = args.settings.hello_header_menu_dropdown;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_footer_logo_display: {
+        selector: '.site-footer .site-logo, .site-footer .site-title',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_footer_logo_display);
+        }
+      },
+      hello_footer_tagline_display: {
+        selector: '.site-footer .site-description',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_footer_tagline_display);
+        }
+      },
+      hello_footer_menu_display: {
+        selector: '.site-footer .site-navigation',
+        callback: ($element, args) => {
+          this.toggleShowHideClass($element, args.settings.hello_footer_menu_display);
+        }
+      },
+      hello_footer_copyright_display: {
+        selector: '.site-footer .copyright',
+        callback: ($element, args) => {
+          const $footerContainer = $element.closest('#site-footer'),
+            inputValue = args.settings.hello_footer_copyright_display;
+          this.toggleShowHideClass($element, inputValue);
+          $footerContainer.toggleClass('footer-has-copyright', 'yes' === inputValue);
+        }
+      },
+      hello_footer_logo_type: {
+        selector: '.site-footer .site-branding',
+        callback: ($element, args) => {
+          const classPrefix = 'show-',
+            inputOptions = args.container.controls.hello_footer_logo_type.options,
+            inputValue = args.settings.hello_footer_logo_type;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_footer_layout: {
+        selector: '.site-footer',
+        callback: ($element, args) => {
+          const classPrefix = 'footer-',
+            inputOptions = args.container.controls.hello_footer_layout.options,
+            inputValue = args.settings.hello_footer_layout;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_footer_width: {
+        selector: '.site-footer',
+        callback: ($element, args) => {
+          const classPrefix = 'footer-',
+            inputOptions = args.container.controls.hello_footer_width.options,
+            inputValue = args.settings.hello_footer_width;
+          this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);
+        }
+      },
+      hello_footer_copyright_text: {
+        selector: '.site-footer .copyright',
+        callback: ($element, args) => {
+          const inputValue = args.settings.hello_footer_copyright_text;
+          $element.find('p').text(inputValue);
+        }
+      }
+    };
+  }
+
+  /**
+   * Toggle show and hide classes on containers
+   *
+   * This will remove the .show and .hide clases from the element, then apply the new class
+   *
+   * @param {jQuery} element
+   * @param {string} inputValue
+   */
+  toggleShowHideClass(element, inputValue) {
+    element.removeClass('hide').removeClass('show').addClass(inputValue ? 'show' : 'hide');
+  }
+
+  /**
+   * Toggle layout classes on containers
+   *
+   * This will cleanly set classes onto which ever container we want to target, removing the old classes and adding the new one
+   *
+   * @param {jQuery} element
+   * @param {string} classPrefix
+   * @param {Object} inputOptions
+   * @param {string} inputValue
+   *
+   */
+  toggleLayoutClass(element, classPrefix, inputOptions, inputValue) {
+    // Loop through the possible classes and remove the one that's not in use
+    Object.entries(inputOptions).forEach(_ref => {
+      let [key] = _ref;
+      element.removeClass(classPrefix + key);
+    });
+
+    // Append the class which we want to use onto the element
+    if ('' !== inputValue) {
+      element.addClass(classPrefix + inputValue);
+    }
+  }
+
+  /**
+   * Set the conditions under which the hook will run.
+   *
+   * @param {Object} args
+   */
+  getConditions(args) {
+    const isKit = 'kit' === elementor.documents.getCurrent().config.type,
+      changedControls = Object.keys(args.settings),
+      isSingleSetting = 1 === changedControls.length;
+
+    // If the document is not a kit, or there are no changed settings, or there is more than one single changed
+    // setting, don't run the hook.
+    if (!isKit || !args.settings || !isSingleSetting) {
+      return false;
+    }
+
+    // If the changed control is in the list of theme controls, return true to run the hook.
+    // Otherwise, return false so the hook doesn't run.
+    return !!Object.keys(this.getHelloThemeControls()).includes(changedControls[0]);
+  }
+
+  /**
+   * The hook logic.
+   *
+   * @param {Object} args
+   */
+  apply(args) {
+    const allThemeControls = this.getHelloThemeControls(),
+      // Extract the control ID from the passed args
+      controlId = Object.keys(args.settings)[0],
+      controlConfig = allThemeControls[controlId],
+      // Find the element that needs to be targeted by the control.
+      $element = elementor.$previewContents.find(controlConfig.selector);
+    controlConfig.callback($element, args);
+  }
+}
+exports["default"] = ControlsHook;
 
 /***/ }),
 
-/***/ "./assets/dev/js/editor/hooks/ui/controls-hook.js":
-/*!********************************************************!*\
-  !*** ./assets/dev/js/editor/hooks/ui/controls-hook.js ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ \"./node_modules/@babel/runtime/helpers/interopRequireDefault.js\");\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports[\"default\"] = void 0;\n\nvar _slicedToArray2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ \"./node_modules/@babel/runtime/helpers/slicedToArray.js\"));\n\nvar _classCallCheck2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ \"./node_modules/@babel/runtime/helpers/classCallCheck.js\"));\n\nvar _createClass2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/createClass */ \"./node_modules/@babel/runtime/helpers/createClass.js\"));\n\nvar _inherits2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/inherits */ \"./node_modules/@babel/runtime/helpers/inherits.js\"));\n\nvar _possibleConstructorReturn2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ \"./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js\"));\n\nvar _getPrototypeOf2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ \"./node_modules/@babel/runtime/helpers/getPrototypeOf.js\"));\n\nfunction _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2[\"default\"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2[\"default\"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2[\"default\"])(this, result); }; }\n\nfunction _isNativeReflectConstruct() { if (typeof Reflect === \"undefined\" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === \"function\") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }\n\nvar ControlsHook = /*#__PURE__*/function (_$e$modules$hookUI$Af) {\n  (0, _inherits2[\"default\"])(ControlsHook, _$e$modules$hookUI$Af);\n\n  var _super = _createSuper(ControlsHook);\n\n  function ControlsHook() {\n    (0, _classCallCheck2[\"default\"])(this, ControlsHook);\n    return _super.apply(this, arguments);\n  }\n\n  (0, _createClass2[\"default\"])(ControlsHook, [{\n    key: \"getCommand\",\n    value: function getCommand() {\n      // Command to listen.\n      return 'document/elements/settings';\n    }\n  }, {\n    key: \"getId\",\n    value: function getId() {\n      // Unique id for the hook.\n      return 'hello-elementor-editor-controls-handler';\n    }\n    /**\n     * Get Hello Theme Controls\n     *\n     * Returns an object in which the keys are control IDs, and the values are the selectors of the elements that need\n     * to be targeted in the apply() method.\n     *\n     * Example return value:\n     *   {\n     *      hello_elementor_show_logo: '.site-header .site-header-logo',\n     *      hello_elementor_show_menu: '.site-header .site-header-menu',\n     *   }\n     */\n\n  }, {\n    key: \"getHelloThemeControls\",\n    value: function getHelloThemeControls() {\n      var _this = this;\n\n      return {\n        hello_header_logo_display: {\n          selector: '.site-header .site-logo, .site-header .site-title',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_header_logo_display);\n          }\n        },\n        hello_header_menu_display: {\n          selector: '.site-header .site-navigation, .site-header .site-navigation-toggle-holder',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_header_menu_display);\n          }\n        },\n        hello_header_tagline_display: {\n          selector: '.site-header .site-description',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_header_tagline_display);\n          }\n        },\n        hello_header_logo_type: {\n          selector: '.site-header .site-branding',\n          callback: function callback($element, args) {\n            var classPrefix = 'show-',\n                inputOptions = args.container.controls.hello_header_logo_type.options,\n                inputValue = args.settings.hello_header_logo_type;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_header_layout: {\n          selector: '.site-header',\n          callback: function callback($element, args) {\n            var classPrefix = 'header-',\n                inputOptions = args.container.controls.hello_header_layout.options,\n                inputValue = args.settings.hello_header_layout;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_header_width: {\n          selector: '.site-header',\n          callback: function callback($element, args) {\n            var classPrefix = 'header-',\n                inputOptions = args.container.controls.hello_header_width.options,\n                inputValue = args.settings.hello_header_width;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_header_menu_layout: {\n          selector: '.site-header',\n          callback: function callback($element, args) {\n            var classPrefix = 'menu-layout-',\n                inputOptions = args.container.controls.hello_header_menu_layout.options,\n                inputValue = args.settings.hello_header_menu_layout; // No matter what, close the mobile menu\n\n            $element.find('.site-navigation-toggle-holder').removeClass('elementor-active');\n            $element.find('.site-navigation-dropdown').removeClass('show');\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_header_menu_dropdown: {\n          selector: '.site-header',\n          callback: function callback($element, args) {\n            var classPrefix = 'menu-dropdown-',\n                inputOptions = args.container.controls.hello_header_menu_dropdown.options,\n                inputValue = args.settings.hello_header_menu_dropdown;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_footer_logo_display: {\n          selector: '.site-footer .site-logo, .site-footer .site-title',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_footer_logo_display);\n          }\n        },\n        hello_footer_tagline_display: {\n          selector: '.site-footer .site-description',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_footer_tagline_display);\n          }\n        },\n        hello_footer_menu_display: {\n          selector: '.site-footer .site-navigation',\n          callback: function callback($element, args) {\n            _this.toggleShowHideClass($element, args.settings.hello_footer_menu_display);\n          }\n        },\n        hello_footer_copyright_display: {\n          selector: '.site-footer .copyright',\n          callback: function callback($element, args) {\n            var $footerContainer = $element.closest('#site-footer'),\n                inputValue = args.settings.hello_footer_copyright_display;\n\n            _this.toggleShowHideClass($element, inputValue);\n\n            $footerContainer.toggleClass('footer-has-copyright', 'yes' === inputValue);\n          }\n        },\n        hello_footer_logo_type: {\n          selector: '.site-footer .site-branding',\n          callback: function callback($element, args) {\n            var classPrefix = 'show-',\n                inputOptions = args.container.controls.hello_footer_logo_type.options,\n                inputValue = args.settings.hello_footer_logo_type;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_footer_layout: {\n          selector: '.site-footer',\n          callback: function callback($element, args) {\n            var classPrefix = 'footer-',\n                inputOptions = args.container.controls.hello_footer_layout.options,\n                inputValue = args.settings.hello_footer_layout;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_footer_width: {\n          selector: '.site-footer',\n          callback: function callback($element, args) {\n            var classPrefix = 'footer-',\n                inputOptions = args.container.controls.hello_footer_width.options,\n                inputValue = args.settings.hello_footer_width;\n\n            _this.toggleLayoutClass($element, classPrefix, inputOptions, inputValue);\n          }\n        },\n        hello_footer_copyright_text: {\n          selector: '.site-footer .copyright',\n          callback: function callback($element, args) {\n            var inputValue = args.settings.hello_footer_copyright_text;\n            $element.find('p').text(inputValue);\n          }\n        }\n      };\n    }\n    /**\n     * Toggle show and hide classes on containers\n     *\n     * This will remove the .show and .hide clases from the element, then apply the new class\n     *\n     * @param {jQuery} element\n     * @param {string} inputValue\n     */\n\n  }, {\n    key: \"toggleShowHideClass\",\n    value: function toggleShowHideClass(element, inputValue) {\n      element.removeClass('hide').removeClass('show').addClass(inputValue ? 'show' : 'hide');\n    }\n    /**\n     * Toggle layout classes on containers\n     *\n     * This will cleanly set classes onto which ever container we want to target, removing the old classes and adding the new one\n     *\n     * @param {jQuery} element\n     * @param {string} classPrefix\n     * @param {Object} inputOptions\n     * @param {string} inputValue\n     *\n     */\n\n  }, {\n    key: \"toggleLayoutClass\",\n    value: function toggleLayoutClass(element, classPrefix, inputOptions, inputValue) {\n      // Loop through the possible classes and remove the one that's not in use\n      Object.entries(inputOptions).forEach(function (_ref) {\n        var _ref2 = (0, _slicedToArray2[\"default\"])(_ref, 1),\n            key = _ref2[0];\n\n        element.removeClass(classPrefix + key);\n      }); // Append the class which we want to use onto the element\n\n      if ('' !== inputValue) {\n        element.addClass(classPrefix + inputValue);\n      }\n    }\n    /**\n     * Set the conditions under which the hook will run.\n     *\n     * @param {Object} args\n     */\n\n  }, {\n    key: \"getConditions\",\n    value: function getConditions(args) {\n      var isKit = 'kit' === elementor.documents.getCurrent().config.type,\n          changedControls = Object.keys(args.settings),\n          isSingleSetting = 1 === changedControls.length; // If the document is not a kit, or there are no changed settings, or there is more than one single changed\n      // setting, don't run the hook.\n\n      if (!isKit || !args.settings || !isSingleSetting) {\n        return false;\n      } // If the changed control is in the list of theme controls, return true to run the hook.\n      // Otherwise, return false so the hook doesn't run.\n\n\n      return !!Object.keys(this.getHelloThemeControls()).includes(changedControls[0]);\n    }\n    /**\n     * The hook logic.\n     *\n     * @param {Object} args\n     */\n\n  }, {\n    key: \"apply\",\n    value: function apply(args) {\n      var allThemeControls = this.getHelloThemeControls(),\n          // Extract the control ID from the passed args\n      controlId = Object.keys(args.settings)[0],\n          controlConfig = allThemeControls[controlId],\n          // Find the element that needs to be targeted by the control.\n      $element = elementor.$previewContents.find(controlConfig.selector);\n      controlConfig.callback($element, args);\n    }\n  }]);\n  return ControlsHook;\n}($e.modules.hookUI.After);\n\nexports[\"default\"] = ControlsHook;\n\n//# sourceURL=././assets/dev/js/editor/hooks/ui/controls-hook.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/arrayLikeToArray.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/arrayLikeToArray.js ***!
-  \*****************************************************************/
-/***/ ((module) => {
-
-eval("function _arrayLikeToArray(arr, len) {\n  if (len == null || len > arr.length) len = arr.length;\n\n  for (var i = 0, arr2 = new Array(len); i < len; i++) {\n    arr2[i] = arr[i];\n  }\n\n  return arr2;\n}\n\nmodule.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/arrayLikeToArray.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/arrayWithHoles.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/arrayWithHoles.js ***!
-  \***************************************************************/
-/***/ ((module) => {
-
-eval("function _arrayWithHoles(arr) {\n  if (Array.isArray(arr)) return arr;\n}\n\nmodule.exports = _arrayWithHoles, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/arrayWithHoles.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/assertThisInitialized.js ***!
-  \**********************************************************************/
-/***/ ((module) => {
-
-eval("function _assertThisInitialized(self) {\n  if (self === void 0) {\n    throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\");\n  }\n\n  return self;\n}\n\nmodule.exports = _assertThisInitialized, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/assertThisInitialized.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/classCallCheck.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/classCallCheck.js ***!
-  \***************************************************************/
-/***/ ((module) => {
-
-eval("function _classCallCheck(instance, Constructor) {\n  if (!(instance instanceof Constructor)) {\n    throw new TypeError(\"Cannot call a class as a function\");\n  }\n}\n\nmodule.exports = _classCallCheck, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/classCallCheck.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/createClass.js":
-/*!************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/createClass.js ***!
-  \************************************************************/
-/***/ ((module) => {
-
-eval("function _defineProperties(target, props) {\n  for (var i = 0; i < props.length; i++) {\n    var descriptor = props[i];\n    descriptor.enumerable = descriptor.enumerable || false;\n    descriptor.configurable = true;\n    if (\"value\" in descriptor) descriptor.writable = true;\n    Object.defineProperty(target, descriptor.key, descriptor);\n  }\n}\n\nfunction _createClass(Constructor, protoProps, staticProps) {\n  if (protoProps) _defineProperties(Constructor.prototype, protoProps);\n  if (staticProps) _defineProperties(Constructor, staticProps);\n  Object.defineProperty(Constructor, \"prototype\", {\n    writable: false\n  });\n  return Constructor;\n}\n\nmodule.exports = _createClass, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/createClass.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/defineProperty.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/defineProperty.js ***!
-  \***************************************************************/
-/***/ ((module) => {
-
-eval("function _defineProperty(obj, key, value) {\n  if (key in obj) {\n    Object.defineProperty(obj, key, {\n      value: value,\n      enumerable: true,\n      configurable: true,\n      writable: true\n    });\n  } else {\n    obj[key] = value;\n  }\n\n  return obj;\n}\n\nmodule.exports = _defineProperty, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/defineProperty.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/getPrototypeOf.js ***!
-  \***************************************************************/
-/***/ ((module) => {
-
-eval("function _getPrototypeOf(o) {\n  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) {\n    return o.__proto__ || Object.getPrototypeOf(o);\n  }, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n  return _getPrototypeOf(o);\n}\n\nmodule.exports = _getPrototypeOf, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/inherits.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/inherits.js ***!
-  \*********************************************************/
+/***/ 693:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("var setPrototypeOf = __webpack_require__(/*! ./setPrototypeOf.js */ \"./node_modules/@babel/runtime/helpers/setPrototypeOf.js\");\n\nfunction _inherits(subClass, superClass) {\n  if (typeof superClass !== \"function\" && superClass !== null) {\n    throw new TypeError(\"Super expression must either be null or a function\");\n  }\n\n  subClass.prototype = Object.create(superClass && superClass.prototype, {\n    constructor: {\n      value: subClass,\n      writable: true,\n      configurable: true\n    }\n  });\n  Object.defineProperty(subClass, \"prototype\", {\n    writable: false\n  });\n  if (superClass) setPrototypeOf(subClass, superClass);\n}\n\nmodule.exports = _inherits, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/inherits.js");
+var toPropertyKey = __webpack_require__(736);
+function _defineProperty(obj, key, value) {
+  key = toPropertyKey(key);
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+module.exports = _defineProperty, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/interopRequireDefault.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/interopRequireDefault.js ***!
-  \**********************************************************************/
+/***/ 994:
 /***/ ((module) => {
 
-eval("function _interopRequireDefault(obj) {\n  return obj && obj.__esModule ? obj : {\n    \"default\": obj\n  };\n}\n\nmodule.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/interopRequireDefault.js");
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    "default": obj
+  };
+}
+module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/iterableToArrayLimit.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/iterableToArrayLimit.js ***!
-  \*********************************************************************/
-/***/ ((module) => {
-
-eval("function _iterableToArrayLimit(arr, i) {\n  var _i = arr == null ? null : typeof Symbol !== \"undefined\" && arr[Symbol.iterator] || arr[\"@@iterator\"];\n\n  if (_i == null) return;\n  var _arr = [];\n  var _n = true;\n  var _d = false;\n\n  var _s, _e;\n\n  try {\n    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {\n      _arr.push(_s.value);\n\n      if (i && _arr.length === i) break;\n    }\n  } catch (err) {\n    _d = true;\n    _e = err;\n  } finally {\n    try {\n      if (!_n && _i[\"return\"] != null) _i[\"return\"]();\n    } finally {\n      if (_d) throw _e;\n    }\n  }\n\n  return _arr;\n}\n\nmodule.exports = _iterableToArrayLimit, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/iterableToArrayLimit.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/nonIterableRest.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/nonIterableRest.js ***!
-  \****************************************************************/
-/***/ ((module) => {
-
-eval("function _nonIterableRest() {\n  throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\");\n}\n\nmodule.exports = _nonIterableRest, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/nonIterableRest.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js ***!
-  \**************************************************************************/
+/***/ 45:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("var _typeof = (__webpack_require__(/*! ./typeof.js */ \"./node_modules/@babel/runtime/helpers/typeof.js\")[\"default\"]);\n\nvar assertThisInitialized = __webpack_require__(/*! ./assertThisInitialized.js */ \"./node_modules/@babel/runtime/helpers/assertThisInitialized.js\");\n\nfunction _possibleConstructorReturn(self, call) {\n  if (call && (_typeof(call) === \"object\" || typeof call === \"function\")) {\n    return call;\n  } else if (call !== void 0) {\n    throw new TypeError(\"Derived constructors may only return object or undefined\");\n  }\n\n  return assertThisInitialized(self);\n}\n\nmodule.exports = _possibleConstructorReturn, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+var _typeof = (__webpack_require__(738)["default"]);
+function toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = t[Symbol.toPrimitive];
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return ("string" === r ? String : Number)(t);
+}
+module.exports = toPrimitive, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/setPrototypeOf.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/setPrototypeOf.js ***!
-  \***************************************************************/
-/***/ ((module) => {
-
-eval("function _setPrototypeOf(o, p) {\n  module.exports = _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) {\n    o.__proto__ = p;\n    return o;\n  }, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n  return _setPrototypeOf(o, p);\n}\n\nmodule.exports = _setPrototypeOf, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/setPrototypeOf.js");
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/slicedToArray.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/slicedToArray.js ***!
-  \**************************************************************/
+/***/ 736:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("var arrayWithHoles = __webpack_require__(/*! ./arrayWithHoles.js */ \"./node_modules/@babel/runtime/helpers/arrayWithHoles.js\");\n\nvar iterableToArrayLimit = __webpack_require__(/*! ./iterableToArrayLimit.js */ \"./node_modules/@babel/runtime/helpers/iterableToArrayLimit.js\");\n\nvar unsupportedIterableToArray = __webpack_require__(/*! ./unsupportedIterableToArray.js */ \"./node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js\");\n\nvar nonIterableRest = __webpack_require__(/*! ./nonIterableRest.js */ \"./node_modules/@babel/runtime/helpers/nonIterableRest.js\");\n\nfunction _slicedToArray(arr, i) {\n  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();\n}\n\nmodule.exports = _slicedToArray, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/slicedToArray.js");
+var _typeof = (__webpack_require__(738)["default"]);
+var toPrimitive = __webpack_require__(45);
+function toPropertyKey(t) {
+  var i = toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
+}
+module.exports = toPropertyKey, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/typeof.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/typeof.js ***!
-  \*******************************************************/
+/***/ 738:
 /***/ ((module) => {
 
-eval("function _typeof(obj) {\n  \"@babel/helpers - typeof\";\n\n  return (module.exports = _typeof = \"function\" == typeof Symbol && \"symbol\" == typeof Symbol.iterator ? function (obj) {\n    return typeof obj;\n  } : function (obj) {\n    return obj && \"function\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj;\n  }, module.exports.__esModule = true, module.exports[\"default\"] = module.exports), _typeof(obj);\n}\n\nmodule.exports = _typeof, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/typeof.js");
+function _typeof(o) {
+  "@babel/helpers - typeof";
 
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js ***!
-  \***************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-eval("var arrayLikeToArray = __webpack_require__(/*! ./arrayLikeToArray.js */ \"./node_modules/@babel/runtime/helpers/arrayLikeToArray.js\");\n\nfunction _unsupportedIterableToArray(o, minLen) {\n  if (!o) return;\n  if (typeof o === \"string\") return arrayLikeToArray(o, minLen);\n  var n = Object.prototype.toString.call(o).slice(8, -1);\n  if (n === \"Object\" && o.constructor) n = o.constructor.name;\n  if (n === \"Map\" || n === \"Set\") return Array.from(o);\n  if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);\n}\n\nmodule.exports = _unsupportedIterableToArray, module.exports.__esModule = true, module.exports[\"default\"] = module.exports;\n\n//# sourceURL=././node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js");
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
+}
+module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ })
 
@@ -229,11 +381,16 @@ eval("var arrayLikeToArray = __webpack_require__(/*! ./arrayLikeToArray.js */ \"
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./assets/dev/js/editor/hello-editor.js");
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(994);
+var _component = _interopRequireDefault(__webpack_require__(706));
+$e.components.register(new _component.default());
+})();
+
 /******/ })()
 ;

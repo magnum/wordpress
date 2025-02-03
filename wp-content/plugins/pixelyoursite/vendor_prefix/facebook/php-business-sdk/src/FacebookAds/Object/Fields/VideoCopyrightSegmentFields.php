@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoCopyrightSegmentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DURATION_IN_SEC = 'duration_in_sec';
-    const MEDIA_TYPE = 'media_type';
-    const START_TIME_IN_SEC = 'start_time_in_sec';
-    public function getFieldTypes()
-    {
-        return array('duration_in_sec' => 'float', 'media_type' => 'string', 'start_time_in_sec' => 'float');
-    }
+
+class VideoCopyrightSegmentFields extends AbstractEnum {
+
+  const DURATION_IN_SEC = 'duration_in_sec';
+  const MEDIA_TYPE = 'media_type';
+  const START_TIME_IN_SEC = 'start_time_in_sec';
+
+  public function getFieldTypes() {
+    return array(
+      'duration_in_sec' => 'float',
+      'media_type' => 'string',
+      'start_time_in_sec' => 'float',
+    );
+  }
 }

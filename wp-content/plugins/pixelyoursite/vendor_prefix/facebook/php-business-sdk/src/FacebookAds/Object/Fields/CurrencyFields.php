@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CurrencyFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CURRENCY_OFFSET = 'currency_offset';
-    const USD_EXCHANGE = 'usd_exchange';
-    const USD_EXCHANGE_INVERSE = 'usd_exchange_inverse';
-    const USER_CURRENCY = 'user_currency';
-    public function getFieldTypes()
-    {
-        return array('currency_offset' => 'unsigned int', 'usd_exchange' => 'float', 'usd_exchange_inverse' => 'float', 'user_currency' => 'string');
-    }
+
+class CurrencyFields extends AbstractEnum {
+
+  const CURRENCY_OFFSET = 'currency_offset';
+  const USD_EXCHANGE = 'usd_exchange';
+  const USD_EXCHANGE_INVERSE = 'usd_exchange_inverse';
+  const USER_CURRENCY = 'user_currency';
+
+  public function getFieldTypes() {
+    return array(
+      'currency_offset' => 'unsigned int',
+      'usd_exchange' => 'float',
+      'usd_exchange_inverse' => 'float',
+      'user_currency' => 'string',
+    );
+  }
 }

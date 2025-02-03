@@ -12,7 +12,7 @@
  *
  * @return string Returns the block content.
  */
-function coblocks_render_icon_block( $attrs ) {
+function coblocks_render_coblocks_icon_block( $attrs ) {
 	if ( ! is_array( $attrs ) ) {
 		$attrs = array();
 	}
@@ -88,7 +88,7 @@ function coblocks_render_icon_block( $attrs ) {
 	if ( ! empty( $attrs['href'] ) ) {
 		$icon = sprintf(
 			'<a href="%1$s" rel="%2$s" target="%3$s" style="%4$s">%5$s</a>',
-			$attrs['href'],
+			esc_url( $attrs['href'] ),
 			! empty( $attrs['rel'] ) ? esc_attr( $attrs['rel'] ) : '',
 			! empty( $attrs['linkTarget'] ) ? esc_attr( $attrs['linkTarget'] ) : '_self',
 			esc_attr( $color_styles ), // To make sure the color gets to the svg when there is an anchor.
@@ -112,20 +112,3 @@ function coblocks_render_icon_block( $attrs ) {
 		)
 	);
 }
-
-/**
- * Registers the block on server.
- */
-function coblocks_register_icon_block() {
-	if ( ! function_exists( 'register_block_type' ) ) {
-		return;
-	}
-
-	register_block_type(
-		COBLOCKS_PLUGIN_DIR . 'src/blocks/icon',
-		array(
-			'render_callback' => 'coblocks_render_icon_block',
-		)
-	);
-}
-add_action( 'init', 'coblocks_register_icon_block' );

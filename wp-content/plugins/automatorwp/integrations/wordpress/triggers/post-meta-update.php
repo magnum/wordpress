@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Post_Meta_Update extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_post_meta_update';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_post_meta_update';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -25,15 +36,16 @@ class AutomatorWP_WordPress_Post_Meta_Update extends AutomatorWP_Integration_Tri
             'integration'       => $this->integration,
             'label'             => __( 'Post meta gets updated with a value', 'automatorwp' ),
             'select_option'     => __( 'Post <strong>meta gets updated</strong> with a value', 'automatorwp' ),
-            /* translators: %1$s: Post title. %2$s: Key. %3$s: Value. %4$s: Number of times. */
-            'edit_label'        => sprintf( __( '%1$s meta %2$s gets updated with %3$s %4$s time(s)', 'automatorwp' ), '{post}', '{meta_key}', '{meta_value}', '{times}' ),
-            /* translators: %1$s: Post title. %2$s: Key. %3$s: Value. */
-            'log_label'         => sprintf( __( '%1$s meta %2$s gets updated with %3$s', 'automatorwp' ), '{post}', '{meta_key}', '{meta_value}' ),
+            /* translators: %1$s: Post title. %2$s: Key. %3$s: Condition. %4$s: Value. %5$s: Number of times. */
+            'edit_label'        => sprintf( __( '%1$s meta %2$s gets updated with a value %3$s %4$s %5$s time(s)', 'automatorwp' ), '{post}', '{meta_key}', '{condition}', '{meta_value}', '{times}' ),
+            /* translators: %1$s: Post title. %2$s: Key. %3$s: Condition. %4$s: Value. */
+            'log_label'         => sprintf( __( '%1$s meta %2$s gets updated with a value %3$s %4$s', 'automatorwp' ), '{post}', '{meta_key}', '{condition}', '{meta_value}' ),
             'action'            => 'updated_post_meta',
             'function'          => array( $this, 'listener' ),
             'priority'          => 10,
             'accepted_args'     => 4,
             'options'           => array(
+                'condition' => automatorwp_utilities_condition_option(),
                 'post' => automatorwp_utilities_post_option( array(
                     'post_type'             => 'any',
                     'option_none_label'     => __( 'Any post', 'automatorwp' ),
@@ -97,9 +109,20 @@ class AutomatorWP_WordPress_Post_Meta_Update extends AutomatorWP_Integration_Tri
 
         $post = get_post( $object_id );
 
+        /**
+         * User ID for post updated triggers
+         *
+         * @since 1.0.0
+         *
+         * @param int    $user_id    The user ID
+         * @param int    $post_ID    The post ID
+         * @param string $trigger    The trigger
+         */
+        $user_id = apply_filters( 'automatorwp_post_updated_user_id', $post->post_author, $object_id, $this->trigger );
+
         automatorwp_trigger_event( array(
             'trigger'       => $this->trigger,
-            'user_id'       => $post->post_author,
+            'user_id'       => $user_id,
             'post_id'       => $object_id,
             'meta_key'      => $meta_key,
             'meta_value'    => $meta_value,
@@ -141,7 +164,7 @@ class AutomatorWP_WordPress_Post_Meta_Update extends AutomatorWP_Integration_Tri
         }
 
         // Don't deserve if value doesn't matches with the trigger option
-        if( $trigger_options['meta_value'] !== '' && $trigger_options['meta_value'] !== $event['meta_value'] ) {
+		if ( $trigger_options['meta_value'] !== '' && ! automatorwp_condition_matches( $event['meta_value'], $trigger_options['meta_value'], $trigger_options['condition'] ) ) {
             return false;
         }
 
@@ -271,4 +294,5 @@ class AutomatorWP_WordPress_Post_Meta_Update extends AutomatorWP_Integration_Tri
 
 }
 
-new AutomatorWP_WordPress_Post_Meta_Update();
+new AutomatorWP_WordPress_Post_Meta_Update( 'wordpress' );
+new AutomatorWP_WordPress_Post_Meta_Update( 'posts' );

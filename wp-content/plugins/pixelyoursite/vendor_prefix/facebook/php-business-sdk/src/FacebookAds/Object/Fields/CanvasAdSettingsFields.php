@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CanvasAdSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const IS_CANVAS_COLLECTION_ELIGIBLE = 'is_canvas_collection_eligible';
-    const LEAD_FORM_CREATED_TIME = 'lead_form_created_time';
-    const LEAD_FORM_NAME = 'lead_form_name';
-    const LEAD_GEN_FORM_ID = 'lead_gen_form_id';
-    const LEADS_COUNT = 'leads_count';
-    const PRODUCT_SET_ID = 'product_set_id';
-    const USE_RETAILER_ITEM_IDS = 'use_retailer_item_ids';
-    public function getFieldTypes()
-    {
-        return array('is_canvas_collection_eligible' => 'bool', 'lead_form_created_time' => 'unsigned int', 'lead_form_name' => 'string', 'lead_gen_form_id' => 'string', 'leads_count' => 'int', 'product_set_id' => 'string', 'use_retailer_item_ids' => 'bool');
-    }
+
+class CanvasAdSettingsFields extends AbstractEnum {
+
+  const IS_CANVAS_COLLECTION_ELIGIBLE = 'is_canvas_collection_eligible';
+  const LEAD_FORM_CREATED_TIME = 'lead_form_created_time';
+  const LEAD_FORM_NAME = 'lead_form_name';
+  const LEAD_GEN_FORM_ID = 'lead_gen_form_id';
+  const LEADS_COUNT = 'leads_count';
+  const PRODUCT_SET_ID = 'product_set_id';
+  const USE_RETAILER_ITEM_IDS = 'use_retailer_item_ids';
+
+  public function getFieldTypes() {
+    return array(
+      'is_canvas_collection_eligible' => 'bool',
+      'lead_form_created_time' => 'unsigned int',
+      'lead_form_name' => 'string',
+      'lead_gen_form_id' => 'string',
+      'leads_count' => 'int',
+      'product_set_id' => 'string',
+      'use_retailer_item_ids' => 'bool',
+    );
+  }
 }

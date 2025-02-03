@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CommentLiveFilterValues getInstance()
  */
-class CommentLiveFilterValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FILTER_LOW_QUALITY = 'filter_low_quality';
-    const NO_FILTER = 'no_filter';
+class CommentLiveFilterValues extends AbstractEnum {
+
+  const FILTER_LOW_QUALITY = 'filter_low_quality';
+  const NO_FILTER = 'no_filter';
 }

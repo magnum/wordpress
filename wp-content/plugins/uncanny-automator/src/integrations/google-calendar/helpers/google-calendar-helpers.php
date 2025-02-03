@@ -305,7 +305,7 @@ class Google_Calendar_Helpers {
 		// Persist connection if okay.
 		$is_connected = $this->auth_persist_connection(
 			automator_filter_input( 'automator_api_message' ),
-			get_transient( 'automator_api_google_authorize_nonce' )
+			automator_filter_input( 'nonce' )
 		);
 
 		if ( $is_connected ) {
@@ -409,7 +409,7 @@ class Google_Calendar_Helpers {
 
 			}
 
-			update_option( self::OPTION_KEY, $tokens );
+			automator_update_option( self::OPTION_KEY, $tokens );
 
 			return true;
 
@@ -510,8 +510,6 @@ class Google_Calendar_Helpers {
 			admin_url( 'admin-ajax.php' )
 		);
 
-		set_transient( 'automator_api_google_authorize_nonce', $nonce, 3600 );
-
 		// Construct the OAuth uri.
 		$auth_uri = add_query_arg(
 			array(
@@ -533,7 +531,7 @@ class Google_Calendar_Helpers {
 	 */
 	public function get_client() {
 
-		return get_option( self::OPTION_KEY, false );
+		return automator_get_option( self::OPTION_KEY, false );
 
 	}
 
@@ -760,7 +758,7 @@ class Google_Calendar_Helpers {
 
 		delete_transient( 'automator_google_calendar_user_info' );
 
-		delete_option( self::OPTION_KEY );
+		automator_delete_option( self::OPTION_KEY );
 
 		return true;
 

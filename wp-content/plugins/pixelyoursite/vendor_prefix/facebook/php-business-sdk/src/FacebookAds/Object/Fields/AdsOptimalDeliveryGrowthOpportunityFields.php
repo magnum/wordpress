@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdsOptimalDeliveryGrowthOpportunityFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CHILD_METADATA = 'child_metadata';
-    const METADATA = 'metadata';
-    const OPTIMIZATION_TYPE = 'optimization_type';
-    public function getFieldTypes()
-    {
-        return array('child_metadata' => 'map<string, Object>', 'metadata' => 'Object', 'optimization_type' => 'string');
-    }
+
+class AdsOptimalDeliveryGrowthOpportunityFields extends AbstractEnum {
+
+  const CHILD_METADATA = 'child_metadata';
+  const METADATA = 'metadata';
+  const OPTIMIZATION_TYPE = 'optimization_type';
+
+  public function getFieldTypes() {
+    return array(
+      'child_metadata' => 'map<string, Object>',
+      'metadata' => 'Object',
+      'optimization_type' => 'string',
+    );
+  }
 }

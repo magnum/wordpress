@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdRuleHistoryFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const EVALUATION_SPEC = 'evaluation_spec';
-    const EXCEPTION_CODE = 'exception_code';
-    const EXCEPTION_MESSAGE = 'exception_message';
-    const EXECUTION_SPEC = 'execution_spec';
-    const IS_MANUAL = 'is_manual';
-    const RESULTS = 'results';
-    const SCHEDULE_SPEC = 'schedule_spec';
-    const TIMESTAMP = 'timestamp';
-    public function getFieldTypes()
-    {
-        return array('evaluation_spec' => 'AdRuleEvaluationSpec', 'exception_code' => 'int', 'exception_message' => 'string', 'execution_spec' => 'AdRuleExecutionSpec', 'is_manual' => 'bool', 'results' => 'list<AdRuleHistoryResult>', 'schedule_spec' => 'AdRuleScheduleSpec', 'timestamp' => 'datetime');
-    }
+
+class AdRuleHistoryFields extends AbstractEnum {
+
+  const EVALUATION_SPEC = 'evaluation_spec';
+  const EXCEPTION_CODE = 'exception_code';
+  const EXCEPTION_MESSAGE = 'exception_message';
+  const EXECUTION_SPEC = 'execution_spec';
+  const IS_MANUAL = 'is_manual';
+  const RESULTS = 'results';
+  const SCHEDULE_SPEC = 'schedule_spec';
+  const TIMESTAMP = 'timestamp';
+
+  public function getFieldTypes() {
+    return array(
+      'evaluation_spec' => 'AdRuleEvaluationSpec',
+      'exception_code' => 'int',
+      'exception_message' => 'string',
+      'execution_spec' => 'AdRuleExecutionSpec',
+      'is_manual' => 'bool',
+      'results' => 'list<AdRuleHistoryResult>',
+      'schedule_spec' => 'AdRuleScheduleSpec',
+      'timestamp' => 'datetime',
+    );
+  }
 }

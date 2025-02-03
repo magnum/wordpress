@@ -132,7 +132,7 @@ class AutomatorWP_GamiPress_Earn_Points extends AutomatorWP_Integration_Trigger 
         if( $trigger_options['points'] > 0 ) {
 
             // Don't deserve if points earned are lower than trigger option
-            if( $event['points'] < $trigger_options['points'] ) {
+            if( $event['points_earned'] < $trigger_options['points'] ) {
                 return false;
             }
 

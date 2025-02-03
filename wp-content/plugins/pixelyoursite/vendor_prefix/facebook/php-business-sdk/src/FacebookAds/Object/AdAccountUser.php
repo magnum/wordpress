@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountUserFields;
+
 /**
  * This class is auto-generated.
  *
@@ -37,33 +38,39 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountUserFields;
  * pull request for this class.
  *
  */
-class AdAccountUser extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'users';
-    }
-    /**
-     * @return AdAccountUserFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountUserFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        return $ref_enums;
-    }
-    public function getAdAccounts(array $fields = array(), array $params = array())
-    {
-        return $this->getManyByConnection(\PYS_PRO_GLOBAL\FacebookAds\Object\AdAccount::className(), $fields, $params);
-    }
-    public function getAdAccountGroups(array $fields = array(), array $params = array())
-    {
-        return $this->getManyByConnection(\PYS_PRO_GLOBAL\FacebookAds\Object\AdAccountGroup::className(), $fields, $params);
-    }
+
+class AdAccountUser extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'users';
+  }
+
+  /**
+   * @return AdAccountUserFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountUserFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    return $ref_enums;
+  }
+
+
+  public function getAdAccounts(
+    array $fields = array(), array $params = array()) {
+    return $this->getManyByConnection(AdAccount::className(), $fields, $params);
+  }
+
+  public function getAdAccountGroups(
+    array $fields = array(), array $params = array()) {
+    return $this->getManyByConnection(
+      AdAccountGroup::className(),
+      $fields,
+      $params);
+  }
 }

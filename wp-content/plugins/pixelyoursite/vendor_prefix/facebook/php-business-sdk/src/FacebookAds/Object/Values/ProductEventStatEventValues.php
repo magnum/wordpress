@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductEventStatEventValues getInstance()
  */
-class ProductEventStatEventValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADDTOCART = 'AddToCart';
-    const ADDTOWISHLIST = 'AddToWishlist';
-    const INITIATECHECKOUT = 'InitiateCheckout';
-    const LEAD = 'Lead';
-    const PURCHASE = 'Purchase';
-    const SEARCH = 'Search';
-    const SUBSCRIBE = 'Subscribe';
-    const VIEWCONTENT = 'ViewContent';
+class ProductEventStatEventValues extends AbstractEnum {
+
+  const ADDTOCART = 'AddToCart';
+  const ADDTOWISHLIST = 'AddToWishlist';
+  const INITIATECHECKOUT = 'InitiateCheckout';
+  const LEAD = 'Lead';
+  const PURCHASE = 'Purchase';
+  const SEARCH = 'Search';
+  const SUBSCRIBE = 'Subscribe';
+  const VIEWCONTENT = 'ViewContent';
 }

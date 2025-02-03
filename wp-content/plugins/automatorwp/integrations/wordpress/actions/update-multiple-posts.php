@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Update_Multiple_Posts extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_update_multiple_posts';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_update_multiple_posts';
+
+        parent::__construct();
+
+    }
 
     /**
      * The post field conditions
@@ -618,4 +629,5 @@ class AutomatorWP_WordPress_Update_Multiple_Posts extends AutomatorWP_Integratio
 
 }
 
-new AutomatorWP_WordPress_Update_Multiple_Posts();
+new AutomatorWP_WordPress_Update_Multiple_Posts( 'wordpress' );
+new AutomatorWP_WordPress_Update_Multiple_Posts( 'posts' );

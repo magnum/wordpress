@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CheckBatchRequestStatusFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CheckBatchRequestStatusErrorPriorityValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CheckBatchRequestStatusErrorPriorit
  * pull request for this class.
  *
  */
-class CheckBatchRequestStatus extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return CheckBatchRequestStatusFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CheckBatchRequestStatusFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['ErrorPriority'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CheckBatchRequestStatusErrorPriorityValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class CheckBatchRequestStatus extends AbstractObject {
+
+  /**
+   * @return CheckBatchRequestStatusFields
+   */
+  public static function getFieldsEnum() {
+    return CheckBatchRequestStatusFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['ErrorPriority'] = CheckBatchRequestStatusErrorPriorityValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

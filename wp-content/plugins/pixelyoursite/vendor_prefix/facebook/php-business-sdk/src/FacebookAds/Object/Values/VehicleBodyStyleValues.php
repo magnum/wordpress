@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,29 +35,29 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static VehicleBodyStyleValues getInstance()
  */
-class VehicleBodyStyleValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONVERTIBLE = 'CONVERTIBLE';
-    const COUPE = 'COUPE';
-    const CROSSOVER = 'CROSSOVER';
-    const ESTATE = 'ESTATE';
-    const GRANDTOURER = 'GRANDTOURER';
-    const HATCHBACK = 'HATCHBACK';
-    const MINIBUS = 'MINIBUS';
-    const MINIVAN = 'MINIVAN';
-    const MPV = 'MPV';
-    const NONE = 'NONE';
-    const OTHER = 'OTHER';
-    const PICKUP = 'PICKUP';
-    const ROADSTER = 'ROADSTER';
-    const SALOON = 'SALOON';
-    const SEDAN = 'SEDAN';
-    const SMALL_CAR = 'SMALL_CAR';
-    const SPORTSCAR = 'SPORTSCAR';
-    const SUPERCAR = 'SUPERCAR';
-    const SUPERMINI = 'SUPERMINI';
-    const SUV = 'SUV';
-    const TRUCK = 'TRUCK';
-    const VAN = 'VAN';
-    const WAGON = 'WAGON';
+class VehicleBodyStyleValues extends AbstractEnum {
+
+  const CONVERTIBLE = 'CONVERTIBLE';
+  const COUPE = 'COUPE';
+  const CROSSOVER = 'CROSSOVER';
+  const ESTATE = 'ESTATE';
+  const GRANDTOURER = 'GRANDTOURER';
+  const HATCHBACK = 'HATCHBACK';
+  const MINIBUS = 'MINIBUS';
+  const MINIVAN = 'MINIVAN';
+  const MPV = 'MPV';
+  const NONE = 'NONE';
+  const OTHER = 'OTHER';
+  const PICKUP = 'PICKUP';
+  const ROADSTER = 'ROADSTER';
+  const SALOON = 'SALOON';
+  const SEDAN = 'SEDAN';
+  const SMALL_CAR = 'SMALL_CAR';
+  const SPORTSCAR = 'SPORTSCAR';
+  const SUPERCAR = 'SUPERCAR';
+  const SUPERMINI = 'SUPERMINI';
+  const SUV = 'SUV';
+  const TRUCK = 'TRUCK';
+  const VAN = 'VAN';
+  const WAGON = 'WAGON';
 }

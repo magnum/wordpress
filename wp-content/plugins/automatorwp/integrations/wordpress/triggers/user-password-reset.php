@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_User_Password_Reset extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_user_password_reset';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_user_password_reset';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -64,4 +75,5 @@ class AutomatorWP_WordPress_User_Password_Reset extends AutomatorWP_Integration_
 
 }
 
-new AutomatorWP_WordPress_User_Password_Reset();
+new AutomatorWP_WordPress_User_Password_Reset( 'wordpress' );
+new AutomatorWP_WordPress_User_Password_Reset( 'users' );

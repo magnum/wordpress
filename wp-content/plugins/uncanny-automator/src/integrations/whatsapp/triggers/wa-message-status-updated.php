@@ -26,6 +26,13 @@ class WA_MESSAGE_STATUS_UPDATED {
 	 */
 	const TRIGGER_META = 'WA_MESSAGE_STATUS_UPDATED_META';
 
+	/**
+	 * The WhatsApp tokens.
+	 *
+	 * @var Wa_Message_Status_Tokens $whatsapp_tokens
+	 */
+	public $whatsapp_tokens;
+
 	public function __construct() {
 
 		$this->whatsapp_tokens = new Wa_Message_Status_Tokens();
@@ -77,13 +84,13 @@ class WA_MESSAGE_STATUS_UPDATED {
 				'options' => array(
 					array(
 						'option_code'     => $this->get_trigger_meta(),
-						'label'           => __( 'Status', 'uncanny-automator-pro' ),
+						'label'           => __( 'Status', 'uncanny-automator' ),
 						'input_type'      => 'select',
 						'required'        => true,
 						'options'         => array(
-							'sent'      => esc_html__( 'Sent', 'uncanny-automator-pro' ),
-							'delivered' => esc_html__( 'Delivered', 'uncanny-automator-pro' ),
-							'read'      => esc_html__( 'Read', 'uncanny-automator-pro' ),
+							'sent'      => esc_html__( 'Sent', 'uncanny-automator' ),
+							'delivered' => esc_html__( 'Delivered', 'uncanny-automator' ),
+							'read'      => esc_html__( 'Read', 'uncanny-automator' ),
 						),
 						'relevant_tokens' => array(),
 					),

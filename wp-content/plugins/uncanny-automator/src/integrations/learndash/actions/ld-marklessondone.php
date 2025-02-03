@@ -9,6 +9,8 @@ namespace Uncanny_Automator;
  */
 class LD_MARKLESSONDONE {
 
+	use Recipe\Action_Tokens;
+
 	/**
 	 * Integration code
 	 *
@@ -48,6 +50,11 @@ class LD_MARKLESSONDONE {
 			'execution_function' => array( $this, 'mark_completes_a_lesson' ),
 			'options_callback'   => array( $this, 'load_options' ),
 		);
+
+		// Set Action Tokens for Lesson and Course.
+		$lesson_tokens = Automator()->helpers->recipe->learndash->options->get_lesson_relevant_tokens( 'action', $this->action_meta );
+		$course_tokens = Automator()->helpers->recipe->learndash->options->get_course_relevant_tokens( 'action', 'LDCOURSE' );
+		$this->set_action_tokens( $lesson_tokens + $course_tokens, $this->action_code );
 
 		Automator()->register->action( $action );
 	}
@@ -115,6 +122,11 @@ class LD_MARKLESSONDONE {
 		$lesson_id = $action_data['meta'][ $this->action_meta ];
 		$this->mark_steps_done( $user_id, $lesson_id, $course_id );
 
+		// Hydrate Lesson & Course Action Tokens.
+		$lesson_tokens = Automator()->helpers->recipe->learndash->options->hydrate_ld_lesson_action_tokens( $lesson_id, $user_id, $this->action_meta );
+		$course_tokens = Automator()->helpers->recipe->learndash->options->hydrate_ld_course_action_tokens( $course_id, $user_id, 'LDCOURSE' );
+		$this->hydrate_tokens( $lesson_tokens + $course_tokens );
+
 		Automator()->complete_action( $user_id, $action_data, $recipe_id );
 	}
 
@@ -138,7 +150,7 @@ class LD_MARKLESSONDONE {
 
 				$this->mark_quiz_complete( $user_id, $course_id );
 
-				learndash_process_mark_complete( $user_id, $topic->ID, false, $course_id );
+				Learndash_Helpers::process_mark_complete( $user_id, $topic->ID, false, $course_id );
 			}
 		}
 
@@ -153,7 +165,7 @@ class LD_MARKLESSONDONE {
 		$this->mark_quiz_complete( $user_id, $course_id );
 
 		//Mark complete a lesson
-		learndash_process_mark_complete( $user_id, $lesson_id, false, $course_id );
+		Learndash_Helpers::process_mark_complete( $user_id, $lesson_id, false, $course_id );
 	}
 
 	/**

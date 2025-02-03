@@ -3,14 +3,14 @@
  * Plugin Name:     	AutomatorWP
  * Plugin URI:      	https://automatorwp.com
  * Description:     	Connect your WordPress plugins together and create automated workflows with no code!
- * Version:         	2.5.9.1
+ * Version:         	5.1.3
  * Author:          	AutomatorWP
  * Author URI:      	https://automatorwp.com/
  * Text Domain:     	automatorwp
  * Domain Path: 		/languages/
  * Requires PHP:        5.6
  * Requires at least: 	4.4
- * Tested up to: 		6.1
+ * Tested up to: 		6.7
  * License:         	GNU AGPL v3.0 (http://www.gnu.org/licenses/agpl.txt)
  *
  * @package         	AutomatorWP
@@ -99,6 +99,7 @@ final class AutomatorWP {
             self::$instance->constants();
             self::$instance->libraries();
             self::$instance->classes();
+            self::$instance->compatibility();
             self::$instance->includes();
             self::$instance->hooks();
             self::$instance->load_textdomain();
@@ -119,7 +120,7 @@ final class AutomatorWP {
     private function constants() {
 
         // Plugin version
-        define( 'AUTOMATORWP_VER', '2.5.9.1' );
+        define( 'AUTOMATORWP_VER', '5.1.3' );
 
         // Plugin file
         define( 'AUTOMATORWP_FILE', __FILE__ );
@@ -174,6 +175,20 @@ final class AutomatorWP {
     }
 
     /**
+	 * Include compatibility files
+	 *
+	 * @access      private
+	 * @since       4.2.0
+	 * @return      void
+	 */
+	private function compatibility() {
+
+		// GamiPress backward compatibility
+		require_once AUTOMATORWP_DIR . 'includes/compatibility/4.2.0.php';
+
+	}
+
+    /**
      * Include plugin files
      *
      * @access      private
@@ -198,6 +213,7 @@ final class AutomatorWP {
         require_once AUTOMATORWP_DIR . 'includes/triggers.php';
         require_once AUTOMATORWP_DIR . 'includes/actions.php';
         require_once AUTOMATORWP_DIR . 'includes/tags.php';
+        require_once AUTOMATORWP_DIR . 'includes/tags-replacements.php';
         require_once AUTOMATORWP_DIR . 'includes/events.php';
         require_once AUTOMATORWP_DIR . 'includes/logs.php';
         require_once AUTOMATORWP_DIR . 'includes/users.php';

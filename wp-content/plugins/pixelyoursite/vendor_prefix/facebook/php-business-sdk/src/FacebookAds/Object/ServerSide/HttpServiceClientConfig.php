@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,38 +21,37 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
-class HttpServiceClientConfig extends \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Singleton
-{
-    protected $client = null;
-    protected $access_token = null;
-    protected $appsecret = null;
-    public function __construct()
-    {
-    }
-    public function getClient()
-    {
-        return $this->client;
-    }
-    public function getAccessToken()
-    {
-        return $this->access_token;
-    }
-    public function getAppsecret()
-    {
-        return $this->appsecret;
-    }
-    public function setClient($client)
-    {
-        $this->client = $client;
-    }
-    public function setAccessToken($access_token)
-    {
-        $this->access_token = $access_token;
-    }
-    public function setAppsecret($appsecret)
-    {
-        $this->appsecret = $appsecret;
-    }
+class HttpServiceClientConfig extends Singleton {
+  protected $client = null;
+  protected $access_token = null;
+  protected $appsecret = null;
+
+  public function __construct() {}
+
+  public function getClient() {
+    return $this->client;
+  }
+
+  public function getAccessToken() {
+    return $this->access_token;
+  }
+
+  public function getAppsecret() {
+    return $this->appsecret;
+  }
+
+  public function setClient($client) {
+    $this->client = $client;
+  }
+
+  public function setAccessToken($access_token) {
+    $this->access_token = $access_token;
+  }
+
+  public function setAppsecret($appsecret) {
+    $this->appsecret = $appsecret;
+  }
 }

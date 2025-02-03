@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductFeedUploadErrorReportFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FILE_HANDLE = 'file_handle';
-    const REPORT_STATUS = 'report_status';
-    public function getFieldTypes()
-    {
-        return array('file_handle' => 'string', 'report_status' => 'string');
-    }
+
+class ProductFeedUploadErrorReportFields extends AbstractEnum {
+
+  const FILE_HANDLE = 'file_handle';
+  const REPORT_STATUS = 'report_status';
+
+  public function getFieldTypes() {
+    return array(
+      'file_handle' => 'string',
+      'report_status' => 'string',
+    );
+  }
 }

@@ -45,10 +45,10 @@ class Mo_SAML_Upload_Metadata_Handler {
 		}
 
 		self::mo_saml_set_metadata_type( $metadata_url_empty );
-		$file = self::mo_saml_get_file_contents( $post_array, $file_array );
+		$file = self::mo_saml_get_file_contents( $post_array );
 
 		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( array( $file ) ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_METADATA_CONFIG, 'UPLOAD_METADATA_INVALID_CONFIGURATION' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_METADATA_CONFIG' ), 'UPLOAD_METADATA_INVALID_CONFIGURATION' );
 			$post_save->mo_saml_post_save_action();
 			return;
 		}
@@ -66,17 +66,17 @@ class Mo_SAML_Upload_Metadata_Handler {
 	 */
 	public static function mo_saml_validate_metadata_fields( $post_array, $metadata_file_empty, $metadata_url_empty, $metadata_file_name_empty ) {
 
-		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( array( $post_array[ Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME ] ) ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::IDP_NAME_EMPTY, 'IDP_NAME_EMPTY' );
+		if ( '0' !== $post_array[ Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME ] && Mo_SAML_Utilities::mo_saml_check_empty_or_null( array( $post_array[ Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME ] ) ) ) {
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'IDP_NAME_EMPTY' ), 'IDP_NAME_EMPTY' );
 
 		} elseif ( ! preg_match( '/^\w*$/', $post_array[ Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME ] ) ) {
 			$log_object = array( Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME => $post_array[ Mo_Saml_Options_Enum_Metadata_Upload::IDENTITY_PROVIDER_NAME ] );
-			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_IDP_NAME_FORMAT, 'INVAILD_IDP_NAME_FORMAT', $log_object );
+			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_IDP_NAME_FORMAT' ), 'INVAILD_IDP_NAME_FORMAT', $log_object );
 		} elseif ( 'false' === $metadata_file_empty && $metadata_file_name_empty ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::METADATA_NAME_EMPTY, 'UPLOAD_METADATA_NAME_EMPTY' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'METADATA_NAME_EMPTY' ), 'UPLOAD_METADATA_NAME_EMPTY' );
 
 		} elseif ( $metadata_file_empty && $metadata_url_empty ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::METADATA_EMPTY, 'UPLOAD_METADATA_EMPTY' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'METADATA_EMPTY' ), 'UPLOAD_METADATA_EMPTY' );
 		}
 
 		if ( isset( $post_save ) ) {
@@ -102,12 +102,12 @@ class Mo_SAML_Upload_Metadata_Handler {
 	 * This function is used to get metadata file content.
 	 *
 	 * @param array $post_array Metadata type file or url.
-	 * @param array $file_array Metadata type file or url.
 	 */
-	public static function mo_saml_get_file_contents( $post_array, $file_array ) {
+	public static function mo_saml_get_file_contents( $post_array ) {
 		if ( 'file' === self::$metadata_type ) {
+			//phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verification is done in parent functions.
 			if ( isset( $_FILES[ Mo_Saml_Options_Enum_Metadata_Upload::METADATA_FILE ]['tmp_name'] ) ) {
-				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Cannot unslash file path.
+				// phpcs:ignore WordPress.Security -- Cannot unslash file path.
 				$metadata_file = sanitize_text_field( $_FILES[ Mo_Saml_Options_Enum_Metadata_Upload::METADATA_FILE ]['tmp_name'] );
 			}
 			$file = Mo_SAML_Utilities::mo_safe_file_get_contents( $metadata_file );
@@ -166,10 +166,13 @@ class Mo_SAML_Upload_Metadata_Handler {
 			$saml_x509_certificate = $idp->mo_saml_get_signing_certificate();
 			$save_array[ Mo_Saml_Options_Enum_Service_Provider::X509_CERTIFICATE ] = maybe_serialize( $saml_x509_certificate );
 
+			$save_array[ Mo_Saml_Options_Enum_Service_Provider::IS_ENCODING_ENABLED ]     = 'checked';
+			$save_array[ Mo_Saml_Options_Enum_Service_Provider::ASSERTION_TIME_VALIDITY ] = 'checked';
+			$save_array[ Mo_Saml_Options_Enum_Sso_Login::SSO_BUTTON ]                     = 'true';
 			$db_handler->mo_saml_save_options( $save_array );
 			break;
 		}
-		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::METADATA_UPLOAD_SUCCESS, 'UPLOAD_METADATA_CONFIGURATION_SAVED', $save_array );
+		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::mo_saml_translate( 'METADATA_UPLOAD_SUCCESS' ), 'UPLOAD_METADATA_CONFIGURATION_SAVED', $save_array );
 		$post_save->mo_saml_post_save_action();
 	}
 
@@ -178,9 +181,9 @@ class Mo_SAML_Upload_Metadata_Handler {
 	 */
 	public static function mo_saml_handle_empty_metadata_child() {
 		if ( 'file' === self::$metadata_type ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_METADATA_FILE, 'UPLOAD_METADATA_INVALID_FILE' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_METADATA_FILE' ), 'UPLOAD_METADATA_INVALID_FILE' );
 		} else {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_METADATA_URL, 'UPLOAD_METADATA_INVALID_URL' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_METADATA_URL' ), 'UPLOAD_METADATA_INVALID_URL' );
 		}
 
 		$post_save->mo_saml_post_save_action();
@@ -191,9 +194,9 @@ class Mo_SAML_Upload_Metadata_Handler {
 	 */
 	public static function mo_saml_handle_empty_metadata_idp_value() {
 		if ( 'file' === self::$metadata_type ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_METADATA_FILE, 'UPLOAD_METADATA_INVALID_FILE' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_METADATA_FILE' ), 'UPLOAD_METADATA_INVALID_FILE' );
 		} else {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_METADATA_URL, 'UPLOAD_METADATA_INVALID_URL' );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_METADATA_URL' ), 'UPLOAD_METADATA_INVALID_URL' );
 		}
 
 		$post_save->mo_saml_post_save_action();
@@ -204,10 +207,8 @@ class Mo_SAML_Upload_Metadata_Handler {
 	 *
 	 * @param string $errno   error no.
 	 * @param string $errstr  error str.
-	 * @param string $errfile error file.
-	 * @param int    $errline error line.
 	 */
-	public static function mo_saml_handle_xml_error( $errno, $errstr, $errfile, $errline ) {
+	public static function mo_saml_handle_xml_error( $errno, $errstr ) {
 		if ( E_WARNING === $errno && ( substr_count( $errstr, 'DOMDocument::loadXML()' ) > 0 ) ) {
 			return true;
 		} else {

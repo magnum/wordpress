@@ -22,14 +22,12 @@ class Gamipress_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Gamipress_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->load_options = true;
 
 		add_action(
 			'wp_ajax_select_achievements_from_types_AWARDACHIEVEMENT',
@@ -302,7 +300,7 @@ class Gamipress_Helpers {
 			// Add any option.
 			$fields[] = array(
 				'value' => -1,
-				'text'  => esc_html__( 'Any rank', 'uncanny-automator-pro' ),
+				'text'  => esc_html__( 'Any rank', 'uncanny-automator' ),
 			);
 
 			foreach ( $options as $award_id => $award_name ) {

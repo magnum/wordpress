@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,21 +34,34 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdRuleFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT_ID = 'account_id';
-    const CREATED_BY = 'created_by';
-    const CREATED_TIME = 'created_time';
-    const EVALUATION_SPEC = 'evaluation_spec';
-    const EXECUTION_SPEC = 'execution_spec';
-    const ID = 'id';
-    const NAME = 'name';
-    const SCHEDULE_SPEC = 'schedule_spec';
-    const STATUS = 'status';
-    const UPDATED_TIME = 'updated_time';
-    const UI_CREATION_SOURCE = 'ui_creation_source';
-    public function getFieldTypes()
-    {
-        return array('account_id' => 'string', 'created_by' => 'User', 'created_time' => 'datetime', 'evaluation_spec' => 'AdRuleEvaluationSpec', 'execution_spec' => 'AdRuleExecutionSpec', 'id' => 'string', 'name' => 'string', 'schedule_spec' => 'AdRuleScheduleSpec', 'status' => 'string', 'updated_time' => 'datetime', 'ui_creation_source' => 'UiCreationSource');
-    }
+
+class AdRuleFields extends AbstractEnum {
+
+  const ACCOUNT_ID = 'account_id';
+  const CREATED_BY = 'created_by';
+  const CREATED_TIME = 'created_time';
+  const EVALUATION_SPEC = 'evaluation_spec';
+  const EXECUTION_SPEC = 'execution_spec';
+  const ID = 'id';
+  const NAME = 'name';
+  const SCHEDULE_SPEC = 'schedule_spec';
+  const STATUS = 'status';
+  const UPDATED_TIME = 'updated_time';
+  const UI_CREATION_SOURCE = 'ui_creation_source';
+
+  public function getFieldTypes() {
+    return array(
+      'account_id' => 'string',
+      'created_by' => 'User',
+      'created_time' => 'datetime',
+      'evaluation_spec' => 'AdRuleEvaluationSpec',
+      'execution_spec' => 'AdRuleExecutionSpec',
+      'id' => 'string',
+      'name' => 'string',
+      'schedule_spec' => 'AdRuleScheduleSpec',
+      'status' => 'string',
+      'updated_time' => 'datetime',
+      'ui_creation_source' => 'UiCreationSource',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AudiencePermissionForActionsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAN_EDIT = 'can_edit';
-    const CAN_SEE_INSIGHT = 'can_see_insight';
-    const CAN_SHARE = 'can_share';
-    const SUBTYPE_SUPPORTS_LOOKALIKE = 'subtype_supports_lookalike';
-    const SUPPORTS_RECIPIENT_LOOKALIKE = 'supports_recipient_lookalike';
-    public function getFieldTypes()
-    {
-        return array('can_edit' => 'bool', 'can_see_insight' => 'bool', 'can_share' => 'bool', 'subtype_supports_lookalike' => 'bool', 'supports_recipient_lookalike' => 'bool');
-    }
+
+class AudiencePermissionForActionsFields extends AbstractEnum {
+
+  const CAN_EDIT = 'can_edit';
+  const CAN_SEE_INSIGHT = 'can_see_insight';
+  const CAN_SHARE = 'can_share';
+  const SUBTYPE_SUPPORTS_LOOKALIKE = 'subtype_supports_lookalike';
+  const SUPPORTS_RECIPIENT_LOOKALIKE = 'supports_recipient_lookalike';
+
+  public function getFieldTypes() {
+    return array(
+      'can_edit' => 'bool',
+      'can_see_insight' => 'bool',
+      'can_share' => 'bool',
+      'subtype_supports_lookalike' => 'bool',
+      'supports_recipient_lookalike' => 'bool',
+    );
+  }
 }

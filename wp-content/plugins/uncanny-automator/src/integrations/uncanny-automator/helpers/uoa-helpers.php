@@ -22,7 +22,7 @@ class Uoa_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Uoa_Helpers constructor.
@@ -53,33 +53,31 @@ class Uoa_Helpers {
 	 * @return mixed
 	 */
 	public function get_recipes( $label = null, $option_code = 'UOARECIPE', $any_option = false ) {
-		if ( ! $this->load_options ) {
-
-			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
-		}
 
 		if ( ! $label ) {
 			$label = esc_attr__( 'Recipe', 'uncanny-automator' );
 		}
 
 		// post query arguments.
-		$args = array(
-			'post_type'      => 'uo-recipe',
-			'posts_per_page' => 999, //phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-			'post_status'    => 'publish',
-		);
-
-		$options = Automator()->helpers->recipe->options->wp_query( $args, $any_option, esc_attr__( 'Any recipe', 'uncanny-automator' ) );
+		global $wpdb;
+		$results       = $wpdb->get_results( $wpdb->prepare( "SELECT ID, post_title, post_status FROM $wpdb->posts WHERE post_status IN ('publish', 'draft') AND post_type = %s ORDER BY post_title ASC", 'uo-recipe' ) );
+		$options       = array();
+		$options['-1'] = esc_attr__( 'Any recipe', 'uncanny-automator' );
+		if ( $results ) {
+			foreach ( $results as $result ) {
+				$options[ $result->ID ] = sprintf( '%s (%s)', $result->post_title, $result->post_status );
+			}
+		}
+		//$options = Automator()->helpers->recipe->options->wp_query( $args, $any_option, esc_attr__( 'Any recipe', 'uncanny-automator' ) );
 
 		$option = array(
-			'option_code'              => $option_code,
-			'label'                    => $label,
-			'input_type'               => 'select',
-			'required'                 => true,
-			'options'                  => $options,
-			'custom_value_description' => esc_attr__( 'Recipe slug', 'uncanny-automator' ),
+			'option_code'     => $option_code,
+			'label'           => $label,
+			'input_type'      => 'select',
+			'required'        => true,
+			'options'         => $options,
+			'relevant_tokens' => array(),
+			//'custom_value_description' => esc_attr__( 'Recipe slug', 'uncanny-automator' ),
 		);
 
 		return apply_filters( 'uap_option_get_recipes', $option );

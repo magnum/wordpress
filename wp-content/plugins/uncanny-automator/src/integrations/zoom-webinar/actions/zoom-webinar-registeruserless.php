@@ -129,7 +129,7 @@ class ZOOM_WEBINAR_REGISTERUSERLESS {
 			'input_type'            => 'select',
 			'required'              => true,
 			'options'               => array(),
-			'supports_tokens'       => false,
+			'supports_tokens'       => true,
 			'supports_custom_value' => true,
 			'is_ajax'               => true,
 			'endpoint'              => 'uap_zoom_api_get_webinar_occurrences',
@@ -156,17 +156,6 @@ class ZOOM_WEBINAR_REGISTERUSERLESS {
 			$webinar_occurrences_field,
 			$this->helpers->get_webinar_questions_repeater(),
 		);
-
-		//Don't show the user dropdown to old credentials so it's easier to test the update
-		if ( $this->helpers->jwt_mode() ) {
-			$option_fileds = array(
-				$email_field,
-				$first_name_field,
-				$last_name_field,
-				$this->helpers->get_webinars_field(),
-				$this->helpers->get_webinar_questions_repeater(),
-			);
-		}
 
 		return array(
 			'options_group' => array(

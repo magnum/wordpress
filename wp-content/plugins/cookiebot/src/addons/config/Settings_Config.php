@@ -7,6 +7,8 @@ use cybot\cookiebot\addons\controller\addons\Base_Cookiebot_Plugin_Addon;
 use cybot\cookiebot\addons\controller\addons\Base_Cookiebot_Theme_Addon;
 use cybot\cookiebot\addons\controller\addons\jetpack\Jetpack;
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Base_Jetpack_Widget;
+use cybot\cookiebot\lib\Consent_API_Helper;
+use cybot\cookiebot\lib\Cookiebot_Frame;
 use cybot\cookiebot\lib\Settings_Page_Tab;
 use cybot\cookiebot\lib\Settings_Service_Interface;
 use cybot\cookiebot\lib\Cookiebot_WP;
@@ -25,7 +27,25 @@ class Settings_Config {
 	 */
 	protected $settings_service;
 
-	const ADMIN_SLUG = 'cookiebot-addons';
+	const ADMIN_SLUG                        = 'cookiebot-addons';
+	const LANGUAGE_DROPDOWN_OPTION_REPLACE  = '%optionname%';
+	const JETPACK_DEFAULT_LANGUAGE_DROPDOWN = 'cookiebot_jetpack_addon[%optionname%][placeholder][languages][site-default]';
+	const ADDONS_DEFAULT_LANGUAGE_DROPDOWN  = 'cookiebot_available_addons[%optionname%][placeholder][languages][site-default]';
+	// Templates
+	const INFO_HEADER_TEMPLATE            = 'admin/common/prior-consent/partials/info-tab-header.php';
+	const EXTRA_INFO_TEMPLATE             = 'admin/common/prior-consent/partials/extra-information.php';
+	const JETPACK_TAB_HEADER_TEMPLATE     = 'admin/common/prior-consent/jetpack-widgets/tab-header.php';
+	const JETPACK_WIDGET_TAB_TEMPLATE     = 'admin/common/prior-consent/jetpack-widgets/tab.php';
+	const PLACEHOLDER_TEMPLATE            = 'admin/common/prior-consent/partials/placeholder-submitboxes.php';
+	const DEFAULT_PLACEHOLDER_TEMPLATE    = 'admin/common/prior-consent/partials/placeholder-submitbox-default.php';
+	const AVAILABLE_TAB_HEADER_TEMPLATE   = 'admin/common/prior-consent/available-addons/tab-header.php';
+	const AVAILABLE_ADDONS_TAB_TEMPLATE   = 'admin/common/prior-consent/available-addons/tab.php';
+	const UNAVAILABLE_TAB_HEADER_TEMPLATE = 'admin/common/prior-consent/unavailable-addons/tab-header.php';
+	const UNAVAILABLE_ADDONS_TAB_TEMPLATE = 'admin/common/prior-consent/unavailable-addons/field.php';
+	const CB_CONSENT_API_TAB_TEMPLATE     = 'admin/cb_frame/prior-consent/consent-api/tab.php';
+	const UC_CONSENT_API_TAB_TEMPLATE     = 'admin/uc_frame/prior-consent/consent-api/tab.php';
+	// Other
+	const INFO_ICON_ASSET_URL = 'img/icons/info.svg';
 
 	/**
 	 * Settings_Config constructor.
@@ -64,18 +84,20 @@ class Settings_Config {
 	 * @since 1.3.0
 	 */
 	public function add_submenu() {
-		add_submenu_page(
-			'cookiebot',
-			esc_html__( 'Plugins', 'cookiebot' ),
-			esc_html__( 'Plugins', 'cookiebot' ),
-			'manage_options',
-			'cookiebot-addons',
-			array(
-				$this,
-				'setting_page',
-			),
-			2
-		);
+		if ( Cookiebot_Frame::is_cb_frame_type() !== 'empty' ) {
+			add_submenu_page(
+				'cookiebot',
+				esc_html__( 'Plugins', 'cookiebot' ),
+				esc_html__( 'Plugins', 'cookiebot' ),
+				'manage_options',
+				'cookiebot-addons',
+				array(
+					$this,
+					'setting_page',
+				),
+				2
+			);
+		}
 	}
 
 	/**
@@ -137,11 +159,14 @@ class Settings_Config {
 			if ( isset( $_GET['tab'] ) && 'unavailable_addons' === $_GET['tab'] ) {
 				$this->register_unavailable_addons();
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			} elseif ( ( isset( $_GET['tab'] ) && 'available_addons' === $_GET['tab'] ) ) {
+			} elseif ( isset( $_GET['tab'] ) && 'available_addons' === $_GET['tab'] ) {
 				$this->register_available_addons();
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			} elseif ( ( isset( $_GET['tab'] ) && 'jetpack' === $_GET['tab'] ) ) {
+			} elseif ( isset( $_GET['tab'] ) && 'jetpack' === $_GET['tab'] ) {
 				$this->register_jetpack_addon();
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			} elseif ( isset( $_GET['tab'] ) && 'consent_api' === $_GET['tab'] ) {
+				$this->register_consent_api();
 			} else {
 				$this->register_addons_info();
 			}
@@ -149,6 +174,7 @@ class Settings_Config {
 			if ( $pagenow === 'options.php' ) {
 				$this->register_jetpack_addon();
 				$this->register_available_addons();
+				$this->register_consent_api();
 			}
 		}
 	}
@@ -177,7 +203,7 @@ class Settings_Config {
 	 * @since 1.3.0
 	 */
 	public function header_addons_info() {
-		include_view( 'admin/settings/prior-consent/partials/info-tab-header.php' );
+		include_view( self::INFO_HEADER_TEMPLATE );
 	}
 
 	/**
@@ -203,7 +229,7 @@ class Settings_Config {
 				add_settings_field(
 					$addon::OPTION_NAME,
 					get_view_html(
-						'admin/settings/prior-consent/partials/extra-information.php',
+						$this::EXTRA_INFO_TEMPLATE,
 						array(
 							'label'                   => $addon::ADDON_NAME,
 							'extra_information_lines' => $addon->get_extra_information(),
@@ -251,32 +277,31 @@ class Settings_Config {
 
 		/** @var Jetpack $addon */
 		foreach ( $this->settings_service->get_addons() as $addon ) {
-			if ( 'Jetpack' === ( new ReflectionClass( $addon ) )->getShortName() ) {
-				if ( $addon->is_addon_installed() && $addon->is_addon_activated() ) {
-					foreach ( $addon->get_widgets() as $widget ) {
-						add_settings_field(
-							$widget->get_widget_option_name(),
-							get_view_html(
-								'admin/settings/prior-consent/partials/extra-information.php',
-								array(
-									'label' => $widget->get_label(),
-									'extra_information_lines' => $widget->get_extra_information(),
-								)
-							),
+			if ( 'Jetpack' === ( new ReflectionClass( $addon ) )->getShortName() &&
+				$addon->is_addon_installed() && $addon->is_addon_activated() ) {
+				foreach ( $addon->get_widgets() as $widget ) {
+					add_settings_field(
+						$widget->get_widget_option_name(),
+						get_view_html(
+							$this::EXTRA_INFO_TEMPLATE,
 							array(
-								$this,
-								'jetpack_addon_callback',
-							),
-							'cookiebot-addons',
-							'jetpack_addon',
-							array(
-								'widget' => $widget,
-								'addon'  => $addon,
+								'label'                   => $widget->get_label(),
+								'extra_information_lines' => $widget->get_extra_information(),
 							)
-						);
+						),
+						array(
+							$this,
+							'jetpack_addon_callback',
+						),
+						'cookiebot-addons',
+						'jetpack_addon',
+						array(
+							'widget' => $widget,
+							'addon'  => $addon,
+						)
+					);
 
-						register_setting( 'cookiebot_jetpack_addon', 'cookiebot_jetpack_addon' );
-					}
+					register_setting( 'cookiebot_jetpack_addon', 'cookiebot_jetpack_addon' );
 				}
 			}
 		}
@@ -309,7 +334,7 @@ class Settings_Config {
 				add_settings_field(
 					$addon::ADDON_NAME,
 					get_view_html(
-						'admin/settings/prior-consent/partials/extra-information.php',
+						$this::EXTRA_INFO_TEMPLATE,
 						array(
 							'label'                   => $addon::ADDON_NAME,
 							'extra_information_lines' => $addon->get_extra_information(),
@@ -335,7 +360,7 @@ class Settings_Config {
 	 * @since 1.3.0
 	 */
 	public function jetpack_addons_header_callback() {
-		include_view( 'admin/settings/prior-consent/jetpack-widgets/tab-header.php' );
+		include_view( self::JETPACK_TAB_HEADER_TEMPLATE );
 	}
 
 	/**
@@ -367,11 +392,29 @@ class Settings_Config {
 		$first_placeholder_language           = isset( $widget_placeholders_array_keys[0] )
 			? $widget_placeholders_array_keys[0]
 			: null;
-		$site_default_languages_dropdown_html = 'cookiebot_jetpack_addon[' . $widget_option_name . '][placeholder][languages][site-default]';
+		$site_default_languages_dropdown_html = cookiebot_addons_get_dropdown_languages(
+			'placeholder_select_language',
+			str_replace(
+				self::LANGUAGE_DROPDOWN_OPTION_REPLACE,
+				$widget_option_name,
+				self::JETPACK_DEFAULT_LANGUAGE_DROPDOWN
+			),
+			'site-default'
+		);
 		$widget_placeholders                  = array_map(
-			function( $language, $placeholder ) use ( $widget_option_name, $widget_placeholders_array, $first_placeholder_language ) {
+			function (
+				$language,
+				$placeholder
+			) use (
+				$widget_option_name,
+				$first_placeholder_language
+			) {
 				$removable               = $first_placeholder_language !== $language;
-				$option_name             = 'cookiebot_jetpack_addon[' . $widget_option_name . '][placeholder][languages][' . $language . ']';
+				$option_name             = str_replace(
+					array( self::LANGUAGE_DROPDOWN_OPTION_REPLACE, 'site-default' ),
+					array( $widget_option_name, $language ),
+					self::JETPACK_DEFAULT_LANGUAGE_DROPDOWN
+				);
 				$languages_dropdown_html = cookiebot_addons_get_dropdown_languages(
 					'placeholder_select_language',
 					$option_name,
@@ -391,19 +434,25 @@ class Settings_Config {
 		$placeholder_helper                   = $addon->get_placeholder_helper();
 		$placeholders_html                    = $widget->widget_has_placeholder()
 			? get_view_html(
-				'admin/settings/prior-consent/partials/placeholder-submitboxes.php',
+				self::PLACEHOLDER_TEMPLATE,
 				array(
 					'placeholders'       => $widget_placeholders,
 					'placeholder_helper' => $placeholder_helper,
+					'info_icon'          => asset_url( self::INFO_ICON_ASSET_URL ),
 				)
 			)
 			: get_view_html(
-				'admin/settings/prior-consent/partials/placeholder-submitbox-default.php',
+				self::DEFAULT_PLACEHOLDER_TEMPLATE,
 				array(
 					'site_default_languages_dropdown_html' => $site_default_languages_dropdown_html,
-					'name'                                 => 'cookiebot_jetpack_addon[' . $widget_option_name . '][placeholder][languages][site-default]',
+					'name'                                 => str_replace(
+						self::LANGUAGE_DROPDOWN_OPTION_REPLACE,
+						$widget_option_name,
+						self::JETPACK_DEFAULT_LANGUAGE_DROPDOWN
+					),
 					'default_placeholder'                  => $widget_default_placeholder,
 					'placeholder_helper'                   => $placeholder_helper,
+					'info_icon'                            => asset_url( self::INFO_ICON_ASSET_URL ),
 				)
 			);
 
@@ -415,7 +464,7 @@ class Settings_Config {
 			'placeholders_html'             => $placeholders_html,
 		);
 
-		include_view( 'admin/settings/prior-consent/jetpack-widgets/tab.php', $view_args );
+		include_view( self::JETPACK_WIDGET_TAB_TEMPLATE, $view_args );
 	}
 
 	/**
@@ -424,7 +473,7 @@ class Settings_Config {
 	 * @since 1.3.0
 	 */
 	public function header_available_addons() {
-		include_view( 'admin/settings/prior-consent/available-addons/tab-header.php' );
+		include_view( self::AVAILABLE_TAB_HEADER_TEMPLATE );
 	}
 
 	/**
@@ -444,16 +493,34 @@ class Settings_Config {
 			throw new InvalidArgumentException();
 		}
 
-		$site_default_languages_dropdown_html = 'cookiebot_available_addons[' . $addon::OPTION_NAME . '][placeholder][languages][site-default]';
+		$site_default_languages_dropdown_html = cookiebot_addons_get_dropdown_languages(
+			'placeholder_select_language',
+			str_replace(
+				self::LANGUAGE_DROPDOWN_OPTION_REPLACE,
+				$addon::OPTION_NAME,
+				self::ADDONS_DEFAULT_LANGUAGE_DROPDOWN
+			),
+			'site-default'
+		);
 		$addon_placeholders_array             = $addon->get_placeholders();
 		$addon_placeholders_array_keys        = array_keys( $addon_placeholders_array );
 		$first_placeholder_language           = isset( $addon_placeholders_array_keys[0] )
 			? $addon_placeholders_array_keys[0]
 			: null;
 		$addon_placeholders                   = array_map(
-			function( $language, $placeholder ) use ( $addon, $addon_placeholders_array, $first_placeholder_language ) {
+			function (
+				$language,
+				$placeholder
+			) use (
+				$addon,
+				$first_placeholder_language
+			) {
 				$removable               = $first_placeholder_language !== $language;
-				$option_name             = 'cookiebot_available_addons[' . $addon::OPTION_NAME . '][placeholder][languages][' . $language . ']';
+				$option_name             = str_replace(
+					array( self::LANGUAGE_DROPDOWN_OPTION_REPLACE, 'site-default' ),
+					array( $addon::OPTION_NAME, $language ),
+					self::ADDONS_DEFAULT_LANGUAGE_DROPDOWN
+				);
 				$languages_dropdown_html = cookiebot_addons_get_dropdown_languages(
 					'placeholder_select_language',
 					$option_name,
@@ -474,19 +541,25 @@ class Settings_Config {
 		$addon_extra_options_html             = $addon->get_extra_addon_options_html();
 		$placeholders_html                    = $addon->has_placeholder()
 			? get_view_html(
-				'admin/settings/prior-consent/partials/placeholder-submitboxes.php',
+				self::PLACEHOLDER_TEMPLATE,
 				array(
 					'placeholders'       => $addon_placeholders,
 					'placeholder_helper' => $placeholder_helper,
+					'info_icon'          => asset_url( self::INFO_ICON_ASSET_URL ),
 				)
 			)
 			: get_view_html(
-				'admin/settings/prior-consent/partials/placeholder-submitbox-default.php',
+				self::DEFAULT_PLACEHOLDER_TEMPLATE,
 				array(
 					'site_default_languages_dropdown_html' => $site_default_languages_dropdown_html,
-					'name'                                 => 'cookiebot_available_addons[' . $addon::OPTION_NAME . '][placeholder][languages][site-default]',
+					'name'                                 => str_replace(
+						self::LANGUAGE_DROPDOWN_OPTION_REPLACE,
+						$addon::OPTION_NAME,
+						self::ADDONS_DEFAULT_LANGUAGE_DROPDOWN
+					),
 					'default_placeholder'                  => $addon::DEFAULT_PLACEHOLDER_CONTENT,
 					'placeholder_helper'                   => $placeholder_helper,
+					'info_icon'                            => asset_url( self::INFO_ICON_ASSET_URL ),
 				)
 			);
 
@@ -499,7 +572,7 @@ class Settings_Config {
 			'addon_extra_options_html'     => $addon_extra_options_html,
 		);
 
-		include_view( 'admin/settings/prior-consent/available-addons/tab.php', $view_args );
+		include_view( self::AVAILABLE_ADDONS_TAB_TEMPLATE, $view_args );
 	}
 
 	/**
@@ -509,7 +582,7 @@ class Settings_Config {
 	 * @since 1.3.0
 	 */
 	public function unavailable_addons_header_callback() {
-		include_view( 'admin/settings/prior-consent/unavailable-addons/tab-header.php' );
+		include_view( self::UNAVAILABLE_TAB_HEADER_TEMPLATE );
 	}
 
 	/**
@@ -544,7 +617,85 @@ class Settings_Config {
 		$view_args = array(
 			'message' => $message,
 		);
-		include_view( 'admin/settings/prior-consent/unavailable-addons/field.php', $view_args );
+		include_view( self::UNAVAILABLE_ADDONS_TAB_TEMPLATE, $view_args );
+	}
+
+	/**
+	 * Adds WP Consent API Section
+	 *
+	 * @version 4.2.14
+	 * @since 4.2.14
+	 */
+	private function register_consent_api() {
+		wp_enqueue_style(
+			'cookiebot-consent-mapping-table',
+			asset_url( 'css/backend/consent_mapping_table.css' ),
+			null,
+			Cookiebot_WP::COOKIEBOT_PLUGIN_VERSION
+		);
+
+		wp_enqueue_script(
+			'cookiebot_consent_mapping_js',
+			asset_url( 'js/backend/consent-mapping.js' ),
+			array( 'jquery' ),
+			Cookiebot_WP::COOKIEBOT_PLUGIN_VERSION,
+			true
+		);
+
+		add_settings_section(
+			'consent_api',
+			'',
+			array(
+				$this,
+				'consent_api_callback',
+			),
+			'cookiebot-addons'
+		);
+
+		register_setting( 'cookiebot-consent-mapping', 'cookiebot-consent-mapping' );
+		register_setting( 'cookiebot-uc-consent-mapping', 'cookiebot-uc-consent-mapping' );
+	}
+
+	public static function get_wp_consent_values( $uc_category, $mapping ) {
+		$wp_consent_categories = array(
+			'preferences',
+			'statistics',
+			'statistics-anonymous',
+			'marketing',
+		);
+
+		$html = '';
+		foreach ( $wp_consent_categories as $category ) {
+			$option_string = '<option value="' . $category . '"';
+			if ( $mapping[ $uc_category ] === $category ) {
+				$option_string .= ' selected';
+			}
+			// phpcs:ignore WordPress.WP.I18n.NoEmptyStrings,WordPress.WP.I18n.MissingTranslatorsComment
+			$option_string .= '>' . esc_html( sprintf( __( '%s', 'cookiebot' ), $category ) ) . '</option>';
+			$html          .= $option_string;
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Consent API tab callback
+	 *
+	 * @since 4.2.14
+	 */
+	public function consent_api_callback() {
+		$consent_api_helper = new Consent_API_Helper();
+		$view_args          = array(
+			'is_wp_consent_api_active' => $consent_api_helper->is_wp_consent_api_active(),
+			'm_default'                => $consent_api_helper->get_default_wp_consent_api_mapping(),
+			'm'                        => $consent_api_helper->get_wp_consent_api_mapping(),
+		);
+
+		if ( Cookiebot_Frame::is_cb_frame_type() === false ) {
+			include_view( self::UC_CONSENT_API_TAB_TEMPLATE, $view_args );
+		} else {
+			include_view( self::CB_CONSENT_API_TAB_TEMPLATE, $view_args );
+		}
 	}
 
 	/**
@@ -576,20 +727,35 @@ class Settings_Config {
 		);
 		$settings_page_tabs     = array(
 			$addons_info_tab,
-			$available_addons_tab,
-			$unavailable_addons_tab,
 		);
-		if ( is_plugin_active( Jetpack::PLUGIN_FILE_PATH ) ) {
+
+		if ( Cookiebot_Frame::is_cb_frame_type() === true ) {
+			$settings_cb_page_tabs = array(
+				$available_addons_tab,
+				$unavailable_addons_tab,
+			);
+			if ( is_plugin_active( Jetpack::PLUGIN_FILE_PATH ) ) {
+				$settings_cb_page_tabs[] = new Settings_Page_Tab(
+					'jetpack',
+					esc_html__( 'Jetpack', 'cookiebot' ),
+					'cookiebot_jetpack_addon',
+					'cookiebot-addons'
+				);
+			}
+			$settings_page_tabs = array_merge( $settings_page_tabs, $settings_cb_page_tabs );
+		}
+
+		if ( is_plugin_active( 'wp-consent-api/wp-consent-api.php' ) ) {
 			$settings_page_tabs[] = new Settings_Page_Tab(
-				'jetpack',
-				esc_html__( 'Jetpack', 'cookiebot' ),
-				'cookiebot_jetpack_addon',
+				'consent_api',
+				esc_html__( 'WP Consent API', 'cookiebot' ),
+				Cookiebot_Frame::is_cb_frame_type() === false ? 'cookiebot-uc-consent-mapping' : 'cookiebot-consent-mapping',
 				'cookiebot-addons'
 			);
 		}
 		$active_tab = array_reduce(
 			$settings_page_tabs,
-			function( $active_tab, Settings_Page_Tab $settings_page_tab ) {
+			function ( $active_tab, Settings_Page_Tab $settings_page_tab ) {
 				if ( ! is_null( $active_tab ) ) {
 					return $active_tab;
 				}
@@ -608,7 +774,7 @@ class Settings_Config {
 			'settings_page_tabs' => $settings_page_tabs,
 			'active_tab'         => $active_tab,
 		);
-		include_view( 'admin/settings/prior-consent/page.php', $view_args );
+		include_view( 'admin/common/prior-consent/page.php', $view_args );
 	}
 
 	/**
@@ -621,7 +787,7 @@ class Settings_Config {
 	 * @throws Exception
 	 * @since 2.2.0
 	 */
-	public function post_hook_available_addons_update_option( $old_value, $value, $option_name ) {
+	public function post_hook_available_addons_update_option( $value ) {
 		if ( is_array( $value ) ) {
 			foreach ( $value as $addon_option_name => $addon_settings ) {
 				if ( isset( $addon_settings['enabled'] ) ) {

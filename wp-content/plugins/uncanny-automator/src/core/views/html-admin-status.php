@@ -385,6 +385,15 @@ $automator_stats    = $report['automator_stats'];
 			<?php endif; ?>
 		</td>
 	</tr>
+	<tr>
+		<td data-export-label="Permalink structure"><?php esc_html_e( 'Permalink structure', 'uncanny-automator' ); ?>
+			:
+		</td>
+		<td class="help"></td>
+		<td>
+			<?php echo $environment['permalink_structure']; ?>
+		</td>
+	</tr>
 	</tbody>
 </table>
 <table class="automator_status_table widefat" cellspacing="0">
@@ -554,13 +563,13 @@ $automator_stats    = $report['automator_stats'];
 		<td><?php echo esc_html( $automator_stats['not_completed_status'] ); ?></td>
 	</tr>
 	<tr>
-		<td data-export-label="Credits left"><?php esc_html_e( 'Credits left', 'uncanny-automator' ); ?>:</td>
-		<td class="help"><?php echo esc_html__( 'Available credits.', 'uncanny-automator' ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+		<td data-export-label="App credits left"><?php esc_html_e( 'App credits left', 'uncanny-automator' ); ?>:</td>
+		<td class="help"><?php echo esc_html__( 'Available app credits.', 'uncanny-automator' ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
 		<td><?php echo esc_html( $automator_stats['credits_left'] ); ?></td>
 	</tr>
 	<tr>
-		<td data-export-label="Recipes using credits"><?php esc_html_e( 'Recipes using credits', 'uncanny-automator' ); ?>:</td>
-		<td class="help"><?php echo esc_html__( 'Total number of recipes using credits on your site.', 'uncanny-automator' ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+		<td data-export-label="Recipes using app credits"><?php esc_html_e( 'Recipes using app credits', 'uncanny-automator' ); ?>:</td>
+		<td class="help"><?php echo esc_html__( 'Total number of recipes using app credits on your site.', 'uncanny-automator' ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
 		<td><?php echo esc_html( $automator_stats['credit_recipes'] ); ?></td>
 	</tr>
 	</tbody>
@@ -636,7 +645,15 @@ $automator_stats    = $report['automator_stats'];
 				<td>
 					<?php
 					if ( ! $table_data ) {
-						echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'Table does not exist', 'uncanny-automator' ) . '</mark>';
+
+						$view_or_table_missing_message =
+							strpos( $table, '_view' )
+								? ( AUTOMATOR_DATABASE_VIEWS_ENABLED
+								? __( 'View does not exist', 'uncanny-automator' )
+								: __( 'DB view is disabled by site administrator', 'uncanny-automator' ) )
+								: __( 'Table does not exist', 'uncanny-automator' );
+
+						echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . $view_or_table_missing_message . '</mark>';
 					} else {
 						/* Translators: %1$f: Table size, %2$f: Index size, %3$s Engine. */
 						printf( esc_html__( 'Data: %1$.2fMB + Index: %2$.2fMB + Engine %3$s', 'uncanny-automator' ), esc_html( $table_data['data'] ), esc_html( $table_data['index'] ), esc_html( $table_data['engine'] ) );
@@ -646,18 +663,6 @@ $automator_stats    = $report['automator_stats'];
 			</tr>
 		<?php } ?>
 
-		<?php foreach ( $database['database_tables']['other'] as $table => $table_data ) { ?>
-			<tr>
-				<td><?php echo esc_html( $table ); ?></td>
-				<td class="help">&nbsp;</td>
-				<td>
-					<?php
-					/* Translators: %1$f: Table size, %2$f: Index size, %3$s Engine. */
-					printf( esc_html__( 'Data: %1$.2fMB + Index: %2$.2fMB + Engine %3$s', 'uncanny-automator' ), esc_html( $table_data['data'] ), esc_html( $table_data['index'] ), esc_html( $table_data['engine'] ) );
-					?>
-				</td>
-			</tr>
-		<?php } ?>
 	<?php else : ?>
 		<tr>
 			<td><?php esc_html_e( 'Database information:', 'uncanny-automator' ); ?></td>

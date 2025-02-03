@@ -17,19 +17,19 @@ Version History
 
 
 class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
-	public static $name = 'manage-themes';
+	public static $name        = 'manage-themes';
 	public static $description = 'Activate, deactivate, and uninstall themes.';
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
 		
-		$response = array();
+		$response = [];
 		
-		$actions = array(
+		$actions = [
 			'get-enabled-multisite' => 'get_enabled_themes',
 			'enable-multisite'      => 'enable_themes',
 			'disable-multisite'     => 'disable_themes',
@@ -37,13 +37,13 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 			'uninstall'             => 'uninstall_themes',
 			'install-and-activate'  => 'install_and_activate_theme',
 			'activate'              => 'activate_theme',
-		);
+		];
 		
 		foreach ( $arguments as $action => $data ) {
-			if ( isset( $actions[$action] ) ) {
-				$response[$action] = call_user_func( array( $this, $actions[$action] ), $data );
+			if ( isset( $actions[ $action ] ) ) {
+				$response[ $action ] = call_user_func( [ $this, $actions[ $action ] ], $data );
 			} else {
-				$response[$action] = 'This action is not recognized';
+				$response[ $action ] = 'This action is not recognized';
 			}
 		}
 		
@@ -60,10 +60,10 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 			return new WP_Error( 'invalid-argument', 'The install-and-activate argument takes a string representing an individual theme.' );
 		}
 		
-		$result['install'] = $this->install_themes( array( $theme ) );
+		$result['install'] = $this->install_themes( [ $theme ] );
 		
-		if ( isset( $result['install'][$theme] ) ) {
-			$result['install'] = $result['install'][$theme];
+		if ( isset( $result['install'][ $theme ] ) ) {
+			$result['install'] = $result['install'][ $theme ];
 		}
 		
 		$this->response['install-and-activate'] = $result;
@@ -86,7 +86,7 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 			return new WP_Error( 'invalid-argument', 'The activate argument only accepts a string representing a single theme.' );
 		}
 		switch_theme( $theme );
-		$new_theme = wp_get_theme( $theme );
+		$new_theme                 = wp_get_theme( $theme );
 		$result['data']['name']    = $new_theme->get( 'Name' );
 		$result['data']['version'] = $new_theme->get( 'Version' );
 		return $result;
@@ -100,7 +100,7 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 		$allowed_themes = get_site_option( 'allowedthemes' );
 		
 		foreach ( (array) $themes as $theme ) {
-			$allowed_themes[$theme] = true;
+			$allowed_themes[ $theme ] = true;
 		}
 		
 		update_site_option( 'allowedthemes', $allowed_themes );
@@ -112,7 +112,7 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 		$allowed_themes = get_site_option( 'allowedthemes' );
 		
 		foreach ( (array) $themes as $theme ) {
-			unset( $allowed_themes[$theme] );
+			unset( $allowed_themes[ $theme ] );
 		}
 		
 		update_site_option( 'allowedthemes', $allowed_themes );
@@ -121,15 +121,15 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 	}
 	
 	private function install_themes( $themes ) {
-		require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-		require_once( ABSPATH . 'wp-admin/includes/theme.php' );
-		require_once( $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php' );
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/theme.php';
+		require_once $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php';
 		
 		$upgrader = new Theme_Upgrader( new Ithemes_Sync_Upgrader_Skin() );
 		
-		$results = array();
+		$results = [];
 		
 		
 		foreach ( (array) $themes as $theme ) {
@@ -138,7 +138,16 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 			if ( preg_match( '{^(http|https|ftp)://}i', $theme ) ) {
 				$result = $upgrader->install( $theme );
 			} else {
-				$api = themes_api( 'theme_information', array( 'slug' => $theme, 'fields' => array( 'sections' => false, 'tags' => false ) ) );
+				$api = themes_api(
+					'theme_information',
+					[
+						'slug'   => $theme,
+						'fields' => [
+							'sections' => false,
+							'tags'     => false,
+						],
+					] 
+				);
 				if ( is_wp_error( $api ) ) {
 					$result = $api;
 				} else {
@@ -147,24 +156,24 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 			}
 			
 			if ( is_wp_error( $result ) ) {
-				$results[$theme]['error'] = array(
+				$results[ $theme ]['error'] = [
 					'error_code'    => $result->get_error_code(),
 					'error_details' => $result->get_error_message(),
-				);
+				];
 			} else {
-				$results[$theme]['result'] = $result;
+				$results[ $theme ]['result'] = $result;
 				
-				$theme_info = $upgrader->theme_info();
-				$results[$theme]['name'] = $theme_info->get( 'Name' );
-				$results[$theme]['version'] = $theme_info->get( 'Version' );
-				if ( is_object( $theme_info ) && is_callable( array( $theme_info, 'get_stylesheet' ) ) ) {
-					$results[$theme]['slug'] = basename( $theme_info->get_stylesheet() );
-				} else if ( isset( $upgrader->result ) && ! empty( $upgrader->result['destination_name'] ) ) {
-					$results[$theme]['slug'] = $upgrader->result['destination_name'];
+				$theme_info                   = $upgrader->theme_info();
+				$results[ $theme ]['name']    = $theme_info->get( 'Name' );
+				$results[ $theme ]['version'] = $theme_info->get( 'Version' );
+				if ( is_object( $theme_info ) && is_callable( [ $theme_info, 'get_stylesheet' ] ) ) {
+					$results[ $theme ]['slug'] = basename( $theme_info->get_stylesheet() );
+				} elseif ( isset( $upgrader->result ) && ! empty( $upgrader->result['destination_name'] ) ) {
+					$results[ $theme ]['slug'] = $upgrader->result['destination_name'];
 				}
 				
 				if ( true === $result ) {
-					$results[$theme]['success'] = true;
+					$results[ $theme ]['success'] = true;
 				}
 			}
 		}
@@ -175,13 +184,13 @@ class Ithemes_Sync_Verb_Manage_themes extends Ithemes_Sync_Verb {
 	}
 	
 	private function uninstall_themes( $themes ) {
-		require_once( ABSPATH . '/wp-admin/includes/file.php' );
-		require_once( ABSPATH . '/wp-admin/includes/theme.php' );
+		require_once ABSPATH . '/wp-admin/includes/file.php';
+		require_once ABSPATH . '/wp-admin/includes/theme.php';
 		
-		$response = array();
+		$response = [];
 		
 		foreach ( (array) $themes as $theme ) {
-			$response[$theme] = delete_theme( $theme );
+			$response[ $theme ] = delete_theme( $theme );
 		}
 		
 		return $response;

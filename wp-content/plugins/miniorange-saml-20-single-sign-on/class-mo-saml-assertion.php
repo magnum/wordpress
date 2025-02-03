@@ -233,10 +233,7 @@ class Mo_SAML_Assertion {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This POST is recieved from the IDP side and hence will not contain nonce.
 			if ( isset( $_POST['RelayState'] ) && 'testValidate' === $_POST['RelayState'] ) {
 				Mo_SAML_Logger::mo_saml_add_log( 'Assertion encrypted', Mo_SAML_Logger::ERROR );
-				$error_cause   = $error_code['cause'];
-				$error_message = $error_code['testConfig_msg'];
-				mo_saml_display_test_config_error_page( $error_code['code'], $error_cause, $error_message );
-				mo_saml_download_logs( $error_cause, $error_message );
+				mo_saml_display_test_config_error_page( $error_code );
 				exit;
 			} else {
 				Mo_SAML_Logger::mo_saml_add_log( 'Assertion encrypted', Mo_SAML_Logger::ERROR );
@@ -250,7 +247,7 @@ class Mo_SAML_Assertion {
 
 		if ( $xml->getAttribute( 'Version' ) !== '2.0' ) {
 			/* Currently a very strict check. */
-			throw new Exception( 'Unsupported version: ' . $xml->getAttribute( 'Version' ) );
+			throw new Exception( 'Unsupported version: ' . esc_html( $xml->getAttribute( 'Version' ) ) );
 		}
 
 		$this->issue_instant = Mo_SAML_Utilities::mo_saml_xs_date_time_to_timestamp( $xml->getAttribute( 'IssueInstant' ) );
@@ -261,12 +258,16 @@ class Mo_SAML_Assertion {
 		}
 		$this->issuer = trim( $issuer[0]->textContent );
 
-		$this->mo_saml_parse_conditions( $xml );
-		$this->mo_saml_parse_authn_statement( $xml );
-		$this->mo_saml_parse_attributes( $xml );
-		$this->mo_saml_parse_encrypted_attributes( $xml );
-		$this->mo_saml_parse_signature( $xml );
-		$this->mo_saml_parse_subject( $xml );
+		try {
+			$this->mo_saml_parse_conditions( $xml );
+			$this->mo_saml_parse_authn_statement( $xml );
+			$this->mo_saml_parse_attributes( $xml );
+			$this->mo_saml_parse_encrypted_attributes( $xml );
+			$this->mo_saml_parse_signature( $xml );
+			$this->mo_saml_parse_subject( $xml );
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SAML response' );
+		}
 	}
 
 	/**
@@ -279,7 +280,6 @@ class Mo_SAML_Assertion {
 		$subject = Mo_SAML_Utilities::mo_saml_xp_query( $xml, './saml_assertion:Subject' );
 		if ( empty( $subject ) ) {
 			/* No Subject node. */
-
 			return;
 		} elseif ( count( $subject ) > 1 ) {
 			throw new Exception( 'More than one <saml:Subject> in <saml:Assertion>.' );
@@ -295,10 +295,7 @@ class Mo_SAML_Assertion {
 			$error_code = Mo_Saml_Options_Enum_Error_Codes::$error_codes['WPSAMLERR002'];
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This POST is recieved from the IDP side and hence will not contain nonce.
 			if ( isset( $_POST['RelayState'] ) && 'testValidate' === $_POST['RelayState'] ) {
-				$error_cause   = $error_code['cause'];
-				$error_message = $error_code['testConfig_msg'];
-				mo_saml_display_test_config_error_page( $error_code['code'], $error_cause, $error_message );
-				mo_saml_download_logs( $error_cause, $error_message );
+				mo_saml_display_test_config_error_page( $error_code );
 			} else {
 				Mo_SAML_Utilities::mo_saml_die( $error_code );
 			}
@@ -352,7 +349,7 @@ class Mo_SAML_Assertion {
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMDocument Attributes.
 			if ( 'urn:oasis:names:tc:SAML:2.0:assertion' !== $node->namespaceURI ) {
 				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DevelopmentFunctions.error_log_var_export -- Ignoring camel case for DOMElement attribute, var_export is used to print useful information while throwing exceptions.
-				throw new Exception( 'Unknown namespace of condition: ' . var_export( $node->namespaceURI, true ) );
+				throw new Exception( 'Unknown namespace of condition: ' . esc_html( var_export( $node->namespaceURI, true ) ) );
 			}
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMDocument Attributes.
 			switch ( $node->localName ) {
@@ -378,10 +375,9 @@ class Mo_SAML_Assertion {
 					break;
 				default:
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DevelopmentFunctions.error_log_var_export -- Ignoring camel case for DOMElement attribute, var_export is used to print useful information while throwing exceptions.
-					throw new Exception( 'Unknown condition: ' . var_export( $node->localName, true ) );
+					throw new Exception( 'Unknown condition: ' . esc_html( var_export( $node->localName, true ) ) );
 			}
 		}
-
 	}
 
 	/**
@@ -413,8 +409,11 @@ class Mo_SAML_Assertion {
 		if ( $authn_statement->hasAttribute( 'SessionIndex' ) ) {
 			$this->session_index = $authn_statement->getAttribute( 'SessionIndex' );
 		}
-
-		$this->mo_saml_parse_authn_context( $authn_statement );
+		try {
+			$this->mo_saml_parse_authn_context( $authn_statement );
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SAML Response' );
+		}
 	}
 
 	/**
@@ -435,22 +434,26 @@ class Mo_SAML_Assertion {
 
 		// Get the AuthnContextDeclRef (if available).
 		$authn_context_decl_refs = Mo_SAML_Utilities::mo_saml_xp_query( $authn_context_el, './saml_assertion:AuthnContextDeclRef' );
-		if ( count( $authn_context_decl_refs ) > 1 ) {
-			throw new Exception(
-				'More than one <saml:AuthnContextDeclRef> found?'
-			);
-		} elseif ( count( $authn_context_decl_refs ) === 1 ) {
-			$this->mo_saml_set_authn_context_decl_ref( trim( $authn_context_decl_refs[0]->textContent ) );
-		}
+		try {
+			if ( count( $authn_context_decl_refs ) > 1 ) {
+				throw new Exception(
+					'More than one <saml:AuthnContextDeclRef> found?'
+				);
+			} elseif ( count( $authn_context_decl_refs ) === 1 ) {
+				$this->mo_saml_set_authn_context_decl_ref( trim( $authn_context_decl_refs[0]->textContent ) );
+			}
 
-		// Get the AuthnContextDecl (if available).
-		$authn_context_decls = Mo_SAML_Utilities::mo_saml_xp_query( $authn_context_el, './saml_assertion:AuthnContextDecl' );
-		if ( count( $authn_context_decls ) > 1 ) {
-			throw new Exception(
-				'More than one <saml:AuthnContextDecl> found?'
-			);
-		} elseif ( count( $authn_context_decls ) === 1 ) {
-			$this->mo_saml_set_authn_context_decl( new SAML2_XML_Chunk( $authn_context_decls[0] ) );
+			// Get the AuthnContextDecl (if available).
+			$authn_context_decls = Mo_SAML_Utilities::mo_saml_xp_query( $authn_context_el, './saml_assertion:AuthnContextDecl' );
+			if ( count( $authn_context_decls ) > 1 ) {
+				throw new Exception(
+					'More than one <saml:AuthnContextDecl> found?'
+				);
+			} elseif ( count( $authn_context_decls ) === 1 ) {
+				$this->mo_saml_set_authn_context_decl( new SAML2_XML_Chunk( $authn_context_decls[0] ) );
+			}
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SAML Response' );
 		}
 
 		// Get the AuthnContextClassRef (if available).
@@ -499,10 +502,8 @@ class Mo_SAML_Assertion {
 			if ( $first_attribute ) {
 				$this->name_format = $name_format;
 				$first_attribute   = false;
-			} else {
-				if ( $this->name_format !== $name_format ) {
+			} elseif ( $this->name_format !== $name_format ) {
 					$this->name_format = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified';
-				}
 			}
 
 			if ( empty( $this->attributes[ $name ] ) ) {
@@ -684,7 +685,11 @@ class Mo_SAML_Assertion {
         // @codingStandardsIgnoreEnd
 
 		$symmetric_key = new Mo_SAML_XML_Security_Key( Mo_SAML_XML_Security_Key::AES128_CBC );
-		$symmetric_key->mo_saml_generate_session_key();
+		try {
+			$symmetric_key->mo_saml_generate_session_key();
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SESSION key' );
+		}
 		$enc->encryptKey( $key, $symmetric_key );
 
 		$this->encrypted_name_id = $enc->encryptNode( $symmetric_key );
@@ -1387,7 +1392,11 @@ class Mo_SAML_Assertion {
 			 * $EncryptionKey
 			 */
 			$symmetric_key = new Mo_SAML_XML_Security_Key( Mo_SAML_XML_Security_Key::AES256_CBC );
-			$symmetric_key->mo_saml_generate_session_key();
+			try {
+				$symmetric_key->mo_saml_generate_session_key();
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SESSION key' );
+			}
 			$enc_assert->encryptKey( $this->encryption_key, $symmetric_key );
 			$encr_node = $enc_assert->encryptNode( $symmetric_key );
 
@@ -1397,5 +1406,4 @@ class Mo_SAML_Assertion {
 			$enc_attribute->appendChild( $n );
 		}
 	}
-
 }

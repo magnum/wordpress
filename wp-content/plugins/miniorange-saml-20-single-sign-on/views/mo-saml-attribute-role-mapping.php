@@ -45,7 +45,7 @@ function mo_saml_display_attribute_mapping() {
 		<div class="mo-saml-bootstrap-row align-items-top">
 			<div class="mo-saml-bootstrap-col-md-12">
 				<h4 class="form-head">
-					<span class="entity-info">Attribute Mapping
+					<span class="entity-info"><?php esc_html_e( 'Attribute Mapping', 'miniorange-saml-20-single-sign-on' ); ?>
 						<a href="https://developers.miniorange.com/docs/saml/wordpress/Attribute-Rolemapping" class="mo-saml-bootstrap-text-dark" target="_blank">
 							<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 								<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
@@ -59,11 +59,11 @@ function mo_saml_display_attribute_mapping() {
 
 		<div class="prem-info mo-saml-bootstrap-mt-5 mo-saml-bootstrap-d-block">
 			<div class="prem-icn nameid-prem-img sso-btn-prem-img"><img class="crown_img" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/crown.webp' ); ?>">
-				<p class="nameid-prem-text">The basic attributes are configurable in Standard, Premium, Enterprise and All-Inclusive plans. Custom Attributes are configurable in Premium and higher plans. <a href="<?php echo esc_url( admin_url( 'admin.php?page=mo_saml_settings&tab=licensing' ) ); ?>" class="mo-saml-bootstrap-text-warning">Click here to upgrade</a></p>
+				<p class="nameid-prem-text"><?php esc_html_e( 'The basic attributes are configurable in Standard, Premium, Enterprise and All-Inclusive plans. Custom Attributes are configurable in Premium and higher plans. ', 'miniorange-saml-20-single-sign-on' ); ?><a href="<?php echo esc_url( Mo_Saml_External_Links::PRICING_PAGE ); ?>" target="_blank" class="mo-saml-bootstrap-text-warning"><?php esc_html_e( 'Click here to upgrade', 'miniorange-saml-20-single-sign-on' ); ?></a></p>
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Username (required) </span>:</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Username (required) ', 'miniorange-saml-20-single-sign-on' ); ?></span>:</h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
 					<p>NameID</p>
@@ -71,7 +71,7 @@ function mo_saml_display_attribute_mapping() {
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Email (required) :</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Email (required) :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
 					<p>NameID</p>
@@ -79,7 +79,7 @@ function mo_saml_display_attribute_mapping() {
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">First Name :</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'First Name :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
 					<input type="text" name="saml_am_first_name" placeholder="Enter attribute name for First Name" class="mo-saml-bootstrap-w-100 mo-saml-bootstrap-bg-light cursor-disabled" value="" disabled>
@@ -87,7 +87,7 @@ function mo_saml_display_attribute_mapping() {
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Last Name :</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Last Name :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
 					<input type="text" name="saml_am_last_name" placeholder="Enter attribute name for Last Name" class="mo-saml-bootstrap-w-100 mo-saml-bootstrap-bg-light cursor-disabled" value="" disabled>
@@ -95,7 +95,7 @@ function mo_saml_display_attribute_mapping() {
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Group/Role :</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Group/Role :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
 					<input type="text" name="" placeholder="Enter attribute name for Group/Role" class="mo-saml-bootstrap-w-100 mo-saml-bootstrap-bg-light cursor-disabled" value="" disabled>
@@ -103,25 +103,25 @@ function mo_saml_display_attribute_mapping() {
 			</div>
 			<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Map Custom Attributes</h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Map Custom Attributes', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-6">
-					<p>Customized Attribute Mapping means you can map any attribute of the IDP to the usermeta table of your database.</p>
+					<p><?php esc_html_e( 'Customized Attribute Mapping means you can map any attribute of the IDP to the usermeta table of your database.', 'miniorange-saml-20-single-sign-on' ); ?></p>
 				</div>
 			</div>
 
 		</div>
 		<div class="align-items-top mo-saml-bootstrap-mt-5 prem-info">
 			<div class="prem-icn anonymous-prem-img sso-btn-prem-img"><img class="crown_img" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/crown.webp' ); ?>">
-				<p class="anonymous-text">Enable this option if you want to allow users to login to the WordPress site without creating a WordPress user account for them. <a href="<?php echo esc_url( admin_url( 'admin.php?page=mo_saml_settings&tab=licensing' ) ); ?>" class="mo-saml-bootstrap-text-warning">Available in Paid Plugin</a></p>
+				<p class="anonymous-text"><?php esc_html_e( 'Enable this option if you want to allow users to login to the WordPress site without creating a WordPress user account for them. ', 'miniorange-saml-20-single-sign-on' ); ?><a href="<?php echo esc_url( Mo_Saml_External_Links::PRICING_PAGE ); ?>" target="_blank" class="mo-saml-bootstrap-text-warning"><?php esc_html_e( 'Available in Paid Plugin', 'miniorange-saml-20-single-sign-on' ); ?></a></p>
 			</div>
 			<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h6 class="mo-saml-bootstrap-text-secondary">Anonymous Login: </h6>
+					<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Anonymous Login:', 'miniorange-saml-20-single-sign-on' ); ?> </h6>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-8">
 					<section>
-						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch">Toggle</label>
+						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch"><?php esc_html_e( 'Toggle', 'miniorange-saml-20-single-sign-on' ); ?></label>
 					</section>
 				</div>
 			</div>
@@ -129,7 +129,6 @@ function mo_saml_display_attribute_mapping() {
 
 	</div>
 	<?php
-
 }
 
 /**
@@ -151,7 +150,7 @@ function mo_saml_display_role_mapping( $default_role, $roles ) {
 			<div class="mo-saml-bootstrap-row align-items-top">
 				<div class="mo-saml-bootstrap-col-md-12">
 					<h4 class="form-head">
-					<span class="entity-info">Role Mapping
+					<span class="entity-info"><?php esc_html_e( 'Role Mapping', 'miniorange-saml-20-single-sign-on' ); ?>
 						<a href="https://developers.miniorange.com/docs/saml/wordpress/Attribute-Rolemapping#Role-Mapping" class="mo-saml-bootstrap-text-dark" target="_blank">
 							<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 								<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
@@ -162,12 +161,12 @@ function mo_saml_display_role_mapping( $default_role, $roles ) {
 					</h4>
 				</div>
 			</div>
-			<div class="mo-saml-bootstrap-align-items-center mo-saml-bootstrap-mt-5"><b>NOTE:</b> Role will be assigned only to new users. Existing WordPress users' role remains same.</div>
+			<div class="mo-saml-bootstrap-align-items-center mo-saml-bootstrap-mt-5"><b><?php esc_html_e( 'NOTE:', 'miniorange-saml-20-single-sign-on' ); ?></b> <?php esc_html_e( 'Role will be assigned only to new users. Existing WordPress users\' role remains same.', 'miniorange-saml-20-single-sign-on' ); ?></div>
 			<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-mt-5">
 				<div class="mo-saml-bootstrap-col-md-3">
-					<h5>Default Role : </h5>
+					<h5><?php esc_html_e( 'Default Role :', 'miniorange-saml-20-single-sign-on' ); ?> </h5>
 				</div>
-				<div class="mo-saml-bootstrap-col-md-3">
+				<div class="mo-saml-bootstrap-col-md-4">
 					<select id="saml_am_default_user_role" name="saml_am_default_user_role">
 						<?php
 						wp_dropdown_roles( $default_role );
@@ -175,37 +174,37 @@ function mo_saml_display_role_mapping( $default_role, $roles ) {
 					</select>
 				</div>
 				<div class="mo-saml-bootstrap-col-md-4">
-					<input type="submit" class="btn-cstm mo-saml-bootstrap-bg-info mo-saml-bootstrap-rounded" name="submit" value="Update">
+					<input type="submit" class="btn-cstm mo-saml-bootstrap-bg-info mo-saml-bootstrap-rounded" name="submit" value="<?php esc_html_e( 'Update', 'miniorange-saml-20-single-sign-on' ); ?>">
 				</div>
 			</div>
 			<div class="prem-info mo-saml-bootstrap-mt-5">
 				<div class="prem-icn role-prem-img sso-btn-prem-img"><img class="crown_img" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/crown.webp' ); ?>">
-					<p class="role-prem-text">Customized Role Mapping options are configurable in the Premium, Enterprise and All-Inclusive versions of the plugin. <a href="<?php echo esc_url( admin_url( 'admin.php?page=mo_saml_settings&tab=licensing' ) ); ?>" class="mo-saml-bootstrap-text-warning">Click here to upgrade</a></p>
+					<p class="role-prem-text"><?php esc_html_e( 'Customized Role Mapping options are configurable in the Premium, Enterprise and All-Inclusive versions of the plugin.', 'miniorange-saml-20-single-sign-on' ); ?> <a href="<?php echo esc_url( Mo_Saml_External_Links::PRICING_PAGE ); ?>" target="_blank" class="mo-saml-bootstrap-text-warning"><?php esc_html_e( 'Click here to upgrade', 'miniorange-saml-20-single-sign-on' ); ?></a></p>
 				</div>
 				<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4 mo-saml-bootstrap-col-md-12">
 					<div class="mo-saml-bootstrap-col-md-7">
-						<h6 class="mo-saml-bootstrap-text-secondary">Do not auto create users if roles are not mapped here :</h6>
+						<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Do not auto create users if roles are not mapped here :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 					</div>
 					<div class="mo-saml-bootstrap-col-md-5">
-						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch">Toggle</label>
+						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch"><?php esc_html_e( 'Toggle', 'miniorange-saml-20-single-sign-on' ); ?></label>
 
-						<p class="mt-2">Enable this option if you do not want the unmapped users to register into your site via SSO.</p>
+						<p class="mt-2"><?php esc_html_e( 'Enable this option if you do not want the unmapped users to register into your site via SSO.', 'miniorange-saml-20-single-sign-on' ); ?></p>
 					</div>
 				</div>
 				<div class="mo-saml-bootstrap-row align-items-top mo-saml-bootstrap-mt-4 mo-saml-bootstrap-col-md-12">
 					<div class="mo-saml-bootstrap-col-md-7">
-						<h6 class="mo-saml-bootstrap-text-secondary">Do not assign role to unlisted users :</h6>
+						<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Do not assign role to unlisted users :', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 					</div>
 					<div class="mo-saml-bootstrap-col-md-5">
-						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch">Toggle</label>
-						<p class="mt-2">Enable this option if you do not want to assign any roles to unmapped users.</p>
+						<input type="checkbox" id="switch" class="mo-saml-switch cursor-disabled" disabled /><label class="mo-saml-switch-label" for="switch"><?php esc_html_e( 'Toggle', 'miniorange-saml-20-single-sign-on' ); ?></label>
+						<p class="mt-2"><?php esc_html_e( 'Enable this option if you do not want to assign any roles to unmapped users.', 'miniorange-saml-20-single-sign-on' ); ?></p>
 					</div>
 				</div>
 			</div>
 
 			<div class="mo-saml-bootstrap-d-block prem-info mo-saml-bootstrap-mt-5">
 				<div class="prem-icn role-admin-prem-img sso-btn-prem-img"><img class="crown_img" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/crown.webp' ); ?>">
-					<p class="role-admin-prem-text">Customized Role Mapping options are configurable in the Premium, Enterprise and All-Inclusive versions of the plugin. <a href="<?php echo esc_url( admin_url( 'admin.php?page=mo_saml_settings&tab=licensing' ) ); ?>" class="mo-saml-bootstrap-text-warning">Click here to upgrade</a></p>
+					<p class="role-admin-prem-text"><?php esc_html_e( 'Customized Role Mapping options are configurable in the Premium, Enterprise and All-Inclusive versions of the plugin. ', 'miniorange-saml-20-single-sign-on' ); ?><a href="<?php echo esc_url( Mo_Saml_External_Links::PRICING_PAGE ); ?>" target="_blank" class="mo-saml-bootstrap-text-warning"><?php esc_html_e( 'Click here to upgrade', 'miniorange-saml-20-single-sign-on' ); ?></a></p>
 				</div>
 				<?php
 				foreach ( $roles as $role_value => $role_name ) {
@@ -226,7 +225,6 @@ function mo_saml_display_role_mapping( $default_role, $roles ) {
 	</form>
 
 	<?php
-
 }
 
 /**

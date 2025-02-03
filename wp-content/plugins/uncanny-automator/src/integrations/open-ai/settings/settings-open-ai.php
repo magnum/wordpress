@@ -76,10 +76,15 @@ class Open_AI_Settings {
 	 */
 	public function validate_secret_key( $sanitized_input, $option_name, $original_input ) {
 
+		// Early bail on empty input.
+		if ( empty( $sanitized_input ) ) {
+			return false;
+		}
+
 		$cache_key = $option_name . '_validated';
 
 		// Prevents duplicate process.
-		if ( wp_cache_get( $cache_key, self::CACHE_GROUP_VALIDATION ) ) {
+		if ( Automator()->cache->get( $cache_key, self::CACHE_GROUP_VALIDATION ) ) {
 			return $sanitized_input;
 		}
 
@@ -95,17 +100,17 @@ class Open_AI_Settings {
 
 			$heading = __( 'Your account has been connected successfully!', 'uncanny-automator' );
 
-			add_settings_error( self::SETTINGS_ERROR, $heading, '', 'success' );
+			automator_add_settings_error( self::SETTINGS_ERROR, $heading, '', 'success' );
 
-			wp_cache_set( $cache_key, true, self::CACHE_GROUP_VALIDATION );
+			Automator()->cache->set( $cache_key, true, self::CACHE_GROUP_VALIDATION );
 
 			return $sanitized_input;
 
 		} catch ( \Exception $e ) {
 
-			wp_cache_set( $cache_key, true, self::CACHE_GROUP_VALIDATION );
+			Automator()->cache->set( $cache_key, true, self::CACHE_GROUP_VALIDATION );
 
-			add_settings_error( self::SETTINGS_ERROR, __( 'Authentication error', 'uncanny-automator' ), $e->getMessage(), 'error' );
+			automator_add_settings_error( self::SETTINGS_ERROR, __( 'Authentication error', 'uncanny-automator' ), $e->getMessage(), 'error' );
 
 			return false;
 
@@ -148,15 +153,17 @@ class Open_AI_Settings {
 			admin_url( 'admin-ajax.php' )
 		);
 
-		$secret_key = get_option( self::OPTION_KEY, '' );
+		$secret_key = automator_get_option( self::OPTION_KEY, '' );
 
 		$vars = array(
-			'alerts'         => (array) get_settings_errors( self::SETTINGS_ERROR ),
-			'setup_url'      => automator_utm_parameters( 'https://automatorplugin.com/knowledge-base/open-ai/', 'settings', 'open-ai-kb_article' ),
-			'secret_key'     => $secret_key,
-			'is_connected'   => $this->helper->is_connected(),
-			'disconnect_url' => $disconnect_url,
-			'redacted_token' => substr( $secret_key, 0, 3 ) . '&hellip;' . substr( $secret_key, strlen( $secret_key ) - 4, strlen( $secret_key ) ),
+			'alerts'                  => (array) get_settings_errors( self::SETTINGS_ERROR ),
+			'setup_url'               => automator_utm_parameters( 'https://automatorplugin.com/knowledge-base/open-ai/', 'settings', 'open-ai-kb_article' ),
+			'secret_key'              => $secret_key,
+			'is_connected'            => $this->helper->is_connected(),
+			'disconnect_url'          => $disconnect_url,
+			'recheck_gpt4_access_url' => admin_url( 'admin-ajax.php?action=automator_openai_recheck_gpt4_access&nonce=' . wp_create_nonce( 'automator_openai_gpt4_check_access_clear' ) ),
+			'redacted_token'          => substr( $secret_key, 0, 3 ) . '&hellip;' . substr( $secret_key, strlen( $secret_key ) - 4, strlen( $secret_key ) ),
+			'can_access_gpt4'         => $this->helper->has_gpt4_access(),
 		);
 
 		include_once 'view-open-ai.php';

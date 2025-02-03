@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static LiveVideoBroadcastStatusValues getInstance()
  */
-class LiveVideoBroadcastStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LIVE = 'LIVE';
-    const LIVE_STOPPED = 'LIVE_STOPPED';
-    const PROCESSING = 'PROCESSING';
-    const SCHEDULED_CANCELED = 'SCHEDULED_CANCELED';
-    const SCHEDULED_EXPIRED = 'SCHEDULED_EXPIRED';
-    const SCHEDULED_LIVE = 'SCHEDULED_LIVE';
-    const SCHEDULED_UNPUBLISHED = 'SCHEDULED_UNPUBLISHED';
-    const UNPUBLISHED = 'UNPUBLISHED';
-    const VOD = 'VOD';
+class LiveVideoBroadcastStatusValues extends AbstractEnum {
+
+  const LIVE = 'LIVE';
+  const LIVE_STOPPED = 'LIVE_STOPPED';
+  const PROCESSING = 'PROCESSING';
+  const SCHEDULED_CANCELED = 'SCHEDULED_CANCELED';
+  const SCHEDULED_EXPIRED = 'SCHEDULED_EXPIRED';
+  const SCHEDULED_LIVE = 'SCHEDULED_LIVE';
+  const SCHEDULED_UNPUBLISHED = 'SCHEDULED_UNPUBLISHED';
+  const UNPUBLISHED = 'UNPUBLISHED';
+  const VOD = 'VOD';
 }

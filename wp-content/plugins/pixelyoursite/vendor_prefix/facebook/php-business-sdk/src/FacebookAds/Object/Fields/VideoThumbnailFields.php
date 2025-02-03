@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoThumbnailFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const HEIGHT = 'height';
-    const ID = 'id';
-    const IS_PREFERRED = 'is_preferred';
-    const NAME = 'name';
-    const SCALE = 'scale';
-    const URI = 'uri';
-    const WIDTH = 'width';
-    public function getFieldTypes()
-    {
-        return array('height' => 'unsigned int', 'id' => 'string', 'is_preferred' => 'bool', 'name' => 'string', 'scale' => 'float', 'uri' => 'string', 'width' => 'unsigned int');
-    }
+
+class VideoThumbnailFields extends AbstractEnum {
+
+  const HEIGHT = 'height';
+  const ID = 'id';
+  const IS_PREFERRED = 'is_preferred';
+  const NAME = 'name';
+  const SCALE = 'scale';
+  const URI = 'uri';
+  const WIDTH = 'width';
+
+  public function getFieldTypes() {
+    return array(
+      'height' => 'unsigned int',
+      'id' => 'string',
+      'is_preferred' => 'bool',
+      'name' => 'string',
+      'scale' => 'float',
+      'uri' => 'string',
+      'width' => 'unsigned int',
+    );
+  }
 }

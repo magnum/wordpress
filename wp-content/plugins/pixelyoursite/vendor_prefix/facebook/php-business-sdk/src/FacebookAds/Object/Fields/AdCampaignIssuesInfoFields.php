@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCampaignIssuesInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ERROR_CODE = 'error_code';
-    const ERROR_MESSAGE = 'error_message';
-    const ERROR_SUMMARY = 'error_summary';
-    const ERROR_TYPE = 'error_type';
-    const LEVEL = 'level';
-    public function getFieldTypes()
-    {
-        return array('error_code' => 'int', 'error_message' => 'string', 'error_summary' => 'string', 'error_type' => 'string', 'level' => 'string');
-    }
+
+class AdCampaignIssuesInfoFields extends AbstractEnum {
+
+  const ERROR_CODE = 'error_code';
+  const ERROR_MESSAGE = 'error_message';
+  const ERROR_SUMMARY = 'error_summary';
+  const ERROR_TYPE = 'error_type';
+  const LEVEL = 'level';
+
+  public function getFieldTypes() {
+    return array(
+      'error_code' => 'int',
+      'error_message' => 'string',
+      'error_summary' => 'string',
+      'error_type' => 'string',
+      'level' => 'string',
+    );
+  }
 }

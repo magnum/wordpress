@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static WhatsAppBusinessAccountTasksValues getInstance()
  */
-class WhatsAppBusinessAccountTasksValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DEVELOP = 'DEVELOP';
-    const MANAGE = 'MANAGE';
-    const MANAGE_PHONE = 'MANAGE_PHONE';
-    const MANAGE_TEMPLATES = 'MANAGE_TEMPLATES';
-    const MESSAGING = 'MESSAGING';
-    const VIEW_COST = 'VIEW_COST';
+class WhatsAppBusinessAccountTasksValues extends AbstractEnum {
+
+  const DEVELOP = 'DEVELOP';
+  const FULL_CONTROL = 'FULL_CONTROL';
+  const MANAGE = 'MANAGE';
+  const MANAGE_EXTENSIONS = 'MANAGE_EXTENSIONS';
+  const MANAGE_PHONE = 'MANAGE_PHONE';
+  const MANAGE_TEMPLATES = 'MANAGE_TEMPLATES';
+  const MESSAGING = 'MESSAGING';
+  const VIEW_COST = 'VIEW_COST';
 }

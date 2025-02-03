@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,20 +34,32 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessImageFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS = 'business';
-    const CREATION_TIME = 'creation_time';
-    const HASH = 'hash';
-    const HEIGHT = 'height';
-    const ID = 'id';
-    const MEDIA_LIBRARY_URL = 'media_library_url';
-    const NAME = 'name';
-    const URL = 'url';
-    const URL_128 = 'url_128';
-    const WIDTH = 'width';
-    public function getFieldTypes()
-    {
-        return array('business' => 'Business', 'creation_time' => 'datetime', 'hash' => 'string', 'height' => 'int', 'id' => 'string', 'media_library_url' => 'string', 'name' => 'string', 'url' => 'string', 'url_128' => 'string', 'width' => 'int');
-    }
+
+class BusinessImageFields extends AbstractEnum {
+
+  const BUSINESS = 'business';
+  const CREATION_TIME = 'creation_time';
+  const HASH = 'hash';
+  const HEIGHT = 'height';
+  const ID = 'id';
+  const MEDIA_LIBRARY_URL = 'media_library_url';
+  const NAME = 'name';
+  const URL = 'url';
+  const URL_128 = 'url_128';
+  const WIDTH = 'width';
+
+  public function getFieldTypes() {
+    return array(
+      'business' => 'Business',
+      'creation_time' => 'datetime',
+      'hash' => 'string',
+      'height' => 'int',
+      'id' => 'string',
+      'media_library_url' => 'string',
+      'name' => 'string',
+      'url' => 'string',
+      'url_128' => 'string',
+      'width' => 'int',
+    );
+  }
 }

@@ -7,13 +7,17 @@
   "general_event_on_woo_enabled": "checkbox",
   "general_event_on_edd_enabled": "checkbox",
 
+  "enable_all_tracking_ids" : "checkbox",
+
   "cookie_duration": "number",
   "last_visit_duration": "number",
   "debug_enabled": "checkbox",
+  "session_disable": "checkbox",
   "do_not_track_user_roles": "multi_select",
   "admin_permissions": "multi_select",
 
   "block_robot_enabled": "checkbox",
+  "exclude_blocked_robots": "multi_select",
   "block_ip_enabled": "checkbox",
   "blocked_ips": "multi_select",
 
@@ -33,6 +37,7 @@
   "woo_view_content_value_option": "radio",
   "woo_view_content_value_global": "number",
   "woo_enabled_save_data_to_orders": "checkbox",
+  "woo_enabled_display_data_to_orders": "checkbox",
   "woo_add_enrich_to_admin_email": "checkbox",
 
   "edd_add_to_cart_on_button_click": "checkbox",
@@ -50,6 +55,7 @@
   "edd_view_content_value_option": "radio",
   "edd_view_content_value_global": "number",
   "edd_enabled_save_data_to_orders": "checkbox",
+  "edd_enabled_display_data_to_orders": "checkbox",
 
   "custom_events_enabled": "checkbox",
 
@@ -59,6 +65,7 @@
   "gdpr_bing_prior_consent_enabled": "checkbox",
   "gdpr_cookiebot_integration_enabled": "checkbox",
   "gdpr_cookiebot_facebook_consent_category": "text",
+  "gdpr_cookiebot_tiktok_consent_category": "text",
   "gdpr_cookiebot_analytics_consent_category": "text",
   "gdpr_cookiebot_pinterest_consent_category": "text",
   "gdpr_cookiebot_bing_consent_category": "text",
@@ -88,6 +95,7 @@
   "woo_add_to_cart_enabled": "checkbox",
   "woo_view_content_enabled": "checkbox",
   "woo_view_category_enabled": "checkbox",
+  "woo_view_cart_enabled" : "checkbox",
   "enable_event_url_param":"checkbox",
   "enable_remove_source_url_params":"checkbox",
 
@@ -103,6 +111,7 @@
   "enable_woo_category_name_param": "checkbox",
   "enable_woo_num_items_param": "checkbox",
   "enable_woo_tags_param":"checkbox",
+  "enable_woo_fees_param": "checkbox",
   "enable_edd_category_name_param": "checkbox",
   "enable_edd_num_items_param": "checkbox",
   "enable_edd_tags_param": "checkbox",
@@ -119,9 +128,24 @@
   "automatic_event_comment_enabled":  "checkbox",
   "automatic_event_scroll_enabled":  "checkbox",
   "automatic_event_time_on_page_enabled":  "checkbox",
+  "automatic_event_404_enabled": "checkbox",
   "automatic_event_search_enabled":  "checkbox",
 
   "automatic_event_download_extensions": "tag_select",
   "automatic_event_scroll_value": "number",
-  "automatic_event_time_on_page_value": "number"
+  "automatic_event_time_on_page_value": "number",
+
+  "enable_success_send_form": "checkbox",
+  "hide_version_plugin_in_console": "checkbox",
+
+
+  "send_external_id": "checkbox",
+  "external_id_expire": "number",
+  "external_id_use_transient": "checkbox",
+  "track_cookie_for_subdomains": "checkbox",
+  "server_event_use_ajax" : "checkbox",
+  "server_static_event_use_ajax": "checkbox",
+  "google_consent_mode": "checkbox",
+
+  "data_persistency": "radio"
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdRuleHistoryActionValues getInstance()
  */
-class AdRuleHistoryActionValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUDGET_NOT_REDISTRIBUTED = 'BUDGET_NOT_REDISTRIBUTED';
-    const CHANGED_BID = 'CHANGED_BID';
-    const CHANGED_BUDGET = 'CHANGED_BUDGET';
-    const EMAIL = 'EMAIL';
-    const ENDPOINT_PINGED = 'ENDPOINT_PINGED';
-    const ERROR = 'ERROR';
-    const FACEBOOK_NOTIFICATION_SENT = 'FACEBOOK_NOTIFICATION_SENT';
-    const MESSAGE_SENT = 'MESSAGE_SENT';
-    const NOT_CHANGED = 'NOT_CHANGED';
-    const PAUSED = 'PAUSED';
-    const UNPAUSED = 'UNPAUSED';
+class AdRuleHistoryActionValues extends AbstractEnum {
+
+  const BUDGET_NOT_REDISTRIBUTED = 'BUDGET_NOT_REDISTRIBUTED';
+  const CHANGED_BID = 'CHANGED_BID';
+  const CHANGED_BUDGET = 'CHANGED_BUDGET';
+  const EMAIL = 'EMAIL';
+  const ENABLE_AUTOFLOW = 'ENABLE_AUTOFLOW';
+  const ENDPOINT_PINGED = 'ENDPOINT_PINGED';
+  const ERROR = 'ERROR';
+  const FACEBOOK_NOTIFICATION_SENT = 'FACEBOOK_NOTIFICATION_SENT';
+  const MESSAGE_SENT = 'MESSAGE_SENT';
+  const NOT_CHANGED = 'NOT_CHANGED';
+  const PAUSED = 'PAUSED';
+  const UNPAUSED = 'UNPAUSED';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,17 +21,18 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Logger\CurlLogger;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\Parameters;
-class JsonAwareParameters extends \PYS_PRO_GLOBAL\FacebookAds\Http\Parameters
-{
-    /**
-     * @param mixed $value
-     * @return string
-     */
-    protected function exportNonScalar($value)
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Logger\CurlLogger\JsonNode::factory($value)->encode();
-    }
+
+class JsonAwareParameters extends Parameters {
+
+  /**
+   * @param mixed $value
+   * @return string
+   */
+  protected function exportNonScalar($value) {
+    return JsonNode::factory($value)->encode();
+  }
 }

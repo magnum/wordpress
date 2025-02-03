@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorSampleFields;
+
 /**
  * This class is auto-generated.
  *
@@ -37,28 +38,43 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorSampleFields;
  * pull request for this class.
  *
  */
-class ProductFeedUploadErrorSample extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return ProductFeedUploadErrorSampleFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorSampleFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        return $ref_enums;
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadErrorSample(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadErrorSample::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class ProductFeedUploadErrorSample extends AbstractCrudObject {
+
+  /**
+   * @return ProductFeedUploadErrorSampleFields
+   */
+  public static function getFieldsEnum() {
+    return ProductFeedUploadErrorSampleFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    return $ref_enums;
+  }
+
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new ProductFeedUploadErrorSample(),
+      'NODE',
+      ProductFeedUploadErrorSample::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

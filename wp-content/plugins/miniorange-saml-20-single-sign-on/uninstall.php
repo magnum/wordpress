@@ -9,7 +9,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 }
 
-require_once dirname( __FILE__ ) . '/includes/lib/class-mo-saml-options-enum.php';
+require_once __DIR__ . '/includes/lib/class-mo-saml-options-enum.php';
 if ( ! ( get_option( 'mo_saml_keep_settings_on_deletion' ) === 'true' ) ) {
 
 	if ( is_multisite() ) {
@@ -28,7 +28,9 @@ function mo_saml_delete_configuration_array() {
 		'Mo_Saml_Options_Test_Configuration',
 		'Mo_Saml_Customer_Constants',
 		'Mo_Saml_Options_Enum',
+		'Mo_Saml_Options_Enum_Identity_Provider',
 		'Mo_Saml_Options_Enum_Service_Provider',
+		'Mo_Saml_Sso_Constants',
 		'Mo_Saml_Options_Enum_Attribute_Mapping',
 		'Mo_Saml_Options_Enum_Role_Mapping',
 		'Mo_Saml_Options_Enum_Sso_Login',
@@ -40,4 +42,3 @@ function mo_saml_delete_configuration_array() {
 		}
 	}
 }
-

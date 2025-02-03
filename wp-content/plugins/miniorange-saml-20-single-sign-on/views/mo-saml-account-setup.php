@@ -23,7 +23,7 @@ function mo_saml_show_customer_details() {
 		<div class="mo-saml-bootstrap-col-md-8 mo-saml-bootstrap-mt-4 mo-saml-bootstrap-ms-5">
 			<div class="mo-saml-bootstrap-p-4 shadow-cstm mo-saml-bootstrap-bg-white mo-saml-bootstrap-rounded">
 				<h4 class="form-head"><?php esc_html_e( 'Thank you for registering with miniOrange', 'miniorange-saml-20-single-sign-on' ); ?></h4>
-
+				<?php mo_saml_show_plugin_download_steps(); ?>
 				<table class="mo-saml-bootstrap-w-100 mo-saml-bootstrap-mt-4">
 					<tr style="border: 0.5px solid #fff;background: #e9f0ff;">
 						<td style="width:45%; padding: 10px;"><?php esc_html_e( 'miniOrange Account Email', 'miniorange-saml-20-single-sign-on' ); ?></td>
@@ -46,7 +46,7 @@ function mo_saml_show_customer_details() {
 							</form>
 						</td>
 						<td>
-							<a href="<?php echo esc_url( add_query_arg( array( 'tab' => 'licensing' ), $server_url ) ); ?>"><input type="button" class="mo-saml-bs-btn btn-cstm" value="<?php esc_attr_e( 'Check Licensing Plans', 'miniorange-saml-20-single-sign-on' ); ?>" /></a>
+							<a href="<?php echo esc_url( Mo_Saml_External_Links::PRICING_PAGE ); ?>" target="_blank"><input type="button" class="mo-saml-bs-btn btn-cstm" value="<?php esc_attr_e( 'Check Licensing Plans', 'miniorange-saml-20-single-sign-on' ); ?>" /></a>
 						</td>
 					</tr>
 				</table>
@@ -60,19 +60,35 @@ function mo_saml_show_customer_details() {
 }
 
 /**
+ * Function to display steps to download paid plugin.
+ */
+function mo_saml_show_plugin_download_steps() {
+	?>
+		<div class="mo_saml_download_paid_plugin_notice">
+			<img class="note_img" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/note.webp' ); ?>">
+				<p id="mo_saml_download_paid_plugin_notice">
+					<span class="entity-info"><?php esc_html_e( 'Hey! You are using the free version of the plugin. If you have already purchased,', 'miniorange-saml-20-single-sign-on' ); ?>
+						<a href="<?php echo esc_url( Mo_Saml_External_Links::FAQ_DOWNLOAD_PAID_PLUGIN ); ?>" target="_blank"><?php esc_html_e( 'you can follow these steps to download the paid plugin.', 'miniorange-saml-20-single-sign-on' ); ?></a>
+					</span>
+				</p>
+		</div>
+	<?php
+}
+
+/**
  * Displays the registration form to create the new account.
  */
 function mo_saml_show_new_registration_page_saml() {
 	?>
 	<div class="mo-saml-bootstrap-row mo-saml-bootstrap-m-4" id="acc-tab-form">
 		<div class="mo-saml-bootstrap-p-4 mo-saml-bootstrap-bg-white mo-saml-bootstrap-rounded">
-			<h4 class="form-head">Register with miniOrange</h4>
+			<h4 class="form-head"><?php esc_html_e( 'Register with miniOrange', 'miniorange-saml-20-single-sign-on' ); ?></h4>
 			<div class="mo-saml-bootstrap-row mo-saml-bootstrap-justify-content-center">
 				<div class="mo-saml-bootstrap-col-md-6 mo-saml-bootstrap-mt-5">
-					<h5 class="mo-saml-bootstrap-text-center mo-saml-why-reg-txt mo_saml_reg_page_header">Why should I register?</h5>
-					<h5 class="mo-saml-bootstrap-text-center mo-saml-why-login-txt mo_saml_reg_page_header">Why should I login?</h5>
-					<p class="mo-saml-bootstrap-mt-3 mo-saml-why-reg mo-saml-why-reg-txt"> You should register so that in case you need help, we can help you with step by step instructions. We support all known IdPs - ADFS, Okta, Salesforce, Shibboleth, SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2 etc. <b>You will also need a miniOrange account to upgrade to the premium version of the plugins.</b> We do not store any information except the email that you will use to register with us.</p>
-					<p class="mo-saml-bootstrap-mt-3 mo-saml-why-reg mo-saml-why-login-txt">You should login so that you can easily reach out to us in case you face any issues while setting up the SSO with your IDP. <b>You will also need a miniOrange account to upgrade to the premium version of the plugins.</b> We do not store any information except the email that you will use to register with us.</p>
+					<h5 class="mo-saml-bootstrap-text-center mo-saml-why-reg-txt mo_saml_reg_page_header"><?php esc_html_e( 'Why should I register?', 'miniorange-saml-20-single-sign-on' ); ?></h5>
+					<h5 class="mo-saml-bootstrap-text-center mo-saml-why-login-txt mo_saml_reg_page_header"><?php esc_html_e( 'Why should I login?', 'miniorange-saml-20-single-sign-on' ); ?></h5>
+					<p class="mo-saml-bootstrap-mt-3 mo-saml-why-reg mo-saml-why-reg-txt"> <?php esc_html_e( 'You should register so that in case you need help, we can help you with step by step instructions. We support all known IdPs - ADFS, Okta, Salesforce, Shibboleth, SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, WSO2 etc. You will also need a miniOrange account to upgrade to the premium version of the plugins. We do not store any information except the email that you will use to register with us.', 'miniorange-saml-20-single-sign-on' ); ?></p>
+					<p class="mo-saml-bootstrap-mt-3 mo-saml-why-reg mo-saml-why-login-txt"><?php esc_html_e( 'You should login so that you can easily reach out to us in case you face any issues while setting up the SSO with your IDP. You will also need a miniOrange account to upgrade to the premium version of the plugins. We do not store any information except the email that you will use to register with us.', 'miniorange-saml-20-single-sign-on' ); ?></p>
 					<div class="mo-saml-bootstrap-text-center">
 						<img src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . '/images/mo-saml-registration-form-bg.webp' ); ?>" width="46%" alt="WordPress saml registration form">
 					</div>
@@ -80,11 +96,11 @@ function mo_saml_show_new_registration_page_saml() {
 				<div class="mo-saml-bootstrap-col-md-5 mo-saml-bootstrap-mt-5 mo-saml-bootstrap-rounded reg-form">
 					<form name="f" method="post" action="">
 						<input type="hidden" name="option" value="mo_saml_register_customer" />
-						<?php wp_nonce_field( 'mo_saml_register_customer' ); ?>
+						<?php wp_nonce_field( 'mo_saml_register_customer', 'mo_saml_register_customer_nonce' ); ?>
 
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-justify-content-center mo-saml-bootstrap-mt-4 mo-saml-reg-field">
 							<div class="mo-saml-bootstrap-col-md-6">
-								<h6 class="mo-saml-bootstrap-text-secondary">Email <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
+								<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Email', 'miniorange-saml-20-single-sign-on' ); ?> <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
 							</div>
 							<div class="mo-saml-bootstrap-col-md-6 mo-saml-bootstrap-ps-0">
 								<input type="text" name="registerEmail" placeholder="person@example.com" required value="" class="mo-saml-bootstrap-w-100 mo-saml-reg-text-field">
@@ -92,24 +108,24 @@ function mo_saml_show_new_registration_page_saml() {
 						</div>
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-justify-content-center mo-saml-bootstrap-mt-4 mo-saml-reg-field">
 							<div class="mo-saml-bootstrap-col-md-6">
-								<h6 class="mo-saml-bootstrap-text-secondary">Password <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
+								<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Password', 'miniorange-saml-20-single-sign-on' ); ?> <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
 							</div>
 							<div class="mo-saml-bootstrap-col-md-6 mo-saml-bootstrap-ps-0">
-								<input class="mo-saml-bootstrap-w-100 mo-saml-reg-text-field" required type="password" name="password" placeholder="Password (Min. length 6)" minlength="6" pattern="^[(\w)*(!@#$.%^&amp;*-_)*]+$" title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&amp;*) should be present.">
+								<input class="mo-saml-bootstrap-w-100 mo-saml-reg-text-field" required type="password" name="password" placeholder="<?php esc_html_e( 'Password (Min. length 6)', 'miniorange-saml-20-single-sign-on' ); ?>" minlength="6" title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&amp;*) should be present.">
 							</div>
 						</div>
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-justify-content-center mo-saml-bootstrap-mt-4 mo-saml-reg-field">
 							<div class="mo-saml-bootstrap-col-md-6">
-								<h6 class="mo-saml-bootstrap-text-secondary">Confirm Password <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
+								<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Confirm Password', 'miniorange-saml-20-single-sign-on' ); ?> <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
 							</div>
 							<div class="mo-saml-bootstrap-col-md-6 mo-saml-bootstrap-ps-0">
-								<input class="mo-saml-bootstrap-w-100 mo-saml-reg-text-field" required type="password" name="confirmPassword" placeholder="Confirm your password" minlength="6" pattern="^[(\w)*(!@#$.%^&amp;*-_)*]+$">
+								<input class="mo-saml-bootstrap-w-100 mo-saml-reg-text-field" required type="password" name="confirmPassword" placeholder="<?php esc_html_e( 'Confirm your password', 'miniorange-saml-20-single-sign-on' ); ?>" minlength="6" >
 							</div>
 						</div>
 
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-justify-content-center mo-saml-bootstrap-mt-4 mo-saml-already-reg-field">
 							<div class="mo-saml-bootstrap-col-md-5">
-								<h6 class="mo-saml-bootstrap-text-secondary">Email <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
+								<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Email', 'miniorange-saml-20-single-sign-on' ); ?> <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
 							</div>
 							<div class="mo-saml-bootstrap-col-md-7 mo-saml-bootstrap-ps-0">
 								<input type="text" name="loginEmail" placeholder="person@example.com" required disabled="true" value="" class="mo-saml-bootstrap-w-100 mo-saml-login-text-field">
@@ -117,16 +133,16 @@ function mo_saml_show_new_registration_page_saml() {
 						</div>
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-align-items-center mo-saml-bootstrap-justify-content-center mo-saml-bootstrap-mt-4 mo-saml-already-reg-field">
 							<div class="mo-saml-bootstrap-col-md-5">
-								<h6 class="mo-saml-bootstrap-text-secondary">Password <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
+								<h6 class="mo-saml-bootstrap-text-secondary"><?php esc_html_e( 'Password', 'miniorange-saml-20-single-sign-on' ); ?> <span class="mo-saml-bootstrap-text-danger">* </span>:</h6>
 							</div>
 							<div class="mo-saml-bootstrap-col-md-7 mo-saml-bootstrap-ps-0">
-								<input class="mo-saml-bootstrap-w-100 mo-saml-login-text-field" required type="password" name="password" disabled="true" placeholder="Password (Min. length 6)" minlength="6" pattern="^[(\w)*(!@#$.%^&amp;*-_)*]+$" title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&amp;*) should be present.">
+								<input class="mo-saml-bootstrap-w-100 mo-saml-login-text-field" required type="password" name="password" disabled="true" placeholder="Password (Min. length 6)" minlength="6" title="Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&amp;*) should be present.">
 							</div>
 						</div>
 						<div class="mo-saml-bootstrap-row mo-saml-bootstrap-mt-4 mo-saml-bootstrap-text-center">
 							<div class="mo-saml-bootstrap-col-md-12">
-								<input type="submit" name="submit" value="Register" class="mo-saml-bs-btn btn-cstm mo-saml-bootstrap-rounded w-176 mo-saml-bootstrap-me-0" id="mo_saml_reg_btn">
-								<input type="submit" name="submit" value="Login" class="mo-saml-bs-btn btn-cstm mo-saml-bootstrap-rounded w-176 mo-saml-bootstrap-me-0" id="mo_saml_reg_login_btn">
+								<input type="submit" name="submit" value="<?php esc_html_e( 'Register', 'miniorange-saml-20-single-sign-on' ); ?>" class="mo-saml-bs-btn btn-cstm mo-saml-bootstrap-rounded w-176 mo-saml-bootstrap-me-0" id="mo_saml_reg_btn">
+								<input type="submit" name="submit" value="<?php esc_html_e( 'Login', 'miniorange-saml-20-single-sign-on' ); ?>" class="mo-saml-bs-btn btn-cstm mo-saml-bootstrap-rounded w-176 mo-saml-bootstrap-me-0" id="mo_saml_reg_login_btn">
 							</div>
 						</div>
 						<div class="mo-saml-bootstrap-row">
@@ -134,12 +150,13 @@ function mo_saml_show_new_registration_page_saml() {
 							</div>
 						</div>
 						<div class="mo-saml-bootstrap-text-center">
-							<input type="button" name="mo_saml_goto_login" id="mo_saml_goto_login" value="Already have an account?" class="mo-saml-bootstrap-border-0 mo-saml-bootstrap-text-info mt-2 mo-saml-bootstrap-h6 mo-saml-alredy-have-btn">
-							<input type="button" name="back" value="Sign Up" class="mo-saml-bootstrap-border-0 mo-saml-bootstrap-text-info mt-2 mo-saml-bootstrap-h6 mo-saml-alredy-have-btn" id="mo_saml_reg_back_btn">
+							<input type="button" name="mo_saml_goto_login" id="mo_saml_goto_login" value="<?php esc_html_e( 'Already have an account?', 'miniorange-saml-20-single-sign-on' ); ?>" class="mo-saml-bootstrap-border-0 mo-saml-bootstrap-text-info mt-2 mo-saml-bootstrap-h6 mo-saml-alredy-have-btn">
+							<input type="button" name="back" value="<?php esc_html_e( 'Sign Up', 'miniorange-saml-20-single-sign-on' ); ?>" class="mo-saml-bootstrap-border-0 mo-saml-bootstrap-text-info mt-2 mo-saml-bootstrap-h6 mo-saml-alredy-have-btn" id="mo_saml_reg_back_btn">
 						</div>
 						<div class="mo-saml-bootstrap-text-center mo-saml-bootstrap-text-secondary mo-saml-bootstrap-mt-3 mo-saml-bootstrap-pe-4 mo-saml-bootstrap-ps-4">
-							<h6 class="mt-2 mo-saml-why-reg mo-saml-bootstrap-border mo-saml-bootstrap-rounded mo-saml-bootstrap-p-3">Need Help? Contact us at <a href="mailto:samlsupport@xecurify.com"><u class="mo-saml-bootstrap-text-info">samlsupport@xecurify.com</u></a> and we'll help you set up SSO with your IdP in no time.</h6>
+							<h6 class="mt-2 mo-saml-why-reg mo-saml-bootstrap-border mo-saml-bootstrap-rounded mo-saml-bootstrap-p-3"><?php esc_html_e( 'Need Help? Contact us at', 'miniorange-saml-20-single-sign-on' ); ?> <a href="mailto:samlsupport@xecurify.com"><u class="mo-saml-bootstrap-text-info">samlsupport@xecurify.com</u></a> <?php esc_html_e( 'and we\'ll help you set up SSO with your IdP in no time.', 'miniorange-saml-20-single-sign-on' ); ?></h6>
 						</div>
+						<?php mo_saml_show_plugin_download_steps(); ?>
 					</form>
 				</div>
 			</div>

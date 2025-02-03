@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdRuleTriggerTypeValues getInstance()
  */
-class AdRuleTriggerTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DELIVERY_INSIGHTS_CHANGE = 'DELIVERY_INSIGHTS_CHANGE';
-    const METADATA_CREATION = 'METADATA_CREATION';
-    const METADATA_UPDATE = 'METADATA_UPDATE';
-    const STATS_CHANGE = 'STATS_CHANGE';
-    const STATS_MILESTONE = 'STATS_MILESTONE';
+class AdRuleTriggerTypeValues extends AbstractEnum {
+
+  const DELIVERY_INSIGHTS_CHANGE = 'DELIVERY_INSIGHTS_CHANGE';
+  const METADATA_CREATION = 'METADATA_CREATION';
+  const METADATA_UPDATE = 'METADATA_UPDATE';
+  const STATS_CHANGE = 'STATS_CHANGE';
+  const STATS_MILESTONE = 'STATS_MILESTONE';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAssetFeedSpecVideoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADLABELS = 'adlabels';
-    const CAPTION_IDS = 'caption_ids';
-    const THUMBNAIL_HASH = 'thumbnail_hash';
-    const THUMBNAIL_URL = 'thumbnail_url';
-    const URL_TAGS = 'url_tags';
-    const VIDEO_ID = 'video_id';
-    public function getFieldTypes()
-    {
-        return array('adlabels' => 'list<AdAssetFeedSpecAssetLabel>', 'caption_ids' => 'list<string>', 'thumbnail_hash' => 'string', 'thumbnail_url' => 'string', 'url_tags' => 'string', 'video_id' => 'string');
-    }
+
+class AdAssetFeedSpecVideoFields extends AbstractEnum {
+
+  const ADLABELS = 'adlabels';
+  const CAPTION_IDS = 'caption_ids';
+  const THUMBNAIL_HASH = 'thumbnail_hash';
+  const THUMBNAIL_URL = 'thumbnail_url';
+  const URL_TAGS = 'url_tags';
+  const VIDEO_ID = 'video_id';
+
+  public function getFieldTypes() {
+    return array(
+      'adlabels' => 'list<AdAssetFeedSpecAssetLabel>',
+      'caption_ids' => 'list<string>',
+      'thumbnail_hash' => 'string',
+      'thumbnail_url' => 'string',
+      'url_tags' => 'string',
+      'video_id' => 'string',
+    );
+  }
 }

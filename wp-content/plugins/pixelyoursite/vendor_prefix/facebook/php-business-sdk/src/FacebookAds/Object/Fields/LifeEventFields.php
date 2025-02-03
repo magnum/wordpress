@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LifeEventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const END_TIME = 'end_time';
-    const FROM = 'from';
-    const ID = 'id';
-    const IS_HIDDEN = 'is_hidden';
-    const START_TIME = 'start_time';
-    const TITLE = 'title';
-    const UPDATED_TIME = 'updated_time';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'end_time' => 'datetime', 'from' => 'Page', 'id' => 'string', 'is_hidden' => 'bool', 'start_time' => 'datetime', 'title' => 'string', 'updated_time' => 'datetime');
-    }
+
+class LifeEventFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const END_TIME = 'end_time';
+  const FROM = 'from';
+  const ID = 'id';
+  const IS_HIDDEN = 'is_hidden';
+  const START_TIME = 'start_time';
+  const TITLE = 'title';
+  const UPDATED_TIME = 'updated_time';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'end_time' => 'datetime',
+      'from' => 'Page',
+      'id' => 'string',
+      'is_hidden' => 'bool',
+      'start_time' => 'datetime',
+      'title' => 'string',
+      'updated_time' => 'datetime',
+    );
+  }
 }

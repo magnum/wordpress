@@ -113,10 +113,7 @@ class WPCF7_ConstantContact extends WPCF7_Service_OAuth2 {
 	}
 
 	public function link() {
-		echo sprintf( '<a href="%1$s">%2$s</a>',
-			'https://constant-contact.evyy.net/c/1293104/205991/3411',
-			'constantcontact.com'
-		);
+		echo 'constantcontact.com';
 	}
 
 	protected function get_redirect_uri() {
@@ -247,7 +244,7 @@ class WPCF7_ConstantContact extends WPCF7_Service_OAuth2 {
 				'Accept' => 'application/json',
 				'Content-Type' => 'application/json; charset=utf-8',
 			),
-			'body' => json_encode( $properties ),
+			'body' => wp_json_encode( $properties ),
 		);
 
 		$response = $this->remote_request( $endpoint, $request );
@@ -344,28 +341,43 @@ class WPCF7_ConstantContact extends WPCF7_Service_OAuth2 {
 	public function admin_notice( $message = '' ) {
 		switch ( $message ) {
 			case 'success':
-				echo sprintf(
-					'<div class="notice notice-success"><p>%s</p></div>',
-					esc_html( __( "Connection established.", 'contact-form-7' ) )
+				wp_admin_notice(
+					esc_html( __( "Connection established.", 'contact-form-7' ) ),
+					'type=success'
 				);
+
 				break;
 			case 'failed':
-				echo sprintf(
-					'<div class="notice notice-error"><p><strong>%1$s</strong>: %2$s</p></div>',
-					esc_html( __( "Error", 'contact-form-7' ) ),
-					esc_html( __( "Failed to establish connection. Please double-check your configuration.", 'contact-form-7' ) )
+				wp_admin_notice(
+					sprintf(
+						'<strong>%1$s</strong>: %2$s',
+						esc_html( __( "Error", 'contact-form-7' ) ),
+						esc_html( __( "Failed to establish connection. Please double-check your configuration.", 'contact-form-7' ) )
+					),
+					'type=error'
 				);
+
 				break;
 			case 'updated':
-				echo sprintf(
-					'<div class="notice notice-success"><p>%s</p></div>',
-					esc_html( __( "Configuration updated.", 'contact-form-7' ) )
+				wp_admin_notice(
+					esc_html( __( "Configuration updated.", 'contact-form-7' ) ),
+					'type=success'
 				);
+
 				break;
 		}
 	}
 
 	public function display( $action = '' ) {
+		echo sprintf(
+			'<p><strong>%1$s</strong> %2$s</p>',
+			esc_html( __( 'Warning:', 'contact-form-7' ) ),
+			wpcf7_link(
+				__( 'https://contactform7.com/2024/02/02/we-end-the-constant-contact-integration/', 'contact-form-7' ),
+				__( "This feature is deprecated. You are not recommended to use it.", 'contact-form-7' )
+			)
+		);
+
 		echo sprintf(
 			'<p>%s</p>',
 			esc_html( __( "The Constant Contact integration module allows you to send contact data collected through your contact forms to the Constant Contact API. You can create reliable email subscription services in a few easy steps.", 'contact-form-7' ) )

@@ -16,27 +16,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 		General
 	</div>
 	<div class="card-body">
-        <div class="row mb-3">
-            <div class="col">
-                <?php Facebook()->render_switcher_input( 'enabled' ); ?>
-                <h4 class="switcher-label">Enable Meta Pixel (formerly Facebook Pixel)</h4>
-            </div>
-        </div>
 		<div class="row">
 			<div class="col">
 				<?php Facebook()->render_switcher_input( 'advanced_matching_enabled' ); ?>
 				<h4 class="switcher-label">Enable Advanced Matching</h4>
-                <div class="alert alert-primary mt-3">Because of a Facebook error, when Advanced Matching is ON, Custom
-                    Audiences based on the pixel
-                    will not show the size number ("Size: -1", or "Size Unavailable"). They will still work fine for
-                    retargeting or Lookalike Audiences. Details <a href="https://www.pixelyoursite
-                    .com/facebook-audience-size-not-available" target="_blank">here</a>.</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col">
 				<?php Facebook()->render_switcher_input( 'remove_metadata' ); ?>
-				<h4 class="switcher-label">Remove Facebook default events</h4>
+				<h4 class="switcher-label">autoConfig: false</h4>
+                <p><small>Remove Facebook default events</small></p>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<div class="col">
+				<?php Facebook()->render_switcher_input( 'disable_noscript' ); ?>
+				<h4 class="switcher-label">Disable noscript</h4>
 			</div>
 		</div>
         <!--
@@ -44,13 +40,44 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="col">
                 <?php Facebook()->render_switcher_input( 'send_external_id_demo',false,true ); ?>
                 <h4 class="switcher-label">Send external id</h4>
-                <?php renderProBadge();?>
+                <?php renderProBadge(); ?>
             </div>
         </div>
         -->
 	</div>
 </div>
 
+<!-- Medical Switch -->
+<div class="card card-static">
+    <div class="card-header">
+        Medical Content
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <?php Facebook()->render_switcher_input( 'enabled_medical' ); ?>
+                <h4 class="switcher-label"><?php _e('Don\'t track parameters', 'pys');?></h4>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <p>
+                    Meta imposes restrictions on tracking data for websites with medical-related content and products. Use this option to disable event parameters that might track such data. These settings apply to Meta Pixel and CAPI events. To disable parameters for all tags, use the default parameter controls.
+                </p>
+                <p>
+                    To replace the standard WooCommerce AddToCart or Purchase events with custom events, you’ll need the Pro version, as this functionality is only available on the Events Page in Pro. <?php renderProBadge(); ?>
+                </p>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <p><?php _e('Don\'t track these parameters for the Meta pixel and CAPI events:', 'pys');?></p>
+                <?php Facebook()->render_multi_select_input('do_not_track_medical_param', getAllMetaEventParamName()); ?>
+                <p><?php _e('If you want to disable parameters for all tags, use the default options from the plugin\'s main page, or from the WooCommerce and EDD pages.', 'pys');?></p>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="panel">
     <div class="row">
         <div class="col text-center">

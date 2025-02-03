@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static OfflineConversionDataSetUploadSortByValues getInstance()
  */
-class OfflineConversionDataSetUploadSortByValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const API_CALLS = 'API_CALLS';
-    const CREATION_TIME = 'CREATION_TIME';
-    const EVENT_TIME_MAX = 'EVENT_TIME_MAX';
-    const EVENT_TIME_MIN = 'EVENT_TIME_MIN';
-    const FIRST_UPLOAD_TIME = 'FIRST_UPLOAD_TIME';
-    const IS_EXCLUDED_FOR_LIFT = 'IS_EXCLUDED_FOR_LIFT';
-    const LAST_UPLOAD_TIME = 'LAST_UPLOAD_TIME';
+class OfflineConversionDataSetUploadSortByValues extends AbstractEnum {
+
+  const API_CALLS = 'API_CALLS';
+  const CREATION_TIME = 'CREATION_TIME';
+  const EVENT_TIME_MAX = 'EVENT_TIME_MAX';
+  const EVENT_TIME_MIN = 'EVENT_TIME_MIN';
+  const FIRST_UPLOAD_TIME = 'FIRST_UPLOAD_TIME';
+  const IS_EXCLUDED_FOR_LIFT = 'IS_EXCLUDED_FOR_LIFT';
+  const LAST_UPLOAD_TIME = 'LAST_UPLOAD_TIME';
 }

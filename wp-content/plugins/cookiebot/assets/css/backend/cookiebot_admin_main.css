@@ -9,7 +9,7 @@
 
 #wpcontent {
     padding-left: 0;
-    font-family: Inter;
+    font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
     background-color: #ffffff;
 }
 
@@ -20,11 +20,12 @@
 }
 
 .cb-header {
-    padding: 15px 25px;
+    padding: 20px 25px 15px;
     border-bottom: 1px solid #d3d3d3;
 }
 
 .cb-body {
+    min-height: 80vh;
     padding: 50px 25px 0;
 }
 
@@ -121,17 +122,20 @@
     text-decoration: none;
     padding: 15px;
     font-size: 15px;
+    line-height: 20px;
     font-weight: 500;
     border-radius: 7px;
     border: none;
     cursor: pointer;
+    box-shadow: unset;
+    outline: unset;
 }
 
 .cb-btn.hidden {
     display: none;
 }
 
-.cb-main-btn {
+.cb-main-btn, .cb-main-btn:focus {
     background-color: #1032cf;
     color: #ffffff;
 }
@@ -141,7 +145,7 @@
     color: #ffffff;
 }
 
-.cb-white-btn {
+.cb-white-btn, .cb-white-btn:focus {
     background-color: #ffffff;
     color: #141414;
 }
@@ -150,7 +154,7 @@
     color: #666666;
 }
 
-.cb-link-btn {
+.cb-link-btn, .cb-link-btn:focus {
     background-color: transparent;
     color: #1032cf;
     padding: 0;
@@ -165,7 +169,7 @@
     text-align: right;
 }
 
-.cb-success-btn {
+.cb-success-btn, .cb-success-btn:focus {
     background-color: #076646;
     color: #ffffff;
     text-align: center;
@@ -232,6 +236,11 @@ input[type=checkbox]:checked:before {
     mask-size: contain;
 }
 
+.cb-settings__config__data__inner label:not(.switch-checkbox) input[type="radio"],
+.cb-settings__config__data__inner label:not(.switch-checkbox) input[type="checkbox"] {
+    margin-left: -30px;
+}
+
 textarea {
     width: 100%;
     border: 2px solid #d3d3d3;
@@ -256,6 +265,7 @@ textarea {
 .switch-checkbox .switcher {
     cursor: pointer;
     width: 70px;
+    min-width: 70px;
     height: 40px;
     margin-right: 10px;
     background-color: #141414;
@@ -290,6 +300,10 @@ textarea {
     width: 30px;
 }
 
+.switch-checkbox input[type=checkbox]:disabled + .switcher {
+    opacity: .5;
+}
+
 .cb-submit__msg {
     box-sizing: border-box;
     width: 468px;
@@ -322,4 +336,107 @@ textarea {
     font-weight: 700;
     font-family: monospace;
     font-size: 23px;
+}
+
+.cb-settings__selector__container {
+    position: relative;
+}
+
+.cb-settings__selector__container .cb-settings__selector-selector {
+    position: relative;
+    width: 100%;
+    background-color: #ffffff;
+    color: #141414;
+    border: 2px solid #d3d3d3;
+    border-radius: 7px;
+    padding: 8px 15px;
+    box-sizing: border-box;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 27px;
+    min-height: 30px;
+    cursor: pointer;
+}
+
+.cb-settings__selector__container .cb-settings__selector-selector:after {
+    content: url(../../img/icons/down.svg);
+    position: absolute;
+    top: 7px;
+    right: 12px;
+}
+
+.cb-settings__selector__container .cb-settings__selector-list-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+    background-color: #ffffff;
+    box-shadow: 0px 8px 24px rgb(0 0 0 / 25%);
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 20px 16px;
+}
+
+.cb-settings__selector__container .cb-settings__selector-veil {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.cb-settings__selector__container .cb-settings__selector-search {
+    position: relative;
+    margin-bottom: 16px;
+    padding: 5px 8px;
+    z-index: 1;
+}
+
+.cb-settings__selector__container .cb-settings__selector-list {
+    display: flex;
+    flex-direction: column;
+    height: 160px;
+    overflow-y: scroll;
+}
+
+
+.cb-settings__selector__container .cb-settings__selector-list > .cb-settings__selector-list-item {
+    position: relative;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 24px;
+    padding: 10px 15px;
+    margin-bottom: 3px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cb-settings__selector__container .cb-settings__selector-list > .cb-settings__selector-list-item:hover {
+    background-color: #f2f2f2;
+    color: #1032CF;
+}
+
+.cb-settings__selector__container .cb-settings__selector-list > .cb-settings__selector-list-item.selected{
+    background-color: #ECEFFE;
+    color: #1032CF;
+    order: -1;
+}
+
+.cb-settings__selector__container .cb-settings__selector-list > .cb-settings__selector-list-item.selected:after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    background-color: #1032cf;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-image: url(../../img/icons/check.svg);
+    mask-image: url(../../img/icons/check.svg);
 }

@@ -27,7 +27,7 @@ class Facebook_Helpers {
 	 *
 	 * @var mixed $load_options
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * The endpoint uri.
@@ -167,9 +167,9 @@ class Facebook_Helpers {
 	 */
 	public function has_connection_data() {
 
-		$facebook_options_user = get_option( self::OPTION_KEY, array() );
+		$facebook_options_user = automator_get_option( self::OPTION_KEY, array() );
 
-		$facebook_options_pages = get_option( '_uncannyowl_facebook_pages_settings', array() );
+		$facebook_options_pages = automator_get_option( '_uncannyowl_facebook_pages_settings', array() );
 
 		if ( ! empty( $facebook_options_user ) && ! empty( $facebook_options_pages ) ) {
 			return true;
@@ -223,13 +223,13 @@ class Facebook_Helpers {
 			$settings['user-info'] = $this->get_user_information( $settings['user']['id'], $settings['user']['token'] );
 
 			// Updates the option value to settings.
-			update_option( self::OPTION_KEY, $settings, false );
+			automator_update_option( self::OPTION_KEY, $settings, true );
 
 			// Updates the option value to settings.
-			update_option( self::OPTION_KEY, $settings, false );
+			automator_update_option( self::OPTION_KEY, $settings, true );
 
 			// Delete any user info left.
-			delete_option( '_uncannyowl_facebook_pages_settings' );
+			automator_delete_option( '_uncannyowl_facebook_pages_settings' );
 
 		}
 
@@ -268,32 +268,29 @@ class Facebook_Helpers {
 	 */
 	public function automator_integration_facebook_capture_token_fetch_user_pages() {
 
-		if ( wp_verify_nonce( automator_filter_input( 'nonce', INPUT_POST ), 'uncanny_automator' ) ) {
+		if ( ! wp_verify_nonce( automator_filter_input( 'nonce', INPUT_POST ), 'uncanny_automator' ) ) {
 
-			$existing_page_settings = get_option( '_uncannyowl_facebook_pages_settings' );
+			wp_die( 'Invalid nonce', 403 );
 
-			$error_message = '';
-
-			if ( false !== $existing_page_settings ) {
-
-				if ( empty( $existing_page_settings ) ) {
-					$error_message = esc_html__( 'There are no pages found.', 'uncanny-automator' );
-				}
-
-				wp_send_json(
-					array(
-						'status'        => 200,
-						'message'       => __( 'Successful', 'automator-pro' ),
-						'pages'         => $existing_page_settings,
-						'error_message' => $error_message,
-					)
-				);
-
-			} else {
-				$pages = $this->fetch_pages_from_api();
-				wp_send_json( $pages );
-			}
 		}
+
+		$existing_pages = automator_get_option( '_uncannyowl_facebook_pages_settings', false );
+
+		if ( ! empty( $existing_pages ) ) {
+
+			$response = array(
+				'status'  => 200,
+				'message' => '',
+				'pages'   => $existing_pages,
+			);
+
+			wp_send_json( $response );
+
+		}
+
+		$pages = $this->fetch_pages_from_api();
+
+		wp_send_json( $pages );
 
 	}
 
@@ -305,7 +302,7 @@ class Facebook_Helpers {
 	 */
 	public function fetch_pages_from_api() {
 
-		$settings = get_option( self::OPTION_KEY );
+		$settings = automator_get_option( self::OPTION_KEY );
 
 		$message = '';
 
@@ -346,15 +343,20 @@ class Facebook_Helpers {
 			$message = esc_html__( 'Pages are fetched successfully', 'uncanny-automator' );
 
 			// Save the option.
-			update_option( '_uncannyowl_facebook_pages_settings', $pages, false );
+			automator_update_option( '_uncannyowl_facebook_pages_settings', $pages, true );
 
 		} catch ( \Exception $e ) {
 
 			// Assign the exception code as status code.
 			$status = $e->getCode();
+
 			// Assign the exception message as the message.
 			$message = $e->getMessage();
 
+		}
+
+		if ( empty( $pages ) ) {
+			$message = esc_html__( 'No Facebook Pages were found linked to this account. Please click the button below to re-authenticate and ensure the correct pages and permissions are selected.', 'uncanny-automator' );
 		}
 
 		$response = array(
@@ -392,7 +394,7 @@ class Facebook_Helpers {
 	 */
 	public function is_user_connected() {
 
-		$settings = get_option( self::OPTION_KEY );
+		$settings = automator_get_option( self::OPTION_KEY );
 
 		if ( ! $settings || empty( $settings ) ) {
 			return false;
@@ -450,7 +452,7 @@ class Facebook_Helpers {
 			return false;
 		}
 
-		return get_option( self::OPTION_KEY );
+		return automator_get_option( self::OPTION_KEY );
 
 	}
 
@@ -505,7 +507,7 @@ class Facebook_Helpers {
 
 		$pages = array();
 
-		$options_pages = get_option( '_uncannyowl_facebook_pages_settings' );
+		$options_pages = automator_get_option( '_uncannyowl_facebook_pages_settings' );
 
 		foreach ( $options_pages as $page ) {
 			$pages[] = array(
@@ -521,21 +523,67 @@ class Facebook_Helpers {
 	/**
 	 * Get the user page access tokens.
 	 *
+	 * @param string $page_id
+	 *
 	 * @return string
 	 */
 	public function get_user_page_access_token( $page_id ) {
 
-		$options_pages = get_option( '_uncannyowl_facebook_pages_settings' );
+		$options_pages = (array) automator_get_option( '_uncannyowl_facebook_pages_settings', array() );
 
 		if ( ! empty( $options_pages ) ) {
 			foreach ( $options_pages as $page ) {
+				// These are both strings.
 				if ( $page['value'] === $page_id ) {
 					return $page['page_access_token'];
 				}
 			}
 		}
 
-		throw new \Exception( __( 'Facebook is not connected', 'uncanny-automator' ) );
+		// Details for debugging.
+		$details = array(
+			'selected_page_id' => $page_id,
+			'options_pages'    => $this->redact_page_access_token( $options_pages ),
+		);
+
+		throw new \Exception(
+			sprintf(
+				/* translators: Error exception message */
+				esc_html_x(
+					'Unable to locate a valid access token for the specified Facebook Page. Please edit the recipe and ensure that you have selected the correct Facebook page, then resave the action. Additionally, you can attempt to reconnect the account by navigating to Automator > App Integrations > Facebook Pages. %s',
+					'Facebook pages',
+					'uncanny-automator'
+				),
+				wp_json_encode( $details )
+			),
+			400
+		);
+	}
+
+	/**
+	 * Redacts the page access token for privacy.
+	 *
+	 * @since 5.2
+	 *
+	 * @param array $options_pages
+	 *
+	 * @return mixed[] The options_pages value
+	 */
+	private function redact_page_access_token( $options_pages = array() ) {
+
+		$redacted = array();
+
+		if ( ! empty( $options_pages ) ) {
+			foreach ( $options_pages as $page ) {
+				$redacted[] = array(
+					'value'             => isset( $page['value'] ) ? $page['value'] : null,
+					'text'              => isset( $page['text'] ) ? $page['text'] : null,
+					'page_access_token' => substr( $page['page_access_token'], 0, 10 ) . '-<redacted>',
+				);
+			}
+		}
+
+		return $redacted;
 	}
 
 	/**
@@ -566,7 +614,7 @@ class Facebook_Helpers {
 			'endpoint' => self::API_ENDPOINT,
 			'body'     => $body,
 			'action'   => $action_data,
-			'timeout'  => 10,
+			'timeout'  => 30,
 		);
 
 		$response = Api_Server::api_call( $params );
@@ -590,7 +638,7 @@ class Facebook_Helpers {
 			'endpoint' => self::API_ENDPOINT,
 			'body'     => $body,
 			'action'   => null,
-			'timeout'  => 10,
+			'timeout'  => 30,
 		);
 
 		return Api_Server::api_call( $params );
@@ -635,7 +683,7 @@ class Facebook_Helpers {
 
 		// Determine if user is connecting Facebook groups.
 		$is_capturing_token = wp_doing_ajax()
-			&& $this->wp_ajax_action === automator_filter_input( 'action' );
+			&& automator_filter_input( 'action' ) === $this->wp_ajax_action;
 
 		// Checks if from recipe edit page.
 		$current_screen           = get_current_screen();
@@ -655,9 +703,9 @@ class Facebook_Helpers {
 	private function remove_credentials() {
 
 		// Delete the credentials
-		delete_option( self::OPTION_KEY );
+		automator_delete_option( self::OPTION_KEY );
 		// Delete settings info.
-		delete_option( '_uncannyowl_facebook_pages_settings' );
+		automator_delete_option( '_uncannyowl_facebook_pages_settings' );
 
 		return true;
 	}

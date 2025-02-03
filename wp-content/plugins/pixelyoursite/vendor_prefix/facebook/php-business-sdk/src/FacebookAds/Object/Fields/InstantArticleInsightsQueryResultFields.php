@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class InstantArticleInsightsQueryResultFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BREAKDOWNS = 'breakdowns';
-    const NAME = 'name';
-    const TIME = 'time';
-    const VALUE = 'value';
-    public function getFieldTypes()
-    {
-        return array('breakdowns' => 'map<string, string>', 'name' => 'string', 'time' => 'datetime', 'value' => 'string');
-    }
+
+class InstantArticleInsightsQueryResultFields extends AbstractEnum {
+
+  const BREAKDOWNS = 'breakdowns';
+  const NAME = 'name';
+  const TIME = 'time';
+  const VALUE = 'value';
+
+  public function getFieldTypes() {
+    return array(
+      'breakdowns' => 'map<string, string>',
+      'name' => 'string',
+      'time' => 'datetime',
+      'value' => 'string',
+    );
+  }
 }

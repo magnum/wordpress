@@ -2,10 +2,10 @@
 Author URI: https://www.godaddy.com
 Contributors: godaddy, richtabor, eherman24, jonathanbardo, jrtashjian, paranoia1906, fjarrett, olivierlafleur, jasonlemay, snovosel
 Tags: page builder, Gutenberg blocks, WordPress blocks, gutenberg, blocks
-Requires at least: 5.5
-Tested up to: 6.1
+Requires at least: 6.3
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.25.5
+Stable tag: 3.1.14
 License: GPL-2.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,50 +120,124 @@ Any properly developed WordPress theme will work with CoBlocks, though if you're
 
 Developers can also apply minor style touch-ups to their themes if necessary. If you're a developer and you need help, don't hesitate to [reach out](https://wordpress.org/support/plugin/coblocks/).
 
+= What version of WordPress does CoBlocks work on? =
+CoBlocks is designed to support the last two major versions of WordPress that are currently released. If you're using one of these versions, you're all set to enjoy everything CoBlocks has to offer!
+
 == Changelog ==
 
-= 2.25.5 / 2022-12-20 =
+= 3.1.14 / 2024-12-20 =
+# Bug Fix
+* Improve nonce handling and permissions in crop settings API. [#2624](https://github.com/godaddy-wordpress/coblocks/pull/2624)
 
-* Fix form button colors and resolve color bleed  [#2461](https://github.com/godaddy-wordpress/coblocks/pull/2461)
+= 3.1.13 / 2024-07-25 =
+# Bug fix
+* Fix block migration error without dependency [#2619](https://github.com/godaddy-wordpress/coblocks/pull/2619)
+* Fix unescaped excerpts in Posts Blocks - Thank you CleanTalk and Dmitrii Ignatyev [#2618](https://github.com/godaddy-wordpress/coblocks/pull/2618)
 
-= 2.25.4 / 2022-12-16 =
+= 3.1.12 / 2024-06-24 =
+# Misc
+* Use `wp_safe_remote_get()` to retreive remote `.ics` data [#2614](https://github.com/godaddy-wordpress/coblocks/pull/2614)
 
-* Improve Form block a11y text [a0b764a3](https://github.com/godaddy-wordpress/coblocks/commit/a0b764a35ed2b9b0cafc48df808383523cc16d58)
-* Fix Form block button style issue [#2449](https://github.com/godaddy-wordpress/coblocks/pull/2449)
-* Update dependencies [#2453](https://github.com/godaddy-wordpress/coblocks/pull/2453), [#2455](https://github.com/godaddy-wordpress/coblocks/pull/2455) and [#2459](https://github.com/godaddy-wordpress/coblocks/pull/2459)
-* Fix Github auth in CircleCI [#2456](https://github.com/godaddy-wordpress/coblocks/pull/2456)
+= 3.1.11 / 2024-06-13 =
+# Bug fix
+* Fix disappearing buttons in Services block [#2613](https://github.com/godaddy-wordpress/coblocks/pull/2613)
 
-= 2.25.3 / 2022-12-05 =
 
-* Fix how/when the Template Selector shows [#2448](https://github.com/godaddy-wordpress/coblocks/pull/2448)
+= 3.1.10 / 2024-05-30 =
+# Bug fix
+* Fix a possible XSS vector [#2612](https://github.com/godaddy-wordpress/coblocks/pull/2612)
 
-= 2.25.2 / 2022-11-15 =
+= 3.1.9 / 2024-04-30 =
+# Bug fix
+* Prevent local URLs from loading with events block [#2607](https://github.com/godaddy-wordpress/coblocks/pull/2607)
+* Fix Site Content extension loading outside of editor [#2609](https://github.com/godaddy-wordpress/coblocks/pull/2609)
+* Fix Site Design extension failing dom operations [#2610](https://github.com/godaddy-wordpress/coblocks/pull/2610)
 
-* Hotfix Site Design controls [#2446](https://github.com/godaddy-wordpress/coblocks/pull/2446)
+= 3.1.8 / 2024-04-02 =
+# Enhancements
+* Introduce WP 6.5 compatibility [#2601](https://github.com/godaddy-wordpress/coblocks/pull/2601)
+* Introduce PHP 8.3 compatibility [#2600](https://github.com/godaddy-wordpress/coblocks/pull/2600)
 
-= 2.25.1 / 2022-11-14 =
+# Bug fix
+* Fix bug around CoBlocks patterns [#2599](https://github.com/godaddy-wordpress/coblocks/pull/2599)
 
-* Enhance a11y accessibility across blocks. [#2430](https://github.com/godaddy-wordpress/coblocks/pull/2430)
-* Improve reliability of Site Design controls. [#2442](https://github.com/godaddy-wordpress/coblocks/pull/2442)
+# Misc
+* Improve tests for WP 6.5 [#2597](https://github.com/godaddy-wordpress/coblocks/pull/2597)
+* Improve CICD logic for WP 6.5 [#2590](https://github.com/godaddy-wordpress/coblocks/pull/2590)
 
-= 2.25.0 / 2022-11-03 =
+= 3.1.7 / 2024-03-11 =
 
-* Compatibility with WP 6.1 [#2439](https://github.com/godaddy-wordpress/coblocks/pull/2439)
-* Drop support for PHP 5.6 [#2408](https://github.com/godaddy-wordpress/coblocks/pull/2408)
-* Introduce Accessibility tests for CoBlocks [#2427](https://github.com/godaddy-wordpress/coblocks/pull/2427)
-* Disable color controls for WordPress 6.1+ [#2420](https://github.com/godaddy-wordpress/coblocks/pull/2420)
-* Fix 404 on CSS dependency [#2438](https://github.com/godaddy-wordpress/coblocks/pull/2438)
-* Fix Lightbox being opened with improper keypress [#2432](https://github.com/godaddy-wordpress/coblocks/pull/2432)
-* Make sure that the Welcome Guide does not show in the Cypress tests [#2441](https://github.com/godaddy-wordpress/coblocks/pull/2441)
-* Fix conditional to determine if we are using a WP version >= WP 6.1 in the tests [#2437](https://github.com/godaddy-wordpress/coblocks/pull/2437)
-* Fix broken tests with WP 6.1 RC1 [#2435](https://github.com/godaddy-wordpress/coblocks/pull/2435)
+# Bug Fix
+* Security issue patched [#2594](https://github.com/godaddy-wordpress/coblocks/pull/2594)
 
-= 2.24.4 / 2022-09-16 =
+= 3.1.6 / 2024-02-28 =
 
-* Update Go commands to fix deploy and canary [#2425](https://github.com/godaddy-wordpress/coblocks/pull/2425) and [#2426](https://github.com/godaddy-wordpress/coblocks/pull/2426)
+# Enhancements
+* Introduce a blueprint for WordPress preview [#2580](https://github.com/godaddy-wordpress/coblocks/pull/2580)
 
-= 2.24.3 / 2022-09-16 =
+# Bug fix
+* Load extension styles for core blocks [#2591](https://github.com/godaddy-wordpress/coblocks/pull/2591)
+* Fix Lightbox for all CoBlocks galleries [#2589](https://github.com/godaddy-wordpress/coblocks/pull/2589)
+* Fix Lightbox with A3 Lazy Loading plugin [#2588](https://github.com/godaddy-wordpress/coblocks/pull/2588)
 
-* Fix button order in editor header [#2423](https://github.com/godaddy-wordpress/coblocks/pull/2423)
-* Upgrade to Cypress 10 [#2424](https://github.com/godaddy-wordpress/coblocks/pull/2424)
-* Update various dependencies [#2422](https://github.com/godaddy-wordpress/coblocks/pull/2422) and [#2412](https://github.com/godaddy-wordpress/coblocks/pull/2412)
+# Misc
+* Encode URI component in Typography settings [#2584](https://github.com/godaddy-wordpress/coblocks/pull/2584)
+
+= 3.1.5 / 2023-11-06 =
+
+# Enhancements
+* Compatibility changes for WP 6.4 [#2568](https://github.com/godaddy-wordpress/coblocks/pull/2568)
+
+# Bug fix
+* Fix performance around superfluous data-store selectors [#2575](https://github.com/godaddy-wordpress/coblocks/pull/2575)
+* Fix missing animation scripts in some cases [#2576](https://github.com/godaddy-wordpress/coblocks/pull/2576)
+* Fix php warning occurring in some cases [#2572](https://github.com/godaddy-wordpress/coblocks/pull/2572)
+
+= 3.1.4 / 2023-09-07 =
+
+* Fix missing registered scripts [#2566](https://github.com/godaddy-wordpress/coblocks/pull/2566)
+
+= 3.1.3 / 2023-08-28 =
+
+# Bug fix
+* Fix text formatting bug [#2563](https://github.com/godaddy-wordpress/coblocks/pull/2563)
+* Fix Lightbox for Masonry block [#2565](https://github.com/godaddy-wordpress/coblocks/pull/2565)
+
+# Misc
+* Set supported version to 6.1 [#2564](https://github.com/godaddy-wordpress/coblocks/pull/2564)
+
+= 3.1.2 / 2023-08-10 =
+
+# Bug fix
+* Resolve Shape Divider bug [#2553](https://github.com/godaddy-wordpress/coblocks/pull/2553)
+* Resolve Form Label warnings [#2555](https://github.com/godaddy-wordpress/coblocks/pull/2555)
+* Resolve Form Array condition [#2557](https://github.com/godaddy-wordpress/coblocks/pull/2557)
+* Fix Form name content order [#2558](https://github.com/godaddy-wordpress/coblocks/pull/2558)
+
+= 3.1.1 / 2023-08-09 =
+
+# Bug fix
+* Correct `Requires at least` value to 6.2 [#2552](https://github.com/godaddy-wordpress/coblocks/pull/2552)
+
+
+= 3.1.0 / 2023-08-08 =
+
+# Enhancements
+* Register all blocks in PHP [#2521](https://github.com/godaddy-wordpress/coblocks/pull/2521)
+
+# Bug fix
+* Fix captions RichText controls across all galleries [#2545](https://github.com/godaddy-wordpress/coblocks/pull/2545)
+* Fix form block test automation with WP 6.3 [#2546](https://github.com/godaddy-wordpress/coblocks/pull/2546)
+* Fix form block saving with WP 6.3 [#2543](https://github.com/godaddy-wordpress/coblocks/pull/2543)
+* Fix blocks for WP 6.3 compatibility [#2538](https://github.com/godaddy-wordpress/coblocks/pull/2538)
+* Fix PHP Unit tests & update to WP-ENV 8.1.1 [#2544](https://github.com/godaddy-wordpress/coblocks/pull/2544)
+
+
+= 3.0.4 / 2023-06-22 =
+
+# Bug fix
+* Validate Site Design nonce and capabilities [#2535](https://github.com/godaddy-wordpress/coblocks/pull/2535)
+
+# Misc
+* Fix Typo in lightbox code and resolve CI issues [#2534](https://github.com/godaddy-wordpress/coblocks/pull/2534)
+* Update wp-env package [#2532](https://github.com/godaddy-wordpress/coblocks/pull/2532)

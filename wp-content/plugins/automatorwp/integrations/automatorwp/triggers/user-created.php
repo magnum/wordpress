@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_AutomatorWP_User_Created extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'automatorwp';
-    public $trigger = 'automatorwp_user_created';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_user_created';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -141,4 +152,5 @@ class AutomatorWP_AutomatorWP_User_Created extends AutomatorWP_Integration_Trigg
 
 }
 
-new AutomatorWP_AutomatorWP_User_Created();
+new AutomatorWP_AutomatorWP_User_Created( 'automatorwp' );
+new AutomatorWP_AutomatorWP_User_Created( 'users' );

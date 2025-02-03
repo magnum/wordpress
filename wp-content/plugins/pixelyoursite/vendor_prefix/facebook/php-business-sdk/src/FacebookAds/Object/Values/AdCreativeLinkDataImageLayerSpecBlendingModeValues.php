@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeLinkDataImageLayerSpecBlendingModeValues getInstance()
  */
-class AdCreativeLinkDataImageLayerSpecBlendingModeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LIGHTEN = 'lighten';
-    const MULTIPLY = 'multiply';
-    const NORMAL = 'normal';
+class AdCreativeLinkDataImageLayerSpecBlendingModeValues extends AbstractEnum {
+
+  const LIGHTEN = 'lighten';
+  const MULTIPLY = 'multiply';
+  const NORMAL = 'normal';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AREffectsBatchStatusFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ERRORS = 'errors';
-    const PRODUCT_GROUPS = 'product_groups';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('errors' => 'list<string>', 'product_groups' => 'list<Object>', 'status' => 'string');
-    }
+
+class AREffectsBatchStatusFields extends AbstractEnum {
+
+  const ERRORS = 'errors';
+  const PRODUCT_GROUPS = 'product_groups';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'errors' => 'list<string>',
+      'product_groups' => 'list<Object>',
+      'status' => 'string',
+    );
+  }
 }

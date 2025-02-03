@@ -31,6 +31,11 @@ class Automator_Send_Webhook {
 	private $field_separator;
 
 	/**
+	 * @var
+	 */
+	private $boundary;
+
+	/**
 	 * Instance of Automator_Send_Webhook
 	 *
 	 * @return Automator_Send_Webhook
@@ -51,6 +56,76 @@ class Automator_Send_Webhook {
 		$this->field_separator = apply_filters( 'automator_send_webhook_field_separator', '/' );
 		require_once __DIR__ . '/class-automator-send-webhook-fields.php';
 		$this->fields = Automator_Send_Webhook_Fields::get_instance();
+
+		// Register hooks.
+		add_filter( 'automator_field_values_before_save', array( $this, 'encrypt_authorization_values' ), 10, 2 );
+	}
+
+	/**
+	 * Encrypt authorization vallues.
+	 *
+	 * @param mixed $meta_value
+	 * @param mixed $item
+	 *
+	 * @return string
+	 */
+	public function encrypt_authorization_values( $meta_value, $item ) {
+
+		if ( ! isset( $meta_value['WEBHOOK_AUTHORIZATIONS'] ) ) {
+			return $meta_value;
+		}
+
+		$authorization = $meta_value['WEBHOOK_AUTHORIZATIONS'];
+
+		if ( empty( $authorization ) ) {
+			return $meta_value;
+		}
+
+		$item_id = $_POST['itemId'] ?? null; //phpcs:ignore
+
+		// Check if the string contains tokens.
+		if ( preg_match( '/\{\{.*?\}\}/', $authorization ) ) {
+			// Delete the original value if exists.
+			delete_post_meta( $item_id, 'WEBHOOK_AUTHORIZATIONS_ORIGINAL' );
+			return $meta_value;
+		}
+
+		// Trim all * and see if a new string is entered
+		$authorization = trim( $authorization, '*' );
+
+		if ( strlen( $authorization ) > 3 ) { // check if trimmed string is over 3 chars
+			$authorization = addslashes( $authorization );
+			update_post_meta( $item_id, 'WEBHOOK_AUTHORIZATIONS_ORIGINAL', $authorization );
+			$meta_value['WEBHOOK_AUTHORIZATIONS'] = $this->hide_string( $authorization );
+		} else {
+			// Delete the original value if exists.
+			delete_post_meta( $item_id, 'WEBHOOK_AUTHORIZATIONS_ORIGINAL' );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * Hides a portion of string.
+	 *
+	 * @param mixed $string
+	 *
+	 * @return mixed
+	 */
+	protected function hide_string( $string ) {
+
+		$length = strlen( $string );
+
+		// If the string is shorter than or equal to 3 characters, return the original string
+		if ( $length <= 3 ) {
+			return $string;
+		}
+
+		// Replace characters except the last 3 with asterisks
+		$hidden_part  = str_repeat( '*', $length - 3 );
+		$visible_part = substr( $string, - 3 );
+
+		return $hidden_part . $visible_part;
 	}
 
 	/**
@@ -79,7 +154,7 @@ class Automator_Send_Webhook {
 				// Get the data we're going to send to the AJAX request
 				let dataToBeSent = {
 					action: 'automator_webhook_send_test_data',
-					nonce: UncannyAutomator.nonce,
+					nonce: UncannyAutomator._site.rest.nonce,
 					integration_id: data.item.integrationCode,
 					item_id: data.item.id,
 					values: data.values
@@ -159,7 +234,7 @@ class Automator_Send_Webhook {
 				// Get the data we're going to send to the AJAX request
 				let dataToBeSent = {
 					action: 'automator_webhook_build_test_data',
-					nonce: UncannyAutomator.nonce,
+					nonce: UncannyAutomator._site.rest.nonce,
 					integration_id: data.item.integrationCode,
 					item_id: data.item.id,
 					values: data.values
@@ -184,12 +259,9 @@ class Automator_Send_Webhook {
 							let $notice = jQuery('<div/>', {
 								'class': 'item-options__notice item-options__notice--' + noticeType
 							});
-							// Parse message using markdown
-							let markdown = new modules.Markdown(response.message);
 
 							// Get markdown HTML
-							//let $message = response.message;
-							let $message = markdown.getHTML();
+							let $message = response.message;
 
 							// Add message to the notice container
 							$notice.html("<pre>" + $message + "<pre>");
@@ -237,11 +309,17 @@ class Automator_Send_Webhook {
 			case 'PUT':
 				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'PUT', $data );
 				break;
+			case 'PATCH':
+				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'PATCH', $data );
+				break;
 			case 'DELETE':
 				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'DELETE', $data );
 				break;
 			case 'HEAD':
 				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'HEAD', $data );
+				break;
+			case 'OPTIONS':
+				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'OPTIONS', $data );
 				break;
 			case 'automator_custom_value':
 				if ( isset( $data['ACTION_EVENT_custom'] ) ) {
@@ -253,6 +331,10 @@ class Automator_Send_Webhook {
 			case 'POST':
 			case 'CUSTOM':
 			default:
+				if ( 'POST' !== $data['ACTION_EVENT'] && isset( $data['ACTION_EVENT_custom'] ) ) {
+					$request_type = apply_filters( 'automator_outgoing_webhook_request_type', $data['ACTION_EVENT_custom'], $data );
+					break;
+				}
 				$request_type = apply_filters( 'automator_outgoing_webhook_request_type', 'POST', $data );
 				break;
 		}
@@ -273,38 +355,6 @@ class Automator_Send_Webhook {
 		}
 
 		return $data['DATA_FORMAT'];
-	}
-
-	/**
-	 * Outgoing webhook Content Type
-	 *
-	 * @return string|array
-	 */
-	public function get_content_type( $data_type, $headers ) {
-		$supported_data_types = array(
-			'application/x-www-form-urlencoded' => 'x-www-form-urlencoded',
-			'multipart/form-data'               => 'form-data',
-			'application/json'                  => 'json',
-			'text/plain'                        => 'plain',
-			'application/binary'                => 'binary',
-			'text/html'                         => 'html',
-			'xml'                               => 'xml',
-			'GraphQL'                           => 'GraphQL',
-			'raw'                               => 'raw',
-		);
-		if ( 'none' === $data_type ) {
-			$data_type = 'raw';
-		}
-		if ( in_array( $data_type, $supported_data_types, true ) ) {
-			$type                    = array_search( $data_type, $supported_data_types, true );
-			$headers['Content-Type'] = $type;
-
-			return $headers;
-		}
-
-		$headers['Content-Type'] = 'application/x-www-form-urlencoded';
-
-		return $headers;
 	}
 
 	/**
@@ -337,22 +387,31 @@ class Automator_Send_Webhook {
 	 * @throws \Exception
 	 */
 	public function get_fields( $data, $legacy = false, $data_type = '', $parsing_args = array(), $is_check_sample = false ) {
+
 		$prepared_data = array();
+
 		if ( $legacy ) {
 			return $this->prepare_legacy_fields( $data, $parsing_args );
 		}
+
 		if ( ! isset( $data['WEBHOOK_FIELDS'] ) ) {
 			return $prepared_data;
 		}
+
 		$fields = ! is_array( $data['WEBHOOK_FIELDS'] ) ? json_decode( $data['WEBHOOK_FIELDS'], true ) : $data['WEBHOOK_FIELDS'];
+
 		if ( empty( $fields ) ) {
 			return $prepared_data;
 		}
+
 		foreach ( $fields as $field ) {
+
 			$key   = isset( $field['KEY'] ) ? $this->maybe_parse_tokens( $field['KEY'], $parsing_args ) : null;
 			$type  = isset( $field['VALUE_TYPE'] ) ? $this->maybe_parse_tokens( $field['VALUE_TYPE'], $parsing_args ) : 'text';
 			$value = isset( $field['VALUE'] ) ? $this->maybe_parse_tokens( $field['VALUE'], $parsing_args ) : null;
-			if ( ! is_null( $key ) && ! is_null( $value ) ) {
+
+			// Do not allow empty key.
+			if ( '' !== $key && ! is_null( $key ) && ! is_null( $value ) ) {
 				switch ( $type ) {
 					case 'null':
 					case 'undefined':
@@ -377,11 +436,11 @@ class Automator_Send_Webhook {
 					case 'text':
 					default:
 						/**
-						 * Allows users to overwrite removal of qoutes.
+						 * Allows users to strip the quotes.
 						 *
 						 * @see <https://secure.helpscout.net/conversation/2067343003/45133?folderId=2122433>
 						 */
-						$should_strip_qoutes = apply_filters( 'automator_send_webhook_get_fields_should_strip_qoutes', true );
+						$should_strip_qoutes = apply_filters( 'automator_send_webhook_get_fields_should_strip_qoutes', false );
 
 						if ( $should_strip_qoutes ) {
 							// Decode HTML entities and replace " and '
@@ -397,6 +456,7 @@ class Automator_Send_Webhook {
 				$prepared_data[ $key ] = apply_filters( 'automator_outgoing_webhook_value', $value, $key, $type, $this );
 			}
 		}
+
 		$prepared_data = $this->create_tree( $prepared_data, $data_type );
 
 		return $this->format_outgoing_data( $prepared_data, $data_type, $is_check_sample );
@@ -426,27 +486,103 @@ class Automator_Send_Webhook {
 	 * Get outgoing headers
 	 *
 	 * @param $data
+	 * @param string $data_type
+	 * @param int $action_id
 	 * @param array $parsing_args
 	 *
 	 * @return array
 	 */
-	public function get_headers( $data, $parsing_args = array() ) {
-		$headers     = array();
+	public function get_headers( $data, $data_type, $action_id, $parsing_args = array() ) {
+
+		$headers = array();
+
+		// Get Webhook Headers from repeater field.
 		$header_meta = isset( $data['WEBHOOK_HEADERS'] ) ? ! is_array( $data['WEBHOOK_HEADERS'] ) ? json_decode( $data['WEBHOOK_HEADERS'], true ) : $data['WEBHOOK_HEADERS'] : array();
-		if ( empty( $header_meta ) ) {
+		if ( ! empty( $header_meta ) ) {
+			foreach ( $header_meta as $meta ) {
+				$key = isset( $meta['NAME'] ) ? $this->maybe_parse_tokens( $meta['NAME'], $parsing_args ) : null;
+				// remove colon if user added in NAME
+				$key             = trim( str_replace( ':', '', $key ) );
+				$value           = isset( $meta['VALUE'] ) ? $this->maybe_parse_tokens( $meta['VALUE'], $parsing_args ) : null;
+				$headers[ $key ] = trim( $value );
+			}
+		}
+
+		// Content Type.
+		$headers = $this->get_content_type( $data_type, $headers );
+
+		// Authorization.
+		$headers = $this->get_authorization( $action_id, $headers, $data, $parsing_args );
+
+		// Remove duplicate keys
+		$final_headers = array();
+		foreach ( $headers as $key => $value ) {
+			if ( ! array_key_exists( $key, $final_headers ) ) {
+				$final_headers[ $key ] = $value;
+			}
+		}
+
+		return $final_headers;
+	}
+
+	/**
+	 * Outgoing webhook Content Type
+	 *
+	 * @return string|array
+	 */
+	public function get_content_type( $data_type, $headers ) {
+		$supported_data_types = array(
+			'application/x-www-form-urlencoded' => 'x-www-form-urlencoded',
+			'multipart/form-data'               => 'form-data',
+			'application/json'                  => 'json',
+			'text/plain'                        => 'plain',
+			'application/binary'                => 'binary',
+			'text/html'                         => 'html',
+			'xml'                               => 'xml',
+			'GraphQL'                           => 'GraphQL',
+			'raw'                               => 'raw',
+		);
+		if ( 'none' === $data_type ) {
+			$data_type = 'raw';
+		}
+		if ( in_array( $data_type, $supported_data_types, true ) ) {
+			$type = array_search( $data_type, $supported_data_types, true );
+			if ( 'form-data' === $data_type ) {
+				$this->boundary = sha1( time() );
+				$type           = $type . '; boundary=' . $this->boundary;
+			}
+			$headers['Content-Type'] = $type;
+
 			return $headers;
 		}
 
-		//$header_fields = count( $header_meta );
-		foreach ( $header_meta as $meta ) {
-			$key = isset( $meta['NAME'] ) ? $this->maybe_parse_tokens( $meta['NAME'], $parsing_args ) : null;
-			// remove colon if user added in NAME
-			$key             = trim( str_replace( ':', '', $key ) );
-			$value           = isset( $meta['VALUE'] ) ? $this->maybe_parse_tokens( $meta['VALUE'], $parsing_args ) : null;
-			$headers[ $key ] = trim( $value );
+		$headers['Content-Type'] = 'application/x-www-form-urlencoded';
+
+		return $headers;
+	}
+
+	/**
+	 * @param $action_id
+	 * @param $headers
+	 * @param $data
+	 * @param $parsing_args
+	 *
+	 * @return array
+	 */
+	public function get_authorization( $action_id, $headers, $data, $parsing_args = array() ) {
+
+		$authorization         = isset( $data['WEBHOOK_AUTHORIZATIONS'] ) ? $data['WEBHOOK_AUTHORIZATIONS'] : null;
+		$authorization_originl = get_post_meta( $action_id, 'WEBHOOK_AUTHORIZATIONS_ORIGINAL', true );
+		$authorization         = ! empty( $authorization_originl ) && is_scalar( $authorization_originl ) ? $authorization_originl : $authorization;
+
+		if ( empty( $authorization ) ) {
+			return $headers;
 		}
 
-		return array_unique( $headers );
+		$authorization            = $this->maybe_parse_tokens( $authorization, $parsing_args );
+		$headers['Authorization'] = apply_filters( 'automator_outgoing_webhook_authorization_string', $authorization, $action_id, $headers, $this );
+
+		return $headers;
 	}
 
 	/**
@@ -458,8 +594,10 @@ class Automator_Send_Webhook {
 	 * @return string|null
 	 */
 	public function maybe_parse_tokens( $value, $parsing_args ) {
+
 		if ( empty( $parsing_args ) ) {
-			return sanitize_text_field( $value );
+			// Convert literal new lines and other into actual new lines.
+			return stripcslashes( $value );
 		}
 
 		return trim( Automator()->parse->text( $value, $parsing_args['recipe_id'], $parsing_args['user_id'], $parsing_args['args'] ) );
@@ -546,7 +684,8 @@ class Automator_Send_Webhook {
 				}
 				break;
 			case 'form-data':
-				$fields = http_build_query( $fields );
+				//$fields = http_build_query( $fields );
+				$fields = $this->build_multipart_form_data( $fields );
 				if ( $is_check_sample ) {
 					$fields = html_entity_decode(
 						str_replace(
@@ -715,17 +854,26 @@ class Automator_Send_Webhook {
 	 * @return array|mixed|void|\WP_Error
 	 */
 	public static function call_webhook( $webhook_url, $args, $request_type = 'POST' ) {
-		switch ( sanitize_text_field( wp_unslash( $request_type ) ) ) {
-			case 'PUT':
+
+		$request_type = sanitize_text_field( wp_unslash( $request_type ) );
+
+		switch ( $request_type ) {
 			case 'POST':
-			case 'DELETE':
 				$response = wp_remote_post( $webhook_url, $args );
 				break;
 			case 'GET':
-				$response = wp_remote_get( $webhook_url, $args );
+				$url      = add_query_arg( $args['body'], $webhook_url );
+				$response = wp_remote_get( $url, $args );
 				break;
 			case 'HEAD':
 				$response = wp_remote_head( $webhook_url, $args );
+				break;
+			case 'PUT':
+			case 'PATCH':
+			case 'DELETE':
+			case 'OPTIONS':
+				$args['method'] = $request_type;
+				$response       = wp_remote_request( $webhook_url, $args );
 				break;
 			default:
 				$response = apply_filters( 'automator_send_webhook_default_response', wp_remote_post( $webhook_url, $args ), $webhook_url, $args );
@@ -733,5 +881,224 @@ class Automator_Send_Webhook {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Build multipart/form-data
+	 *
+	 * @param mixed[] $data
+	 *
+	 * @return string
+	 */
+	public function build_multipart_form_data( $data ) {
+
+		$boundary = $this->boundary;
+
+		if ( empty( $boundary ) ) {
+			$boundary = '--' . sha1( time() );
+		}
+
+		/**
+		 * @see <https://proxyman.io/posts/2021-06-24-preview-multipart-formdata>
+		 */
+		$separator = "\r\n";
+
+		// Build the form-data body.
+		$body_start = 'Content-Type: multipart/form-data; boundary=' . $boundary . $separator . $separator;
+
+		$form_data_body = $body_start;
+
+		$data_count = count( $data );
+
+		$counter = 1;
+
+		foreach ( (array) $data as $key => $value ) {
+
+			$form_data_body .=
+				$boundary
+				. $separator
+				. 'Content-Disposition: form-data; name="' . $key . '"'
+				. $separator
+				. 'Content-Type: text/plain'
+				. $separator
+				. $separator
+				. $value
+				. $separator;
+
+			// Proper line breaks. The last form-data should only have one space.
+			if ( $data_count < $counter ) {
+				$form_data_body .= PHP_EOL;
+			}
+
+			$counter ++;
+		}
+
+		$form_data_body .= $boundary . '--';
+
+		return trim( $form_data_body );
+	}
+
+	/**
+	 * @param $array
+	 * @param bool $add_data
+	 *
+	 * @return array
+	 */
+	public static function get_leafs( $array, $add_data = false ) {
+		$leafs = array();
+
+		if ( ! is_array( $array ) ) {
+			return $leafs;
+		}
+
+		$array_iterator    = new \RecursiveArrayIterator( $array );
+		$iterator_iterator = new \RecursiveIteratorIterator( $array_iterator, \RecursiveIteratorIterator::LEAVES_ONLY );
+		foreach ( $iterator_iterator as $key => $value ) {
+			$keys = array();
+			for ( $i = 0; $i < $iterator_iterator->getDepth(); $i ++ ) { //phpcs:ignore Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed
+				$keys[] = $iterator_iterator->getSubIterator( $i )->key();
+			}
+			$keys[]   = $key;
+			$leaf_key = implode( apply_filters( 'automator_outgoing_webhook_array_key_in_token_separator', '|' ), $keys );
+
+			//$leafs[ $leaf_key ] = $value;
+			$leafs[] = array(
+				'key'  => $leaf_key,
+				'type' => self::value_maybe_of_type( $leaf_key, $value ),
+				'data' => true === $add_data ? $value : '',
+			);
+		}
+
+		return $leafs;
+	}
+
+	/**
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return mixed|null
+	 */
+	public static function value_maybe_of_type( $key, $value ) {
+		$type = 'text';
+
+		if ( is_array( $value ) || is_object( $value ) ) {
+			return apply_filters( 'automator_outgoing_webhook_value_of_type_array', $type, $key, $value );
+		}
+
+		if ( is_email( $value ) ) {
+			$type = 'email';
+
+			return apply_filters( 'automator_outgoing_webhook_value_of_type_email', $type, $key, $value );
+		}
+
+		if ( is_float( $value ) ) {
+			$type = 'float';
+
+			return apply_filters( 'automator_outgoing_webhook_value_of_type_float', $type, $key, $value );
+		}
+
+		if ( is_numeric( $value ) ) {
+			$type = 'int';
+
+			return apply_filters( 'automator_outgoing_webhook_value_of_type_int', $type, $key, $value );
+		}
+
+		if ( wp_http_validate_url( $value ) ) {
+			$type = 'url';
+
+			return apply_filters( 'automator_outgoing_webhook_value_of_type_url', $type, $key, $value );
+		}
+
+		return apply_filters( 'automator_outgoing_webhook_value_of_type_text', $type, $key, $value );
+	}
+
+	/**
+	 * @param mixed[] $raw
+	 * @param mixed[] $response
+	 *
+	 * @return array
+	 */
+	public static function before_hydrate_tokens( $raw = array(), $response = array() ) {
+
+		if ( empty( $raw ) ) {
+			return array();
+		}
+
+		$hydration_data = array();
+
+		foreach ( $raw as $action_token ) {
+			$tag                    = strtoupper( $action_token['key'] );
+			$hydration_data[ $tag ] = $action_token['data'];
+		}
+
+		// Hydrate the "WEBHOOK_RESPONSE_BODY" action token.
+		$hydration_data['WEBHOOK_RESPONSE_BODY'] = (string) wp_remote_retrieve_body( $response );
+		$hydration_data['WEBHOOK_RESPONSE_CODE'] = wp_remote_retrieve_response_code( $response );
+
+		return $hydration_data;
+
+	}
+
+	/**
+	 * @param \WpOrg\Requests\Utility\CaseInsensitiveDictionary $header
+	 *
+	 * @return array
+	 */
+	public static function parse_headers( $header ) {
+
+		if ( ! $header instanceof \WpOrg\Requests\Utility\CaseInsensitiveDictionary ) {
+			return array();
+		}
+
+		if ( empty( $header->getAll() ) ) {
+			return array();
+		}
+
+		$tokens = array();
+		foreach ( $header->getAll() as $k => $v ) {
+			$tokens[] = array(
+				'key'  => "header|$k",
+				'data' => self::esc_html_string( $v ),
+				'type' => 'text',
+			);
+		}
+
+		return $tokens;
+	}
+
+	/**
+	 * Escaping for HTML blocks.
+	 *
+	 * @param mixed $value The value to parse.
+	 * @param bool $is_html Whether the value has HTML contents or not.
+	 *
+	 * @return string
+	 */
+	public static function esc_html_string( $value = '' ) {
+
+		// Return the empty value if its not scalar.
+		if ( ! is_scalar( $value ) || ! is_string( $value ) ) {
+			return '';
+		}
+
+		return esc_html( $value );
+
+	}
+
+	/**
+	 * @param $tokens
+	 *
+	 * @return array
+	 */
+	public static function clean_tokens_before_save( $tokens ) {
+		if ( empty( $tokens ) ) {
+			return array();
+		}
+
+		foreach ( $tokens as $k => $v ) {
+			$tokens[ $k ]['data'] = '';
+		}
+
+		return $tokens;
 	}
 }

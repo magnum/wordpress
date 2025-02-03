@@ -74,8 +74,9 @@ class HUBSPOT_ADDUSER {
 					array(
 						'option_code'       => 'CUSTOM_FIELDS',
 						'input_type'        => 'repeater',
+						'relevant_tokens'   => array(),
 						'label'             => __( 'Custom fields', 'uncanny-automator' ),
-						'description'       => __( "* User Email Address, First and Last names will be taken from the user's account.", 'uncanny-automator' ),
+						'description'       => __( "* User Email Address, First and Last names will be taken from the user's account. Leaving a field value empty will not update the field. To delete a value from a field, set its value to [delete], including the square brackets.", 'uncanny-automator' ),
 						'required'          => false,
 						'fields'            => array(
 							array(
@@ -152,7 +153,12 @@ class HUBSPOT_ADDUSER {
 
 		if ( ! empty( $action_data['meta']['CUSTOM_FIELDS'] ) ) {
 
-			$custom_fields = json_decode( Automator()->parse->text( $action_data['meta']['CUSTOM_FIELDS'], $recipe_id, $user_id, $args ), true );
+			$json = Automator()->parse->text( $action_data['meta']['CUSTOM_FIELDS'], $recipe_id, $user_id, $args );
+
+			// Replace line breaks to prevent invalid json
+			$json = str_replace( "\r\n", '\r\n', $json );
+
+			$custom_fields = json_decode( $json, true );
 
 			if ( ! empty( $custom_fields ) ) {
 				foreach ( $custom_fields as $field ) {

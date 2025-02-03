@@ -34,6 +34,9 @@ class Automator_Notifications {
 	 */
 	public $option_name = 'automator_notifications';
 
+	/**
+	 *
+	 */
 	public function __construct() {
 
 		if ( defined( 'AUTOMATOR_NOTIFICATIONS_SOURCE_URL' ) ) {
@@ -79,18 +82,18 @@ class Automator_Notifications {
 					$screen = get_current_screen();
 					if ( 'edit-uo-recipe' === $screen->id ) {
 						// Enqueue the style incase it wasnt called.
-						wp_enqueue_style( 'uap-admin', Utilities::automator_get_asset( 'backend/dist/bundle.min.css' ), array(), Utilities::automator_get_version() );
+						wp_enqueue_style( 'uap-admin', Utilities::automator_get_asset( 'backend/dist/main.bundle.min.css' ), array(), Utilities::automator_get_version() );
 						// Register main JS in case it wasnt registered.
 						wp_register_script(
 							'uap-admin',
-							Utilities::automator_get_asset( 'backend/dist/bundle.min.js' ),
+							Utilities::automator_get_asset( 'backend/dist/main.bundle.min.js' ),
 							array(),
 							Utilities::automator_get_version(),
 							true
 						);
 						// Enqueue uap-admin.
 						wp_enqueue_script( 'uap-admin' );
-						add_action( 'admin_notices', array( $this, 'show_notifications' ) );
+						add_action( 'automator_show_internal_admin_notice', array( $this, 'show_notifications' ) );
 					}
 				},
 				10
@@ -130,7 +133,7 @@ class Automator_Notifications {
 			return $this->option;
 		}
 
-		$option = get_option( $this->option_name, array() );
+		$option = automator_get_option( $this->option_name, array() );
 
 		$this->option = array(
 			'update'    => ! empty( $option['update'] ) ? $option['update'] : 0,
@@ -226,7 +229,7 @@ class Automator_Notifications {
 
 			// Ignore if notification existed before installing automator.
 			// Prevents bombarding the user with notifications after activation.
-			$over_time = get_option( 'automator_over_time', array() );
+			$over_time = automator_get_option( 'automator_over_time', array() );
 
 			if (
 				! empty( $over_time['installed_date'] ) &&
@@ -420,7 +423,7 @@ class Automator_Notifications {
 
 		$notification = $this->verify( array( $notification ) );
 
-		update_option(
+		automator_update_option(
 			$this->option_name,
 			array(
 				'update'    => $option['update'],
@@ -428,7 +431,7 @@ class Automator_Notifications {
 				'events'    => array_merge( $notification, $option['events'] ),
 				'dismissed' => $option['dismissed'],
 			),
-			false
+			true
 		);
 	}
 
@@ -444,7 +447,7 @@ class Automator_Notifications {
 		$feed   = $this->fetch_feed();
 		$option = $this->get_option();
 
-		update_option(
+		automator_update_option(
 			$this->option_name,
 			array(
 				'update'    => time(),
@@ -452,7 +455,7 @@ class Automator_Notifications {
 				'events'    => $option['events'],
 				'dismissed' => array_slice( $option['dismissed'], 0, 30 ), // Limit dismissed notifications to last 30.
 			),
-			false
+			true
 		);
 	}
 
@@ -510,7 +513,7 @@ class Automator_Notifications {
 			}
 		}
 
-		update_option( $this->option_name, $option, false );
+		automator_update_option( $this->option_name, $option, true );
 
 		wp_send_json_success();
 	}
@@ -588,15 +591,18 @@ class Automator_Notifications {
 	 */
 	public function delete_notifications_data() {
 
-		delete_option( $this->option_name );
+		automator_delete_option( $this->option_name );
 
 		// Delete old notices option.
-		delete_option( 'automator_notices' );
+		automator_delete_option( 'automator_notices' );
 
 		automator_notification_event_runner()->delete_data();
 
 	}
 
+	/**
+	 * @return void
+	 */
 	public function show_notifications() {
 
 		$notifications = $this->get_active_notifications();
@@ -616,6 +622,9 @@ class Automator_Notifications {
 
 	}
 
+	/**
+	 * @return false|string
+	 */
 	public function get_license_type() {
 
 		return Api_Server::get_license_type();

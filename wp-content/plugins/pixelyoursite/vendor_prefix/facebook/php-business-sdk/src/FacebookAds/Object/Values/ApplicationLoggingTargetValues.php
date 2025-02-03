@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ApplicationLoggingTargetValues getInstance()
  */
-class ApplicationLoggingTargetValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP = 'APP';
-    const APP_AND_PAGE = 'APP_AND_PAGE';
-    const PAGE = 'PAGE';
+class ApplicationLoggingTargetValues extends AbstractEnum {
+
+  const APP = 'APP';
+  const APP_AND_PAGE = 'APP_AND_PAGE';
+  const PAGE = 'PAGE';
 }

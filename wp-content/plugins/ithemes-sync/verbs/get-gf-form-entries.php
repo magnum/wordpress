@@ -13,19 +13,19 @@
 
 
 class Ithemes_Sync_Verb_Get_GF_Form_Entries extends Ithemes_Sync_Verb {
-	public static $name = 'get-gf-form-entries';
+	public static $name        = 'get-gf-form-entries';
 	public static $description = 'Retrieve Gravity Forms form entries.';
 
 	public function run( $arguments ) {
-		if ( class_exists( 'RGFormsModel' ) && is_callable( array( 'RGFormsModel', 'get_form_meta' ) )
-			&& class_exists( 'GFAPI' ) && is_callable( array( 'GFAPI', 'get_entries' ) ) ) {
+		if ( class_exists( 'RGFormsModel' ) && is_callable( [ 'RGFormsModel', 'get_form_meta' ] )
+			&& class_exists( 'GFAPI' ) && is_callable( [ 'GFAPI', 'get_entries' ] ) ) {
 
 			if ( empty( $arguments['id'] ) ) {
-				return array( 'error' => 'Form ID Required' );
+				return [ 'error' => 'Form ID Required' ];
 			}
-			$return = array();
-			$form_meta = GFFormsModel::get_form_meta( absint( $arguments['id'] ) );
-			$return['field_labels'] = array();
+			$return                 = [];
+			$form_meta              = GFFormsModel::get_form_meta( absint( $arguments['id'] ) );
+			$return['field_labels'] = [];
 			foreach ( $form_meta['fields'] as $field ) {
 				$return['field_labels'][ "{$field['id']}" ] = $this->_process_label( $field );
 			}
@@ -35,14 +35,14 @@ class Ithemes_Sync_Verb_Get_GF_Form_Entries extends Ithemes_Sync_Verb {
 				$return['current_page'] = 1;
 			}
 
-			$paging = array(
+			$paging           = [
 				'page_size' => 20,
-			);
+			];
 			$paging['offset'] = ( $return['current_page'] - 1 ) * $paging['page_size'];
 
 			$return['total_count'] = 0;
-			$return['entries'] = GFAPI::get_entries( absint( $arguments['id'] ), null, null, $paging, $return['total_count'] );
-			$return['page_size'] = $paging['page_size'];
+			$return['entries']     = GFAPI::get_entries( absint( $arguments['id'] ), null, null, $paging, $return['total_count'] );
+			$return['page_size']   = $paging['page_size'];
 			$return['total_pages'] = ceil( $return['total_count'] / $paging['page_size'] );
 			return $return;
 		}
@@ -50,10 +50,10 @@ class Ithemes_Sync_Verb_Get_GF_Form_Entries extends Ithemes_Sync_Verb {
 	}
 
 	private function _process_label( $field ) {
-		$return = array( 'label' => $field['label'] );
+		$return = [ 'label' => $field['label'] ];
 
 		if ( ! empty( $field['inputs'] ) ) {
-			$return['children'] = array();
+			$return['children'] = [];
 			foreach ( $field['inputs'] as $input ) {
 				$return['children'][ "{$input['id']}" ] = $this->_process_label( $input );
 			}

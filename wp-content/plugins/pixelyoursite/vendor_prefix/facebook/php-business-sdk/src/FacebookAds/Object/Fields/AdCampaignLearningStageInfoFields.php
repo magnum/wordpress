@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCampaignLearningStageInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ATTRIBUTION_WINDOWS = 'attribution_windows';
-    const CONVERSIONS = 'conversions';
-    const LAST_SIG_EDIT_TS = 'last_sig_edit_ts';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('attribution_windows' => 'list<string>', 'conversions' => 'unsigned int', 'last_sig_edit_ts' => 'int', 'status' => 'string');
-    }
+
+class AdCampaignLearningStageInfoFields extends AbstractEnum {
+
+  const ATTRIBUTION_WINDOWS = 'attribution_windows';
+  const CONVERSIONS = 'conversions';
+  const LAST_SIG_EDIT_TS = 'last_sig_edit_ts';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'attribution_windows' => 'list<string>',
+      'conversions' => 'unsigned int',
+      'last_sig_edit_ts' => 'int',
+      'status' => 'string',
+    );
+  }
 }

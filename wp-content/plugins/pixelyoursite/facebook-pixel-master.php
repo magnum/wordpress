@@ -3,21 +3,20 @@
 /**
  * Plugin Name: PixelYourSite
  * Plugin URI: http://www.pixelyoursite.com/
- * Description: No coding <strong>Meta Pixel (formerly Facebook Pixel), Facebook Converion API,</strong> and <strong>Google Analytics</strong> install. Track key actions with our Automated Events, or configure your own events. WooCommerce and EDD fully supported, with Facebook Dynamic Ads Pixel set-up and Google Analytics Enhanced Ecommerce. Insert any custom script with our Head & Footer option. Add the <strong>Pinterest Tag</strong> with our paid add-on. The PRO version adds support for the Google Ads tag plus a lot of extra stuff. Full support for <strong>ConsentMagic.com</strong>.
- * Version: 9.3.2
+ * Description: Meta Pixel & CAPI, GA4, and GTM support with ZERO CODING. Track events, WooCommerce/EDD ready, with Pinterest & Bing add-ons, plus consent support.
+ * Version: 10.0.4
  * Author: PixelYourSite
  * Author URI: http://www.pixelyoursite.com
  * License: GPLv3
  *
  * Requires at least: 4.4
- * Tested up to: 6.3
+ * Tested up to: 6.7
  *
  * WC requires at least: 2.6.0
- * WC tested up to: 7.3
+ * WC tested up to: 9.4
  *
  * Text Domain: pys
  */
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
@@ -38,7 +37,6 @@ function pysFreeActivation() {
     if ( isPysProActive() ) {
         deactivate_plugins('pixelyoursite-pro/pixelyoursite-pro.php');
     }
-
     \PixelYourSite\manageAdminPermissions();
 }
 /**

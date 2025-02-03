@@ -45,6 +45,7 @@ class SLACK_SENDMESSAGE {
 			'integration'           => self::$integration,
 			'code'                  => $this->action_code,
 			'requires_user'         => false,
+			// translators: slack channel name
 			'sentence'              => sprintf( __( 'Send a message to {{a channel:%1$s}}', 'uncanny-automator' ), $this->action_meta ),
 			'select_option_name'    => __( 'Send a message to {{a channel}}', 'uncanny-automator' ),
 			'priority'              => 10,
@@ -67,6 +68,8 @@ class SLACK_SENDMESSAGE {
 			'options_group' => array(
 				$this->action_meta => array(
 					Automator()->helpers->recipe->slack->options->get_slack_channels( esc_attr__( 'Slack Channel', 'uncanny-automator' ), 'SLACKCHANNEL' ),
+					Automator()->helpers->recipe->slack->bot_name_field(),
+					Automator()->helpers->recipe->slack->bot_icon_field(),
 					Automator()->helpers->recipe->slack->textarea_field( 'SLACKMESSAGE', esc_attr__( 'Message', 'uncanny-automator' ), true, 'textarea', '', true, esc_attr__( '* Markdown is supported', 'uncanny-automator' ), __( 'Enter the message', 'uncanny-automator' ) ),
 				),
 			),
@@ -85,17 +88,23 @@ class SLACK_SENDMESSAGE {
 		$message['channel'] = $action_data['meta']['SLACKCHANNEL'];
 		$message['text']    = Automator()->parse->text( $action_data['meta']['SLACKMESSAGE'], $recipe_id, $user_id, $args );
 
+		if ( ! empty( $action_data['meta']['BOT_NAME'] ) ) {
+			$message['username'] = Automator()->parse->text( $action_data['meta']['BOT_NAME'], $recipe_id, $user_id, $args );
+		}
+
+		if ( ! empty( $action_data['meta']['BOT_ICON'] ) ) {
+			$message['icon_url'] = Automator()->parse->text( $action_data['meta']['BOT_ICON'], $recipe_id, $user_id, $args );
+		}
+
 		$error_msg = '';
 
 		try {
 			$response = Automator()->helpers->recipe->slack->chat_post_message( $message, $action_data );
 		} catch ( \Exception $e ) {
 			$error_msg                           = $e->getMessage();
-			$action_data['do-nothing']           = true;
 			$action_data['complete_with_errors'] = true;
 		}
 
 		Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
-		return;
 	}
 }

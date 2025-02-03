@@ -13,12 +13,12 @@
 
 
 class Ithemes_Sync_Verb_Get_Admin_Bar_Items extends Ithemes_Sync_Verb {
-	public static $name = 'get-admin-bar-items';
+	public static $name        = 'get-admin-bar-items';
 	public static $description = 'Retrieve list of admin bar items for a user.';
 
 	public function run( $arguments ) {
 		if ( empty( $arguments['id'] ) ) {
-			return array( 'error' => 'User ID Required' );
+			return [ 'error' => 'User ID Required' ];
 		}
 
 		$user = get_user_by( 'id', absint( $arguments['id'] ) );

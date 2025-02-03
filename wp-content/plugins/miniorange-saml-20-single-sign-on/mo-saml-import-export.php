@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
 
-require_once dirname( __FILE__ ) . '/includes/lib/class-mo-saml-options-enum.php';
+require_once __DIR__ . '/includes/lib/class-mo-saml-options-enum.php';
 require_once 'class-mo-saml-logger.php';
 add_action( 'admin_init', 'mo_saml_miniorange_import_export' );
 
@@ -77,16 +77,17 @@ function mo_saml_miniorange_import_export( $test_config_screen = false, $json_in
 		} elseif ( 'mo_saml_keep_settings_on_deletion' === $_POST['option'] && check_admin_referer( 'mo_saml_keep_settings_on_deletion' ) ) {
 
 			if ( ! empty( $_POST['mo_saml_keep_settings_intact'] ) ) {
-				update_option( Mo_Saml_Options_Enum::MO_SAML_KEEP_SETTINGS_DELETION, 'true' );
+				update_option( Mo_Saml_Options_Enum_Sso_Login::MO_SAML_KEEP_SETTINGS_DELETION, 'true' );
 			} else {
-				update_option( Mo_Saml_Options_Enum::MO_SAML_KEEP_SETTINGS_DELETION, '' );
+				update_option( Mo_Saml_Options_Enum_Sso_Login::MO_SAML_KEEP_SETTINGS_DELETION, '' );
 			}
+			update_option( 'mo_saml_message', 'Keep Settings Intact Option Updated Successfully.' );
+			Mo_SAML_Utilities::mo_saml_show_success_message();
 		}
 
 		return;
 
 	}
-
 }
 
 /**
@@ -127,5 +128,4 @@ function mo_saml_get_version_informations() {
 	$array_version['DOM']               = Mo_SAML_Utilities::mo_saml_is_dom_installed();
 
 	return $array_version;
-
 }

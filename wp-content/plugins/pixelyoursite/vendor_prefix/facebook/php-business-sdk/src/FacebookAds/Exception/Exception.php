@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,8 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Exception;
 
-class Exception extends \Exception
-{
+class Exception extends \Exception {
+
 }

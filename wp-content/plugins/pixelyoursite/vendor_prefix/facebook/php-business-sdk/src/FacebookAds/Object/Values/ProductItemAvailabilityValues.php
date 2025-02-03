@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemAvailabilityValues getInstance()
  */
-class ProductItemAvailabilityValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AVAILABLE_FOR_ORDER = 'available for order';
-    const DISCONTINUED = 'discontinued';
-    const IN_STOCK = 'in stock';
-    const OUT_OF_STOCK = 'out of stock';
-    const PENDING = 'pending';
-    const PREORDER = 'preorder';
+class ProductItemAvailabilityValues extends AbstractEnum {
+
+  const AVAILABLE_FOR_ORDER = 'available for order';
+  const DISCONTINUED = 'discontinued';
+  const IN_STOCK = 'in stock';
+  const OUT_OF_STOCK = 'out of stock';
+  const PENDING = 'pending';
+  const PREORDER = 'preorder';
 }

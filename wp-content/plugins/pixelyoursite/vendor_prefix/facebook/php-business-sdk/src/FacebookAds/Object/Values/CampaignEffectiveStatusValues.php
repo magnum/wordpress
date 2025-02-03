@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CampaignEffectiveStatusValues getInstance()
  */
-class CampaignEffectiveStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTIVE = 'ACTIVE';
-    const ARCHIVED = 'ARCHIVED';
-    const DELETED = 'DELETED';
-    const IN_PROCESS = 'IN_PROCESS';
-    const PAUSED = 'PAUSED';
-    const WITH_ISSUES = 'WITH_ISSUES';
+class CampaignEffectiveStatusValues extends AbstractEnum {
+
+  const ACTIVE = 'ACTIVE';
+  const ARCHIVED = 'ARCHIVED';
+  const DELETED = 'DELETED';
+  const IN_PROCESS = 'IN_PROCESS';
+  const PAUSED = 'PAUSED';
+  const WITH_ISSUES = 'WITH_ISSUES';
 }

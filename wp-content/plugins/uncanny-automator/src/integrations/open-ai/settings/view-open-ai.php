@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="uap-settings-panel-title">
 
-				<uo-icon integration="OPEN_AI"></uo-icon> 
+				<uo-icon integration="OPEN_AI"></uo-icon>
 
 				<?php esc_html_e( 'OpenAI', 'uncanny-automator' ); ?>
 
@@ -40,6 +40,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php esc_html_e( 'If you create recipes and then change the connected OpenAI account, your previous recipes may no longer work.', 'uncanny-automator' ); ?>
 					</uo-alert>
 
+					<?php if ( true === $vars['can_access_gpt4'] ) { ?>
+						<uo-alert type="success" class="uap-spacing-bottom uap-spacing-bottom--big" heading="<?php esc_attr_e( 'The connected account has access to the GPT-4 API.', 'uncanny-automator' ); ?>">
+						</uo-alert>
+					<?php } else { ?>
+						<uo-alert type="warning" class="uap-spacing-bottom uap-spacing-bottom--big" heading="<?php esc_attr_e( 'GPT-4 API access', 'uncanny-automator' ); ?>">
+							<?php
+								esc_html_e(
+									'The connected account does not currently have access to the GPT-4 API. Once you gain access to the GPT-4 API, additional OpenAI actions will become available. If you have recently been granted access to GPT-4, please create a new key, disconnect the current connection, and reconnect by entering your new key. You may also use the button below to recheck access to GPT-4.',
+									'uncanny-automator'
+								);
+							?>
+							<br/></br>
+							<uo-button href="<?php echo esc_url( $vars['recheck_gpt4_access_url'] ); ?>" size="small" color="secondary">
+								<?php esc_html_e( 'Recheck GPT-4 access', 'uncanny-automator' ); ?>
+							</uo-button>
+						</uo-alert>
+					<?php } ?>
+
 					<?php } ?>
 
 				<?php if ( false === $vars['is_connected'] ) { ?>
@@ -62,7 +80,62 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<li>
 							<uo-icon id="bolt"></uo-icon>
 							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Analyze sentiment with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Correct spelling and grammar with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Create a list of links that might help resolve a customer request with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Generate a meta description with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Generate an excerpt suitable for Instagram with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Generate an excerpt suitable for Twitter with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Generate an excerpt with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Generate an SEO title with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Translate text with GPT-4', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Use a prompt to generate an image', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
 							<?php esc_html_e( 'Use a prompt to generate text', 'uncanny-automator' ); ?>
+						</li>
+						<li>
+							<uo-icon id="bolt"></uo-icon>
+							<?php esc_html_e( 'Action' ); ?>:
+							<?php esc_html_e( 'Use a prompt to generate text with the GPT model', 'uncanny-automator' ); ?>
 						</li>
 					</ul>
 

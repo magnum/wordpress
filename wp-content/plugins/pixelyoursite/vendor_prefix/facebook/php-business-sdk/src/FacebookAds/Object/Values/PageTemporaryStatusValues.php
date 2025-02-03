@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PageTemporaryStatusValues getInstance()
  */
-class PageTemporaryStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DIFFERENTLY_OPEN = 'DIFFERENTLY_OPEN';
-    const NO_DATA = 'NO_DATA';
-    const OPERATING_AS_USUAL = 'OPERATING_AS_USUAL';
-    const TEMPORARILY_CLOSED = 'TEMPORARILY_CLOSED';
+class PageTemporaryStatusValues extends AbstractEnum {
+
+  const DIFFERENTLY_OPEN = 'DIFFERENTLY_OPEN';
+  const NO_DATA = 'NO_DATA';
+  const OPERATING_AS_USUAL = 'OPERATING_AS_USUAL';
+  const TEMPORARILY_CLOSED = 'TEMPORARILY_CLOSED';
 }

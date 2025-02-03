@@ -2,6 +2,7 @@
 
 namespace cybot\cookiebot\lib {
 
+	use DomainException;
 	use Exception;
 	use InvalidArgumentException;
 	use RuntimeException;
@@ -13,7 +14,10 @@ namespace cybot\cookiebot\lib {
 	 */
 	function deprecation_error( $type, $deprecated_name, $alternative_name ) {
 		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
-		trigger_error( esc_html( $type . ' `' . $deprecated_name . '` is deprecated. Use `' . $alternative_name . '` instead.' ), E_USER_DEPRECATED );
+		trigger_error(
+			esc_html( $type . ' `' . $deprecated_name . '` is deprecated. Use `' . $alternative_name . '` instead.' ),
+			E_USER_DEPRECATED
+		);
 	}
 
 	/**
@@ -23,20 +27,17 @@ namespace cybot\cookiebot\lib {
 	 *                  False   If attributes only should be added if consent no given
 	 */
 	function cookiebot_addons_enabled_cache_plugin() {
-		if ( defined( 'WP_ROCKET_PATH' ) ) {
-			return true; //WP Rocket - We need to ensure we not cache tags without attributes
-		}
-		if ( defined( 'W3TC' ) ) {
-			return true; //W3 Total Cache
-		}
-		if ( defined( 'WPCACHEHOME' ) ) {
-			return true; //WP Super Cache
-		}
-		if ( defined( 'WPFC_WP_PLUGIN_DIR' ) ) {
-			return true; //WP Fastest Cache
-		}
-		if ( defined( 'LSCWP_CONTENT_DIR' ) ) {
-			return true; //Litespeed Cache
+		// WP Rocket - We need to ensure we not cache tags without attributes
+		if ( defined( 'WP_ROCKET_PATH' ) ||
+			// W3 Total Cache
+			defined( 'W3TC' ) ||
+			// WP Super Cache
+			defined( 'WPCACHEHOME' ) ||
+			// WP Fastest Cache
+			defined( 'WPFC_WP_PLUGIN_DIR' ) ||
+			// Litespeed Cache
+			defined( 'LSCWP_CONTENT_DIR' ) ) {
+			return true;
 		}
 
 		return false;
@@ -60,27 +61,26 @@ namespace cybot\cookiebot\lib {
 		global $wp_filter;
 		$deleted = false;
 
-		if ( isset( $wp_filter[ $action ] ) && isset( $wp_filter[ $action ][ $priority ] ) ) {
-			$len = strlen( $method );
-			foreach ( $wp_filter[ $action ][ $priority ] as $name => $def ) {
-				if ( substr( $name, - $len ) === $method ) {
-					if ( is_array( $def['function'] ) ) {
-						if ( is_string( $def['function'][0] ) !== false ) {
-							$def_class = $def['function'][0];
-						} else {
-							$def_class = get_class( $def['function'][0] );
-						}
+		if ( ! isset( $wp_filter[ $action ] ) || ! isset( $wp_filter[ $action ][ $priority ] ) ) {
+			return false;
+		}
 
-						if ( $def_class === $class ) {
-							if ( is_object( $wp_filter[ $action ] ) && isset( $wp_filter[ $action ]->callbacks ) ) {
-								$wp_filter[ $action ]->remove_filter( $action, $name, $priority );
-							} else {
-								unset( $wp_filter[ $action ][ $priority ][ $name ] );
-							}
-							$deleted = true;
-						}
-					}
+		foreach ( $wp_filter[ $action ][ $priority ] as $name => $def ) {
+			if ( substr( $name, -strlen( $method ) ) !== $method || ! is_array( $def['function'] ) ) {
+				continue;
+			}
+
+			$def_class = is_string( $def['function'][0] ) !== false
+				? $def['function'][0]
+				: get_class( $def['function'][0] );
+
+			if ( $def_class === $class ) {
+				if ( is_object( $wp_filter[ $action ] ) && isset( $wp_filter[ $action ]->callbacks ) ) {
+					$wp_filter[ $action ]->remove_filter( $action, $name, $priority );
+				} else {
+					unset( $wp_filter[ $action ][ $priority ][ $name ] );
 				}
+				$deleted = true;
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace cybot\cookiebot\lib {
 		 * @version 2.0.4
 		 * @since   1.2.0
 		 */
-		$pattern = '/(<script.*?>)(.*?)(<\/script>)/is';
+		$pattern = '/(<script[^>]*+>)(.*?)(<\/script>)/is';
 
 		/**
 		 * Get all scripts and add cookieconsent if it does match with the criterion
@@ -132,28 +132,32 @@ namespace cybot\cookiebot\lib {
 				 * Check if the script contains the keywords, checks keywords one by one
 				 *
 				 * If one match, then the rest of the keywords will be skipped.
-				 **/
+				 */
 				foreach ( $keywords as $needle => $cookie_type ) {
 					/**
 					 * The script contains the needle
-					 **/
+					 */
 					if ( strpos( $script, $needle ) !== false ) {
 						/**
 						 * replace all single quotes with double quotes in the open tag
 						 * remove previously set data-cookieconsent attribute
 						 * remove type attribute
 						 */
-						$script_tag_open = preg_replace( '/\'/', '"', $script_tag_open );
-						$script_tag_open = preg_replace( '/\sdata-cookieconsent=\".*?\"/', '', $script_tag_open );
-						$script_tag_open = preg_replace( '/\stype=\".*?\"/', '', $script_tag_open );
+						$script_tag_open = str_replace( '\'', '"', $script_tag_open );
+						$script_tag_open = preg_replace( '/\sdata-cookieconsent=\"[^"]*+\"/', '', $script_tag_open );
+						$script_tag_open = preg_replace( '/\stype=\"[^"]*+\"/', '', $script_tag_open );
 
 						/**
 						 * set the type attribute to text/plain to prevent javascript execution
 						 * add data-cookieconsent attribute
 						 */
-						$cookie_types    = cookiebot_addons_output_cookie_types( $cookie_type );
-						$replacement     = '<script type="text/plain" data-cookieconsent="' . $cookie_types . '"';
-						$script_tag_open = preg_replace( '/<script/', $replacement, $script_tag_open );
+						$cookie_types = cookiebot_addons_output_cookie_types( $cookie_type );
+
+						$script_tag_open = str_replace(
+							'<script',
+							sprintf( '<script type="text/plain" data-cookieconsent="%s"', $cookie_types ),
+							$script_tag_open
+						);
 
 						/**
 						 * reconstruct the script and break the foreach loop
@@ -188,7 +192,7 @@ namespace cybot\cookiebot\lib {
 	}
 
 	/**
-	 * @param array $cookie_types
+	 * @param array       $cookie_types
 	 * @param $cookie_type
 	 */
 	function cookiebot_addons_checked_selected_helper( array $cookie_types, $cookie_type ) {
@@ -238,16 +242,22 @@ namespace cybot\cookiebot\lib {
 	function cookiebot_translate_type_name( $type ) {
 		switch ( $type ) {
 			case 'marketing':
-				return esc_html__( 'marketing', 'cookiebot' );
+				$translated_name = esc_html__( 'marketing', 'cookiebot' );
+				break;
 			case 'statistics':
-				return esc_html__( 'statistics', 'cookiebot' );
+				$translated_name = esc_html__( 'statistics', 'cookiebot' );
+				break;
 			case 'preferences':
-				return esc_html__( 'preferences', 'cookiebot' );
+				$translated_name = esc_html__( 'preferences', 'cookiebot' );
+				break;
 			case 'necessary':
-				return esc_html__( 'necessary', 'cookiebot' );
+				$translated_name = esc_html__( 'necessary', 'cookiebot' );
+				break;
 			default:
-				return $type;
+				$translated_name = $type;
 		}
+
+		return $translated_name;
 	}
 
 	/**
@@ -275,7 +285,7 @@ namespace cybot\cookiebot\lib {
 	 * @since 1.9.0
 	 */
 	function cookiebot_get_current_site_language() {
-		$lang = get_locale(); //Gets language in en-US format
+		$lang = get_locale(); // Gets language in en-US format
 
 		/**
 		 *  Add support for 3rd party plugins
@@ -291,22 +301,30 @@ namespace cybot\cookiebot\lib {
 	 */
 	function cookiebot_get_language_from_setting( $only_from_setting = false ) {
 		// Get language set in setting page - if empty use WP language info
-		$lang = get_option( 'cookiebot-language' );
-		if ( ! empty( $lang ) ) {
-			if ( $lang !== '_wp' ) {
-				return $lang;
+		$lang           = get_option( 'cookiebot-language' );
+		$front_language = get_option( 'cookiebot-front-language' );
+
+		if ( ! empty( $front_language ) ) {
+			$lang = get_locale(); // Gets language in en-US format
+			if ( ! empty( $lang ) ) {
+				list($lang) = explode( '_', $lang ); // Changes format from eg. en-US to en.
 			}
+			return $lang;
+		}
+
+		if ( ! empty( $lang ) && $lang !== '_wp' ) {
+			return $lang;
 		}
 
 		if ( $only_from_setting ) {
-			return $lang; //We want only to get if already set
+			return $lang; // We want only to get if already set
 		}
 
-		//Language not set - use WP language
+		// Language not set - use WP language
 		if ( $lang === '_wp' ) {
-			$lang = get_bloginfo( 'language' ); //Gets language in en-US format
+			$lang = get_bloginfo( 'language' ); // Gets language in en-US format
 			if ( ! empty( $lang ) ) {
-				list( $lang ) = explode( '-', $lang ); //Changes format from eg. en-US to en.
+				list($lang) = explode( '-', $lang ); // Changes format from eg. en-US to en.
 			}
 		}
 
@@ -336,6 +354,88 @@ namespace cybot\cookiebot\lib {
 			},
 			$cookie_names
 		);
+	}
+
+	/**
+	 * @param string $placeholder
+	 *
+	 * @return string
+	 */
+	function cookiebot_translate_placeholder( $placeholder ) {
+		$translated_placeholder = array(
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable tracking.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable tracking.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Social Share buttons.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Social Share buttons.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to view this element.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to view this element.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to watch this video.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to watch this video.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Google Services.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Google Services.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable facebook shopping feature.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable facebook shopping feature.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to track for google analytics.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to track for google analytics.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Google Analytics.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Google Analytics.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable instagram feed.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable instagram feed.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Facebook Pixel.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable Facebook Pixel.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to Social Share buttons.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to Social Share buttons.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to allow Matomo statistics.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to allow Matomo statistics.',
+				'cookiebot'
+			),
+			// translators: %cookie_types refers to the list of cookie types assigned to the addon placeholder
+			'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable saving user information.' => esc_html__(
+				'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable saving user information.',
+				'cookiebot'
+			),
+		);
+
+		return empty( $translated_placeholder[ $placeholder ] ) ? $placeholder : $translated_placeholder[ $placeholder ];
 	}
 
 	/**
@@ -380,7 +480,7 @@ namespace cybot\cookiebot\lib {
 
 		$url_parts = explode( '.', $host );
 
-		$url_parts = array_slice( $url_parts, - 2 );
+		$url_parts = array_slice( $url_parts, -2 );
 
 		return implode( '.', $url_parts );
 	}
@@ -397,7 +497,7 @@ namespace cybot\cookiebot\lib {
 		$host = $home_url['host'];
 
 		if ( empty( $host ) ) {
-			throw new Exception( 'Home url domain is not found.' );
+			throw new DomainException( 'Home url domain is not found.' );
 		}
 
 		return $host;
@@ -411,7 +511,7 @@ namespace cybot\cookiebot\lib {
 	 */
 	function cookiebot_get_local_file_contents( $file_path ) {
 		if ( ! file_exists( $file_path ) ) {
-			throw new Exception( 'File ' . $file_path . ' does not exist' );
+			throw new InvalidArgumentException( 'File ' . $file_path . ' does not exist' );
 		}
 
 		ob_start();
@@ -454,7 +554,7 @@ namespace cybot\cookiebot\lib {
 	 * @throws InvalidArgumentException
 	 */
 	function asset_path( $relative_path ) {
-		$absolute_path = CYBOT_COOKIEBOT_PLUGIN_DIR . 'assets/' . $relative_path;
+		$absolute_path = CYBOT_COOKIEBOT_PLUGIN_DIR . CYBOT_COOKIEBOT_PLUGIN_ASSETS_DIR . $relative_path;
 		if ( ! file_exists( $absolute_path ) ) {
 			throw new InvalidArgumentException( 'Asset could not be loaded from "' . $absolute_path . '"' );
 		}
@@ -468,8 +568,8 @@ namespace cybot\cookiebot\lib {
 	 * @throws InvalidArgumentException
 	 */
 	function asset_url( $relative_path ) {
-		$absolute_path = CYBOT_COOKIEBOT_PLUGIN_DIR . 'assets/' . $relative_path;
-		$url           = esc_url( CYBOT_COOKIEBOT_PLUGIN_URL . 'assets/' . $relative_path );
+		$absolute_path = CYBOT_COOKIEBOT_PLUGIN_DIR . CYBOT_COOKIEBOT_PLUGIN_ASSETS_DIR . $relative_path;
+		$url           = esc_url( CYBOT_COOKIEBOT_PLUGIN_URL . CYBOT_COOKIEBOT_PLUGIN_ASSETS_DIR . $relative_path );
 		if ( ! file_exists( $absolute_path ) || empty( $url ) ) {
 			throw new InvalidArgumentException( 'Asset could not be loaded from "' . $absolute_path . '"' );
 		}
@@ -479,7 +579,8 @@ namespace cybot\cookiebot\lib {
 
 	/**
 	 * Helper function to update your scripts
-	 * @param  string|string[]  $type
+	 *
+	 * @param string|string[] $type
 	 *
 	 * @return string
 	 */
@@ -522,4 +623,6 @@ namespace cybot\cookiebot\lib {
 	function cookiebot() {
 		return Cookiebot_WP::instance();
 	}
+
+	const CYBOT_COOKIEBOT_PLUGIN_ASSETS_DIR = 'assets/';
 }

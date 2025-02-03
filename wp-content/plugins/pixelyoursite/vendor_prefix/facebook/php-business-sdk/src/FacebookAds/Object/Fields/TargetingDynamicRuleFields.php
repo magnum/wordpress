@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class TargetingDynamicRuleFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FIELD_ACTION_TYPE = 'action.type';
-    const AD_GROUP_ID = 'ad_group_id';
-    const CAMPAIGN_GROUP_ID = 'campaign_group_id';
-    const CAMPAIGN_ID = 'campaign_id';
-    const IMPRESSION_COUNT = 'impression_count';
-    const PAGE_ID = 'page_id';
-    const POST = 'post';
-    const RETENTION_SECONDS = 'retention_seconds';
-    public function getFieldTypes()
-    {
-        return array('action.type' => 'string', 'ad_group_id' => 'string', 'campaign_group_id' => 'string', 'campaign_id' => 'string', 'impression_count' => 'string', 'page_id' => 'string', 'post' => 'string', 'retention_seconds' => 'string');
-    }
+
+class TargetingDynamicRuleFields extends AbstractEnum {
+
+  const FIELD_ACTION_TYPE = 'action.type';
+  const AD_GROUP_ID = 'ad_group_id';
+  const CAMPAIGN_GROUP_ID = 'campaign_group_id';
+  const CAMPAIGN_ID = 'campaign_id';
+  const IMPRESSION_COUNT = 'impression_count';
+  const PAGE_ID = 'page_id';
+  const POST = 'post';
+  const RETENTION_SECONDS = 'retention_seconds';
+
+  public function getFieldTypes() {
+    return array(
+      'action.type' => 'string',
+      'ad_group_id' => 'string',
+      'campaign_group_id' => 'string',
+      'campaign_id' => 'string',
+      'impression_count' => 'string',
+      'page_id' => 'string',
+      'post' => 'string',
+      'retention_seconds' => 'string',
+    );
+  }
 }

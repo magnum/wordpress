@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,17 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdsPixelAutomaticMatchingFieldsValues getInstance()
  */
-class AdsPixelAutomaticMatchingFieldsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNTRY = 'country';
-    const CT = 'ct';
-    const DB = 'db';
-    const EM = 'em';
-    const EXTERNAL_ID = 'external_id';
-    const FN = 'fn';
-    const GE = 'ge';
-    const LN = 'ln';
-    const PH = 'ph';
-    const ST = 'st';
-    const ZP = 'zp';
+class AdsPixelAutomaticMatchingFieldsValues extends AbstractEnum {
+
+  const COUNTRY = 'country';
+  const CT = 'ct';
+  const DB = 'db';
+  const EM = 'em';
+  const EXTERNAL_ID = 'external_id';
+  const FN = 'fn';
+  const GE = 'ge';
+  const LN = 'ln';
+  const PH = 'ph';
+  const ST = 'st';
+  const ZP = 'zp';
 }

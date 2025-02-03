@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,29 +35,29 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PageModelValues getInstance()
  */
-class PageModelValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ARABIC = 'ARABIC';
-    const CHINESE = 'CHINESE';
-    const CROATIAN = 'CROATIAN';
-    const CUSTOM = 'CUSTOM';
-    const DANISH = 'DANISH';
-    const DUTCH = 'DUTCH';
-    const ENGLISH = 'ENGLISH';
-    const FRENCH_STANDARD = 'FRENCH_STANDARD';
-    const GEORGIAN = 'GEORGIAN';
-    const GERMAN_STANDARD = 'GERMAN_STANDARD';
-    const GREEK = 'GREEK';
-    const HEBREW = 'HEBREW';
-    const HUNGARIAN = 'HUNGARIAN';
-    const IRISH = 'IRISH';
-    const ITALIAN_STANDARD = 'ITALIAN_STANDARD';
-    const KOREAN = 'KOREAN';
-    const NORWEGIAN_BOKMAL = 'NORWEGIAN_BOKMAL';
-    const POLISH = 'POLISH';
-    const PORTUGUESE = 'PORTUGUESE';
-    const ROMANIAN = 'ROMANIAN';
-    const SPANISH = 'SPANISH';
-    const SWEDISH = 'SWEDISH';
-    const VIETNAMESE = 'VIETNAMESE';
+class PageModelValues extends AbstractEnum {
+
+  const ARABIC = 'ARABIC';
+  const CHINESE = 'CHINESE';
+  const CROATIAN = 'CROATIAN';
+  const CUSTOM = 'CUSTOM';
+  const DANISH = 'DANISH';
+  const DUTCH = 'DUTCH';
+  const ENGLISH = 'ENGLISH';
+  const FRENCH_STANDARD = 'FRENCH_STANDARD';
+  const GEORGIAN = 'GEORGIAN';
+  const GERMAN_STANDARD = 'GERMAN_STANDARD';
+  const GREEK = 'GREEK';
+  const HEBREW = 'HEBREW';
+  const HUNGARIAN = 'HUNGARIAN';
+  const IRISH = 'IRISH';
+  const ITALIAN_STANDARD = 'ITALIAN_STANDARD';
+  const KOREAN = 'KOREAN';
+  const NORWEGIAN_BOKMAL = 'NORWEGIAN_BOKMAL';
+  const POLISH = 'POLISH';
+  const PORTUGUESE = 'PORTUGUESE';
+  const ROMANIAN = 'ROMANIAN';
+  const SPANISH = 'SPANISH';
+  const SWEDISH = 'SWEDISH';
+  const VIETNAMESE = 'VIETNAMESE';
 }

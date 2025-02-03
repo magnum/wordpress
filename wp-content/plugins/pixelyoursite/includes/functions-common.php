@@ -187,7 +187,13 @@ function isWPMLActive() {
 
     return is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' );
 }
+function isPhotoCartActive() {
+    if ( ! function_exists( 'is_plugin_active' ) ) {
+        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
 
+    return is_plugin_active( 'sunshine-photo-cart/sunshine-photo-cart.php' );
+}
 /**
  * Clean variables using sanitize_text_field. Arrays are cleaned recursively.
  * Non-scalar values are ignored.
@@ -452,7 +458,7 @@ function isDisabledForCurrentRole() {
 		if ( in_array( $role, $disabled_for ) ) {
 
 			add_action( 'wp_head', function() {
-				echo "<script type='application/javascript'>console.warn('PixelYourSite is disabled for current user role.');</script>\r\n";
+				echo "<script type='application/javascript' id='pys-config-warning-user-role'>console.warn('PixelYourSite is disabled for current user role.');</script>\r\n";
 			} );
 
 			return true;
@@ -664,7 +670,31 @@ function getObjectTerms( $taxonomy, $post_id ) {
 	return $results;
 
 }
+/**
+ * @param string $taxonomy Taxonomy name
+ *
+ * @return array Array of object term names and id
+ */
+function getObjectTermsWithId( $taxonomy, $post_id ) {
 
+    $terms   = get_the_terms( $post_id, $taxonomy );
+    $results = array();
+
+    if ( is_wp_error( $terms ) || empty ( $terms ) ) {
+        return array();
+    }
+
+    // decode special chars
+    foreach ( $terms as $term ) {
+        $results[] = [
+            'name' => html_entity_decode( $term->name ),
+            'id'   => $term->term_id
+        ];
+    }
+
+    return $results;
+
+}
 /**
  * Sanitize event name. Only letters, numbers and underscores allowed.
  *
@@ -759,7 +789,10 @@ function endsWith( $haystack, $needle ) {
 }
 
 function getCurrentPageUrl($removeQuery = false) {
-    if($removeQuery) {
+    if(!isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['REQUEST_URI'])) {
+        return '';
+    }
+    if($removeQuery && isset($_SERVER['QUERY_STRING']) && isset($_SERVER['HTTP_HOST'])){
         return $_SERVER['HTTP_HOST'] . str_replace("?".$_SERVER['QUERY_STRING'],"",$_SERVER['REQUEST_URI']);
     }
     return  $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ;
@@ -1092,6 +1125,9 @@ function getStandardParams() {
             $params['page_title'] = $term->name;
         }
 
+    }elseif(is_archive()){
+        $params['page_title'] = get_the_archive_title();
+        $params['post_type'] = 'archive';
     } elseif ((isWooCommerceActive() && $cpt == 'product') ||
         (isEddActive() && $cpt == 'download') ) {
         $params['page_title'] = $post->post_title;
@@ -1111,4 +1147,166 @@ function getStandardParams() {
 
 
     return $params;
+}
+
+function getTrafficSource () {
+    $referrer = "";
+    $source = "";
+    try {
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            $referrer = $_SERVER['HTTP_REFERER'];
+        }
+
+        $direct = empty($referrer);
+        $internal = $direct ? false : (substr($referrer, 0, strlen(site_url())) === site_url());
+        $external = !$direct && !$internal;
+        $cookie = !isset($_COOKIE['pysTrafficSource']) ? null : $_COOKIE['pysTrafficSource'];
+        $session = !isset($_SESSION['TrafficSource']) ? null : $_SESSION['TrafficSource'];
+        if (!$external) {
+            $source = $cookie || $session ? $cookie ?? $session : 'direct';
+        } else {
+            $source = ($cookie && $cookie === $referrer) || ($session && $session === $referrer) ? $cookie ?? $session : $referrer;
+        }
+
+        if ($source !== 'direct') {
+
+            $parse = parse_url($source);
+            if(isset($parse['host'])) {
+                return $parse['host'];// leave only domain (Issue #70)
+            } elseif ($source == $cookie || $source == $session){
+                return $source;
+            } else {
+                return defined( 'REST_REQUEST' ) && REST_REQUEST ? 'REST API' : "direct";
+            }
+        } else {
+            return defined( 'REST_REQUEST' ) && REST_REQUEST ? 'REST API' : $source;
+        }
+    } catch (\Exception $e) {
+        return "direct";
+    }
+}
+
+function filterEmails($value) {
+    return validateEmail($value) ? "undefined" : $value;
+}
+
+function validateEmail($email){
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
+
+function getUtms ($seed_undefined = false) {
+    $utm = array();
+
+    $utmTerms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    foreach ($utmTerms as $utmTerm) {
+        if(isset($_GET[$utmTerm])) {
+            $utm[$utmTerm] = filterEmails($_GET[$utmTerm]);
+        } elseif (isset($_COOKIE["pys_".$utmTerm])) {
+            $utm[$utmTerm] =filterEmails( $_COOKIE["pys_".$utmTerm]);
+        } elseif(isset($_SESSION['TrafficUtms']) && isset($_SESSION['TrafficUtms'][$utmTerm])){
+            $utm[$utmTerm] =filterEmails( $_SESSION['TrafficUtms'][$utmTerm]);
+        } else {
+            if($seed_undefined){
+                $utm[$utmTerm] = "undefined";
+            }
+        }
+    }
+
+    return $utm;
+}
+
+function getUtmsId ($seed_undefined = false) {
+    $utm = array();
+
+    $utmTerms = ['fbadid', 'gadid', 'padid', 'bingid'];
+    foreach ($utmTerms as $utmTerm) {
+        if(isset($_GET[$utmTerm])) {
+            $utm[$utmTerm] = filterEmails($_GET[$utmTerm]);
+        } elseif (isset($_COOKIE["pys_".$utmTerm])) {
+            $utm[$utmTerm] =filterEmails( $_COOKIE["pys_".$utmTerm]);
+        } elseif(isset($_SESSION['TrafficUtmsId']) &&  isset($_SESSION['TrafficUtmsId'][$utmTerm])){
+            $utm[$utmTerm] =filterEmails( $_SESSION['TrafficUtmsId'][$utmTerm]);
+        } else {
+            if($seed_undefined){
+                $utm[$utmTerm] = "undefined";
+            }
+        }
+    }
+
+    return $utm;
+}
+function getBrowserTime(){
+    $dateTime = array();
+    $date = new \DateTime();
+
+    $days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    $months = array('January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December');
+    $hours = array('00-01', '01-02', '02-03', '03-04', '04-05', '05-06', '06-07', '07-08',
+        '08-09', '09-10', '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17',
+        '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24');
+
+    $dateTime[] = $hours[$date->format('G')];
+    $dateTime[] = $days[$date->format('w')];
+    $dateTime[] = $months[$date->format('n') - 1];
+
+    $dateTimeString = implode("|", $dateTime);
+    return $dateTimeString;
+}
+
+/**
+ * Get persistence user data
+ * @param $em
+ * @param $fn
+ * @param $ln
+ * @param $tel
+ * @return array
+ */
+function get_persistence_user_data( $em, $fn, $ln, $tel ) {
+
+	if ( !apply_filters( 'pys_disable_advanced_form_data_cookie', false ) && !apply_filters( 'pys_disable_advance_data_cookie', false ) ) {
+		if ( isset( $_COOKIE[ "pys_advanced_form_data" ] ) ) {
+			$userData = json_decode( stripslashes( $_COOKIE[ "pys_advanced_form_data" ] ), true );
+			$data_persistence = PYS()->getOption( 'data_persistency' );
+
+			if ( isset( $userData[ "email" ] ) && $userData[ "email" ] != "" && ( $data_persistence == 'keep_data' || empty( $em ) ) ) {
+				$em = $userData[ "email" ];
+			}
+			if ( isset( $userData[ "phone" ] ) && $userData[ "phone" ] != "" && ( $data_persistence == 'keep_data' || empty( $tel ) ) ) {
+				$tel = $userData[ "phone" ];
+			}
+			if ( isset( $userData[ "first_name" ] ) && $userData[ "first_name" ] != "" && ( $data_persistence == 'keep_data' || empty( $fn ) ) ) {
+				$fn = $userData[ "first_name" ];
+			}
+			if ( isset( $userData[ "last_name" ] ) && $userData[ "last_name" ] != "" && ( $data_persistence == 'keep_data' || empty( $ln ) ) ) {
+				$ln = $userData[ "last_name" ];
+			}
+		}
+	}
+
+	return array(
+		'em'  => $em,
+		'fn'  => $fn,
+		'ln'  => $ln,
+		'tel' => $tel
+	);
+}
+
+function getAllMetaEventParamName(){
+    $metaEventParamName = array(
+        'event_url'=>'Event URL',
+        'landing_page'=>'Landing Page URL',
+        'post_id'=>'Post ID',
+        'post_title'=>'Post Title',
+        'post_type'=>'Post Type',
+        'page_title' => 'Page Title',
+        'content_name'=>'Content Name',
+        'content_type'=>'Content Type',
+        'categories'=>'Categories',
+        'tags'=>'Tags',
+        'user_role'=>'User Role',
+        'plugin'=>'Plugin',
+    );
+
+    return $metaEventParamName;
 }

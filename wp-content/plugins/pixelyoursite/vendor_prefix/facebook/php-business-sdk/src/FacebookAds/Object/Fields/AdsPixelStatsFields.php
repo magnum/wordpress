@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdsPixelStatsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNT = 'count';
-    const DIAGNOSTICS_HOURLY_LAST_TIMESTAMP = 'diagnostics_hourly_last_timestamp';
-    const EVENT = 'event';
-    const VALUE = 'value';
-    public function getFieldTypes()
-    {
-        return array('count' => 'int', 'diagnostics_hourly_last_timestamp' => 'datetime', 'event' => 'string', 'value' => 'string');
-    }
+
+class AdsPixelStatsFields extends AbstractEnum {
+
+  const COUNT = 'count';
+  const DIAGNOSTICS_HOURLY_LAST_TIMESTAMP = 'diagnostics_hourly_last_timestamp';
+  const EVENT = 'event';
+  const VALUE = 'value';
+
+  public function getFieldTypes() {
+    return array(
+      'count' => 'int',
+      'diagnostics_hourly_last_timestamp' => 'datetime',
+      'event' => 'string',
+      'value' => 'string',
+    );
+  }
 }

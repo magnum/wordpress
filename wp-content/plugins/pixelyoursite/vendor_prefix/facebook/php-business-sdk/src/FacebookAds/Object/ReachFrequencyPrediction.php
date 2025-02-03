@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ReachFrequencyPredictionFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionActionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionBuyingTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionInstreamPackagesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,38 +41,53 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionInstreamPac
  * pull request for this class.
  *
  */
-class ReachFrequencyPrediction extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'reachfrequencypredictions';
-    }
-    /**
-     * @return ReachFrequencyPredictionFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ReachFrequencyPredictionFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Action'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionActionValues::getInstance()->getValues();
-        $ref_enums['BuyingType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionBuyingTypeValues::getInstance()->getValues();
-        $ref_enums['InstreamPackages'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ReachFrequencyPredictionInstreamPackagesValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ReachFrequencyPrediction(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ReachFrequencyPrediction::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class ReachFrequencyPrediction extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'reachfrequencypredictions';
+  }
+
+  /**
+   * @return ReachFrequencyPredictionFields
+   */
+  public static function getFieldsEnum() {
+    return ReachFrequencyPredictionFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Action'] = ReachFrequencyPredictionActionValues::getInstance()->getValues();
+    $ref_enums['BuyingType'] = ReachFrequencyPredictionBuyingTypeValues::getInstance()->getValues();
+    $ref_enums['InstreamPackages'] = ReachFrequencyPredictionInstreamPackagesValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new ReachFrequencyPrediction(),
+      'NODE',
+      ReachFrequencyPrediction::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

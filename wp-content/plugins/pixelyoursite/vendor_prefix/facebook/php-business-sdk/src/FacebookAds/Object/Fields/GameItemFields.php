@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class GameItemFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNT = 'count';
-    const CREATED = 'created';
-    const EXT_ID = 'ext_id';
-    const ID = 'id';
-    const ITEM_DEF = 'item_def';
-    const OWNER = 'owner';
-    const STATUS = 'status';
-    const UPDATED = 'updated';
-    public function getFieldTypes()
-    {
-        return array('count' => 'int', 'created' => 'datetime', 'ext_id' => 'string', 'id' => 'string', 'item_def' => 'string', 'owner' => 'User', 'status' => 'string', 'updated' => 'datetime');
-    }
+
+class GameItemFields extends AbstractEnum {
+
+  const COUNT = 'count';
+  const CREATED = 'created';
+  const EXT_ID = 'ext_id';
+  const ID = 'id';
+  const ITEM_DEF = 'item_def';
+  const OWNER = 'owner';
+  const STATUS = 'status';
+  const UPDATED = 'updated';
+
+  public function getFieldTypes() {
+    return array(
+      'count' => 'int',
+      'created' => 'datetime',
+      'ext_id' => 'string',
+      'id' => 'string',
+      'item_def' => 'string',
+      'owner' => 'User',
+      'status' => 'string',
+      'updated' => 'datetime',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeObjectStorySpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const INSTAGRAM_ACTOR_ID = 'instagram_actor_id';
-    const LINK_DATA = 'link_data';
-    const PAGE_ID = 'page_id';
-    const PHOTO_DATA = 'photo_data';
-    const TEMPLATE_DATA = 'template_data';
-    const TEXT_DATA = 'text_data';
-    const VIDEO_DATA = 'video_data';
-    public function getFieldTypes()
-    {
-        return array('instagram_actor_id' => 'string', 'link_data' => 'AdCreativeLinkData', 'page_id' => 'string', 'photo_data' => 'AdCreativePhotoData', 'template_data' => 'AdCreativeLinkData', 'text_data' => 'AdCreativeTextData', 'video_data' => 'AdCreativeVideoData');
-    }
+
+class AdCreativeObjectStorySpecFields extends AbstractEnum {
+
+  const INSTAGRAM_ACTOR_ID = 'instagram_actor_id';
+  const LINK_DATA = 'link_data';
+  const PAGE_ID = 'page_id';
+  const PHOTO_DATA = 'photo_data';
+  const TEMPLATE_DATA = 'template_data';
+  const TEXT_DATA = 'text_data';
+  const VIDEO_DATA = 'video_data';
+
+  public function getFieldTypes() {
+    return array(
+      'instagram_actor_id' => 'string',
+      'link_data' => 'AdCreativeLinkData',
+      'page_id' => 'string',
+      'photo_data' => 'AdCreativePhotoData',
+      'template_data' => 'AdCreativeLinkData',
+      'text_data' => 'AdCreativeTextData',
+      'video_data' => 'AdCreativeVideoData',
+    );
+  }
 }

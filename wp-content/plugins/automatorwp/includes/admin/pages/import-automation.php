@@ -248,9 +248,27 @@ function automatorwp_ajax_import_automation_from_url() {
                 continue;
             }
 
-            foreach ( $item['o'] as $meta_key => $meta_value ) {
+            $type = sanitize_text_field( $item['t'] );
 
-                $type = sanitize_text_field( $item['t'] );
+            if( $item_type === 'trigger' ) {
+                $object = automatorwp_get_trigger( $type );
+            } else {
+                $object = automatorwp_get_action( $type );
+            }
+
+            $fields = array();
+
+            // Merge all object fields to check them later
+            if( isset( $object['options'] ) ) {
+                foreach( $object['options'] as $option => $option_args ) {
+                    if( isset( $option_args['fields'] ) ) {
+                        $fields = $option_args['fields'];
+                    }
+                }
+                
+            }
+
+            foreach ( $item['o'] as $meta_key => $meta_value ) {
 
                 /**
                  * Filter to exclude a meta on export this item through URL
@@ -271,10 +289,30 @@ function automatorwp_ajax_import_automation_from_url() {
                     continue;
                 }
 
+                // KEY
                 $meta_key = sanitize_key( $meta_key );
                 $meta_key = wp_unslash( $meta_key );
 
+                // Skip if this meta key is not an object field
+                if( ! isset( $fields[$meta_key] ) ) {
+                    continue;
+                }
+
+                $field_type = ( isset( $fields[$meta_key]['type'] ) ? $fields[$meta_key]['type'] : 'text' );
+
+                // VALUE
                 $meta_value = urldecode( $meta_value );
+
+
+                // Sanitize value based on its type
+                if( in_array( $field_type, array( 'textarea', 'textarea_small', 'textarea_code', 'wysiwyg' ) ) ) {
+                    // HTML fields
+                    $meta_value = wp_kses_post( $meta_value );
+                } else {
+                    // The rest of field types
+                    $meta_value = sanitize_text_field( $meta_value );
+                }
+
                 $meta_value = maybe_unserialize( $meta_value );
                 $meta_value = wp_unslash( $meta_value );
                 $meta_value = esc_sql( $meta_value );

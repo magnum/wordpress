@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdStudyCellFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AD_ENTITIES_COUNT = 'ad_entities_count';
-    const CONTROL_PERCENTAGE = 'control_percentage';
-    const ID = 'id';
-    const NAME = 'name';
-    const TREATMENT_PERCENTAGE = 'treatment_percentage';
-    public function getFieldTypes()
-    {
-        return array('ad_entities_count' => 'unsigned int', 'control_percentage' => 'float', 'id' => 'string', 'name' => 'string', 'treatment_percentage' => 'float');
-    }
+
+class AdStudyCellFields extends AbstractEnum {
+
+  const AD_ENTITIES_COUNT = 'ad_entities_count';
+  const CONTROL_PERCENTAGE = 'control_percentage';
+  const ID = 'id';
+  const NAME = 'name';
+  const TREATMENT_PERCENTAGE = 'treatment_percentage';
+
+  public function getFieldTypes() {
+    return array(
+      'ad_entities_count' => 'unsigned int',
+      'control_percentage' => 'float',
+      'id' => 'string',
+      'name' => 'string',
+      'treatment_percentage' => 'float',
+    );
+  }
 }

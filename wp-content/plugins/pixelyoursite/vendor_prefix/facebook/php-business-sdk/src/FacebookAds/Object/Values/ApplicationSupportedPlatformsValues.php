@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,20 +35,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ApplicationSupportedPlatformsValues getInstance()
  */
-class ApplicationSupportedPlatformsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMAZON = 'AMAZON';
-    const ANDROID = 'ANDROID';
-    const CANVAS = 'CANVAS';
-    const GAMEROOM = 'GAMEROOM';
-    const INSTANT_GAME = 'INSTANT_GAME';
-    const IPAD = 'IPAD';
-    const IPHONE = 'IPHONE';
-    const MOBILE_WEB = 'MOBILE_WEB';
-    const OCULUS = 'OCULUS';
-    const SAMSUNG = 'SAMSUNG';
-    const SUPPLEMENTARY_IMAGES = 'SUPPLEMENTARY_IMAGES';
-    const WEB = 'WEB';
-    const WINDOWS = 'WINDOWS';
-    const XIAOMI = 'XIAOMI';
+class ApplicationSupportedPlatformsValues extends AbstractEnum {
+
+  const AMAZON = 'AMAZON';
+  const ANDROID = 'ANDROID';
+  const CANVAS = 'CANVAS';
+  const GAMEROOM = 'GAMEROOM';
+  const INSTANT_GAME = 'INSTANT_GAME';
+  const IPAD = 'IPAD';
+  const IPHONE = 'IPHONE';
+  const MOBILE_WEB = 'MOBILE_WEB';
+  const OCULUS = 'OCULUS';
+  const SAMSUNG = 'SAMSUNG';
+  const SUPPLEMENTARY_IMAGES = 'SUPPLEMENTARY_IMAGES';
+  const WEB = 'WEB';
+  const WINDOWS = 'WINDOWS';
+  const XIAOMI = 'XIAOMI';
 }

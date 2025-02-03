@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,17 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdSetBillingEventValues getInstance()
  */
-class AdSetBillingEventValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP_INSTALLS = 'APP_INSTALLS';
-    const CLICKS = 'CLICKS';
-    const IMPRESSIONS = 'IMPRESSIONS';
-    const LINK_CLICKS = 'LINK_CLICKS';
-    const LISTING_INTERACTION = 'LISTING_INTERACTION';
-    const NONE = 'NONE';
-    const OFFER_CLAIMS = 'OFFER_CLAIMS';
-    const PAGE_LIKES = 'PAGE_LIKES';
-    const POST_ENGAGEMENT = 'POST_ENGAGEMENT';
-    const PURCHASE = 'PURCHASE';
-    const THRUPLAY = 'THRUPLAY';
+class AdSetBillingEventValues extends AbstractEnum {
+
+  const APP_INSTALLS = 'APP_INSTALLS';
+  const CLICKS = 'CLICKS';
+  const IMPRESSIONS = 'IMPRESSIONS';
+  const LINK_CLICKS = 'LINK_CLICKS';
+  const LISTING_INTERACTION = 'LISTING_INTERACTION';
+  const NONE = 'NONE';
+  const OFFER_CLAIMS = 'OFFER_CLAIMS';
+  const PAGE_LIKES = 'PAGE_LIKES';
+  const POST_ENGAGEMENT = 'POST_ENGAGEMENT';
+  const PURCHASE = 'PURCHASE';
+  const THRUPLAY = 'THRUPLAY';
 }

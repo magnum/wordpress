@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static BusinessOwnedObjectOnBehalfOfRequestStatusValues getInstance()
  */
-class BusinessOwnedObjectOnBehalfOfRequestStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APPROVE = 'APPROVE';
-    const DECLINE = 'DECLINE';
-    const EXPIRED = 'EXPIRED';
-    const IN_PROGRESS = 'IN_PROGRESS';
-    const PENDING = 'PENDING';
-    const PENDING_INTEGRITY_REVIEW = 'PENDING_INTEGRITY_REVIEW';
+class BusinessOwnedObjectOnBehalfOfRequestStatusValues extends AbstractEnum {
+
+  const APPROVE = 'APPROVE';
+  const DECLINE = 'DECLINE';
+  const EXPIRED = 'EXPIRED';
+  const IN_PROGRESS = 'IN_PROGRESS';
+  const PENDING = 'PENDING';
+  const PENDING_EMAIL_VERIFICATION = 'PENDING_EMAIL_VERIFICATION';
+  const PENDING_INTEGRITY_REVIEW = 'PENDING_INTEGRITY_REVIEW';
 }

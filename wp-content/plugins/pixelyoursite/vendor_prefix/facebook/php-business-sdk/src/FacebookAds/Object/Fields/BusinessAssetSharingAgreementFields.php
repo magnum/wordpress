@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessAssetSharingAgreementFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const INITIATOR = 'initiator';
-    const RECIPIENT = 'recipient';
-    const RELATIONSHIP_TYPE = 'relationship_type';
-    const REQUEST_STATUS = 'request_status';
-    const REQUEST_TYPE = 'request_type';
-    public function getFieldTypes()
-    {
-        return array('id' => 'string', 'initiator' => 'Business', 'recipient' => 'Business', 'relationship_type' => 'list<string>', 'request_status' => 'string', 'request_type' => 'string');
-    }
+
+class BusinessAssetSharingAgreementFields extends AbstractEnum {
+
+  const ID = 'id';
+  const INITIATOR = 'initiator';
+  const RECIPIENT = 'recipient';
+  const RELATIONSHIP_TYPE = 'relationship_type';
+  const REQUEST_STATUS = 'request_status';
+  const REQUEST_TYPE = 'request_type';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'string',
+      'initiator' => 'Business',
+      'recipient' => 'Business',
+      'relationship_type' => 'list<string>',
+      'request_status' => 'string',
+      'request_type' => 'string',
+    );
+  }
 }

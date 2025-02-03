@@ -1,0 +1,1808 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: miniOrange SSO using SAML 2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-18 16:59+0000\n"
+"PO-Revision-Date: 2024-09-18 17:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.11; wp-6.6.2\n"
+"X-Domain: miniorange-saml-20-single-sign-on"
+
+#. %1s: search term
+#: class-mo-saml-logger.php:294
+#, php-format
+msgid ""
+"To allow logging, make  <code>\"%1s\"</code> directory writable.miniOrange "
+"will not be able to log the errors."
+msgstr ""
+
+#. %s: search term
+#: class-mo-saml-logger.php:308
+#, php-format
+msgid ""
+" miniOrange SAML 2.0 logs are active. Want to turn it off? <a href=\"%s\">"
+"Learn more here."
+msgstr ""
+
+#: class-mo-saml-login-widget.php:28
+msgid "This is a miniOrange SAML login widget."
+msgstr "Dies ist ein miniOrange SAML-login widget."
+
+#: class-mo-saml-login-widget.php:113
+msgid "Please configure the miniOrange SAML Plugin first."
+msgstr "Bitte konfigurieren Sie die miniOrange SAML-Plugin das erste mal."
+
+#: class-mo-saml-login-widget.php:117
+msgid "We could not sign you in. Please contact your Administrator."
+msgstr ""
+"Wir konnten Sie nicht anmelden. Bitte Kontaktieren Sie Ihren Administrator."
+
+#. %s: user's display name
+#: class-mo-saml-login-widget.php:129
+#, php-format
+msgid "Hello, %s"
+msgstr "Hallo, %s"
+
+#: class-mo-saml-login-widget.php:134
+msgid "Logout"
+msgstr "Logout"
+
+#: class-mo-saml-utilities.php:716 class-mo-saml-utilities.php:733
+msgid "Unable to connect to the Internet. Please try again."
+msgstr "Keine Verbindung zum Internet. Bitte versuchen Sie es erneut."
+
+#: class-mo-saml-wp-config-editor.php:47 class-mo-saml-wp-config-editor.php:218
+msgid "File doesn't exist."
+msgstr "Datei nicht vorhanden ist."
+
+#: class-mo-saml-wp-config-editor.php:64 class-mo-saml-wp-config-editor.php:74
+msgid ""
+"Failed to update the WP config file. Please enable the debug-logs manually"
+msgstr ""
+"Fehler beim update der WP-config-Datei. Bitte aktivieren Sie die debug-"
+"Protokolle manuell"
+
+#: class-mo-saml-wp-config-editor.php:78
+msgid "Configuration Saved Successfully"
+msgstr "Konfiguration Erfolgreich Gespeichert"
+
+#: class-mo-saml-wp-config-editor.php:93 class-mo-saml-wp-config-editor.php:132
+msgid "Config value must be a string."
+msgstr "Config-Wert muss eine Zeichenfolge sein."
+
+#: class-mo-saml-wp-config-editor.php:109
+msgid "Unable to locate placement anchor."
+msgstr "Nicht in der Lage zu finden die Platzierung Anker."
+
+#: class-mo-saml-wp-config-editor.php:225
+msgid "<code>wp-config.php</code> file is empty."
+msgstr ""
+
+#: login.php:296
+msgid "Configure SAML Identity Provider for SSO"
+msgstr "Konfigurieren der SAML-Identity-Provider für SSO"
+
+#: login.php:309
+msgid "Plugin Configuration"
+msgstr "Plugin-Konfiguration"
+
+#: login.php:317 login.php:388
+msgid "Premium Plans"
+msgstr "Premium-Pläne"
+
+#: login.php:325 views/mo-saml-plugin-core.php:161
+msgid "Add-Ons"
+msgstr "Add-Ons"
+
+#: login.php:333 views/mo-saml-plugin-core.php:208
+msgid "Troubleshoot"
+msgstr "Problembehandlung"
+
+#: login.php:387
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: mo-saml-settings-page.php:203
+msgid "Close"
+msgstr "Schließen"
+
+#: views/mo-saml-account-setup.php:25
+msgid "Thank you for registering with miniOrange"
+msgstr "Danke für die Registrierung mit miniOrange"
+
+#: views/mo-saml-account-setup.php:29
+msgid "miniOrange Account Email"
+msgstr "miniOrange Konto-E-Mail"
+
+#: views/mo-saml-account-setup.php:33
+msgid "Customer ID"
+msgstr "Kunden-ID"
+
+#: views/mo-saml-account-setup.php:45
+msgid "Switch Account"
+msgstr "Konto Wechseln"
+
+#: views/mo-saml-account-setup.php:49
+msgid "Check Licensing Plans"
+msgstr "Überprüfen Sie Die Lizenzierung Pläne"
+
+#: views/mo-saml-account-setup.php:70
+msgid ""
+"Hey! You are using the free version of the plugin. If you have already "
+"purchased,"
+msgstr ""
+"Hey! Sie sind mit der kostenlosen version des plugins. Wenn Sie bereits "
+"gekauft haben,"
+
+#: views/mo-saml-account-setup.php:71
+msgid "you can follow these steps to download the paid plugin."
+msgstr "befolgen Sie diese Schritte zum herunterladen der bezahlt plugin."
+
+#: views/mo-saml-account-setup.php:85
+msgid "Register with miniOrange"
+msgstr "Registrieren Sie sich mit miniOrange"
+
+#: views/mo-saml-account-setup.php:88
+msgid "Why should I register?"
+msgstr "Warum sollte ich mich registrieren?"
+
+#: views/mo-saml-account-setup.php:89
+msgid "Why should I login?"
+msgstr "Warum sollte ich mich anmelden?"
+
+#: views/mo-saml-account-setup.php:90
+msgid ""
+"You should register so that in case you need help, we can help you with step "
+"by step instructions. We support all known IdPs - ADFS, Okta, Salesforce, "
+"Shibboleth, SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, "
+"OneLogin, Bitium, WSO2 etc. You will also need a miniOrange account to "
+"upgrade to the premium version of the plugins. We do not store any "
+"information except the email that you will use to register with us."
+msgstr ""
+"Sie müssen sich registrieren, so dass im Fall, dass Sie Hilfe brauchen, wir "
+"können Ihnen helfen, mit Schritt-für-Schritt Anleitung. Wir unterstützen "
+"alle bekannten Vertriebenen - ADFS, Okta, Salesforce, Shibboleth, "
+"SimpleSAMLphp, OpenAM, Centrify, Ping, RSA, IBM, Oracle, OneLogin, Bitium, "
+"WSO2 etc. Sie müssen auch eine miniOrange-account, um ein upgrade auf die "
+"premium-version des plugins. Wir speichern keine Informationen außer der E-"
+"Mail, mit der Sie sich bei uns registrieren."
+
+#: views/mo-saml-account-setup.php:91
+msgid ""
+"You should login so that you can easily reach out to us in case you face any "
+"issues while setting up the SSO with your IDP. You will also need a "
+"miniOrange account to upgrade to the premium version of the plugins. We do "
+"not store any information except the email that you will use to register "
+"with us."
+msgstr ""
+"Sollten Sie login, so dass Sie kann leicht erreichen Sie uns in Fall Sie "
+"irgendwelche Fragen während der Einstellung der SSO mit Ihrem IDP. Sie "
+"müssen auch eine miniOrange-account, um ein upgrade auf die premium-version "
+"des plugins. Wir speichern keine Informationen außer der E-Mail, mit der Sie "
+"sich bei uns registrieren."
+
+#: views/mo-saml-account-setup.php:103 views/mo-saml-account-setup.php:128
+msgid "Email"
+msgstr "E-Mail"
+
+#: views/mo-saml-account-setup.php:111 views/mo-saml-account-setup.php:136
+msgid "Password"
+msgstr "Passwort"
+
+#: views/mo-saml-account-setup.php:114
+msgid "Password (Min. length 6)"
+msgstr "Passwort (Min. Länge 6)"
+
+#: views/mo-saml-account-setup.php:119
+msgid "Confirm Password"
+msgstr "Passwort Bestätigen"
+
+#: views/mo-saml-account-setup.php:122
+msgid "Confirm your password"
+msgstr "Bestätigen Sie Ihr Passwort"
+
+#: views/mo-saml-account-setup.php:144
+msgid "Register"
+msgstr "Registrieren"
+
+#: views/mo-saml-account-setup.php:145
+msgid "Login"
+msgstr "Login"
+
+#: views/mo-saml-account-setup.php:153
+msgid "Already have an account?"
+msgstr "Sie haben bereits ein Konto?"
+
+#: views/mo-saml-account-setup.php:154
+msgid "Sign Up"
+msgstr "Anmelden"
+
+#: views/mo-saml-account-setup.php:157
+msgid "Need Help? Contact us at"
+msgstr "Brauchen Sie Hilfe? Kontaktieren Sie uns unter"
+
+#: views/mo-saml-account-setup.php:157
+msgid "and we'll help you set up SSO with your IdP in no time."
+msgstr "und wir werden helfen Sie set up SSO mit Ihrem IdP in kürzester Zeit."
+
+#: views/mo-saml-addons.php:21
+msgid ""
+"Allows to synchronize WordPress objects to Salesforce. Along with WordPress "
+"to Salesforce sync the plugin can also enable syncing data from Salesforce "
+"to WordPress."
+msgstr ""
+"Ermöglicht das synchronisieren von WordPress Objekte in Salesforce. Zusammen "
+"mit WordPress-zu-Salesforce-sync-plugin ermöglicht auch die Synchronisierung "
+"von Daten aus Salesforce, WordPress."
+
+#: views/mo-saml-addons.php:22
+msgid ""
+"To establishing trust between the WordPress site and Power BI to securely "
+"authenticate and login users to the WordPress site."
+msgstr ""
+"Zur Vertrauensbildung zwischen WordPress-Website und Power BI zu "
+"authentifizieren und login-Benutzer die WordPress-Website."
+
+#: views/mo-saml-addons.php:23
+msgid ""
+"To establishing trust between the WordPress site and Microsoft SharePoint to "
+"securely authenticate and login users to the WordPress site."
+msgstr ""
+"Zur Herstellung von Vertrauen zwischen den WordPress-site und Microsoft "
+"SharePoint zu authentifizieren und login-Benutzer die WordPress-Website."
+
+#: views/mo-saml-addons.php:24
+msgid ""
+"Creates a Central directory of Employees, Staff or Team. Provides an easily "
+"searchable, sortable list of all the Employees, group or tag your Employees "
+"based on categories and many more."
+msgstr ""
+"Erstellt ein zentrales Verzeichnis der Angestellten, Arbeitnehmer, "
+"Mitarbeiter oder Team. Bietet eine einfach durchsuchbare und sortierbare "
+"Liste aller Mitarbeiter -, Gruppen-oder tag-Ihre Mitarbeiter basiert auf "
+"Kategorien, und viele mehr."
+
+#: views/mo-saml-addons.php:25
+msgid ""
+"Provides an option for bi-directional synchronization of the users from "
+"Azure AD / Azure B2C / Office 365 to WordPress. It also supports seamless "
+"WordPress integration with all Microsoft Apps"
+msgstr ""
+"Bietet eine option für \" bi-direktionale Synchronisation der Benutzer aus "
+"Azure AD / Azure B2C / Office 365, WordPress. Es unterstützt auch die "
+"nahtlose WordPress-integration mit allen Microsoft-Apps"
+
+#: views/mo-saml-addons.php:26 includes/lib/class-mo-saml-options-enum.php:302
+msgid ""
+"Allows real-time user sync (automatic user create, delete, and update) from "
+"your Identity Provider such as Azure, Okta, Onelogin into your WordPress "
+"site."
+msgstr ""
+"Ermöglicht die Echtzeit-Benutzer-sync (automatische Benutzer erstellen, "
+"löschen und aktualisieren) von Ihrem identitätsanbieter wie Azure, Okta, "
+"Onelogin in Ihre WordPress-Website."
+
+#: views/mo-saml-addons.php:27 includes/lib/class-mo-saml-options-enum.php:296
+msgid ""
+"Restrict access to WordPress pages/posts based on user roles and their login "
+"status, thereby protecting these pages/posts from unauthorized access."
+msgstr ""
+"Beschränken Sie den Zugriff auf WordPress-Seiten/Beiträge auf Benutzerrollen "
+"basiert und den login-status, und schützen damit diese Seiten/Beiträge vor "
+"unbefugtem Zugriff."
+
+#: views/mo-saml-addons.php:28
+msgid ""
+"Restrict any kind of media files such as images, audio, videos, documents, "
+"etc, and any extension (configurable) such as png, pdf, jpeg, jpg, bmp, gif, "
+"etc."
+msgstr ""
+"Beschränken Sie jede Art von Medien-Dateien wie Bilder, audio, videos, "
+"Dokumente, etc, und jede Erweiterung (konfigurierbar) wie png, pdf, jpeg, "
+"jpg, bmp, gif, etc."
+
+#: views/mo-saml-addons.php:29
+msgid ""
+"SSO Login Audit tracks all the SSO users and generates detailed reports. The "
+"advanced search filters in audit reports makes it easy to find and keep "
+"track of your users."
+msgstr ""
+"Die SSO-Anmeldung Audit-tracks alle SSO-Benutzer und erzeugt detaillierte "
+"Berichte. Die erweiterte Suche Filter im audit-Berichte, die macht es leicht "
+"zu finden und zu halten track von Ihre Benutzer."
+
+#: views/mo-saml-addons.php:30
+msgid ""
+"Integrate user information sent by the SAML Identity Provider in SAML "
+"Assertion with the BuddyPress profile fields."
+msgstr ""
+"Integrieren Sie die Benutzer-Informationen gesendet durch die SAML-Identity-"
+"Provider in der SAML-Assertion mit dem BuddyPress Profilfelder."
+
+#: views/mo-saml-addons.php:31
+msgid ""
+"Allows mapping your users to different LearnDash LMS plugin groups as per "
+"their group information sent by configured  SAML Identity Provider."
+msgstr ""
+"Ermöglicht die Zuordnung Ihrer Benutzer zu verschiedenen LearnDash LMS-"
+"plugin-Gruppen wie pro Ihre Gruppe die Informationen gesendet durch die "
+"konfigurierten SAML Identity Provider."
+
+#: views/mo-saml-addons.php:32
+msgid ""
+"Enables you to redirect your users to different pages after they log into "
+"your site, based on the attributes sent by your Identity Provider."
+msgstr ""
+"Können Sie leitet den Benutzer zu anderen Seiten, nachdem Sie sich in Ihre "
+"Website, basierend auf den Parametern gesendet, die von Ihrem Identity-"
+"Provider."
+
+#: views/mo-saml-addons.php:33
+msgid ""
+"Helps you in managing the login session time of your users based on their "
+"WordPress roles. Session time for roles can be specified."
+msgstr ""
+"Hilft Ihnen bei der Verwaltung des login-session-time der Benutzer basierend "
+"auf Ihrer WordPress-Rollen. Session Zeit für Rollen angegeben werden können."
+
+#: views/mo-saml-addons.php:34
+msgid ""
+"Allows secure access to the site using various federations such as InCommon, "
+"HAKA, HKAF, etc. Users can log into the WordPress site using their "
+"university credentials."
+msgstr ""
+"Ermöglicht den sicheren Zugriff auf die Website über verschiedene Verbände "
+"wie verwendet incommon, HAKA, HKAF, etc. Benutzer können log in die "
+"WordPress-site mit Ihrem Uni-Login."
+
+#: views/mo-saml-addons.php:35
+msgid ""
+"Map users to different membership levels created by the MemberPress plugin "
+"using the group information sent by your Identity Provider."
+msgstr ""
+"Die Zuordnung von Benutzern zu unterschiedlichen Mitgliedschaften, erstellt "
+"von der MemberPress plugin mit der Gruppe gesendeten Informationen von Ihrem "
+"Identity-Provider."
+
+#: views/mo-saml-addons.php:36
+msgid ""
+"Integrate WP-members fields using the attributes sent by your SAML Identity "
+"Provider in the SAML Assertion."
+msgstr ""
+"Integrieren WP-Mitglieder, die Felder mit Hilfe der Attribute geschickt von "
+"Ihrem SAML-identitätsanbieter in der SAML-Assertion."
+
+#: views/mo-saml-addons.php:37
+msgid ""
+"Map WooCommerce checkout page fields using the attributes sent by your IDP. "
+"This also allows you to map the users in different WooCommerce roles based "
+"on their IDP groups."
+msgstr ""
+"Karte WooCommerce checkout-Seite Feldern mit den Parametern gesendet durch "
+"Ihren IDP. Auch dies ermöglicht Ihnen die Zuordnung der Benutzer in "
+"verschiedenen WooCommerce-Rollen basierend auf Ihre IDP-Gruppen."
+
+#: views/mo-saml-addons.php:38
+msgid ""
+"Allows users to SSO into your site without creating a user account for them. "
+"This is useful when you dont want to manage the user accounts at the "
+"WordPress site."
+msgstr ""
+"Ermöglicht es Benutzern, um SSO in Ihre Website erstellen, ohne ein "
+"Benutzerkonto für Sie. Dies ist nützlich, wenn Sie nicht wollen, zu "
+"verwalten die Benutzerkonten WordPress-Website."
+
+#: views/mo-saml-addons.php:39
+msgid ""
+"Map your users to different Paid MembershipPro membership levels as per the "
+"group information sent by your Identity Provider."
+msgstr ""
+"Zuordnung von Benutzern zu verschiedenen Bezahlt MembershipPro "
+"Mitgliedschaft Ebenen, wie pro die Gruppe gesendete information von Ihrem "
+"Identity-Provider."
+
+#: views/mo-saml-addons.php:40
+msgid ""
+"Maps raw image data or URL received from your Identity Provider into "
+"Gravatar for the user."
+msgstr ""
+"Karten von raw-Bilddaten oder URL erhalten von Ihrem Identity-Provider in "
+"Gravatar für die Benutzer."
+
+#: views/mo-saml-addons.php:41
+msgid ""
+"It simplifies the process of configuring multiple communities by allowing "
+"you to configure login and logout URLs for each community in one place. This "
+"enables users from various Salesforce Communities to seamlessly single sign-"
+"on (SSO) into your WordPress site."
+msgstr ""
+"Es vereinfacht den Prozess der Konfiguration mehrerer Gemeinden, indem Sie "
+"zum konfigurieren der login-und logout-URLs für jede Gemeinschaft an einem "
+"Ort. Dies ermöglicht es den Benutzern, aus verschiedenen Salesforce-"
+"Communities, um nahtlose single sign-on (SSO) in Ihre WordPress-Website."
+
+#: views/mo-saml-addons.php:42
+msgid ""
+"Allows the whitelisted users to bypass redirection to the IDP for "
+"authentication based on their IP address."
+msgstr ""
+"Ermöglicht es dem Benutzer auf der Whitelist zu umgehen Weiterleitung zum "
+"IDP zur Authentifizierung basierend auf Ihrer IP-Adresse."
+
+#: views/mo-saml-addons.php:43
+msgid ""
+"It reduces the requirement of configuring multiple tenants separately. All "
+"the users from the configured tenants will be able to perform SSO login "
+"using only a single Azure AD application with a common endpoint."
+msgstr ""
+"Es reduziert die Anforderung der Konfiguration von mehreren Mietern separat. "
+"Alle Benutzer aus, die konfiguriert Mieter werden in der Lage zu führen Sie "
+"die SSO-Anmeldung unter Verwendung nur einer einzelnen Azure AD-Anwendung, "
+"die mit einem gemeinsamen Endpunkt."
+
+#: views/mo-saml-addons.php:63
+msgid "Recommended Add-ons for you"
+msgstr "Empfohlen Add-ons für Sie"
+
+#: views/mo-saml-addons.php:86
+msgid "Check out all our add-ons"
+msgstr "Schauen Sie sich alle unsere add-ons"
+
+#: views/mo-saml-addons.php:119
+msgid "Learn More"
+msgstr "Erfahren Sie Mehr"
+
+#: views/mo-saml-attribute-role-mapping.php:48
+msgid "Attribute Mapping"
+msgstr "Attribut-Mapping"
+
+#: views/mo-saml-attribute-role-mapping.php:62
+msgid ""
+"The basic attributes are configurable in Standard, Premium, Enterprise and "
+"All-Inclusive plans. Custom Attributes are configurable in Premium and "
+"higher plans. "
+msgstr ""
+
+#: views/mo-saml-attribute-role-mapping.php:62
+#: views/mo-saml-attribute-role-mapping.php:182
+#: views/mo-saml-attribute-role-mapping.php:207
+#: views/mo-saml-redirection-sso-links.php:78
+#: views/mo-saml-redirection-sso-links.php:272
+#: views/mo-saml-redirection-sso-links.php:325
+#: views/mo-saml-redirection-sso-links.php:379
+#: views/mo-saml-service-provider-metadata.php:64
+msgid "Click here to upgrade"
+msgstr "Klicken Sie hier, um das upgrade"
+
+#: views/mo-saml-attribute-role-mapping.php:66
+msgid "Username (required) "
+msgstr ""
+
+#: views/mo-saml-attribute-role-mapping.php:74
+msgid "Email (required) :"
+msgstr "E-Mail (erforderlich) :"
+
+#: views/mo-saml-attribute-role-mapping.php:82
+msgid "First Name :"
+msgstr "Vorname :"
+
+#: views/mo-saml-attribute-role-mapping.php:90
+msgid "Last Name :"
+msgstr "Nachname :"
+
+#: views/mo-saml-attribute-role-mapping.php:98
+msgid "Group/Role :"
+msgstr "Gruppe/Rolle :"
+
+#: views/mo-saml-attribute-role-mapping.php:106
+msgid "Map Custom Attributes"
+msgstr "Anzeigen Benutzerdefinierte Attribute"
+
+#: views/mo-saml-attribute-role-mapping.php:109
+msgid ""
+"Customized Attribute Mapping means you can map any attribute of the IDP to "
+"the usermeta table of your database."
+msgstr ""
+"Benutzerdefinierte Attribute Mapping bedeutet, dass Sie können die Karte "
+"jedes Attribut der IDP der usermeta-Tabelle aus Ihrer Datenbank."
+
+#: views/mo-saml-attribute-role-mapping.php:116
+msgid ""
+"Enable this option if you want to allow users to login to the WordPress site "
+"without creating a WordPress user account for them. "
+msgstr ""
+
+#: views/mo-saml-attribute-role-mapping.php:116
+msgid "Available in Paid Plugin"
+msgstr "Verfügbar in Paid Plugin"
+
+#: views/mo-saml-attribute-role-mapping.php:120
+msgid "Anonymous Login:"
+msgstr "Anonyme Anmeldung:"
+
+#: views/mo-saml-attribute-role-mapping.php:124
+#: views/mo-saml-attribute-role-mapping.php:189
+#: views/mo-saml-attribute-role-mapping.php:199
+#: views/mo-saml-redirection-sso-links.php:280
+#: views/mo-saml-redirection-sso-links.php:291
+#: views/mo-saml-redirection-sso-links.php:334
+#: views/mo-saml-redirection-sso-links.php:346
+#: views/mo-saml-redirection-sso-links.php:386
+msgid "Toggle"
+msgstr "Toggle"
+
+#: views/mo-saml-attribute-role-mapping.php:153
+msgid "Role Mapping"
+msgstr "Role Mapping"
+
+#: views/mo-saml-attribute-role-mapping.php:164
+msgid "NOTE:"
+msgstr "HINWEIS:"
+
+#: views/mo-saml-attribute-role-mapping.php:164
+msgid ""
+"Role will be assigned only to new users. Existing WordPress users' role "
+"remains same."
+msgstr ""
+"Rolle zugewiesen werden, nur für neue Benutzer. Bestehende WordPress-Nutzer "
+"die Rolle bleibt gleich."
+
+#: views/mo-saml-attribute-role-mapping.php:167
+msgid "Default Role :"
+msgstr "Default-Rolle :"
+
+#: views/mo-saml-attribute-role-mapping.php:177
+#: views/mo-saml-service-provider-metadata.php:76
+msgid "Update"
+msgstr "Update"
+
+#: views/mo-saml-attribute-role-mapping.php:182
+msgid ""
+"Customized Role Mapping options are configurable in the Premium, Enterprise "
+"and All-Inclusive versions of the plugin."
+msgstr ""
+"Benutzerdefinierte Rolle Mapping-Optionen sind konfigurierbar, in der "
+"Premium -, Enterprise-und All-Inclusive-Versionen des plugins."
+
+#: views/mo-saml-attribute-role-mapping.php:186
+msgid "Do not auto create users if roles are not mapped here :"
+msgstr ""
+"Keine automatische erstellen Sie Benutzer, wenn die Rollen sind nicht belegt "
+"Sie hier :"
+
+#: views/mo-saml-attribute-role-mapping.php:191
+msgid ""
+"Enable this option if you do not want the unmapped users to register into "
+"your site via SSO."
+msgstr ""
+"Aktivieren Sie diese option, wenn Sie nicht möchten, dass der nicht "
+"zugeordnete Benutzer zu registrieren in Ihre Website über SSO."
+
+#: views/mo-saml-attribute-role-mapping.php:196
+msgid "Do not assign role to unlisted users :"
+msgstr "Nicht Rolle zuweisen, um nicht aufgelistete Benutzer :"
+
+#: views/mo-saml-attribute-role-mapping.php:200
+msgid ""
+"Enable this option if you do not want to assign any roles to unmapped users."
+msgstr ""
+"Aktivieren Sie diese option, wenn Sie nicht möchten, weisen Sie Rollen zu "
+"nicht zugeordneten Benutzer."
+
+#: views/mo-saml-attribute-role-mapping.php:207
+msgid ""
+"Customized Role Mapping options are configurable in the Premium, Enterprise "
+"and All-Inclusive versions of the plugin. "
+msgstr ""
+
+#: views/mo-saml-attribute-role-mapping.php:241
+msgid "Attributes sent by the Identity Provider"
+msgstr "Attribute geschickt durch den Identity Provider"
+
+#: views/mo-saml-attribute-role-mapping.php:245
+msgid "ATTRIBUTE NAME"
+msgstr "ATTRIBUT NAME"
+
+#: views/mo-saml-attribute-role-mapping.php:246
+msgid "ATTRIBUTE VALUE"
+msgstr "ATTRIBUT-WERT"
+
+#: views/mo-saml-attribute-role-mapping.php:265
+msgid "Clear Attributes List"
+msgstr "Klar-Attribute-Liste"
+
+#: views/mo-saml-attribute-role-mapping.php:267
+msgid "NOTE"
+msgstr "HINWEIS"
+
+#: views/mo-saml-attribute-role-mapping.php:267
+msgid ""
+"Please clear this list after configuring the plugin to hide your "
+"confidential attributes."
+msgstr ""
+"Bitte deaktivieren Sie diese Liste nach der Konfiguration des plugin "
+"versteckt Ihre vertraulichen Attributen."
+
+#: views/mo-saml-attribute-role-mapping.php:268
+msgid ""
+"Click on Test configuration in Service Provider Setup tab to populate the "
+"list again."
+msgstr ""
+"Klicken Sie auf Test configuration, in-Service-Provider-Setup Registerkarte, "
+"um die Liste zu füllen wieder."
+
+#: views/mo-saml-debug-logs.php:154
+msgid "Debug Tools"
+msgstr "Debug-Tools"
+
+#: views/mo-saml-debug-logs.php:155
+msgid "Error Codes"
+msgstr "Fehler-Codes"
+
+#: views/mo-saml-feedback-form.php:25
+msgid "Your feedback"
+msgstr "Ihr feedback"
+
+#: views/mo-saml-feedback-form.php:33
+msgid "Please help us to improve our plugin by giving your opinion."
+msgstr ""
+"Bitte helfen Sie uns zu verbessern unsere plugin, indem Sie Ihre Meinung."
+
+#: views/mo-saml-feedback-form.php:58 views/mo-saml-feedback-form.php:138
+#: views/mo-saml-feedback-form.php:148
+msgid "Thank you for appreciating our work"
+msgstr "Vielen Dank für die Wertschätzung unserer Arbeit"
+
+#: views/mo-saml-feedback-form.php:71
+msgid "Please enter your email address"
+msgstr "Bitte geben Sie Ihre E-Mail-Adresse"
+
+#: views/mo-saml-feedback-form.php:79
+msgid "Tell us what happened!"
+msgstr "Sagen Sie uns, was passiert ist!"
+
+#: views/mo-saml-feedback-form.php:82
+msgid ""
+"miniOrange representative will reach out to you at the email-address entered "
+"above."
+msgstr ""
+"miniOrange Vertreter erreichen Sie unter der E-Mail-Adresse eingegeben oben."
+
+#: views/mo-saml-feedback-form.php:87
+msgid "Send"
+msgstr "Senden"
+
+#: views/mo-saml-feedback-form.php:89
+msgid "Skip"
+msgstr "Skip"
+
+#: views/mo-saml-feedback-form.php:140
+msgid "Not happy with our plugin? Let us know what went wrong"
+msgstr ""
+"Nicht zufrieden mit unserem plugin? Lassen Sie uns wissen, was falsch "
+"gelaufen ist"
+
+#: views/mo-saml-feedback-form.php:142
+msgid "Found any issues? Let us know and we'll fix it ASAP"
+msgstr ""
+"Gefunden Probleme? Lassen Sie uns wissen, und wir lösen es so schnell wie "
+"möglich"
+
+#: views/mo-saml-feedback-form.php:144
+msgid "Let us know if you need any help"
+msgstr "Lassen Sie uns wissen, wenn Sie Hilfe brauchen"
+
+#: views/mo-saml-feedback-form.php:146
+msgid "We're glad that you are happy with our plugin"
+msgstr "Wir sind froh, dass Sie sind glücklich mit unserem plugin"
+
+#: views/mo-saml-notice.php:25
+msgid "It seems you are using "
+msgstr ""
+
+#: views/mo-saml-notice.php:25
+msgid "as your IDP. Hence, you might be interested in our other "
+msgstr ""
+
+#: views/mo-saml-notice.php:25
+msgid "Microsoft Integrations"
+msgstr "Microsoft-Integrationen"
+
+#: views/mo-saml-notice.php:26
+msgid ""
+" like Real-time User Sync, Power BI Embed, SharePoint Document Library, etc."
+msgstr ""
+
+#: views/mo-saml-notice.php:29
+msgid "Get Power BI Plugin"
+msgstr "Holen Sie sich Power-BI-Plugin"
+
+#: views/mo-saml-notice.php:32
+msgid "Get SharePoint Plugin"
+msgstr "SharePoint-Plugin"
+
+#: views/mo-saml-notice.php:35
+msgid "Get User/Profile Sync Plugin"
+msgstr "Get-User/Profile-Sync-Plugin"
+
+#: views/mo-saml-notice.php:38
+msgid "Get Employee Directory Plugin"
+msgstr "Bekommen Mitarbeiter-Verzeichnis Plugin"
+
+#: views/mo-saml-plugin-core.php:53
+msgid "Let's get started!"
+msgstr "Let ' s get started!"
+
+#: views/mo-saml-plugin-core.php:55
+msgid "Hey, Thank you for installing miniOrange SSO using SAML 2.0 plugin"
+msgstr ""
+"Hey, vielen Dank für die Installation miniOrange SSO mit SAML 2.0 plugin"
+
+#: views/mo-saml-plugin-core.php:58
+msgid "We support all SAML 2.0 compliant Identity Providers. "
+msgstr ""
+
+#: views/mo-saml-plugin-core.php:65
+msgid "Make sure to check out the list of supported"
+msgstr "Stellen Sie sicher, dass Sie die Liste der unterstützten"
+
+#: views/mo-saml-plugin-core.php:66
+msgid "add-ons"
+msgstr "add-ons"
+
+#: views/mo-saml-plugin-core.php:67
+msgid "to increase the functionality of your WordPress site."
+msgstr "erhöhen Sie die Funktionalität Ihrer WordPress-Website."
+
+#: views/mo-saml-plugin-core.php:97
+msgid "Configure Your IDP Now"
+msgstr "Konfigurieren Sie Ihre IDP Jetzt"
+
+#. Name of the plugin
+#: views/mo-saml-plugin-core.php:132
+msgid "miniOrange SSO using SAML 2.0"
+msgstr "miniOrange SSO über SAML 2.0"
+
+#: views/mo-saml-plugin-core.php:136
+msgid "Try Paid Features"
+msgstr "Versuchen Sie Kostenpflichtige Funktionen"
+
+#: views/mo-saml-plugin-core.php:139
+msgid "Premium Plans | Upgrade Now"
+msgstr ""
+
+#: views/mo-saml-plugin-core.php:157
+msgid "Service Provider Setup"
+msgstr "Service-Provider-Setup"
+
+#: views/mo-saml-plugin-core.php:158
+msgid "Service Provider Metadata"
+msgstr "Service-Provider Für Metadaten"
+
+#: views/mo-saml-plugin-core.php:159
+msgid "Attribute/Role Mapping"
+msgstr "Attribut/Role Mapping"
+
+#: views/mo-saml-plugin-core.php:160
+msgid "Redirection & SSO Links"
+msgstr "Umleitung & SSO-Links"
+
+#: views/mo-saml-plugin-core.php:162
+msgid "Account Setup"
+msgstr "Konto Einrichten"
+
+#: views/mo-saml-plugin-core.php:189
+msgid "miniOrange Support"
+msgstr "miniOrange Unterstützung"
+
+#: views/mo-saml-plugin-core.php:205
+msgid ""
+"Facing issues? Check out the Troubleshooting options available in the plugin"
+msgstr ""
+"Probleme? Schauen Sie sich die Optionen zur Fehlerbehebung zur Verfügung in "
+"der-plugin"
+
+#: views/mo-saml-plugin-core.php:224
+msgid "Keep configuration Intact"
+msgstr "Halten-Konfiguration Intakt"
+
+#: views/mo-saml-plugin-core.php:231
+msgid ""
+"Enabling this would keep your settings intact when plugin is uninstalled"
+msgstr ""
+"Die Aktivierung dieser halten Sie Ihre Einstellungen intakt, wenn plugin "
+"deinstalliert wird"
+
+#: views/mo-saml-plugin-core.php:240
+msgid "Please enable this option when you are updating to a Premium version"
+msgstr ""
+"Bitte aktivieren Sie diese option, wenn Sie eine Aktualisierung auf eine "
+"Premium-version"
+
+#: views/mo-saml-plugin-core.php:254
+msgid "Wait! You have more to explore"
+msgstr "Warten Sie! Sie haben mehr zu erkunden"
+
+#: views/mo-saml-plugin-core.php:258 views/mo-saml-plugin-core.php:259
+msgid "Azure AD / Office 365 Sync"
+msgstr "Azure AD / Office 365 Synchronisieren"
+
+#: views/mo-saml-plugin-core.php:283
+#: views/mo-saml-service-provider-metadata.php:122
+#: includes/lib/class-mo-saml-options-enum.php:244
+#: includes/lib/class-mo-saml-options-enum.php:253
+#: includes/lib/class-mo-saml-options-enum.php:261
+#: includes/lib/class-mo-saml-options-enum.php:269
+msgid "Download"
+msgstr "Download"
+
+#: views/mo-saml-plugin-core.php:284
+#: includes/lib/class-mo-saml-options-enum.php:245
+#: includes/lib/class-mo-saml-options-enum.php:254
+#: includes/lib/class-mo-saml-options-enum.php:262
+#: includes/lib/class-mo-saml-options-enum.php:270
+msgid "Know More"
+msgstr "Mehr Erfahren"
+
+#: views/mo-saml-redirection-sso-links.php:52
+msgid "Option 1: Use a Single Sign-On button"
+msgstr "Option 1: Verwenden Sie einen Single-Sign-On-Taste"
+
+#: views/mo-saml-redirection-sso-links.php:65
+msgid "Add a Single Sign-On button on the WordPress login page"
+msgstr "Fügen Sie einen Single-Sign-On-button auf der WordPress-login-Seite"
+
+#: views/mo-saml-redirection-sso-links.php:78
+msgid ""
+"Customization of SSO/Login button is available in Premium, Enterprise and "
+"All-Inclusive versions of the plugin"
+msgstr ""
+"Die Anpassung von SSO/Login-button ist verfügbar in Premium -, Enterprise-"
+"und All-Inclusive-Versionen des plugins"
+
+#: views/mo-saml-redirection-sso-links.php:80
+msgid "Customize Single Sign-On Button"
+msgstr "Anpassen Der Single-Sign-On-Taste"
+
+#: views/mo-saml-redirection-sso-links.php:85
+msgid "Shape"
+msgstr "Form"
+
+#: views/mo-saml-redirection-sso-links.php:88
+msgid "Theme"
+msgstr "Thema"
+
+#: views/mo-saml-redirection-sso-links.php:91
+msgid "Size of the Button"
+msgstr "Die Größe der Taste"
+
+#: views/mo-saml-redirection-sso-links.php:96
+msgid "Round"
+msgstr "Runde"
+
+#: views/mo-saml-redirection-sso-links.php:102
+msgid "Button Color:"
+msgstr "Taste Farbe:"
+
+#: views/mo-saml-redirection-sso-links.php:114
+msgid "Width:"
+msgstr "Breite:"
+
+#: views/mo-saml-redirection-sso-links.php:125
+msgid "Rounded Edges"
+msgstr "Abgerundete Kanten"
+
+#: views/mo-saml-redirection-sso-links.php:131
+msgid "Button Text:"
+msgstr "Button-Text:"
+
+#: views/mo-saml-redirection-sso-links.php:143
+msgid "Height:"
+msgstr "Höhe:"
+
+#: views/mo-saml-redirection-sso-links.php:154
+msgid "Square"
+msgstr "Square"
+
+#: views/mo-saml-redirection-sso-links.php:160
+msgid "Font Color:"
+msgstr "Schriftfarbe:"
+
+#: views/mo-saml-redirection-sso-links.php:172
+msgid "Curve:"
+msgstr "Kurve:"
+
+#: views/mo-saml-redirection-sso-links.php:183
+msgid "Long Button with Text"
+msgstr "Lange Taste mit Text"
+
+#: views/mo-saml-redirection-sso-links.php:189
+msgid "Font Size:"
+msgstr "Schriftgröße:"
+
+#: views/mo-saml-redirection-sso-links.php:224
+msgid "Option 2: Use a Widget"
+msgstr "Option 2: Verwenden Sie ein Widget"
+
+#: views/mo-saml-redirection-sso-links.php:235
+msgid ""
+"Add the SSO Widget by following the instructions below. This will add the "
+"SSO link on your site."
+msgstr ""
+"Fügen Sie die SSO-Widget durch folgenden die Anweisungen unten. Dies wird "
+"fügen Sie die SSO-link auf Ihrer Website."
+
+#: views/mo-saml-redirection-sso-links.php:238
+msgid "Go to Appearances"
+msgstr "Gehen Sie zu Erscheinungen"
+
+#: views/mo-saml-redirection-sso-links.php:238
+msgid "Widgets."
+msgstr "Widgets."
+
+#: views/mo-saml-redirection-sso-links.php:239
+msgid ""
+"Click on Add Block (\"+\" sign) at the top left corner, besides the heading "
+"Widgets."
+msgstr ""
+"Klicken Sie auf Block Hinzufügen (\"+\"- Zeichen) in der oberen linken Ecke, "
+"neben der überschrift Widgets."
+
+#: views/mo-saml-redirection-sso-links.php:240
+msgid ""
+"In the search box, search for \"Login with \", and drag and drop this block "
+"to your favourite location."
+msgstr ""
+"In das Suchfeld, suchen Sie nach \"Anmeldung mit\" und ziehen Sie diesen "
+"block, um Ihre Lieblings-Ort."
+
+#: views/mo-saml-redirection-sso-links.php:241
+msgid ""
+"Click on the \"Update\" button at the top right to save the widget settings."
+msgstr ""
+"Klicken Sie auf die Schaltfläche \"Aktualisieren\" oben rechts, um zu "
+"speichern Sie die widget-Einstellungen."
+
+#: views/mo-saml-redirection-sso-links.php:259
+msgid "Option 3: Auto-Redirection from site"
+msgstr "Option 3: die Automatische Umleitung von der Website"
+
+#: views/mo-saml-redirection-sso-links.php:272
+msgid ""
+"Auto-Redirection from site is configurable in Standard, Premium, Enterprise "
+"and All-Inclusive versions of the plugin"
+msgstr ""
+"Automatische Umleitung von der Website, können in Standard -, Premium -, "
+"Enterprise-und All-Inclusive-Versionen des plugins"
+
+#: views/mo-saml-redirection-sso-links.php:274
+msgid ""
+"1. Select this option if you want to restrict your site to only logged in "
+"users. Selecting this option will redirect the users to your IdP if logged "
+"in session is not found."
+msgstr ""
+"1. Wählen Sie diese option, wenn Sie möchten, um zu verhindern, dass Ihre "
+"Website nur angemeldete Benutzer. Bei Auswahl dieser option leiten Sie die "
+"Benutzer zu Ihren IdP, wenn angemeldet Sitzung nicht gefunden."
+
+#: views/mo-saml-redirection-sso-links.php:277
+msgid "Redirect to IdP if user not logged in [PROTECT COMPLETE SITE]"
+msgstr ""
+
+#: views/mo-saml-redirection-sso-links.php:285
+msgid ""
+"2. It will force user to provide credentials on your IdP on each login "
+"attempt even if the user is already logged in to IdP. This option may "
+"require some additional setting in your IdP to force it depending on your "
+"Identity Provider."
+msgstr ""
+"2. Es wird Kraft, um die Anmeldeinformationen bereitzustellen, die auf Ihre "
+"IdP auf jeden login-Versuch, auch wenn der Benutzer bereits angemeldet IdP. "
+"Diese option erfordert eventuell einige zusätzliche Einstellung in Ihrem IdP "
+"zu zwingen, es abhängig von Ihrem Identity-Provider."
+
+#: views/mo-saml-redirection-sso-links.php:288
+msgid "Force authentication with your IdP on each login attempt"
+msgstr "Zwingen Sie die Authentifizierung bei Ihrem IdP bei jedem Anmeldeversuch"
+
+#: views/mo-saml-redirection-sso-links.php:312
+msgid "Option 4: Auto-Redirection from WordPress Login"
+msgstr "Option 4: Automatische Umleitung von WordPress Login"
+
+#: views/mo-saml-redirection-sso-links.php:325
+msgid ""
+"Auto-Redirection from WordPress is configurable in Standard, Premium, "
+"Enterprise and All-Inclusive versions of the plugin"
+msgstr ""
+"Automatische Umleitung von WordPress ist konfigurierbar in Standard -, "
+"Premium -, Enterprise-und All-Inclusive-Versionen des plugins"
+
+#: views/mo-saml-redirection-sso-links.php:327
+msgid ""
+"1. Select this option if you want the users visiting any of the following "
+"URLs to get redirected to your configured IdP for authentication:"
+msgstr ""
+"1. Wählen Sie diese option, wenn Sie möchten, dass der Benutzer den Besuch "
+"einer der folgenden URLs umgeleitet, um Ihre konfigurierten IdP-"
+"Authentifizierung:"
+
+#: views/mo-saml-redirection-sso-links.php:328
+msgid "or"
+msgstr "oder"
+
+#: views/mo-saml-redirection-sso-links.php:331
+msgid "Redirect to IdP from WordPress Login Page"
+msgstr "Redirect zum IdP von WordPress Login-Seite"
+
+#: views/mo-saml-redirection-sso-links.php:339
+msgid ""
+"2. Select this option to enable backdoor login if auto-redirect from "
+"WordPress Login is enabled."
+msgstr ""
+"2. Wählen Sie diese option, um die backdoor-Anmeldung wenn die automatische "
+"Weiterleitung von WordPress-Login aktiviert ist."
+
+#: views/mo-saml-redirection-sso-links.php:342
+msgid ""
+"Checking this option creates a backdoor to login to your Website using "
+"WordPress credentials incase you get locked out of your IdP"
+msgstr ""
+"Durch aktivieren dieser option erstellt ein backdoor-login auf Ihrer Website "
+"mit WordPress-Anmeldeinformationen, sofern Sie gesperrt aus Ihrem IdP"
+
+#: views/mo-saml-redirection-sso-links.php:366
+msgid "Option 5: Use a ShortCode"
+msgstr "Option 5: Verwenden Sie eine Kurzwahlnummer"
+
+#: views/mo-saml-redirection-sso-links.php:379
+msgid ""
+"These options are configurable in the Standard, Premium, Enterprise and All-"
+"Inclusive version of the plugin."
+msgstr ""
+"Diese Optionen sind konfigurierbar in der Standard -, Premium -, Enterprise-"
+"und All-Inclusive-version des plugins."
+
+#: views/mo-saml-redirection-sso-links.php:383
+msgid "Check this option if you want to add a shortcode to your page"
+msgstr ""
+"Aktivieren Sie diese option, wenn Sie möchten, fügen Sie einen shortcode auf "
+"Ihrer Seite"
+
+#: views/mo-saml-service-provider-metadata.php:50
+msgid "Service Provider Endpoints"
+msgstr "Service-Provider-Endpoints"
+
+#: views/mo-saml-service-provider-metadata.php:55
+msgid "SP EntityID / Issuer :"
+msgstr "SP EntityID / Issuer :"
+
+#: views/mo-saml-service-provider-metadata.php:59
+msgid "Note:"
+msgstr "Hinweis:"
+
+#: views/mo-saml-service-provider-metadata.php:59
+msgid "If you have already shared the above URLs or Metadata with your IdP, do"
+msgstr ""
+"Wenn Sie weitergegeben haben, die oben genannten URLs und Metadaten mit "
+"Ihrem IdP, tun"
+
+#: views/mo-saml-service-provider-metadata.php:59
+msgid "NOT"
+msgstr "NICHT"
+
+#: views/mo-saml-service-provider-metadata.php:59
+msgid "change SP EntityID. It might break your existing login flow."
+msgstr "ändern SP EntityID. Es kann Ihre vorhandenen login-flow."
+
+#: views/mo-saml-service-provider-metadata.php:64
+msgid "Configurable ACS URL / SP Base URL available in the"
+msgstr "Konfigurierbare ACS-URL / SP-Basis-URL zur Verfügung, die in der"
+
+#: views/mo-saml-service-provider-metadata.php:64
+msgid "Paid"
+msgstr "Bezahlt"
+
+#: views/mo-saml-service-provider-metadata.php:64
+msgid "versions of the plugin."
+msgstr "Versionen des plugins."
+
+#: views/mo-saml-service-provider-metadata.php:68
+msgid "SP Base URL :"
+msgstr "SP-Basis-URL :"
+
+#: views/mo-saml-service-provider-metadata.php:96
+msgid "Provide Metadata"
+msgstr "Metadaten"
+
+#: views/mo-saml-service-provider-metadata.php:107
+msgid "Provide Metadata URL"
+msgstr "Metadaten-URL"
+
+#: views/mo-saml-service-provider-metadata.php:110
+msgid "Metadata URL :"
+msgstr "Metadata URL :"
+
+#: views/mo-saml-service-provider-metadata.php:114
+#: views/mo-saml-service-provider-metadata.php:147
+#: views/mo-saml-service-provider-metadata.php:160
+#: views/mo-saml-service-provider-metadata.php:173
+#: views/mo-saml-service-provider-metadata.php:188
+#: views/mo-saml-service-provider-metadata.php:201
+#: views/mo-saml-service-provider-metadata.php:214
+msgid "Copy to Clipboard"
+msgstr "In die Zwischenablage kopieren"
+
+#: views/mo-saml-service-provider-metadata.php:119
+msgid "Metadata XML File :"
+msgstr "Metadaten-XML-Datei :"
+
+#: views/mo-saml-service-provider-metadata.php:126
+#: views/mo-saml-service-provider-setup.php:158
+#: views/mo-saml-service-provider-setup.php:312
+msgid "OR"
+msgstr "ODER"
+
+#: views/mo-saml-service-provider-metadata.php:130
+msgid "Note the following to configure the IDP"
+msgstr "Beachten Sie Folgendes konfigurieren Sie die IDP"
+
+#: views/mo-saml-service-provider-metadata.php:135
+msgid "All IDP Setup Guides"
+msgstr "Alle IDP Setup Guides"
+
+#: views/mo-saml-service-provider-metadata.php:141
+msgid "SP-EntityID / Issuer"
+msgstr "SP-EntityID / Emittent"
+
+#: views/mo-saml-service-provider-metadata.php:154
+msgid "ACS (AssertionConsumerService) URL"
+msgstr "ACS (AssertionConsumerService) URL"
+
+#: views/mo-saml-service-provider-metadata.php:167
+msgid "Audience URI"
+msgstr "Publikum URI"
+
+#: views/mo-saml-service-provider-metadata.php:180
+msgid "NameID format"
+msgstr "NameID-format"
+
+#: views/mo-saml-service-provider-metadata.php:195
+msgid "Recipient URL"
+msgstr "Empfänger-URL"
+
+#: views/mo-saml-service-provider-metadata.php:208
+msgid "Destination URL"
+msgstr "Ziel-URL"
+
+#: views/mo-saml-service-provider-metadata.php:221
+msgid "Default Relay State (Optional)"
+msgstr "Standard-Relay-Staat (Optional)"
+
+#: views/mo-saml-service-provider-metadata.php:226
+#: views/mo-saml-service-provider-metadata.php:239
+msgid "Premium"
+msgstr "Premium"
+
+#: views/mo-saml-service-provider-metadata.php:234
+msgid "Certificate (Optional)"
+msgstr "Zertifikat (Optional)"
+
+#: views/mo-saml-service-provider-setup.php:74
+msgid "Search and select your IDP"
+msgstr "Suchen Sie und wählen Sie Ihren IDP"
+
+#: views/mo-saml-service-provider-setup.php:81
+msgid "Choose Custom IDP if you don't find your IDP"
+msgstr "Wählen Sie Benutzerdefiniert, IDP, wenn Sie nicht finden Ihre IDP"
+
+#: views/mo-saml-service-provider-setup.php:127
+msgid "Configure Service Provider"
+msgstr "Konfigurieren Der Service-Provider"
+
+#: views/mo-saml-service-provider-setup.php:147
+msgid "Setup Guide"
+msgstr "Setup Guide"
+
+#: views/mo-saml-service-provider-setup.php:152
+msgid "Video Guide"
+msgstr "Video-Guide"
+
+#: views/mo-saml-service-provider-setup.php:157
+msgid "Enter IDP Metadata Manually"
+msgstr "Geben Sie IDP-Metadaten Manuell"
+
+#: views/mo-saml-service-provider-setup.php:159
+msgid "Upload IDP Metadata"
+msgstr "Upload-IDP-Metadaten"
+
+#: views/mo-saml-service-provider-setup.php:179
+msgid "Identity Provider Name"
+msgstr "Identity-Provider-Name"
+
+#: views/mo-saml-service-provider-setup.php:182
+msgid "Identity Provider name like ADFS, SimpleSAML, Salesforce"
+msgstr "Identity-Provider-Namen wie ADFS, SimpleSAML, Salesforce"
+
+#: views/mo-saml-service-provider-setup.php:183
+#: views/mo-saml-service-provider-setup.php:192
+#: views/mo-saml-service-provider-setup.php:201
+#: views/mo-saml-service-provider-setup.php:221
+#: views/mo-saml-service-provider-setup.php:236
+#: views/mo-saml-service-provider-setup.php:245
+#: views/mo-saml-service-provider-setup.php:294
+msgid "Note"
+msgstr "Hinweis"
+
+#: views/mo-saml-service-provider-setup.php:183
+#: views/mo-saml-service-provider-setup.php:294
+msgid ""
+": Only alphabets, numbers and underscores are allowed as the Identity "
+"Provider name."
+msgstr ""
+": Nur Buchstaben, Ziffern und Unterstriche sind erlaubt, wie die Identity-"
+"Provider-Namen."
+
+#: views/mo-saml-service-provider-setup.php:188
+msgid "IdP Entity ID or Issuer"
+msgstr "IdP-Entitäts-ID oder Emittent"
+
+#: views/mo-saml-service-provider-setup.php:192
+msgid ": You can find the"
+msgstr ": Finden Sie das"
+
+#: views/mo-saml-service-provider-setup.php:192
+msgid "EntityID"
+msgstr "EntityID"
+
+#: views/mo-saml-service-provider-setup.php:192
+msgid "in Your IdP-Metadata XML file enclosed in "
+msgstr ""
+
+#: views/mo-saml-service-provider-setup.php:192
+msgid "tag having attribute as"
+msgstr "- tag mit Attribut als"
+
+#: views/mo-saml-service-provider-setup.php:192
+msgid "entityID"
+msgstr "entityID"
+
+#: views/mo-saml-service-provider-setup.php:197
+#: views/mo-saml-service-provider-setup.php:201
+msgid "SAML Login URL"
+msgstr "SAML-Anmelde-URL"
+
+#: views/mo-saml-service-provider-setup.php:201
+msgid "You can find the"
+msgstr "Sie finden die"
+
+#: views/mo-saml-service-provider-setup.php:201
+msgid "in Your IdP-Metadata XML file enclosed in"
+msgstr "in Ihrem IdP-Metadaten-XML-Datei beigefügt"
+
+#: views/mo-saml-service-provider-setup.php:201
+msgid "tag (Binding type: HTTP-Redirect)"
+msgstr "tag (Verbindliches Typ: HTTP-Redirect)"
+
+#: views/mo-saml-service-provider-setup.php:209
+msgid "X.509 Certificate"
+msgstr "X. 509 Zertifikat"
+
+#: views/mo-saml-service-provider-setup.php:218
+msgid "Invalid Certificate"
+msgstr "Ungültiges Zertifikat"
+
+#: views/mo-saml-service-provider-setup.php:221
+msgid ": Format of the certificate -"
+msgstr ": Format des Zertifikats -"
+
+#: views/mo-saml-service-provider-setup.php:230
+msgid "Character encoding :"
+msgstr "Zeichenkodierung :"
+
+#: views/mo-saml-service-provider-setup.php:236
+msgid ""
+": Uses iconv encoding to convert X509 certificate into correct encoding."
+msgstr ""
+": Verwendungen iconv-Codierung zu konvertieren, X509-Zertifikat in die "
+"richtige Codierung."
+
+#: views/mo-saml-service-provider-setup.php:241
+msgid "Assertion Time Validity:"
+msgstr "Geltendmachung Zeit Gültigkeit:"
+
+#: views/mo-saml-service-provider-setup.php:245
+msgid ""
+" : Disable this toggle to disable the check of time validity for SAML "
+"assertion."
+msgstr ""
+
+#: views/mo-saml-service-provider-setup.php:251
+msgid "Save"
+msgstr "Speichern"
+
+#: views/mo-saml-service-provider-setup.php:257
+msgid "Test Configuration"
+msgstr "Test-Konfiguration"
+
+#: views/mo-saml-service-provider-setup.php:272
+msgid "Export Plugin Configuration"
+msgstr "Plugin-Konfiguration exportieren"
+
+#: views/mo-saml-service-provider-setup.php:290
+msgid "Identity Provider Name :"
+msgstr "Identity-Provider-Name :"
+
+#: views/mo-saml-service-provider-setup.php:299
+msgid "Upload Metadata :"
+msgstr "Metadaten Hochladen :"
+
+#: views/mo-saml-service-provider-setup.php:308
+msgid "Upload"
+msgstr "Upload"
+
+#: views/mo-saml-service-provider-setup.php:316
+msgid "Enter metadata URL :"
+msgstr "Geben Sie die Metadaten-URL :"
+
+#: views/mo-saml-service-provider-setup.php:319
+msgid "Enter metadata URL of your IdP"
+msgstr "Geben Sie die Metadaten-URL von Ihrem IdP"
+
+#: views/mo-saml-service-provider-setup.php:325
+msgid "Fetch Metadata"
+msgstr "Fetch Metadaten"
+
+#: views/mo-saml-support-form.php:33
+msgid "Feature Request/Contact Us"
+msgstr "Feature Request/Kontaktieren Sie Uns"
+
+#: views/mo-saml-support-form.php:33
+msgid "(24*7 Support)"
+msgstr "(24*7 Support)"
+
+#: views/mo-saml-support-form.php:34
+msgid "Call us at +1 978 658 9387 in case of any help"
+msgstr "Rufen Sie uns an +1 978 658 9387 in Fall von jede Hilfe"
+
+#: views/mo-saml-support-form.php:37
+msgid "Enter your email"
+msgstr "Geben Sie Ihre E-Mail"
+
+#: views/mo-saml-support-form.php:38
+msgid "Enter your phone"
+msgstr "Geben Sie uns Ihre Telefonnummer"
+
+#: views/mo-saml-support-form.php:39
+msgid "Write your query here"
+msgstr "Schreiben Sie Ihre Abfrage hier"
+
+#: views/mo-saml-support-form.php:41
+msgid "Setup a Call / Screen-share session with miniOrange Technical Team"
+msgstr ""
+"Einrichten eines Call - / Screen-Sharing-Sitzung mit miniOrange Technische "
+"Team"
+
+#: views/mo-saml-support-form.php:45
+msgid "Enable this option to setup a call"
+msgstr "Aktivieren Sie diese option, um das setup eines Anrufs"
+
+#: views/mo-saml-support-form.php:53
+msgid "TimeZone"
+msgstr "Zeitzone"
+
+#: views/mo-saml-support-form.php:57
+msgid "Select your timezone"
+msgstr "Wählen Sie Ihre Zeitzone"
+
+#: views/mo-saml-support-form.php:76
+msgid "Date"
+msgstr "Datum"
+
+#: views/mo-saml-support-form.php:79
+msgid "Select Date"
+msgstr "Datum Auswählen"
+
+#: views/mo-saml-support-form.php:82
+msgid "Time (24-hour)"
+msgstr "Zeit (24-Stunden)"
+
+#: views/mo-saml-support-form.php:85
+msgid "Select Time"
+msgstr "Wählen Sie Zeit"
+
+#: views/mo-saml-support-form.php:90
+msgid ""
+"Call and Meeting details will be sent to your email. Please verify the email "
+"before submitting your query."
+msgstr ""
+"Anruf-und Meeting-details wird an Ihre E-Mail. Bitte überprüfen Sie die E-"
+"Mail, bevor Sie Ihre Abfrage."
+
+#: views/mo-saml-support-form.php:95
+msgid "Submit"
+msgstr "Einreichen"
+
+#: includes/lib/class-mo-saml-options-enum.php:193
+msgid "Unable to find a certificate ."
+msgstr "Nicht in der Lage zu finden, ein Zertifikat ."
+
+#: includes/lib/class-mo-saml-options-enum.php:194
+msgid ""
+"No signature found in SAML Response or Assertion. Please sign at least one "
+"of them."
+msgstr ""
+"Keine Signatur gefunden in der SAML-Antwort oder Erklärung. Bitte melden Sie "
+"sich mindestens einer von Ihnen."
+
+#: includes/lib/class-mo-saml-options-enum.php:195
+msgid "Unable to find a certificate matching the configured fingerprint."
+msgstr ""
+"Nicht in der Lage zu finden, ein Zertifikat Abgleich der so konfiguriert "
+"Fingerabdruck."
+
+#: includes/lib/class-mo-saml-options-enum.php:196
+msgid ""
+"X.509 Certificate field in plugin does not match the certificate found in "
+"SAML Response."
+msgstr ""
+"X. 509-Zertifikat-Feld im plugin nicht mit der Zertifikats fand in der SAML-"
+"Antwort."
+
+#: includes/lib/class-mo-saml-options-enum.php:197
+msgid "Invalid Audience URI."
+msgstr "Ungültige Publikum URI."
+
+#: includes/lib/class-mo-saml-options-enum.php:198
+msgid ""
+"The value of 'Audience URI' field on Identity Provider's side is incorrect"
+msgstr ""
+"Der Wert von 'Publikum URI' Feld Identity Provider der Seite ist falsch"
+
+#: includes/lib/class-mo-saml-options-enum.php:199
+msgid "Issuer cannot be verified."
+msgstr "Emittenten kann nicht überprüft werden."
+
+#: includes/lib/class-mo-saml-options-enum.php:200
+msgid ""
+"IdP Entity ID configured and the one found in SAML Response do not match"
+msgstr ""
+"IdP-Entitäts-ID konfiguriert ist und die fand man in der SAML-Antwort nicht "
+"übereinstimmen"
+
+#: includes/lib/class-mo-saml-options-enum.php:234
+#: includes/lib/class-mo-saml-options-enum.php:274
+msgid ""
+"miniOrange SAML Single Sign On Plugin allows users in a corporate Active "
+"Directory setup to log into WordPress using their Windows Credentials. Once "
+"the user is logged in to a domain joined machine, they will not have to re-"
+"enter credentials in order to log into WordPress."
+msgstr ""
+"miniOrange SAML-Single-Sign-On Plugin ermöglicht es Benutzern, in einer "
+"corporate Active Directory-setup-Anmeldung in WordPress über Ihre Windows-"
+"Anmeldeinformationen. Sobald der Benutzer angemeldet ist, zu einer Domäne "
+"beigetretenen Computer, Sie werden nicht haben zu re-geben Sie die "
+"Anmeldeinformationen ein, um sich in WordPress."
+
+#: includes/lib/class-mo-saml-options-enum.php:236
+#: includes/lib/class-mo-saml-options-enum.php:276
+msgid "Enable Windows SSO"
+msgstr "Aktivieren von Windows SSO"
+
+#: includes/lib/class-mo-saml-options-enum.php:237
+#: includes/lib/class-mo-saml-options-enum.php:277
+msgid "See Configuration"
+msgstr "Siehe Konfiguration"
+
+#: includes/lib/class-mo-saml-options-enum.php:241
+msgid ""
+"User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with "
+"Microsoft Azure AD Graph APIs and provides Bi-directional User "
+"Synchronization, Creation of <a target = \"blank\" href = \"https:"
+"//wordpress.org/plugins/employee-staff-directory/\"> Employee Directory</a>, "
+"<a target = \"blank\" href = \"https://wordpress.org/plugins/embed-power-bi-"
+"reports/\">PowerBI integration </a>, <a target = \"blank\" href = \"https:"
+"//wordpress.org/plugins/embed-sharepoint-onedrive-documents/\">Sharepoint "
+"integration </a>, etc."
+msgstr ""
+
+#: includes/lib/class-mo-saml-options-enum.php:243
+#: includes/lib/class-mo-saml-options-enum.php:252
+msgid "User Sync for Azure AD / Azure B2C"
+msgstr "Benutzer-Synchronisierung für Azure-AD / Azure B2C"
+
+#: includes/lib/class-mo-saml-options-enum.php:250
+msgid ""
+"User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with "
+"Microsoft Azure AD Graph APIs and provides Bi-directional User "
+"Synchronization, PowerBI integration, Sharepoint integration, etc."
+msgstr ""
+"Benutzer-Synchronisierung für Azure-AD / Azure B2C-WordPress-plugin Bietet "
+"die Integration mit Microsoft Azure AD Graph-APIs und bietet eine Bi-"
+"direktionale Benutzer-Synchronisation, PowerBI integration, Sharepoint-"
+"integration, etc."
+
+#: includes/lib/class-mo-saml-options-enum.php:258
+#: includes/lib/class-mo-saml-options-enum.php:266
+msgid ""
+"Object Data Sync For Salesforce plugin provides a bi-directional data "
+"synchronization between WP and Salesforce objects"
+msgstr ""
+"Objekt-Daten Sync For Salesforce-plugin bietet eine bi-direktionale "
+"Synchronisation der Daten zwischen WP-und Salesforce-Objekten"
+
+#: includes/lib/class-mo-saml-options-enum.php:260
+#: includes/lib/class-mo-saml-options-enum.php:268
+msgid "Object Data Sync For Salesforce"
+msgstr "Objekt-Daten Sync For Salesforce"
+
+#: includes/lib/class-mo-saml-options-enum.php:295
+msgid "Page / Post Restriction"
+msgstr "Seite / Post Einschränkung"
+
+#: includes/lib/class-mo-saml-options-enum.php:301
+#: includes/lib/class-mo-saml-options-enum.php:518
+msgid "SCIM User Provisioning"
+msgstr "SCIM User Provisioning"
+
+#: includes/lib/class-mo-saml-options-enum.php:513
+msgid "Object Data Sync for Salesforce"
+msgstr "Objekt-Daten Sync for Salesforce"
+
+#: includes/lib/class-mo-saml-options-enum.php:514
+msgid "Embed Power BI Report"
+msgstr "Einbetten von Power BI-Bericht"
+
+#: includes/lib/class-mo-saml-options-enum.php:515
+msgid "Sharepoint/ One-Drive Integration"
+msgstr "Sharepoint/ Man-Drive-Integration"
+
+#: includes/lib/class-mo-saml-options-enum.php:516
+msgid "Employee Staff Directory"
+msgstr "Mitarbeiter-Stammdatenverzeichnis"
+
+#: includes/lib/class-mo-saml-options-enum.php:517
+msgid "Azure AD/Office 365 Integrations"
+msgstr "Azure AD/Office 365-Integrationen"
+
+#: includes/lib/class-mo-saml-options-enum.php:519
+msgid "Page and Post Restriction"
+msgstr "Seite und Post Einschränkung"
+
+#: includes/lib/class-mo-saml-options-enum.php:520
+msgid "Prevent File Access"
+msgstr "Verhindern, Dass Die Datei Zugreifen"
+
+#: includes/lib/class-mo-saml-options-enum.php:521
+msgid "SSO Login Audit"
+msgstr "Das SSO-Login-Audit"
+
+#: includes/lib/class-mo-saml-options-enum.php:522
+msgid "BuddyPress Integrator"
+msgstr "BuddyPress Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:523
+msgid "Learndash Integrator"
+msgstr "Learndash Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:524
+msgid "Attribute Based Redirection"
+msgstr "Attribut-Basierte Umleitung"
+
+#: includes/lib/class-mo-saml-options-enum.php:525
+msgid "SSO Session Management"
+msgstr "SSO-Session-Management"
+
+#: includes/lib/class-mo-saml-options-enum.php:526
+msgid "Federation Single Sign-On"
+msgstr "Federation-Single-Sign-On"
+
+#: includes/lib/class-mo-saml-options-enum.php:527
+msgid "MemberPress Integrator"
+msgstr "MemberPress Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:528
+msgid "WP-Members Integrator"
+msgstr "WP-Mitglieder Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:529
+msgid "WooCommerce Integrator"
+msgstr "WooCommerce Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:530
+msgid "Guest Login"
+msgstr "Gast-Login"
+
+#: includes/lib/class-mo-saml-options-enum.php:531
+msgid "Profile Picture Add-on"
+msgstr "Profil-Bild-Add-on"
+
+#: includes/lib/class-mo-saml-options-enum.php:532
+msgid "PaidMembership Pro Integrator"
+msgstr "PaidMembership Pro Integrator"
+
+#: includes/lib/class-mo-saml-options-enum.php:533
+msgid "Salesforce Community Add-on"
+msgstr "Salesforce Community-Add-on"
+
+#: includes/lib/class-mo-saml-options-enum.php:534
+msgid "IP Whitelisting Add-on"
+msgstr "IP-Whitelist-Add-on"
+
+#: includes/lib/class-mo-saml-options-enum.php:535
+msgid "Azure Multitenant Add-on"
+msgstr "Azure Multi-Tenant-Add-on"
+
+#: includes/lib/class-mo-saml-options-enum.php:1064
+#: includes/lib/class-mo-saml-options-enum.php:1075
+msgid "Identity Provider details saved successfully."
+msgstr "Identity Provider details wurde erfolgreich gespeichert."
+
+#: includes/lib/class-mo-saml-options-enum.php:1065
+msgid "Invalid certificate: Please provide a valid X.509 certificate."
+msgstr "Ungültiges Zertifikat: Bitte geben Sie eine gültige X. 509-Zertifikat."
+
+#: includes/lib/class-mo-saml-options-enum.php:1066
+msgid "All the fields are required. Please enter valid entries."
+msgstr "Alle Felder sind erforderlich. Bitte geben Sie eine gültige Einträge."
+
+#: includes/lib/class-mo-saml-options-enum.php:1067
+#: includes/lib/class-mo-saml-options-enum.php:1071
+msgid ""
+"Please match the requested format for Identity Provider Name. Only alphabets,"
+" numbers and underscore is allowed."
+msgstr ""
+"Bitte mit den gewünschten übereinstimmen format für Identity-Provider-Namen. "
+"Nur Buchstaben, zahlen und Unterstrich ist erlaubt."
+
+#: includes/lib/class-mo-saml-options-enum.php:1068
+msgid "Please upload a valid metadata file or URL."
+msgstr "Bitte laden Sie eine gültige Metadaten-Datei oder eine URL."
+
+#: includes/lib/class-mo-saml-options-enum.php:1069
+msgid "IDP Name cannot be empty. Please enter a valid Identity Provider Name."
+msgstr ""
+"IDP-Name kann nicht leer sein. Bitte geben Sie einen gültigen Identitäts-"
+"Provider-Namen."
+
+#: includes/lib/class-mo-saml-options-enum.php:1070
+msgid "Error uploading metadata. Please upload a valid metadata file."
+msgstr ""
+"Fehler beim hochladen der Metadaten. Bitte laden Sie eine gültige Metadaten-"
+"Datei."
+
+#: includes/lib/class-mo-saml-options-enum.php:1072
+msgid "Please provide a valid metadata file."
+msgstr "Bitte geben Sie eine gültige Metadaten-Datei."
+
+#: includes/lib/class-mo-saml-options-enum.php:1073
+msgid "Please provide a valid metadata URL."
+msgstr "Bitte geben Sie eine gültige Metadaten-URL."
+
+#: includes/lib/class-mo-saml-options-enum.php:1074
+msgid "Unable to fetch Metadata. Please check your metadata again."
+msgstr "Unable to fetch Metadaten. Bitte überprüfen Sie Ihre Metadaten wieder."
+
+#: includes/lib/class-mo-saml-options-enum.php:1076
+msgid "Settings updated successfully."
+msgstr "Einstellungen erfolgreich aktualisiert."
+
+#: includes/lib/class-mo-saml-options-enum.php:1077
+msgid "Please fill up required fields to submit your query."
+msgstr "Bitte füllen Sie die erforderlichen Felder zu senden Sie Ihre Anfrage."
+
+#: includes/lib/class-mo-saml-options-enum.php:1078
+msgid "Please enter a valid email address."
+msgstr "Bitte geben Sie eine gültige E-Mail-Adresse."
+
+#: includes/lib/class-mo-saml-options-enum.php:1079
+msgid "Please fill up Schedule Call Details to submit your query."
+msgstr "Bitte füllen Sie Planen Rufen Sie Details zu senden Sie Ihre Anfrage."
+
+#: includes/lib/class-mo-saml-options-enum.php:1080
+msgid "Your query could not be submitted. Please try again."
+msgstr ""
+"Ihre Abfrage konnte nicht vorgelegt werden. Bitte versuchen Sie es erneut."
+
+#: includes/lib/class-mo-saml-options-enum.php:1081
+msgid "Thanks for getting in touch! We will reach out on your email shortly."
+msgstr "Thanks for getting in touch! Wir werden auf Ihre E-Mail in Kürze."
+
+#: includes/lib/class-mo-saml-options-enum.php:1082
+msgid "Role Mapping details saved successfully."
+msgstr "Role Mapping details wurde erfolgreich gespeichert."
+
+#: includes/lib/class-mo-saml-options-enum.php:1083
+msgid ""
+"Something went wrong. Please reach out to us using the Support/Contact Us "
+"form to get help with the demo."
+msgstr ""
+"Etwas ging schief. Bitte erreichen, um uns über das Support/Kontakt-Formular "
+"um Hilfe zu bekommen mit der demo."
+
+#: includes/lib/class-mo-saml-options-enum.php:1084
+msgid ""
+"Minimum 6 characters should be present. Maximum 15 characters should be "
+"present. Only following symbols (!@#.$%^&*-_) are allowed."
+msgstr ""
+
+#: includes/lib/class-mo-saml-options-enum.php:1085
+msgid "Passwords do not match."
+msgstr "Passwörter Stimmen nicht überein."
+
+#: includes/lib/class-mo-saml-options-enum.php:1086
+msgid ""
+"You already have an account with miniOrange. Please enter a valid password."
+msgstr ""
+"Sie haben bereits ein Konto mit miniOrange. Bitte geben Sie ein gültiges "
+"Passwort ein."
+
+#: includes/lib/class-mo-saml-options-enum.php:1087
+msgid "Invalid username or password. Please try again."
+msgstr "Falscher Benutzername oder Passwort. Bitte versuchen Sie es erneut."
+
+#: includes/lib/class-mo-saml-options-enum.php:1088
+msgid "Thank you for registering with miniOrange."
+msgstr "Danke für die Registrierung mit miniOrange."
+
+#: includes/lib/class-mo-saml-options-enum.php:1089
+msgid "Customer retrieved successfully."
+msgstr "Kunden erfolgreich abgerufen."
+
+#: includes/lib/class-mo-saml-options-enum.php:1090
+msgid "List of attributes cleared."
+msgstr "Liste der Attribute gelöscht."
+
+#: includes/lib/class-mo-saml-options-enum.php:1091
+msgid "Log file doesn't exist."
+msgstr "Log-Datei nicht vorhanden ist."
+
+#: includes/lib/class-mo-saml-options-enum.php:1092
+msgid "Successfully cleared log files."
+msgstr "Erfolgreich gelöscht log-Dateien."
+
+#: includes/lib/class-mo-saml-options-enum.php:1093
+msgid ""
+"WP-config.php is not writable, please follow the manual steps to "
+"enable/disable the debug logs."
+msgstr ""
+"WP-config.php ist nicht beschreibbar, bitte befolgen Sie die manuellen "
+"Schritte, die zum aktivieren/deaktivieren der debug-Protokolle."
+
+#: includes/lib/class-mo-saml-options-enum.php:1094
+msgid "Plugin deactivated successfully."
+msgstr "Plugin deaktiviert erfolgreich."
+
+#: includes/lib/class-mo-saml-options-enum.php:1095
+msgid "Thank you for the feedback."
+msgstr "Vielen Dank für das feedback."
+
+#. Description of the plugin
+msgid ""
+"miniOrange SAML plugin allows sso/login using Azure, Azure B2C, Okta, ADFS, "
+"Keycloak, Onelogin, Salesforce, Google Apps (Gsuite), Salesforce, Shibboleth,"
+" Centrify, Ping, Auth0 and other Identity Providers. It acts as a SAML "
+"Service Provider which can be configured to establish a trust between the "
+"plugin and IDP to securely authenticate and login the user to WordPress site."
+msgstr ""
+"miniOrange SAML-plugin ermöglicht sso/login Azure, Azure B2C -, Okta, ADFS, "
+"Keycloak, Onelogin, Salesforce, Google Apps (Gsuite), Salesforce, Shibboleth,"
+" Centrify, Ping, Auth0 und anderen identitätsanbietern. Es fungiert als SAML "
+"Service Provider, die können konfiguriert werden, um eine Vertrauensstellung "
+"zwischen dem plugin und IDP, sicher authentifizieren und anmelden der "
+"Benutzer zu WordPress-Website."
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "https://miniorange.com/"
+msgstr ""
+
+#. Author of the plugin
+msgid "miniOrange"
+msgstr "miniOrange"

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Traits;
 
 /**
@@ -29,24 +29,26 @@ namespace PYS_PRO_GLOBAL\FacebookAds\Object\Traits;
  * This trait will be deprecated
  * @property array $changedFields
  */
-trait ObjectValidation
-{
-    /**
-     * @param array $params
-     * @return $this
-     */
-    public abstract function save(array $params = array());
-    /**
-     * @param array $params
-     * @return $this
-     * @throws \InvalidArgumentException
-     */
-    public function validate(array $params = array())
-    {
-        $changed_fields = $this->changedFields;
-        $validate_flag = array('execution_options' => array('validate_only'));
-        $this->save(\array_merge($params, $validate_flag));
-        $this->changedFields = $changed_fields;
-        return $this;
-    }
+trait ObjectValidation {
+
+  /**
+   * @param array $params
+   * @return $this
+   */
+  abstract public function save(array $params = array());
+
+  /**
+   * @param array $params
+   * @return $this
+   * @throws \InvalidArgumentException
+   */
+  public function validate(array $params = array()) {
+    $changed_fields = $this->changedFields;
+    $validate_flag = array(
+      'execution_options' => array('validate_only')
+    );
+    $this->save(array_merge($params, $validate_flag));
+    $this->changedFields = $changed_fields;
+    return $this;
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeCollectionThumbnailInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ELEMENT_CHILD_INDEX = 'element_child_index';
-    const ELEMENT_CROPS = 'element_crops';
-    const ELEMENT_ID = 'element_id';
-    public function getFieldTypes()
-    {
-        return array('element_child_index' => 'int', 'element_crops' => 'AdsImageCrops', 'element_id' => 'string');
-    }
+
+class AdCreativeCollectionThumbnailInfoFields extends AbstractEnum {
+
+  const ELEMENT_CHILD_INDEX = 'element_child_index';
+  const ELEMENT_CROPS = 'element_crops';
+  const ELEMENT_ID = 'element_id';
+
+  public function getFieldTypes() {
+    return array(
+      'element_child_index' => 'int',
+      'element_crops' => 'AdsImageCrops',
+      'element_id' => 'string',
+    );
+  }
 }

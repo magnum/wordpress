@@ -25,14 +25,12 @@ class Memberpress_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Memberpress_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->load_options = true;
 
 	}
 
@@ -53,7 +51,7 @@ class Memberpress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return mixed
 	 */
@@ -78,10 +76,27 @@ class Memberpress_Helpers {
 		$options = array();
 
 		if ( $args['uo_include_any'] ) {
-			$options[- 1] = $args['uo_any_label'];
+			$options['-1'] = $args['uo_any_label'];
 		}
 
-		$options = Automator()->helpers->recipe->options->wp_query( array( 'post_type' => 'memberpressproduct' ) );
+		$results = Automator()->helpers->recipe->options->wp_query( array( 'post_type' => 'memberpressproduct' ) );
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $k => $v ) {
+				$options[ $k ] = $v;
+			}
+		}
+
+		$relevant_tokens = array(
+			$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
+			$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
+			$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
+			$option_code . '_THUMB_ID'  => esc_attr__( 'Product featured image ID', 'uncanny-automator' ),
+			$option_code . '_THUMB_URL' => esc_attr__( 'Product featured image URL', 'uncanny-automator' ),
+		);
+
+		if ( isset( $args['relevant_tokens'] ) && ! empty( $args['relevant_tokens'] ) && is_array( $args['relevant_tokens'] ) ) {
+			$relevant_tokens = array_merge( $relevant_tokens, $args['relevant_tokens'] );
+		}
 
 		$option = array(
 			'option_code'     => $option_code,
@@ -89,13 +104,7 @@ class Memberpress_Helpers {
 			'input_type'      => 'select',
 			'required'        => true,
 			'options'         => $options,
-			'relevant_tokens' => array(
-				$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Product featured image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Product featured image URL', 'uncanny-automator' ),
-			),
+			'relevant_tokens' => $relevant_tokens,
 		);
 
 		return apply_filters( 'uap_option_all_memberpress_products', $option );
@@ -104,7 +113,7 @@ class Memberpress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return mixed
 	 */
@@ -129,7 +138,7 @@ class Memberpress_Helpers {
 		$options = array();
 
 		if ( $args['uo_include_any'] ) {
-			$options[- 1] = $args['uo_any_label'];
+			$options['-1'] = $args['uo_any_label'];
 		}
 
 		//$posts   = get_posts( );
@@ -145,7 +154,26 @@ class Memberpress_Helpers {
 				),
 			),
 		);
-		$options    = Automator()->helpers->recipe->wp_query( $query_args );
+
+		$results = Automator()->helpers->recipe->wp_query( $query_args );
+
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $k => $v ) {
+				$options[ $k ] = $v;
+			}
+		}
+
+		$relevant_tokens = array(
+			$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
+			$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
+			$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
+			$option_code . '_THUMB_ID'  => esc_attr__( 'Product featured image ID', 'uncanny-automator' ),
+			$option_code . '_THUMB_URL' => esc_attr__( 'Product featured image URL', 'uncanny-automator' ),
+		);
+
+		if ( isset( $args['relevant_tokens'] ) && ! empty( $args['relevant_tokens'] ) && is_array( $args['relevant_tokens'] ) ) {
+			$relevant_tokens = array_merge( $relevant_tokens, $args['relevant_tokens'] );
+		}
 
 		$option = array(
 			'option_code'     => $option_code,
@@ -153,13 +181,7 @@ class Memberpress_Helpers {
 			'input_type'      => 'select',
 			'required'        => true,
 			'options'         => $options,
-			'relevant_tokens' => array(
-				$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Product featured image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Product featured image URL', 'uncanny-automator' ),
-			),
+			'relevant_tokens' => $relevant_tokens,
 		);
 
 		return apply_filters( 'uap_option_all_memberpress_products_onetime', $option );
@@ -168,7 +190,7 @@ class Memberpress_Helpers {
 	/**
 	 * @param string $label
 	 * @param string $option_code
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return mixed
 	 */
@@ -193,7 +215,7 @@ class Memberpress_Helpers {
 		$options = array();
 
 		if ( $args['uo_include_any'] ) {
-			$options[- 1] = $args['uo_any_label'];
+			$options['-1'] = $args['uo_any_label'];
 		}
 
 		$query_args = array(
@@ -208,7 +230,25 @@ class Memberpress_Helpers {
 				),
 			),
 		);
-		$options    = Automator()->helpers->recipe->wp_query( $query_args );
+
+		$results = Automator()->helpers->recipe->wp_query( $query_args );
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $k => $v ) {
+				$options[ $k ] = $v;
+			}
+		}
+
+		$relevant_tokens = array(
+			$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
+			$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
+			$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
+			$option_code . '_THUMB_ID'  => esc_attr__( 'Product featured image ID', 'uncanny-automator' ),
+			$option_code . '_THUMB_URL' => esc_attr__( 'Product featured image URL', 'uncanny-automator' ),
+		);
+
+		if ( isset( $args['relevant_tokens'] ) && ! empty( $args['relevant_tokens'] ) && is_array( $args['relevant_tokens'] ) ) {
+			$relevant_tokens = array_merge( $relevant_tokens, $args['relevant_tokens'] );
+		}
 
 		$option = array(
 			'option_code'     => $option_code,
@@ -216,16 +256,27 @@ class Memberpress_Helpers {
 			'input_type'      => 'select',
 			'required'        => true,
 			'options'         => $options,
-			'relevant_tokens' => array(
-				$option_code                => esc_attr__( 'Product title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Product ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Product URL', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Product featureed image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Product featureed image URL', 'uncanny-automator' ),
-			),
+			'relevant_tokens' => $relevant_tokens,
 		);
 
 		return apply_filters( 'uap_option_all_memberpress_products_recurring', $option );
+	}
+
+	/**
+	 * @param $subscription
+	 *
+	 * @return bool
+	 */
+	public function check_if_is_renewal_or_first_payment( $subscription ) {
+		if ( $subscription !== false ) {
+			if ( ( ! $subscription->trial || ( $subscription->trial && $subscription->trial_amount <= 0.00 ) ) && $subscription->txn_count == 1 ) {
+				return true;
+			} elseif ( $subscription->trial && $subscription->trial_amount > 0.00 && $subscription->txn_count == 2 ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

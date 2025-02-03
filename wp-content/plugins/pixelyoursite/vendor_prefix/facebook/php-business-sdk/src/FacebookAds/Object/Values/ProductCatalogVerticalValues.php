@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,21 +35,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductCatalogVerticalValues getInstance()
  */
-class ProductCatalogVerticalValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADOPTABLE_PETS = 'adoptable_pets';
-    const BOOKABLE = 'bookable';
-    const COMMERCE = 'commerce';
-    const DESTINATIONS = 'destinations';
-    const FLIGHTS = 'flights';
-    const HOME_LISTINGS = 'home_listings';
-    const HOTELS = 'hotels';
-    const JOBS = 'jobs';
-    const LOCAL_DELIVERY_SHIPPING_PROFILES = 'local_delivery_shipping_profiles';
-    const LOCAL_SERVICE_BUSINESSES = 'local_service_businesses';
-    const OFFER_ITEMS = 'offer_items';
-    const OFFLINE_COMMERCE = 'offline_commerce';
-    const TICKETED_EXPERIENCES = 'ticketed_experiences';
-    const TRANSACTABLE_ITEMS = 'transactable_items';
-    const VEHICLES = 'vehicles';
+class ProductCatalogVerticalValues extends AbstractEnum {
+
+  const ADOPTABLE_PETS = 'adoptable_pets';
+  const BOOKABLE = 'bookable';
+  const COMMERCE = 'commerce';
+  const DESTINATIONS = 'destinations';
+  const FLIGHTS = 'flights';
+  const HOME_LISTINGS = 'home_listings';
+  const HOTELS = 'hotels';
+  const JOBS = 'jobs';
+  const LOCAL_DELIVERY_SHIPPING_PROFILES = 'local_delivery_shipping_profiles';
+  const LOCAL_SERVICE_BUSINESSES = 'local_service_businesses';
+  const OFFER_ITEMS = 'offer_items';
+  const OFFLINE_COMMERCE = 'offline_commerce';
+  const TICKETED_EXPERIENCES = 'ticketed_experiences';
+  const TRANSACTABLE_ITEMS = 'transactable_items';
+  const VEHICLES = 'vehicles';
 }

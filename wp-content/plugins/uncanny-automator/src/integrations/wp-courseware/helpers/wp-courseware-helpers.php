@@ -7,6 +7,7 @@ use Uncanny_Automator_Pro\Wp_Courseware_Pro_Helpers;
 
 /**
  * Class Wp_Courseware_Helpers
+ *
  * @package Uncanny_Automator
  */
 class Wp_Courseware_Helpers {
@@ -23,14 +24,13 @@ class Wp_Courseware_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Wp_Courseware_Helpers constructor.
 	 */
 	public function __construct() {
 
-		$this->load_options = true;
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Wp_Courseware_Helpers {
 		$options = array();
 		if ( Automator()->helpers->recipe->load_helpers ) {
 			if ( function_exists( 'wpcw_get_modules' ) ) {
-				$modules = wpcw_get_modules();
+				$modules = wpcw_get_modules( array( 'number' => 99999 ) );
 			}
 
 			if ( $any_option ) {

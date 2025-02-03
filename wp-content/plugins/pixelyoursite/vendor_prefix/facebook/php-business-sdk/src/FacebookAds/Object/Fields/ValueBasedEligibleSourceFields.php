@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ValueBasedEligibleSourceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const TITLE = 'title';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('id' => 'string', 'title' => 'string', 'type' => 'string');
-    }
+
+class ValueBasedEligibleSourceFields extends AbstractEnum {
+
+  const ID = 'id';
+  const TITLE = 'title';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'string',
+      'title' => 'string',
+      'type' => 'string',
+    );
+  }
 }

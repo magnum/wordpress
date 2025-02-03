@@ -97,7 +97,7 @@ abstract class Component {
 	 */
 	public static function get_argument_from_path( $arguments, $path, $delimiter = '.' ) {
 		$path_keys = explode( $delimiter, $path );
-		$num_keys  = count( $path_keys );
+		$num_keys  = false !== $path_keys ? count( $path_keys ) : 0;
 
 		$val = $arguments;
 		for ( $i = 0; $i < $num_keys; $i++ ) {
@@ -110,5 +110,29 @@ abstract class Component {
 			}
 		}
 		return $val;
+	}
+
+	/**
+	 * Array of required arguments.
+	 *
+	 * @var array
+	 */
+	protected $required_arguments = array();
+
+	/**
+	 * Get missing arguments of args array.
+	 *
+	 * @param array $args field arguments.
+	 * @return array
+	 */
+	public function get_missing_arguments( $args ) {
+		return array_values(
+			array_filter(
+				$this->required_arguments,
+				function( $arg_key ) use ( $args ) {
+					return null === self::get_argument_from_path( $args, $arg_key );
+				}
+			)
+		);
 	}
 }

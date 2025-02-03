@@ -113,13 +113,13 @@ class Automator_DB_Handler_Triggers {
 		}
 
 		if ( ! is_numeric( $trigger_log_id ) ) {
-			Automator()->error->add_error( 'insert_trigger_meta', 'ERROR: You are trying to insert trigger meta without providing valid trigger_log_id', $this );
+			Automator()->wp_error->add_error( 'insert_trigger_meta', 'ERROR: You are trying to insert trigger meta without providing valid trigger_log_id', $this );
 
 			return null;
 		}
 
 		if ( null === $meta_key || ! is_string( $meta_key ) ) {
-			Automator()->error->add_error( 'insert_trigger_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_key', $this );
+			Automator()->wp_error->add_error( 'insert_trigger_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_key', $this );
 
 			return null;
 		}
@@ -181,19 +181,19 @@ class Automator_DB_Handler_Triggers {
 		}
 
 		if ( null === $trigger_log_id || ! is_numeric( $trigger_log_id ) ) {
-			Automator()->error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing valid trigger_log_id', $this );
+			Automator()->wp_error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing valid trigger_log_id', $this );
 
 			return null;
 		}
 
 		if ( empty( $meta_key ) ) {
-			Automator()->error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_key', $this );
+			Automator()->wp_error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_key', $this );
 
 			return null;
 		}
 
 		if ( empty( $meta_value ) ) {
-			Automator()->error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_value', $this );
+			Automator()->wp_error->add_error( 'insert_trigger_token_meta', 'ERROR: You are trying to insert trigger meta without providing a meta_value', $this );
 
 			return null;
 		}
@@ -296,6 +296,54 @@ class Automator_DB_Handler_Triggers {
 	}
 
 	/**
+	 * Get trigger meta, but allow multiple values.
+	 *
+	 * @param string $meta_key
+	 * @param int $trigger_id
+	 * @param int $trigger_log_id
+	 * @param int|null $user_id
+	 *
+	 * @return array{}|string[]
+	 */
+	public function get_meta_multiple( string $meta_key, int $trigger_id, string $trigger_log_id, $user_id = null ) {
+
+		if ( empty( $meta_key ) || empty( $trigger_id ) || empty( $trigger_log_id ) ) {
+			return '';
+		}
+
+		global $wpdb;
+
+		$items = array();
+
+		$tbl = Automator()->db->tables->trigger_meta;
+
+		$query_string_prepared = $wpdb->prepare(
+			"SELECT meta_value FROM {$wpdb->prefix}$tbl WHERE user_id = %d AND meta_key = %s AND automator_trigger_id = %d AND automator_trigger_log_id = %d",
+			$user_id,
+			$meta_key,
+			$trigger_id,
+			$trigger_log_id
+		);
+
+		$results = (array) $wpdb->get_results(
+			$query_string_prepared,
+			ARRAY_A
+		);
+
+		foreach ( $results as $result ) {
+			if ( isset( $result['meta_value'] ) && is_string( $result['meta_value'] ) ) {
+				$property = maybe_unserialize( $result['meta_value'] );
+				if ( is_array( $property ) ) {
+					$items[] = maybe_unserialize( $result['meta_value'] );
+				}
+			}
+		}
+
+		return $items;
+
+	}
+
+	/**
 	 * @param $meta_key
 	 * @param $args
 	 *
@@ -371,13 +419,13 @@ class Automator_DB_Handler_Triggers {
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'is_trigger_completed', 'ERROR: You are trying to check if a trigger is completed without providing a trigger_id', $this );
+			Automator()->wp_error->add_error( 'is_trigger_completed', 'ERROR: You are trying to check if a trigger is completed without providing a trigger_id', $this );
 
 			return null;
 		}
 
 		if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-			Automator()->error->add_error( 'is_trigger_completed', 'ERROR: You are trying to check if a trigger is completed without providing a recipe_id', $this );
+			Automator()->wp_error->add_error( 'is_trigger_completed', 'ERROR: You are trying to check if a trigger is completed without providing a recipe_id', $this );
 
 			return null;
 		}

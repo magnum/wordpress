@@ -4,6 +4,8 @@ namespace Uncanny_Automator;
 
 use Uncanny_Automator\Automator_System_Report;
 
+use WP_REST_Response;
+
 /**
  * Class Usage_Reports.
  *
@@ -11,14 +13,45 @@ use Uncanny_Automator\Automator_System_Report;
  */
 class Usage_Reports {
 
-	const  OPTION_NAME         = 'automator_reporting';
+	/**
+	 *
+	 */
+	const  OPTION_NAME = 'automator_reporting';
+	/**
+	 *
+	 */
 	const  RECIPE_COUNT_OPTION = 'automator_completed_recipes';
-	const  SCHEDULE_NAME       = 'automator_report';
-	const  AUTOMATOR_PATH      = 'uncanny-automator/uncanny-automator.php';
-	const  AUTOMATOR_PRO_PATH  = 'uncanny-automator-pro/uncanny-automator-pro.php';
+	/**
+	 *
+	 */
+	const  SCHEDULE_NAME = 'automator_report';
+	/**
+	 *
+	 */
+	const  AUTOMATOR_PATH = 'uncanny-automator/uncanny-automator.php';
+	/**
+	 *
+	 */
+	const  AUTOMATOR_PRO_PATH = 'uncanny-automator-pro/uncanny-automator-pro.php';
+	/**
+	 *
+	 */
+	const  STATS_OPTION_NAME = 'usage_report_stats';
+	/**
+	 * @var
+	 */
 	public $system_report;
+	/**
+	 * @var
+	 */
 	public $recipes_data;
+	/**
+	 * @var
+	 */
 	public $report;
+	/**
+	 * @var bool
+	 */
 	private $forced = false;
 
 	/**
@@ -43,10 +76,81 @@ class Usage_Reports {
 
 		add_action( 'automator_recipe_completed', array( $this, 'count_recipe_completion' ) );
 
-		add_action( 'update_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 3 );
-		add_action( 'add_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 3 );
+		add_action( 'automator_update_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 2 );
+		add_action( 'automator_add_option_' . self::OPTION_NAME, array( $this, 'maybe_schedule_report' ), 100, 2 );
 
 		add_action( 'automator_weekly_healthcheck', array( $this, 'maybe_schedule_report' ) );
+
+		add_action( 'automator_view_path', array( $this, 'count_integrations_view' ), 10, 2 );
+
+		add_action( 'rest_api_init', array( $this, 'register_rest_endpoints' ) );
+
+		add_action( 'automator_settings_premium_integration_before_output', array( $this, 'count_premium_integration_view' ) );
+
+	}
+
+	/**
+	 * @return void
+	 */
+	public function register_rest_endpoints() {
+		register_rest_route(
+			AUTOMATOR_REST_API_END_POINT,
+			'/log-event/',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'log_event' ),
+				'args'                => array(),
+				'permission_callback' => array( $this, 'validate_event' ),
+			)
+		);
+	}
+
+	/**
+	 * @param $request
+	 *
+	 * @return bool
+	 */
+	public function validate_event( $request ) {
+
+		$request_params = $request->get_params();
+
+		if ( ! isset( $request_params['nonce'] ) ) {
+			return false;
+		}
+
+		if ( false === wp_verify_nonce( $request_params['nonce'], 'uncanny_automator' ) ) {
+			return false;
+		}
+
+		if ( empty( $request_params['event'] ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function log_event( $request ) {
+
+		$data = $request->get_params();
+
+		$event = $data['event'];
+
+		$usage_report_stats = automator_get_option( self::STATS_OPTION_NAME, array( 'events' => array() ) );
+
+		if ( ! isset( $usage_report_stats['events'][ $event ] ) ) {
+			$usage_report_stats['events'][ $event ] = array();
+		}
+
+		$usage_report_stats['events'][ $event ][] = $data['value'];
+
+		automator_update_option( self::STATS_OPTION_NAME, $usage_report_stats );
+
+		return new WP_REST_Response( array(), 201 );
 	}
 
 	/**
@@ -58,6 +162,7 @@ class Usage_Reports {
 
 		if ( ! $this->reporting_enabled() ) {
 			$this->unschedule_report();
+
 			return;
 		}
 
@@ -148,7 +253,7 @@ class Usage_Reports {
 			return AUTOMATOR_REPORTING;
 		}
 
-		if ( (bool) get_option( self::OPTION_NAME, false ) === true ) {
+		if ( (bool) automator_get_option( self::OPTION_NAME, false ) === true ) {
 			$reporting_enabled = true;
 		}
 
@@ -179,6 +284,7 @@ class Usage_Reports {
 				'live_recipes_count'        => 0,
 				'user_recipes_count'        => 0,
 				'everyone_recipes_count'    => 0,
+				'loops_recipes_count'       => 0,
 				'total_actions'             => 0,
 				'total_triggers'            => 0,
 				'total_closures'            => 0,
@@ -214,7 +320,11 @@ class Usage_Reports {
 		$this->report['active_plugins'] = $this->get_plugins_info( $this->system_report['active_plugins'] );
 		$this->get_automator_info();
 		$this->get_recipes_info();
+		$this->get_user_walkthrough_info();
 		$this->get_date();
+		$this->get_views();
+		$this->get_template_library_info();
+		$this->get_settings();
 
 		$finished_at = microtime( true );
 
@@ -271,7 +381,8 @@ class Usage_Reports {
 	/**
 	 * import_from_system_report
 	 *
-	 * @param  mixed $keys
+	 * @param mixed $keys
+	 *
 	 * @return void
 	 */
 	public function import_from_system_report( $keys ) {
@@ -389,7 +500,7 @@ class Usage_Reports {
 	 * @return void
 	 */
 	public function get_automator_info() {
-		$this->report['automator']['version'] = $this->system_report['environment']['version'];
+		$this->report['automator']['version'] = AUTOMATOR_PLUGIN_VERSION;
 
 		if ( defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ) {
 			$this->report['automator']['pro_version'] = AUTOMATOR_PRO_PLUGIN_VERSION;
@@ -405,6 +516,8 @@ class Usage_Reports {
 	 * @return void
 	 */
 	public function get_recipes_info() {
+
+		$this->report['recipes']['loops_recipes_count'] = $this->get_loop_recipes();
 
 		$this->report['recipes']['completed_recipes'] = $this->get_completed_runs();
 
@@ -432,12 +545,95 @@ class Usage_Reports {
 	}
 
 	/**
-	 * get_completed_runs
+	 * get_user_walkthrough_info
 	 *
 	 * @return void
 	 */
+	public function get_user_walkthrough_info() {
+
+		// Collect all user walkthroughs meta.
+		global $wpdb;
+		$results = $wpdb->get_results(
+			"SELECT `meta_value` FROM {$wpdb->usermeta} WHERE meta_key = 'automator_walkthrough_progress'"
+		);
+
+		// Bail if no results.
+		if ( empty( $results ) ) {
+			$this->report['walkthroughs'] = array();
+			return;
+		}
+
+		// Filter out valid data and organize.
+		$walkthroughs = array();
+		foreach ( $results as $result ) {
+			$meta = empty( $result ) ? false : maybe_unserialize( $result->meta_value );
+			if ( empty( $meta ) || ! is_array( $meta ) ) {
+				continue;
+			}
+
+			foreach ( $meta as $id => $progress ) {
+				if ( ! is_string( $id ) || ! is_array( $progress ) || empty( $progress['step'] ) ) {
+					continue;
+				}
+
+				// Add walkthrough if not set.
+				if ( ! isset( $walkthroughs[ $id ] ) ) {
+					$walkthroughs[ $id ] = array();
+				}
+
+				// Initialize the step if not already set.
+				if ( ! isset( $walkthroughs[ $id ][ $progress['step'] ] ) ) {
+					$walkthroughs[ $id ][ $progress['step'] ] = array(
+						'name'  => $progress['step'],
+						'value' => 0,
+					);
+				}
+
+				$walkthroughs[ $id ][ $progress['step'] ]['value']++;
+			}
+		}
+
+		// Bail if no valid walkthroughs.
+		if ( empty( $walkthroughs ) ) {
+			$this->report['walkthroughs'] = array();
+			return;
+		}
+
+		// Remove the keys from each walkthrough array.
+		$walkthroughs = array_map( 'array_values', $walkthroughs );
+
+		$this->report['walkthroughs'] = $walkthroughs;
+	}
+
+	/**
+	 * get_completed_runs
+	 *
+	 * @return int
+	 */
 	public function get_completed_runs() {
-		return absint( get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() ) );
+		return absint( automator_get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() ) );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_loop_recipes() {
+		global $wpdb;
+
+		$qry = $wpdb->prepare(
+			"SELECT COUNT(p1.ID) as recipes
+FROM $wpdb->posts p
+    JOIN $wpdb->posts p1
+        ON p.ID = p1.post_parent
+WHERE p.post_type LIKE %s
+  AND p1.post_type = %s",
+			'uo-recipe',
+			'uo-loop'
+		);
+
+		$result = $wpdb->get_var( $qry );
+
+		return absint( $result );
 	}
 
 	/**
@@ -446,8 +642,8 @@ class Usage_Reports {
 	 * @return void
 	 */
 	public function count_recipe_completion() {
-		$completed_runs = absint( get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() - 1 ) );
-		update_option( self::RECIPE_COUNT_OPTION, ++$completed_runs );
+		$completed_runs = absint( automator_get_option( self::RECIPE_COUNT_OPTION, Automator()->get->total_completed_runs() - 1 ) );
+		automator_update_option( self::RECIPE_COUNT_OPTION, ++ $completed_runs );
 	}
 
 	/**
@@ -474,7 +670,8 @@ class Usage_Reports {
 	/**
 	 * process_recipe_items
 	 *
-	 * @param  mixed $recipe
+	 * @param mixed $recipe
+	 *
 	 * @return void
 	 */
 	public function process_recipe_items( $recipe_data ) {
@@ -510,7 +707,8 @@ class Usage_Reports {
 	/**
 	 * get_actions_conditions
 	 *
-	 * @param  mixed $recipe_data
+	 * @param mixed $recipe_data
+	 *
 	 * @return array
 	 */
 	public function get_actions_conditions( $recipe_data ) {
@@ -541,9 +739,10 @@ class Usage_Reports {
 	/**
 	 * get_recipe_items
 	 *
-	 * @param  mixed $recipe
-	 * @param  mixed $type
-	 * @return void
+	 * @param mixed $recipe
+	 * @param mixed $type
+	 *
+	 * @return array
 	 */
 	public function get_recipe_items( $recipe, $type ) {
 
@@ -573,8 +772,9 @@ class Usage_Reports {
 	/**
 	 * get_recipe_integrations
 	 *
-	 * @param  mixed $recipe
-	 * @return void
+	 * @param mixed $recipe
+	 *
+	 * @return array
 	 */
 	public function get_recipe_integrations( $recipe ) {
 
@@ -620,6 +820,10 @@ class Usage_Reports {
 			} elseif ( 'schedule' === $data['meta']['async_mode'] ) {
 
 				$this->report['recipes']['scheduled_actions_count'] ++;
+
+			} elseif ( 'custom' === $data['meta']['async_mode'] ) {
+
+				$this->report['recipes']['custom_actions_count'] ++;
 
 			}
 		}
@@ -680,6 +884,80 @@ class Usage_Reports {
 	}
 
 	/**
+	 * get_views
+	 *
+	 * @return void
+	 */
+	public function get_views() {
+
+		$stats = automator_get_option( self::STATS_OPTION_NAME, array() );
+
+		if ( ! empty( $stats['page_views'] ) ) {
+			$stats['page_views'] = array_values( $stats['page_views'] );
+		}
+
+		$this->report['stats'] = $stats;
+	}
+
+	/**
+	 * get_template_library_info
+	 *
+	 * @return void
+	 */
+	public function get_template_library_info() {
+		// Collect events stats.
+		$stats   = automator_get_option( self::STATS_OPTION_NAME, array() );
+		$stats   = isset( $stats['events'] ) ? $stats['events'] : array();
+		$pre     = 'template-library-';
+		$library = array(
+			'search' => array(),
+			'import' => array(),
+		);
+
+		// Bail if no stats.
+		if ( empty( $stats ) ) {
+			$this->report['template-library-search'] = array();
+			$this->report['template-library-import'] = array();
+			return;
+		}
+
+		// Loop through stats for library keys.
+		foreach ( $library as $key => $data ) {
+			// Check if 'search' or 'import' key exists in events stats.
+			$data = isset( $stats[ "{$pre}{$key}" ] ) ? $stats[ "{$pre}{$key}" ] : array();
+			if ( empty( $data ) ) {
+				continue;
+			}
+
+			// Group results data and add counts.
+			foreach ( $data as $term ) {
+				// Lowercase search terms.
+				$term = 'search' === $key ? strtolower( $term ) : $term;
+				// Add term to results if not already set.
+				if ( ! isset( $library[ $key ][ $term ] ) ) {
+					$library[ $key ][ $term ] = array(
+						$key    => $term,
+						'count' => 0,
+					);
+				}
+				// Increment count.
+				$library[ $key ][ $term ]['count']++;
+			}
+
+			// Remove the array keys and convert to objects.
+			$library[ $key ] = array_map(
+				function( $item ) {
+					return (object) $item;
+				},
+				array_values( $library[ $key ] )
+			);
+		}
+
+		$this->report['template-library-search'] = $library['search'];
+		$this->report['template-library-import'] = $library['import'];
+	}
+
+	/**
 	 * send_report
 	 *
 	 * @return void
@@ -705,15 +983,104 @@ class Usage_Reports {
 				throw new \Exception( __( 'Something went wrong', 'uncanny-automator' ) );
 			}
 
+			automator_delete_option( self::STATS_OPTION_NAME );
+
 			return true;
 		} catch ( \Exception $e ) {
-
 			automator_log( $e->getMessage(), 'Could not send report' );
-
 		}
 
 		return false;
-
 	}
 
+	/**
+	 * @param $views_directory
+	 * @param $file_name
+	 *
+	 * @return mixed
+	 */
+	public function count_integrations_view( $views_directory, $file_name ) {
+
+		$s = DIRECTORY_SEPARATOR;
+
+		$views_to_count = array(
+			'admin-integrations' . $s . 'archive.php'      => 'All integrations',
+			'admin-settings' . $s . 'tab' . $s . 'general' . $s . 'improve-automator.php' => 'Improve Automator',
+			'admin-settings' . $s . 'tab' . $s . 'general' . $s . 'logs.php' => 'Logs settings',
+			'admin-settings' . $s . 'tab' . $s . 'general.php' => 'General settings',
+			'admin-settings' . $s . 'tab' . $s . 'advanced' . $s . 'background-actions.php' => 'Background actions settings',
+			'admin-settings' . $s . 'tab' . $s . 'advanced' . $s . 'automator-cache.php' => 'Automator cache settings',
+			'admin-tools' . $s . 'tab' . $s . 'status.php' => 'Status',
+			'admin-tools' . $s . 'tab' . $s . 'tools.php'  => 'Satus > Tools',
+			'admin-tools' . $s . 'tab' . $s . 'debug.php'  => 'Status > Debug',
+		);
+
+		if ( isset( $views_to_count[ $file_name ] ) ) {
+
+			$this->increment_view( $views_to_count[ $file_name ] );
+		}
+
+		return $views_directory;
+	}
+
+	/**
+	 * @param $page
+	 *
+	 * @return void
+	 */
+	public function increment_view( $page ) {
+
+		$user_id = get_current_user_id();
+
+		$usage_report_stats = automator_get_option( self::STATS_OPTION_NAME, array( 'page_views' => array() ) );
+
+		$page_views = array(
+			'name'     => $page,
+			'total'    => 0,
+			'per_user' => array( $user_id => 0 ),
+			'average'  => 0,
+		);
+
+		if ( isset( $usage_report_stats['page_views'][ $page ] ) ) {
+			$page_views = $usage_report_stats['page_views'][ $page ];
+		}
+
+		if ( ! isset( $page_views['per_user'][ $user_id ] ) ) {
+			$page_views['per_user'][ $user_id ] = 0;
+		}
+
+		$page_views['per_user'][ $user_id ] ++;
+
+		$page_views['total'] ++;
+
+		$total_users = count( $page_views['per_user'] );
+
+		$page_views['average'] = $page_views['total'] / $total_users;
+
+		$usage_report_stats['page_views'][ $page ] = $page_views;
+
+		automator_update_option( self::STATS_OPTION_NAME, $usage_report_stats );
+	}
+
+	public function count_premium_integration_view( $Settings_Page ) {
+		$this->increment_view( $Settings_Page->get_name() . ' Settings' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function get_settings() {
+
+		$settings_to_report = array(
+			'Background actions' => '1' === automator_get_option( Background_Actions::OPTION_NAME, '' ) ? 'Enabled' : 'Disabled',
+			'Automator cache'    => '1' === automator_get_option( Automator_Cache_Handler::OPTION_NAME, '' ) ? 'Enabled' : 'Disabled',
+		);
+
+		if ( is_automator_pro_active() ) {
+			$settings_to_report['Auto-prune activity logs']        = empty( as_next_scheduled_action( 'uapro_auto_purge_logs' ) ) ? 'Disabled' : 'Enabled';
+			$settings_to_report['Auto-prune activity logs (days)'] = (int) automator_get_option( 'uap_automator_purge_days', 0 );
+		}
+
+		$this->report['settings'] = $settings_to_report;
+	}
 }

@@ -56,7 +56,7 @@ class GA extends Settings implements Pixel {
 			$this->configured = $this->enabled()
                                 && count( $tracking_id ) > 0
                                 && !empty($tracking_id[0])
-			                    && ! apply_filters( 'pys_pixel_disabled', false, $this->getSlug() );
+			                    && ! apply_filters( 'pys_pixel_disabled', array(), $this->getSlug() );
 			
 		}
 		
@@ -65,14 +65,28 @@ class GA extends Settings implements Pixel {
 	}
 
     public function getPixelDebugMode() {
-
-        $flags = (array) $this->getOption( 'is_enable_debug_mode' );
-
-        if ( isSuperPackActive() && SuperPack()->getOption( 'enabled' ) && SuperPack()->getOption( 'additional_ids_enabled' ) ) {
-            return $flags;
-        } else {
-            return (array) reset( $flags ); // return first id only
+        $flags = array();
+        if($this->getOption( 'is_enable_debug_mode')){
+            $flags = (array) $this->getOption( 'is_enable_debug_mode' );
         }
+        return $flags; // return first id only
+    }
+
+    public function getPixelAdditionalConfig() {
+        $flags = array();
+        $mainTag = (string) $this->getPixelIDs()[0];
+        $flags[$mainTag]['first_party_collection'] = $this->getOption('first_party_collection');
+        return $flags;
+    }
+    public function getPixelServerContainerUrls() {
+        $flags = array();
+        $mainTag = (string) $this->getPixelIDs()[0];
+        $flags[$mainTag]['enable_server_container'] = (string) $this->getOption('enable_server_container');
+        $flags[$mainTag]['server_container_url'] = $this->getOption('server_container_url') ? (string) $this->getOption('server_container_url')[0] : '';
+        $flags[$mainTag]['transport_url'] = $this->getOption('transport_url') ? (string) $this->getOption('transport_url')[0] : '';
+
+
+        return $flags;// return first id only
     }
 
 	public function getPixelIDs() {
@@ -81,7 +95,8 @@ class GA extends Settings implements Pixel {
         if(count($ids) == 0) {
             return apply_filters("pys_ga_ids",[]);
         } else {
-            return apply_filters("pys_ga_ids",(array) reset( $ids )); // return first id only
+			$id = array_shift($ids);
+			return apply_filters("pys_ga_ids", array($id)); // return first id only
         }
 	}
 
@@ -90,21 +105,23 @@ class GA extends Settings implements Pixel {
 
         return array(
             'trackingIds' => $this->getPixelIDs(),
-            'enhanceLinkAttr' => $this->getOption('enhance_link_attribution'),
-            'anonimizeIP' => $this->getOption('anonimize_ip'),
             'commentEventEnabled' => $this->getOption('comment_event_enabled'),
-            'commentEventNonInteractive' => $this->getOption('comment_event_non_interactive'),
             'downloadEnabled' => $this->getOption('download_event_enabled'),
-            'downloadEventNonInteractive' => $this->getOption('download_event_non_interactive'),
             'formEventEnabled' => $this->getOption('form_event_enabled'),
             'crossDomainEnabled' => $this->getOption('cross_domain_enabled'),
             'crossDomainAcceptIncoming' => $this->getOption('cross_domain_accept_incoming'),
             'crossDomainDomains' => $this->getOption('cross_domain_domains'),
             'isDebugEnabled'                => $this->getPixelDebugMode(),
+            'serverContainerUrls'                => $this->getPixelServerContainerUrls(),
+            'additionalConfig'  => $this->getPixelAdditionalConfig(),
             'disableAdvertisingFeatures'    => $this->getOption( 'disable_advertising_features' ),
             'disableAdvertisingPersonalization' => $this->getOption( 'disable_advertising_personalization' ),
-            'wooVariableAsSimple' => $this->getOption( 'woo_variable_as_simple' )
+            'wooVariableAsSimple' => GATags()->getOption( 'woo_variable_as_simple' ),
+            'custom_page_view_event' => $this->getOption( 'custom_page_view_event' ),
         );
+    }
+    private function isGaV4($tag) {
+        return strpos($tag, 'G') === 0;
     }
     /**
      * Create pixel event and fill it
@@ -117,7 +134,11 @@ class GA extends Settings implements Pixel {
             return [];
         }
 
-        $pixelIds = $this->getPixelIDs();
+        //$onlyGA4event = ['woo_view_cart'];
+        //$isGA4Event = in_array($event->getId(), $onlyGA4event);
+        $pixelIds = array_filter($this->getPixelIDs(), static function ($tag) {
+            return strpos($tag, 'UA-') === false;
+        });
 
         if(count($pixelIds) > 0) {
             $pixelEvent = clone $event;
@@ -149,19 +170,21 @@ class GA extends Settings implements Pixel {
 
             case 'automatic_event_signup' : {
                 $event->addPayload(["name" => "sign_up"]);
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
             case 'automatic_event_login' :{
                 $event->addPayload(["name" => "login"]);
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
+                $isActive = $this->getOption($event->getId().'_enabled');
+            } break;
+            case 'automatic_event_404' :{
+                $event->addPayload(["name" => "404"]);
+
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
             case 'automatic_event_search' :{
                 $event->addPayload(["name" => "search"]);
                 $event->addParams([
                     "search_term"       =>  empty( $_GET['s'] ) ? null : $_GET['s'],
-                    'non_interaction'   =>  $this->getOption($event->getId()."_non_interactive_enabled")
                 ]);
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
@@ -171,12 +194,14 @@ class GA extends Settings implements Pixel {
             case 'automatic_event_comment' :
             case 'automatic_event_scroll' :
             case 'automatic_event_time_on_page' : {
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
                 $isActive = $this->getOption($event->getId().'_enabled');
             }break;
 
 
             case 'init_event': {
+                    if ( ! $this->getOption( 'custom_page_view_event' ) ) {
+                        return;
+                    }
                     $eventData = $this->getPageViewEventParams();
                     if ($eventData) {
                         $isActive = true;
@@ -198,6 +223,9 @@ class GA extends Settings implements Pixel {
                     $isActive = true;
                     $this->addDataToEvent($eventData, $event);
                 }
+            }break;
+            case 'woo_view_cart': {
+                $isActive =  $this->getWooViewCartEventParams($event);
             }break;
             case 'woo_add_to_cart_on_cart_page':
             case 'woo_add_to_cart_on_checkout_page':{
@@ -225,14 +253,14 @@ class GA extends Settings implements Pixel {
                     $this->addDataToEvent($eventData, $event);
                 }
             }break;
-            case 'woo_view_item_list':
+            /*case 'woo_view_item_list':
                 {
                     $eventData = $this->getWooViewCategoryEventParams();
                     if ($eventData) {
                         $isActive = true;
                         $this->addDataToEvent($eventData, $event);
                     }
-                }break;
+                }break;*/
             case 'edd_view_content': {
                 $eventData = $this->getEddViewContentEventParams();
                 if ($eventData) {
@@ -255,13 +283,13 @@ class GA extends Settings implements Pixel {
                 }
             }break;
 
-            case 'edd_view_category': {
+            /*case 'edd_view_category': {
                 $eventData = $this->getEddViewCategoryEventParams();
                 if ($eventData) {
                     $isActive = true;
                     $this->addDataToEvent($eventData, $event);
                 }
-            }break;
+            }break;*/
 
             case 'edd_initiate_checkout': {
                 $eventData = $this->getEddCartEventParams('begin_checkout');
@@ -322,7 +350,7 @@ class GA extends Settings implements Pixel {
 	
 	public function outputNoScriptEvents() {
 	 
-		if ( ! $this->configured() ) {
+		if ( ! $this->configured() || $this->getOption('disable_noscript')) {
 			return;
 		}
 
@@ -331,12 +359,10 @@ class GA extends Settings implements Pixel {
 		foreach ( $eventsManager->getStaticEvents( 'ga' ) as $eventName => $events ) {
 			foreach ( $events as $event ) {
 				foreach ( $this->getPixelIDs() as $pixelID ) {
-
 					$args = array(
 						'v'   => 1,
 						'tid' => $pixelID,
 						't'   => 'event',
-						'aip' => $this->getOption( 'anonimize_ip' ),
 					);
 
 					//@see: https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#ec
@@ -356,9 +382,9 @@ class GA extends Settings implements Pixel {
 						$args['ev'] = urlencode( $event['params']['value'] );
 					}
 
-					if ( isset( $event['params']['items'] ) ) {
+                    if ( isset( $event['params']['items'] ) && is_array( $event['params']['items'] )) {
 
-						foreach ( $event['params']['items'] as $key => $item ) {
+                        foreach ( $event['params']['items'] as $key => $item ) {
                             if(isset($item['id']))
 							    @$args["pr{$key}id" ] = urlencode( $item['id'] );
                             if(isset($item['name']))
@@ -394,16 +420,10 @@ class GA extends Settings implements Pixel {
 	
 	private function getPageViewEventParams() {
 
-		if ( PYS()->getEventsManager()->doingAMP ) {
-
-			return array(
-				'name' => 'PageView',
-				'data' => array(),
-			);
-
-		} else {
-			return false; // PageView is fired by tag itself
-		}
+        return array(
+            'name' => 'page_view',
+            'data' => array(),
+        );
 
 	}
 
@@ -415,17 +435,17 @@ class GA extends Settings implements Pixel {
 	 */
 	private function getCustomEventData( $event ) {
 
-		$ga_action = $event->getGoogleAnalyticsAction();
+		$ga_action = $event->getMergedAction();
 
-		if ( ! $event->isGoogleAnalyticsEnabled() || empty( $ga_action ) ) {
+		if ( ! $event->isUnifyAnalyticsEnabled() || empty( $ga_action ) ) {
 			return false;
 		}
 
 
         if($event->isGaV4()) {
-            $params = $event->getGaParams();
+            $params = $event->getMergedGaParams();
 
-            foreach ($event->getGACustomParams() as $item) {
+            foreach ($event->getGAMergedCustomParams() as $item) {
                 $params[$item['name']] = $item['value'];
             }
 
@@ -436,11 +456,10 @@ class GA extends Settings implements Pixel {
                 'value'           => $event->ga_event_value,
             );
         }
-        $params['non_interaction'] = $event->ga_non_interactive;
 
 
 		return array(
-			'name'  => $event->getGoogleAnalyticsAction(),
+			'name'  => $event->getMergedAction(),
 			'data'  => $params,
 			'delay' => $event->getDelay(),
 		);
@@ -467,7 +486,6 @@ class GA extends Settings implements Pixel {
             }
         }
 
-		$list_name = implode( '/', array_reverse( $product_categories ) );
 
 		$items = array();
 		$product_ids = array();
@@ -482,13 +500,14 @@ class GA extends Settings implements Pixel {
 			$item = array(
 				'id'            => GA\Helpers\getWooProductContentId($posts[ $i ]->ID),
 				'name'          => $posts[ $i ]->post_title,
-				'category'      => implode( '/', getObjectTerms( 'product_cat', $posts[ $i ]->ID ) ),
 				'quantity'      => 1,
 				'price'         => getWooProductPriceToDisplay( $posts[ $i ]->ID ),
-				'list_position' => $i + 1,
-				'list'          => $list_name,
 			);
-
+            $category = $this->getCategoryArrayWoo($posts[ $i ]->ID);
+            if(!empty($category))
+            {
+                $item = array_merge($item, $category);
+            }
 			$items[] = $item;
 			$product_ids[] = $item['id'];
 			$total_value += $item['price'];
@@ -497,9 +516,9 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
-			'event_label'     => $list_name,
+			'event_label'     => 'category',
+            'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_view_category_non_interactive' ),
 		);
 		
 		return array(
@@ -510,25 +529,64 @@ class GA extends Settings implements Pixel {
 	}
 
 	private function getWooViewContentEventParams() {
-		global $post;
 
 		if ( ! $this->getOption( 'woo_view_content_enabled' ) ) {
 			return false;
 		}
+        $quantity = 1;
+        $customProductPrice = -1;
 
-		$params = array(
-			'event_category'  => 'ecommerce',
-			'items'           => array(
-				array(
-					'id'       => GA\Helpers\getWooProductContentId($post->ID),
-					'name'     => $post->post_title,
-					'category' => implode( '/', getObjectTerms( 'product_cat', $post->ID ) ),
-					'quantity' => 1,
-					'price'    => getWooProductPriceToDisplay( $post->ID ),
-				),
-			),
-			'non_interaction' => $this->getOption( 'woo_view_content_non_interactive' ),
-		);
+        global $post;
+        $product = wc_get_product( $post->ID );
+        if(!$product)  return false;
+
+        $productId = GA\Helpers\getWooProductContentId($product->get_id());
+
+        $items = array();
+        $general_item = array(
+            'id'       => $productId,
+            'name'     => $product->get_name(),
+            'quantity' => $quantity,
+            'price'    => getWooProductPriceToDisplay($product->get_id(), $quantity, $customProductPrice),
+        );
+
+        $category = $this->getCategoryArrayWoo($productId);
+        if(!empty($category))
+        {
+            $general_item = array_merge($general_item, $category);
+        }
+
+        $items[] = $general_item;
+// Check if the product has variations
+        if ($product->is_type('variable') && !GATags()->getOption( 'woo_variable_as_simple' )) {
+
+            $variations = $product->get_available_variations();
+
+            foreach ($variations as $variation) {
+                $variationProduct = wc_get_product($variation['variation_id']);
+                $variationProductId = GA\Helpers\getWooProductContentId($variation['variation_id']);
+                $category = $this->getCategoryArrayWoo($variationProductId, true);
+
+                $item = array(
+                    'id'       => $variationProductId,
+                    'name'     => GATags()->getOption('woo_variations_use_parent_name') ? $variationProduct->get_title() : $variationProduct->get_name(),
+                    'quantity' => $quantity,
+                    'price'    => getWooProductPriceToDisplay($variationProduct->get_id(), $quantity, $customProductPrice)
+                );
+                $items[] = array_merge($item, $category);
+            }
+        }
+        $params = array(
+            'event_category'  => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
+        );
+        $params['items'] = $items;
+
+        if ( PYS()->getOption( 'woo_view_content_value_enabled' ) ) {
+            $value_option = PYS()->getOption( 'woo_view_content_value_option' );
+            $global_value = PYS()->getOption( 'woo_view_content_value_global', 0 );
+            $params['value']    = getWooEventValue( $value_option, $global_value,100, $product->get_id() ,$quantity);
+        }
 
 		return array(
 			'name'  => 'view_item',
@@ -537,7 +595,73 @@ class GA extends Settings implements Pixel {
 		);
 
 	}
+    private function getWooViewCartEventParams(&$event){
+        if ( ! $this->getOption( 'woo_view_cart_enabled' ) ) {
+            return false;
+        }
+        $data = ['name'  => 'view_cart'];
+        $payload = $event->payload;
+        $params = $this->getWooEventViewCartParams( $event );
+        $event->addParams($params);
+        $event->addPayload($data);
+        return true;
+    }
+    private function getWooEventViewCartParams($event){
+        $params = [
+            'event_category' => 'ecommerce',
+        ];
+        $params['currency'] = get_woocommerce_currency();
+        $items = array();
+        $product_ids = array();
+        $withTax = 'incl' === get_option( 'woocommerce_tax_display_cart' );
+        if(WC()->cart->get_cart())
+        {
+            foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
 
+                $product = wc_get_product(!empty($cart_item['variation_id'] && !GATags()->getOption('woo_variable_as_simple')) ? $cart_item['variation_id'] : $cart_item['product_id']);
+
+                if ($product) {
+
+                    $product_data = $product->get_data();
+                    $product_id = GA\Helpers\getWooCartItemId( $cart_item );
+                    $content_id = GA\Helpers\getWooProductContentId($product_id);
+                    $price = $cart_item['line_subtotal'];
+
+
+                    if ($withTax) {
+                        $price += $cart_item['line_subtotal_tax'];
+                    }
+                    $item = array(
+                        'id'       => $content_id,
+                        'name'     => GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name(),
+                        'quantity' => $cart_item['quantity'],
+                        'price'    => $cart_item['quantity'] > 0 ? pys_round($price / $cart_item['quantity']) : $price,
+                    );
+                    $category = $this->getCategoryArrayWoo($product_id, $product->is_type('variation'));
+                    if (!empty($category)) {
+                        $item = array_merge($item, $category);
+                    }
+                    if ($product && $product->is_type('variation')) {
+                        foreach ($event->args['products'] as $event_product){
+                            if($event_product['product_id'] == $product_id && !empty($event_product['variation_name']))
+                            {
+                                $item['variant'] = $event_product['variation_name'];
+                            }
+
+                        }
+                    }
+
+                    $items[] = $item;
+                    $product_ids[] = $item['id'];
+                }
+            }
+        }
+        $params['items'] = $items;
+        $params['currency'] =  get_woocommerce_currency();
+        $params['value'] = getWooEventCartTotal($event);
+
+        return $params;
+    }
 	private function getWooAddToCartOnButtonClickEventParams( $args ) {
 
 		if ( ! $this->getOption( 'woo_add_to_cart_enabled' )  || ! PYS()->getOption( 'woo_add_to_cart_on_button_click' ) ) {
@@ -566,31 +690,43 @@ class GA extends Settings implements Pixel {
             }
             $content_id = GA\Helpers\getWooProductContentId($child_id);
             $price = getWooProductPriceToDisplay( $child_id, $quantity );
-            $name = $childProduct->get_title();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $childProduct->is_type('variation') ? $childProduct->get_title() : $childProduct->get_name();
+
 
             if ( $childProduct->get_type() == 'variation' ) {
-                $variation_name = implode("/", $childProduct->get_variation_attributes());
-                $categories = implode( '/', getObjectTerms( 'product_cat', $childProduct->get_parent_id() ) );
+                $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $childProduct->get_variation_attributes()) : $product->get_title();
+                $categories = $this->getCategoryArrayWoo($child_id, true);
             } else {
-                $categories = implode( '/', getObjectTerms( 'product_cat', $child_id ) );
+                $categories = $this->getCategoryArrayWoo($child_id);
                 $variation_name = null;
             }
-            $items[] = array(
+            $item = array(
                 'id'       => $content_id,
                 'name'     => $name,
-                'category' => $categories,
                 'quantity' => $quantity,
                 'price'    => $price,
                 'variant'  => $variation_name,
             );
+            if (!empty($categories)) {
+                $item = array_merge($item, $categories);
+            }
+
+            $items[] = $item;
         }
 
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_add_to_cart_non_interactive' ),
 		);
+
+        if ( PYS()->getOption( 'woo_add_to_cart_value_enabled' ) ) {
+            $value_option = PYS()->getOption( 'woo_add_to_cart_value_option' );
+            $global_value = PYS()->getOption( 'woo_add_to_cart_value_global', 0 );
+
+            $params['value']    = getWooEventValue( $value_option, $global_value,100, $product_id,$quantity );
+        }
 
         $data = array(
             'params'  => $params,
@@ -618,7 +754,6 @@ class GA extends Settings implements Pixel {
 		}
 
 		$params = $this->getWooCartParams();
-		$params['non_interaction'] = true;
 
 		return array(
 			'name' => 'add_to_cart',
@@ -644,18 +779,19 @@ class GA extends Settings implements Pixel {
 
         $name = $product->get_title();
 
+
 		if ( ! empty( $cart_item['variation_id'] ) ) {
-			$variation = wc_get_product( (int) $cart_item['variation_id'] );
-            if($variation && $variation->get_type() == 'variation') {
-                $variation_name = implode("/", $variation->get_variation_attributes());
-                $categories = implode( '/', getObjectTerms( 'product_cat', $variation->get_parent_id() ) );
+            $variation = wc_get_product( $cart_item['variation_id'] );
+            if($variation && $variation->get_type() == 'variation'  && !GATags()->getOption( 'woo_variable_as_simple' )) {
+                $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+                $categories = $this->getCategoryArrayWoo($product_id, true);
             } else {
                 $variation_name = null;
-                $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+                $categories = $this->getCategoryArrayWoo($product_id);
             }
 		} else {
 			$variation_name = null;
-            $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+            $categories = $this->getCategoryArrayWoo($product_id);
 		}
 
         $data = [
@@ -668,13 +804,17 @@ class GA extends Settings implements Pixel {
                 array(
                     'id'       => $product_id,
                     'name'     => $name,
-                    'category' => $categories,
                     'quantity' => $cart_item['quantity'],
                     'price'    => getWooProductPriceToDisplay( $product_id, $cart_item['quantity'] ),
                     'variant'  => $variation_name,
                 ),
-            ),
-            'non_interaction' => $this->getOption( 'woo_remove_from_cart_non_interactive' ),];
+            )];
+
+        if(!empty($categories))
+        {
+            $params['items'][0] = array_merge($params['items'][0], $categories);
+        }
+
         $event->addParams($params);
         $event->addPayload($data);
 
@@ -687,8 +827,7 @@ class GA extends Settings implements Pixel {
 			return false;
 		}
 
-		$params = $this->getWooCartParams();
-		$params['non_interaction'] = $this->getOption( 'woo_initiate_checkout_non_interactive' );
+		$params = $this->getWooCartParams('InitiateCheckout');
 
 		return array(
 			'name'  => 'begin_checkout',
@@ -698,14 +837,27 @@ class GA extends Settings implements Pixel {
 	}
 	
 	private function getWooPurchaseEventParams() {
-
+        global $wp;
 		if ( ! $this->getOption( 'woo_purchase_enabled' ) ) {
 			return false;
 		}
         $key = sanitize_key($_REQUEST['key']);
-		$order_id = (int) wc_get_order_id_by_order_key( $key );
+        $cache_key = 'order_id_' . $key;
+        $order_id = get_transient( $cache_key );
+        if (PYS()->woo_is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
 
-		$order = new \WC_Order( $order_id );
+            $order_id = absint( $wp->query_vars['order-received'] );
+            if ($order_id) {
+                set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
+            }
+        }
+        if ( empty($order_id) ) {
+            $order_id = (int) wc_get_order_id_by_order_key( $key );
+            set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
+        }
+
+        $order    = wc_get_order( $order_id );
+        if(!$order) return false;
 		$items = array();
 		$product_ids = array();
 		$total_value = 0;
@@ -716,21 +868,27 @@ class GA extends Settings implements Pixel {
             $content_id = GA\Helpers\getWooProductContentId( $product_id );
 
 			$product = wc_get_product( $product_id );
+            if (GATags()->getOption('woo_variable_as_simple') && $product->is_type('variation')) {
+                $product = wc_get_product($product->get_parent_id());
+            }
             if(!$product) continue;
-            $name = $product->get_title();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
 
-			if ( $line_item['variation_id'] ) {
+
+
+            if ( $line_item['variation_id'] ) {
 				$variation = wc_get_product( $line_item['variation_id'] );
-                if($variation && $variation->get_type() == 'variation') {
-                    $variation_name = implode("/", $variation->get_variation_attributes());
-                    $categories = implode( '/', getObjectTerms( 'product_cat', $variation->get_parent_id() ) );
+                if($variation && $variation->get_type() == 'variation' && !GATags()->getOption( 'woo_variable_as_simple' )) {
+
+                    $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+                    $categories = $this->getCategoryArrayWoo($product_id, true);
                 } else {
                     $variation_name = null;
-                    $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+                    $categories = $this->getCategoryArrayWoo($product_id);
                 }
 			} else {
 				$variation_name = null;
-                $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+                $categories = $this->getCategoryArrayWoo($product_id);
 			}
 
 			/**
@@ -767,26 +925,31 @@ class GA extends Settings implements Pixel {
 			$item = array(
 				'id'       => $content_id,
 				'name'     => $name,
-				'category' => $categories,
 				'quantity' => $qty,
 				'price'    => $price,
 				'variant'  => $variation_name,
 			);
-
+            if (!empty($categories)) {
+                $item = array_merge($item, $categories);
+            }
 			$items[] = $item;
 			$product_ids[] = $item['id'];
 			$total_value   += $item['price' ];
 
 		}
-		
+
 		$params = array(
 			'event_category'  => 'ecommerce',
             'transaction_id'  => $order_id,
-			'value'           => $order->get_total(),
 			'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_purchase_non_interactive' ),
 		);
+        $value_option = PYS()->getOption( 'woo_purchase_value_option' );
+        $global_value = PYS()->getOption( 'woo_purchase_value_global', 0 );
+
+        $params['value'] = getWooEventValueOrder( $value_option, $order, $global_value );
+
+        $params['fees'] = get_fees($order);
 
 		return array(
 			'name' => 'purchase',
@@ -795,7 +958,7 @@ class GA extends Settings implements Pixel {
 
 	}
 
-	private function getWooCartParams() {
+	private function getWooCartParams($context='cart') {
 
 		$items = array();
 		$product_ids = array();
@@ -809,31 +972,36 @@ class GA extends Settings implements Pixel {
 			$product = wc_get_product( $product_id );
 			if(!$product) continue;
 
-            $name = $product->get_title();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
+
 
 			if ( $cart_item['variation_id'] ) {
-				$variation = wc_get_product( $cart_item['variation_id'] );
-                if ( $variation && $variation->get_type() == 'variation' ) {
-                    $variation_name = implode("/", $variation->get_variation_attributes());
-                    $categories = implode( '/', getObjectTerms( 'product_cat', $variation->get_parent_id() ) );
+                $variation = wc_get_product( $cart_item['variation_id'] );
+                if($variation && $variation->get_type() == 'variation' && !GATags()->getOption( 'woo_variable_as_simple' )) {
+                    $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+                    $categories = $this->getCategoryArrayWoo($product_id, true);
                 } else {
+
                     $variation_name = null;
-                    $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+                    $categories = $this->getCategoryArrayWoo($product_id);
                 }
-			} else {
-				$variation_name = null;
-                $categories = implode( '/', getObjectTerms( 'product_cat', $product_id ) );
+            } else {
+
+                $variation_name = null;
+                $categories = $this->getCategoryArrayWoo($product_id);
 			}
 
 			$item = array(
 				'id'       => $content_id,
 				'name'     => $name,
-				'category' => $categories,
 				'quantity' => $cart_item['quantity'],
 				'price'    => getWooProductPriceToDisplay( $product_id ),
 				'variant'  => $variation_name,
 			);
 
+            if (!empty($categories)) {
+                $item = array_merge($item, $categories);
+            }
 			$items[] = $item;
 			$product_ids[] = $item['id'];
 			$total_value += $item['price'];
@@ -842,8 +1010,31 @@ class GA extends Settings implements Pixel {
 		
 		$params = array(
 			'event_category' => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
 			'items' => $items,
 		);
+
+        if ( $context == 'InitiateCheckout' ) {
+
+            $value_enabled_option = 'woo_initiate_checkout_value_enabled';
+            $value_option_option  = 'woo_initiate_checkout_value_option';
+            $value_global_option  = 'woo_initiate_checkout_value_global';
+
+        } else { // AddToCart
+
+            $value_enabled_option = 'woo_add_to_cart_value_enabled';
+            $value_option_option  = 'woo_add_to_cart_value_option';
+            $value_global_option  = 'woo_add_to_cart_value_global';
+
+        }
+        if ( PYS()->getOption( $value_enabled_option ) ) {
+
+            $value_option = PYS()->getOption( $value_option_option );
+            $global_value = PYS()->getOption( $value_global_option, 0 );
+
+            $params['value']    = getWooEventValueCart( $value_option, $global_value );
+
+        }
 
 		return $params;
 
@@ -858,6 +1049,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items'           => array(
 				array(
 					'id'       => $post->ID,
@@ -867,9 +1059,16 @@ class GA extends Settings implements Pixel {
 					'price'    => getEddDownloadPriceToDisplay( $post->ID ),
 				),
 			),
-			'non_interaction' => $this->getOption( 'edd_view_content_non_interactive' ),
 		);
+        if ( PYS()->getOption( 'edd_view_content_value_enabled' ) ) {
 
+            $amount = getEddDownloadPriceToDisplay( $post->ID );
+            $value_option   = PYS()->getOption( 'edd_view_content_value_option' );
+            $global_value   = PYS()->getOption( 'edd_view_content_value_global', 0 );
+
+            $params['value'] = getEddEventValue( $value_option, $amount, $global_value );
+
+        }
 		return array(
 			'name'  => 'view_item',
 			'data'  => $params,
@@ -890,6 +1089,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items'           => array(
 				array(
 					'id'       => GA\Helpers\getEddDownloadContentId($download_id),
@@ -899,9 +1099,17 @@ class GA extends Settings implements Pixel {
 					'price'    => getEddDownloadPriceToDisplay( $download_id, $price_index ),
 				),
 			),
-			'non_interaction' => $this->getOption( 'edd_add_to_cart_non_interactive' ),
 		);
-		
+
+        if ( PYS()->getOption( 'edd_add_to_cart_value_enabled' ) ) {
+
+            $amount = getEddDownloadPriceToDisplay( $download_id, $price_index );
+            $value_option = PYS()->getOption( 'edd_add_to_cart_value_option' );
+            $global_value = PYS()->getOption( 'edd_add_to_cart_value_global', 0 );
+
+            $params['value'] = getEddEventValue( $value_option, $amount, $global_value );
+
+        }
 		return $params;
 
 	}
@@ -915,6 +1123,20 @@ class GA extends Settings implements Pixel {
 		} elseif ( $context == 'purchase' && ! $this->getOption( 'edd_purchase_enabled' ) ) {
 			return false;
 		}
+
+        if ( $context == 'add_to_cart' ) {
+            $value_enabled  = PYS()->getOption( 'edd_add_to_cart_value_enabled' );
+            $value_option   = PYS()->getOption( 'edd_add_to_cart_value_option' );
+            $global_value   = PYS()->getOption( 'edd_add_to_cart_value_global', 0 );
+        } elseif ( $context == 'begin_checkout' ) {
+            $value_enabled  = PYS()->getOption( 'edd_initiate_checkout_value_enabled' );
+            $value_option   = PYS()->getOption( 'edd_initiate_checkout_value_option' );
+            $global_value   = PYS()->getOption( 'edd_initiate_checkout_global', 0 );
+        } else {
+            $value_enabled  = PYS()->getOption( 'edd_purchase_value_enabled' );
+            $value_option   = PYS()->getOption( 'edd_purchase_value_option' );
+            $global_value   = PYS()->getOption( 'edd_purchase_value_global', 0 );
+        }
 
 		if ( $context == 'add_to_cart' || $context == 'begin_checkout' ) {
 			$cart = edd_get_cart_contents();
@@ -947,15 +1169,17 @@ class GA extends Settings implements Pixel {
 			 * Price as is used for all events except Purchase to avoid wrong values in Product Performance report.
 			 */
 			if ( $context == 'purchase' ) {
-			 
-				$price = $cart_item['item_price'] - $cart_item['discount'];
-
-				if ( edd_prices_include_tax() ) {
-					$price -= $cart_item['tax'];
+			    if(!isset($cart_item['item_price']) || !isset($cart_item['discount']) || !isset($cart_item['tax'])) {
+					$price = getEddDownloadPriceToDisplay( $download_id, $price_index );
 				} else {
-					$price += $cart_item['tax'];
-				}
+				    $price = $cart_item['item_price'] - $cart_item['discount'];
 
+				    if ( edd_prices_include_tax() ) {
+					    $price -= $cart_item['tax'];
+				    } else {
+					    $price += $cart_item['tax'];
+				    }
+			    }
 			} else {
 				$price = getEddDownloadPriceToDisplay( $download_id, $price_index );
 			}
@@ -977,16 +1201,10 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category' => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items' => $items,
 		);
 
-		if ( $context == 'add_to_cart' ) {
-			$params['non_interaction'] = true;
-		} elseif ( $context == 'begin_checkout' ) {
-			$params['non_interaction'] = $this->getOption( 'edd_initiate_checkout_non_interactive' );
-		} elseif ( $context == 'purchase' ) {
-			$params['non_interaction'] = $this->getOption( 'edd_purchase_non_interactive' );
-		}
 
 		if ( $context == 'purchase' ) {
 
@@ -995,9 +1213,13 @@ class GA extends Settings implements Pixel {
 
             $params['transaction_id'] = $payment_id;
 			$params['currency'] = edd_get_currency();
-            $params['value'] = edd_get_payment_amount( $payment_id );
 
 		}
+
+        if ( $value_enabled ) {
+            $amount = edd_get_payment_amount( $payment_id );
+            $params['value']    = getEddEventValue( $value_option, $amount, $global_value );
+        }
 		
 		return array(
 			'name' => $context,
@@ -1032,7 +1254,6 @@ class GA extends Settings implements Pixel {
 //						'variant'  => $variation_name,
 					),
 				),
-				'non_interaction' => $this->getOption( 'edd_remove_from_cart_non_interactive' ),
 			),
 		);
 
@@ -1084,8 +1305,8 @@ class GA extends Settings implements Pixel {
 		$params = array(
 			'event_category'  => 'ecommerce',
 			'event_label'     => $list_name,
+            'currency' => edd_get_currency(),
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'edd_view_category_non_interactive' ),
 		);
 
 		return array(
@@ -1095,6 +1316,30 @@ class GA extends Settings implements Pixel {
 
 	}
 
+
+
+    private function getCategoryArrayWoo($contentID, $isVariant = false)
+    {
+        $category_array = array();
+
+        if ($isVariant) {
+            $parent_product_id = wp_get_post_parent_id($contentID);
+            $category = getObjectTerms('product_cat', $parent_product_id);
+        } else {
+            $category = getObjectTerms('product_cat', $contentID);
+        }
+
+        $category_index = 1;
+
+        foreach ($category as $cat) {
+            if ($category_index >= 6) {
+                break; // Stop the loop if the maximum limit of 5 categories is exceeded
+            }
+            $category_array['item_category' . ($category_index > 1 ? $category_index : '')] = $cat;
+            $category_index++;
+        }
+        return $category_array;
+    }
 }
 
 /**

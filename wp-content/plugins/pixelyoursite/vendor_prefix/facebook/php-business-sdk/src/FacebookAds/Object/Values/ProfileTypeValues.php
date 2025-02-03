@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,18 +35,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProfileTypeValues getInstance()
  */
-class ProfileTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ANGRY = 'ANGRY';
-    const CARE = 'CARE';
-    const FIRE = 'FIRE';
-    const HAHA = 'HAHA';
-    const HUNDRED = 'HUNDRED';
-    const LIKE = 'LIKE';
-    const LOVE = 'LOVE';
-    const NONE = 'NONE';
-    const PRIDE = 'PRIDE';
-    const SAD = 'SAD';
-    const THANKFUL = 'THANKFUL';
-    const WOW = 'WOW';
+class ProfileTypeValues extends AbstractEnum {
+
+  const ANGRY = 'ANGRY';
+  const CARE = 'CARE';
+  const FIRE = 'FIRE';
+  const HAHA = 'HAHA';
+  const HUNDRED = 'HUNDRED';
+  const LIKE = 'LIKE';
+  const LOVE = 'LOVE';
+  const NONE = 'NONE';
+  const PRIDE = 'PRIDE';
+  const SAD = 'SAD';
+  const THANKFUL = 'THANKFUL';
+  const WOW = 'WOW';
 }

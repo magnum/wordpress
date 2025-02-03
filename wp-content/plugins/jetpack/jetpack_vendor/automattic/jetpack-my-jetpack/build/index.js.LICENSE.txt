@@ -6,14 +6,8 @@
  * @see https://github.com/kvz/phpjs/blob/ffe1356af23a6f2512c84c954dd4e828e92579fa/functions/strings/number_format.js
  */
 
-/*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
-*/
-
 /**
- * @remix-run/router v1.2.1
+ * @remix-run/router v1.21.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -24,7 +18,7 @@
  */
 
 /**
- * React Router DOM v6.6.2
+ * React Router DOM v6.28.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -35,7 +29,7 @@
  */
 
 /**
- * React Router v6.6.2
+ * React Router v6.28.1
  *
  * Copyright (c) Remix Software Inc.
  *

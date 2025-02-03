@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPromotedObjectFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPromotedObjectCustomEventTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPromotedObjectCustomEventTypeValu
  * pull request for this class.
  *
  */
-class AdPromotedObject extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdPromotedObjectFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPromotedObjectFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['CustomEventType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPromotedObjectCustomEventTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdPromotedObject extends AbstractObject {
+
+  /**
+   * @return AdPromotedObjectFields
+   */
+  public static function getFieldsEnum() {
+    return AdPromotedObjectFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['CustomEventType'] = AdPromotedObjectCustomEventTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

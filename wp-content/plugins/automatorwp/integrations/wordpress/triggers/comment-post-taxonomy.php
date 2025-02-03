@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Comment_Post_Taxonomy extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_comment_post_taxonomy';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_comment_post_taxonomy';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -140,4 +151,5 @@ class AutomatorWP_WordPress_Comment_Post_Taxonomy extends AutomatorWP_Integratio
 
 }
 
-new AutomatorWP_WordPress_Comment_Post_Taxonomy();
+new AutomatorWP_WordPress_Comment_Post_Taxonomy( 'wordpress' );
+new AutomatorWP_WordPress_Comment_Post_Taxonomy( 'comments' );

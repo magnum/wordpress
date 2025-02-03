@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdsPixelFirstPartyCookieStatusValues getInstance()
  */
-class AdsPixelFirstPartyCookieStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const VALUE_EMPTY = 'EMPTY';
-    const FIRST_PARTY_COOKIE_DISABLED = 'FIRST_PARTY_COOKIE_DISABLED';
-    const FIRST_PARTY_COOKIE_ENABLED = 'FIRST_PARTY_COOKIE_ENABLED';
+class AdsPixelFirstPartyCookieStatusValues extends AbstractEnum {
+
+  const VALUE_EMPTY = 'EMPTY';
+  const FIRST_PARTY_COOKIE_DISABLED = 'FIRST_PARTY_COOKIE_DISABLED';
+  const FIRST_PARTY_COOKIE_ENABLED = 'FIRST_PARTY_COOKIE_ENABLED';
 }

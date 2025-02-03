@@ -36,6 +36,9 @@ class Automator_Send_Webhook_Fields {
 
 		if ( null === self::$instance ) {
 			self::$instance = new self();
+			if ( empty( self::$instance->data_format_types ) ) {
+				self::$instance->register_data_format_types();
+			}
 		}
 
 		return self::$instance;
@@ -45,6 +48,14 @@ class Automator_Send_Webhook_Fields {
 	 * Constructor
 	 */
 	public function __construct() {
+
+		add_action( 'init', array( $this, 'register_data_format_types' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function register_data_format_types() {
 		$this->data_format_types = apply_filters(
 			'automator_outgoing_webhook_content_types',
 			array(
@@ -75,10 +86,13 @@ class Automator_Send_Webhook_Fields {
 	 * @return array
 	 */
 	public function options_group( $action_meta, $data_format_required = true, $default = null, $allowed = array() ) {
+
 		if ( null === $default ) {
 			$default = 'x-www-form-urlencoded';
 		}
+
 		$fields = array();
+
 		// Webhook URL
 		$fields[] = array(
 			'input_type'      => 'url',
@@ -88,6 +102,7 @@ class Automator_Send_Webhook_Fields {
 			'required'        => true,
 			'description'     => esc_attr__( 'Enter the URL of the destination webhook.', 'uncanny-automator' ),
 		);
+
 		// Action event
 		$fields[] = array(
 			'input_type'    => 'select',
@@ -98,13 +113,16 @@ class Automator_Send_Webhook_Fields {
 			'required'      => true,
 			'default_value' => 'POST',
 			'options'       => array(
-				'GET'    => 'GET',
-				'PUT'    => 'PUT',
-				'POST'   => 'POST',
-				'DELETE' => 'DELETE',
-				'HEAD'   => 'HEAD',
+				'GET'     => 'GET',
+				'PUT'     => 'PUT',
+				'POST'    => 'POST',
+				'PATCH'   => 'PATCH',
+				'DELETE'  => 'DELETE',
+				'HEAD'    => 'HEAD',
+				'OPTIONS' => 'OPTIONS',
 			),
 		);
+
 		// Data format field
 		if ( $data_format_required ) {
 			$options  = $this->data_format_types;
@@ -126,9 +144,34 @@ class Automator_Send_Webhook_Fields {
 				'supports_custom_value' => false,
 				'default_value'         => $default,
 				'options'               => $options,
+				'dynamic_visibility'    => array(
+					'default_state'    => 'visible',
+					'visibility_rules' => array(
+						array(
+							'operator'             => 'AND',
+							'rule_conditions'      => array(
+								array(
+									'option_code' => 'ACTION_EVENT',
+									'compare'     => '==',
+									'value'       => 'GET',
+								),
+							),
+							'resulting_visibility' => 'hide',
+						),
+					),
+				),
 			);
 			$fields[]     = $data_formats;
 		}
+
+		// Authorizations.
+		$fields[] = array(
+			'input_type'  => 'text',
+			'option_code' => 'WEBHOOK_AUTHORIZATIONS',
+			'label'       => esc_attr__( 'Authorization', 'uncanny-automator' ),
+			'description' => esc_attr__( 'The authorization string will be automatically incorporated into the header. Once saved, the value will be masked.', 'uncanny-automator' ),
+			'required'    => false,
+		);
 
 		// Header
 		$fields[] = array(
@@ -165,19 +208,20 @@ class Automator_Send_Webhook_Fields {
 			/* translators: Non-personal infinitive verb */
 			'remove_row_button' => esc_attr__( 'Remove header', 'uncanny-automator' ),
 		);
-		// Fields
+
+		// Fields.
 		$fields[] = array(
 			'input_type'        => 'repeater',
 			'option_code'       => 'WEBHOOK_FIELDS',
 			'label'             => esc_attr__( 'Body', 'uncanny-automator' ),
-			'required'          => true,
+			'required'          => false,
 			'fields'            => array(
 				array(
 					'input_type'      => 'text',
 					'option_code'     => 'KEY',
 					'label'           => esc_attr__( 'Key', 'uncanny-automator' ),
 					'supports_tokens' => true,
-					'required'        => true,
+					'required'        => false,
 					'placeholder'     => __( 'first_name', 'uncanny-automator' ),
 					'description'     => sprintf( '<i>%s</i>', esc_html__( 'Separate keys with / to build nested data.', 'uncanny-automator' ) ),
 				),

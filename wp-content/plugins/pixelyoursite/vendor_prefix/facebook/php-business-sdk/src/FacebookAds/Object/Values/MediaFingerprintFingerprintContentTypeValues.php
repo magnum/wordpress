@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static MediaFingerprintFingerprintContentTypeValues getInstance()
  */
-class MediaFingerprintFingerprintContentTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AM_SONGTRACK = 'AM_SONGTRACK';
-    const EPISODE = 'EPISODE';
-    const MOVIE = 'MOVIE';
-    const OTHER = 'OTHER';
-    const SONGTRACK = 'SONGTRACK';
+class MediaFingerprintFingerprintContentTypeValues extends AbstractEnum {
+
+  const AM_SONGTRACK = 'AM_SONGTRACK';
+  const EPISODE = 'EPISODE';
+  const MOVIE = 'MOVIE';
+  const OTHER = 'OTHER';
+  const SONGTRACK = 'SONGTRACK';
 }

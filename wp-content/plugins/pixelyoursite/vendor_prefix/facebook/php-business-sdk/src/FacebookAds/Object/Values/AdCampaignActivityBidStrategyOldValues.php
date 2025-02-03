@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
-use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 /**
  * This class is auto-generated.
  *
@@ -34,7 +34,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCampaignActivityBidStrategyOldValues getInstance()
  */
-class AdCampaignActivityBidStrategyOldValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
+class AdCampaignActivityBidStrategyOldValues extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const COST_CAP = 'COST_CAP';
     const LOWEST_COST_WITHOUT_CAP = 'LOWEST_COST_WITHOUT_CAP';

@@ -21,16 +21,17 @@ Version History
 
 
 class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
-	public static $name = 'do-update';
+	public static $name        = 'do-update';
 	public static $description = 'Update WordPress, plugins, and themes.';
-	
-	private $default_arguments = array();
+
+	private $default_arguments = [];
 	private $original_update_details;
-	
-	
+	private $skin;
+
+
 	public function run( $arguments ) {
-		require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		require_once( $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php' );
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php';
 		
 		$this->skin = new Ithemes_Sync_Upgrader_Skin();
 		
@@ -38,11 +39,16 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
 		
-		$this->original_update_details = Ithemes_Sync_Functions::get_update_details( array( 'verbose' => true, 'force_refresh' => true ) );
+		$this->original_update_details = Ithemes_Sync_Functions::get_update_details(
+			[
+				'verbose'       => true,
+				'force_refresh' => true,
+			] 
+		);
 				
-		add_action( 'upgrader_process_complete', array( $this, 'disable_language_pack_upgrades' ), 5 );
+		add_action( 'upgrader_process_complete', [ $this, 'disable_language_pack_upgrades' ], 5 );
 
-		$response = array();
+		$response = [];
 		
 		if ( ! empty( $arguments['plugin'] ) ) {
 			$response['plugin'] = $this->do_plugin_upgrade( $arguments['plugin'] );
@@ -59,45 +65,50 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 	}
 	
 	public function disable_language_pack_upgrades() {
-		remove_action( 'upgrader_process_complete', array( 'Language_Pack_Upgrader', 'async_upgrade' ), 20 );
+		remove_action( 'upgrader_process_complete', [ 'Language_Pack_Upgrader', 'async_upgrade' ], 20 );
 	}
 	
 	public function do_core_upgrade( $params ) {
-		$required_fields = array(
+		$required_fields = [
 			'upgrade_id',
 			'locale',
 			'version',
-		);
+		];
 		
-		$errors = array();
+		$errors = [];
 		
 		foreach ( $required_fields as $field ) {
-			if ( ! isset( $params[$field] ) ) {
+			if ( ! isset( $params[ $field ] ) ) {
 				$errors[] = "The '$field' field is missing.";
 			}
 		}
 		
 		
 		if ( empty( $errors ) ) {
-			require_once( $GLOBALS['ithemes_updater_path'] . '/functions.php' );
+			require_once $GLOBALS['ithemes_updater_path'] . '/functions.php';
 			
-			$updates = Ithemes_Sync_Functions::get_update_details( array( 'verbose' => true, 'force_refresh' => array( 'core' ) ) );
+			$updates = Ithemes_Sync_Functions::get_update_details(
+				[
+					'verbose'       => true,
+					'force_refresh' => [ 'core' ],
+				] 
+			);
 			
 			if ( empty( $updates['core'] ) ) {
 				$errors[] = 'No core updates are currently available.';
-			} else if ( empty( $updates['core'][$params['upgrade_id']] ) ) {
+			} elseif ( empty( $updates['core'][ $params['upgrade_id'] ] ) ) {
 				$errors[] = 'Unable to find an availble upgrade matching the requested upgrade_id.';
-			} else if ( $params['locale'] != $updates['core'][$params['upgrade_id']]->locale ) {
+			} elseif ( $params['locale'] != $updates['core'][ $params['upgrade_id'] ]->locale ) {
 				$errors[] = 'The requested upgrade does not match the requested locale.';
-			} else if ( isset( $updates['core'][$params['upgrade_id']]->version ) && ( $params['version'] != $updates['core'][$params['upgrade_id']]->version ) ) {
+			} elseif ( isset( $updates['core'][ $params['upgrade_id'] ]->version ) && ( $params['version'] != $updates['core'][ $params['upgrade_id'] ]->version ) ) {
 				$errors[] = 'The requested upgrade does not match the requested version.';
-			} else if ( isset( $updates['core'][$params['upgrade_id']]->current ) && ( $params['version'] != $updates['core'][$params['upgrade_id']]->current ) ) {
+			} elseif ( isset( $updates['core'][ $params['upgrade_id'] ]->current ) && ( $params['version'] != $updates['core'][ $params['upgrade_id'] ]->current ) ) {
 				$errors[] = 'The requested upgrade does not match the requested version.';
 			}
 		}
 		
 		if ( ! empty( $errors ) ) {
-			return array( 'errors' => $errors );
+			return [ 'errors' => $errors ];
 		}
 		
 		
@@ -105,26 +116,26 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 		
 		$original_version = Ithemes_Sync_Functions::get_wordpress_version();
 		
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		require_once( ABSPATH . 'wp-admin/includes/update.php' );
-		require_once( ABSPATH . 'wp-admin/includes/misc.php' );
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/update.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
 		
 		$upgrader = new Core_Upgrader( $this->skin );
-		$result = $upgrader->upgrade( $updates['core'][$params['upgrade_id']] );
+		$result   = $upgrader->upgrade( $updates['core'][ $params['upgrade_id'] ] );
 		
 		Ithemes_Sync_Functions::refresh_core_updates();
 		
 		if ( is_wp_error( $result ) ) {
-			return array(
-				'errors' => array(
+			return [
+				'errors' => [
 					$result->get_error_code() => $result->get_error_message(),
-				),
-			);
+				],
+			];
 		}
 		
 		
-		$current_version = Ithemes_Sync_Functions::get_wordpress_version();
-		$current_updates = Ithemes_Sync_Functions::get_update_details( array( 'force_refresh' => array( 'core' ) ) );
+		$current_version        = Ithemes_Sync_Functions::get_wordpress_version();
+		$current_updates        = Ithemes_Sync_Functions::get_update_details( [ 'force_refresh' => [ 'core' ] ] );
 		$current_update_version = false;
 		
 		foreach ( $current_updates['core'] as $index => $update ) {
@@ -134,13 +145,13 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 		}
 		
 		
-		$response = array(
+		$response = [
 			'wordpress_response'      => $result,
 			'original_version'        => $original_version,
 			'current_version'         => $current_version,
 			'current_update_version'  => $current_update_version,
-			'original_update_version' => $updates['core'][$params['upgrade_id']]->version,
-		);
+			'original_update_version' => $updates['core'][ $params['upgrade_id'] ]->version,
+		];
 		
 		
 		if ( is_multisite() ) {
@@ -157,15 +168,21 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 			
 			foreach ( (array) $blogs as $details ) {
 				switch_to_blog( $details['blog_id'] );
-				$siteurl = site_url();
+				$siteurl     = site_url();
 				$upgrade_url = admin_url( 'upgrade.php?step=upgrade_db' );
 				restore_current_blog();
 				
-				$result = wp_remote_get( $upgrade_url, array( 'timeout' => 120, 'httpversion' => '1.1' ) );
+				$result = wp_remote_get(
+					$upgrade_url,
+					[
+						'timeout'     => 120,
+						'httpversion' => '1.1',
+					] 
+				);
 				
 				if ( is_wp_error( $result ) ) {
 					$response['network_upgrade'] = false;
-					$response['errors'][] = 'Unable to successfully upgrade the network. You may need to visit the network admin dashboard to manually upgrade the network.';
+					$response['errors'][]        = 'Unable to successfully upgrade the network. You may need to visit the network admin dashboard to manually upgrade the network.';
 					break;
 				}
 				
@@ -192,7 +209,7 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 	}
 	
 	private function do_bulk_upgrade( $packages, $type ) {
-		if ( ! in_array( $type, array( 'plugin', 'theme' ) ) ) {
+		if ( ! in_array( $type, [ 'plugin', 'theme' ] ) ) {
 			return new WP_Error( 'unrecognized-bulk-upgrade-type', "An unrecognized type ($type) was passed to do_bulk_upgrade()." );
 		}
 		
@@ -200,7 +217,7 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 		Ithemes_Sync_Functions::set_time_limit( 300 );
 		
 		
-		$original_versions = array();
+		$original_versions = [];
 		
 		foreach ( $packages as $package ) {
 			if ( 'plugin' === $type ) {
@@ -209,68 +226,68 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 				$file_data = Ithemes_Sync_Functions::get_file_data( WP_CONTENT_DIR . "/themes/$package/style.css" );
 			}
 			
-			$original_versions[$package] = $file_data['version'];
+			$original_versions[ $package ] = $file_data['version'];
 		}
 		
 		
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-		require_once( ABSPATH . 'wp-admin/includes/misc.php' );
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
 		
 		
 		if ( 'plugin' === $type ) {
 			$upgrader = new Plugin_Upgrader( $this->skin );
-			$result = $upgrader->bulk_upgrade( $packages );
+			$result   = $upgrader->bulk_upgrade( $packages );
 			Ithemes_Sync_Functions::refresh_plugin_updates();
 		} else {
 			$upgrader = new Theme_Upgrader( $this->skin );
-			$result = $upgrader->bulk_upgrade( $packages );
+			$result   = $upgrader->bulk_upgrade( $packages );
 			Ithemes_Sync_Functions::refresh_theme_updates();
 		}
 		
 		
 		if ( is_wp_error( $result ) ) {
-			return array(
-				'errors' => array(
+			return [
+				'errors' => [
 					$result->get_error_code() => $result->get_error_message(),
-				),
-			);
-		} else if ( false === $result ) {
+				],
+			];
+		} elseif ( false === $result ) {
 			if ( 'plugin' === $type ) {
-				$result = $upgrader->fs_connect( array( WP_CONTENT_DIR, WP_PLUGIN_DIR ) );
+				$result = $upgrader->fs_connect( [ WP_CONTENT_DIR, WP_PLUGIN_DIR ] );
 			} else {
-				$result = $upgrader->fs_connect( array( WP_CONTENT_DIR ) );
+				$result = $upgrader->fs_connect( [ WP_CONTENT_DIR ] );
 			}
 			
 			
 			if ( is_wp_error( $result ) ) {
-				return array(
-					'errors' => array(
+				return [
+					'errors' => [
 						$result->get_error_code() => $result->get_error_message(),
-					),
-				);
+					],
+				];
 			} else {
-				return array(
-					'errors' => array(
+				return [
+					'errors' => [
 						'non-connected-filesystem' => 'Unable to update due to a non-connected filesystem.',
-					),
-				);
+					],
+				];
 			}
 		}
 		
 		
-		$update_details = Ithemes_Sync_Functions::get_update_details( array( 'verbose' => true ) );
-		$response = array();
+		$update_details = Ithemes_Sync_Functions::get_update_details( [ 'verbose' => true ] );
+		$response       = [];
 		
 		$update_index = "{$type}s";
 		
 		foreach ( $result as $package => $info ) {
 			if ( false === $info ) {
-				$response[$package]['errors']['non-connected-filesystem'] = 'Unable to update due to a non-connected filesystem.';
-			} else if ( is_wp_error( $info ) ) {
-				$response[$package]['errors'][$info->get_error_code()] = $info->get_error_message();
+				$response[ $package ]['errors']['non-connected-filesystem'] = 'Unable to update due to a non-connected filesystem.';
+			} elseif ( is_wp_error( $info ) ) {
+				$response[ $package ]['errors'][ $info->get_error_code() ] = $info->get_error_message();
 			} else {
-				$response[$package]['wordpress_response'] = $info;
+				$response[ $package ]['wordpress_response'] = $info;
 				
 				if ( 'plugin' === $type ) {
 					$file_data = Ithemes_Sync_Functions::get_file_data( WP_PLUGIN_DIR . "/$package" );
@@ -278,23 +295,23 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 					$file_data = Ithemes_Sync_Functions::get_file_data( WP_CONTENT_DIR . "/themes/$package/style.css" );
 				}
 				
-				$response[$package]['current_version'] = $file_data['version'];
+				$response[ $package ]['current_version'] = $file_data['version'];
 				
-				if ( isset( $original_versions[$package] ) ) {
-					$response[$package]['original_version'] = $original_versions[$package];
+				if ( isset( $original_versions[ $package ] ) ) {
+					$response[ $package ]['original_version'] = $original_versions[ $package ];
 				}
-				if ( isset( $update_details[$update_index][$package] ) ) {
-					if ( ( 'plugin' === $type ) && isset( $update_details[$update_index][$package]->new_version ) ) {
-						$response[$package]['current_update_version'] = $update_details[$update_index][$package]->new_version;
-					} else if ( ( 'theme' === $type ) && isset( $update_details[$update_index][$package]['new_version'] ) ) {
-						$response[$package]['current_update_version'] = $update_details[$update_index][$package]['new_version'];
+				if ( isset( $update_details[ $update_index ][ $package ] ) ) {
+					if ( ( 'plugin' === $type ) && isset( $update_details[ $update_index ][ $package ]->new_version ) ) {
+						$response[ $package ]['current_update_version'] = $update_details[ $update_index ][ $package ]->new_version;
+					} elseif ( ( 'theme' === $type ) && isset( $update_details[ $update_index ][ $package ]['new_version'] ) ) {
+						$response[ $package ]['current_update_version'] = $update_details[ $update_index ][ $package ]['new_version'];
 					}
 				}
-				if ( isset( $this->original_update_details[$update_index][$package] ) ) {
-					if ( ( 'plugin' === $type ) && isset( $this->original_update_details[$update_index][$package]->new_version ) ) {
-						$response[$package]['original_update_version'] = $this->original_update_details[$update_index][$package]->new_version;
-					} else if ( ( 'theme' === $type ) && isset( $this->original_update_details[$update_index][$package]['new_version'] ) ) {
-						$response[$package]['original_update_version'] = $this->original_update_details[$update_index][$package]['new_version'];
+				if ( isset( $this->original_update_details[ $update_index ][ $package ] ) ) {
+					if ( ( 'plugin' === $type ) && isset( $this->original_update_details[ $update_index ][ $package ]->new_version ) ) {
+						$response[ $package ]['original_update_version'] = $this->original_update_details[ $update_index ][ $package ]->new_version;
+					} elseif ( ( 'theme' === $type ) && isset( $this->original_update_details[ $update_index ][ $package ]['new_version'] ) ) {
+						$response[ $package ]['original_update_version'] = $this->original_update_details[ $update_index ][ $package ]['new_version'];
 					}
 				}
 				
@@ -303,25 +320,25 @@ class Ithemes_Sync_Verb_Do_Update extends Ithemes_Sync_Verb {
 					$removed_old_update_data = $GLOBALS['ithemes_sync_request_handler']->remove_old_update_plugins_data( $package );
 					
 					if ( ! is_null( $removed_old_update_data ) ) {
-						$response[$package]['removed_old_update_data'] = $removed_old_update_data;
+						$response[ $package ]['removed_old_update_data'] = $removed_old_update_data;
 					}
 				}
 				
 				
-				if ( ! isset( $response[$package]['original_update_version'] ) ) {
-					$response[$package]['errors']['no-update'] = 'No update was available.';
-				} else if ( version_compare( $response[$package]['current_version'], $response[$package]['original_update_version'], '>=' ) ) {
-					$response[$package]['success'] = 1;
+				if ( ! isset( $response[ $package ]['original_update_version'] ) ) {
+					$response[ $package ]['errors']['no-update'] = 'No update was available.';
+				} elseif ( version_compare( $response[ $package ]['current_version'], $response[ $package ]['original_update_version'], '>=' ) ) {
+					$response[ $package ]['success'] = 1;
 					
-					if ( isset( $response[$package]['current_update_version'] ) ) {
-						if ( version_compare( $response[$package]['current_version'], $response[$package]['current_update_version'], '>=' ) ) {
-							$response[$package]['errors']['old-update-remains-available'] = 'The original update is still listed despite the update working properly.';
+					if ( isset( $response[ $package ]['current_update_version'] ) ) {
+						if ( version_compare( $response[ $package ]['current_version'], $response[ $package ]['current_update_version'], '>=' ) ) {
+							$response[ $package ]['errors']['old-update-remains-available'] = 'The original update is still listed despite the update working properly.';
 						} else {
-							$response[$package]['errors']['new-update-available'] = 'An update is available.';
+							$response[ $package ]['errors']['new-update-available'] = 'An update is available.';
 						}
 					}
 				} else {
-					$response[$package]['errors']['unknown-error'] = 'An unknown error prevented the update from completing successfully.';
+					$response[ $package ]['errors']['unknown-error'] = 'An unknown error prevented the update from completing successfully.';
 				}
 			}
 		}

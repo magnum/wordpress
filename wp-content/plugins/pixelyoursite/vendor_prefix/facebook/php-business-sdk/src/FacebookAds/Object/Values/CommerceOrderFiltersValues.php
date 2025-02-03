@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CommerceOrderFiltersValues getInstance()
  */
-class CommerceOrderFiltersValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const HAS_CANCELLATIONS = 'HAS_CANCELLATIONS';
-    const HAS_FULFILLMENTS = 'HAS_FULFILLMENTS';
-    const HAS_REFUNDS = 'HAS_REFUNDS';
-    const NO_CANCELLATIONS = 'NO_CANCELLATIONS';
-    const NO_REFUNDS = 'NO_REFUNDS';
-    const NO_SHIPMENTS = 'NO_SHIPMENTS';
+class CommerceOrderFiltersValues extends AbstractEnum {
+
+  const HAS_CANCELLATIONS = 'HAS_CANCELLATIONS';
+  const HAS_FULFILLMENTS = 'HAS_FULFILLMENTS';
+  const HAS_REFUNDS = 'HAS_REFUNDS';
+  const NO_CANCELLATIONS = 'NO_CANCELLATIONS';
+  const NO_REFUNDS = 'NO_REFUNDS';
+  const NO_SHIPMENTS = 'NO_SHIPMENTS';
 }

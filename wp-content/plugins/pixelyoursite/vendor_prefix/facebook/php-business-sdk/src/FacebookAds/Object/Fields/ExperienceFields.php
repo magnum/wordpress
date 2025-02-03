@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ExperienceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const FROM = 'from';
-    const ID = 'id';
-    const NAME = 'name';
-    const WITH = 'with';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'from' => 'User', 'id' => 'string', 'name' => 'string', 'with' => 'list<User>');
-    }
+
+class ExperienceFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const FROM = 'from';
+  const ID = 'id';
+  const NAME = 'name';
+  const WITH = 'with';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'from' => 'Object',
+      'id' => 'string',
+      'name' => 'string',
+      'with' => 'list<User>',
+    );
+  }
 }

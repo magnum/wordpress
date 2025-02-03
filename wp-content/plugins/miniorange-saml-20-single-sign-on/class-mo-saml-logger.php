@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once 'class-mo-saml-utilities.php';
-require_once dirname( __FILE__ ) . '/includes/lib/class-mo-saml-options-enum.php';
+require_once __DIR__ . '/includes/lib/class-mo-saml-options-enum.php';
 require_once 'class-mo-saml-wp-config-editor.php';
 /**
  * Class includes all the functions like to create log file, to add logs, to get log file, and etc.. .
@@ -42,33 +42,47 @@ class Mo_SAML_Logger {
 	 * @return bool
 	 */
 	public static function mo_saml_is_log_file_writable() {
-		return is_writeable( self::mo_saml_get_saml_log_directory() );
-	}
-
-	/***
-	 * Initializes directory to write debug logs.
-	 */
-	public static function mo_saml_init() {
-
-		// For setting up debug directory for log files.
-		$upload_dir = wp_upload_dir( null, false );
-		if ( is_writable( $upload_dir['basedir'] ) ) {
-			self::$log_file_writable = true;
-			if ( ! is_dir( self::mo_saml_get_saml_log_directory() ) ) {
-				self::mo_saml_create_files();
-			}
-		} else {
-			add_action( 'admin_notices', 'mo_saml_directory_notice', 11 );
+		if ( is_dir( self::mo_saml_get_saml_log_directory() ) ) {
+			return wp_is_writable( self::mo_saml_get_saml_log_directory() );
 		}
 	}
 
 	/**
-	 * This function is to get saml log directory.
+	 * Initializes directory to write debug logs.
+	 *
+	 * @throws Exception Directory Not created.
+	 */
+	public static function mo_saml_init() {
+		// For setting up debug directory for log files.
+		$upload_dir     = wp_upload_dir( null, false );
+		$log_dir        = self::mo_saml_get_saml_log_directory();
+		$upload_basedir = str_replace( '\\', '/', $upload_dir['basedir'] );
+		if ( wp_is_writable( $upload_basedir ) ) {
+			self::$log_file_writable = true;
+			if ( ! is_dir( $log_dir ) ) {
+				global $wp_filesystem;
+				if ( ! WP_Filesystem() ) {
+					return;
+				}
+				if ( ! $wp_filesystem->mkdir( $log_dir, 0755, true ) && ! is_dir( $log_dir ) ) {
+					throw new Exception( sprintf( 'Directory "%s" was not created', esc_html( $log_dir ) ) );
+				}
+				self::mo_saml_create_files();
+			}
+		} else {
+			add_action( 'admin_notices', array( __CLASS__, 'mo_saml_directory_notice' ) );
+		}
+	}
+
+	/**
+	 * This function is to get SAML log directory.
+	 *
+	 * @return string SAML log directory path.
 	 */
 	public static function mo_saml_get_saml_log_directory() {
 		$upload_dir = wp_upload_dir( null, false );
-
-		return $upload_dir['basedir'] . '/mo-saml-logs/';
+		$log_dir    = $upload_dir['basedir'] . '/mo-saml-logs/';
+		return str_replace( '\\', '/', $log_dir );
 	}
 
 	/**
@@ -85,9 +99,9 @@ class Mo_SAML_Logger {
 		error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
 		$log_path = self::mo_saml_get_log_file_path( 'mo_saml' );
 		if ( $log_path ) {
-			//phpcs:ignore WordPress.PHP.IniSet.display_errors_Blacklisted -- Prevent displaying the errors. 
+			//phpcs:ignore WordPress.PHP.IniSet.display_errors_Disallowed -- Prevent displaying the errors. 
 			ini_set( 'display_errors', 0 );
-			//phpcs:ignore WordPress.PHP.IniSet.log_errors_Blacklisted -- Enable error logging.
+			//phpcs:ignore WordPress.PHP.IniSet.log_errors_Disallowed -- Enable error logging.
 			ini_set( 'log_errors', 1 );
 			//phpcs:ignore WordPress.PHP.IniSet.Risky -- To add the error log path.
 			ini_set( 'error_log', $log_path );
@@ -121,7 +135,7 @@ class Mo_SAML_Logger {
 		) ) {
 			self::mo_saml_add_log(
 				/* translators: %1$s: message term  %2$s: file term %3$s: line term*/
-				sprintf( __( '%1$s in %2$s on line %3$s', 'mo' ), $error['message'], $error['file'], $error['line'] ) . PHP_EOL,
+				sprintf( __( '%1$s in %2$s on line %3$s', 'miniorange-saml-20-single-sign-on' ), $error['message'], $error['file'], $error['line'] ) . PHP_EOL,
 				self::CRITICAL
 			);
 		}
@@ -134,7 +148,7 @@ class Mo_SAML_Logger {
 	 * @since 3.4.0
 	 */
 	public static function mo_saml_get_log_files() {
-		$files  = scandir( self::mo_saml_get_saml_log_directory() );
+		$files  = is_dir( self::mo_saml_get_saml_log_directory() ) ? scandir( self::mo_saml_get_saml_log_directory() ) : '';
 		$result = array();
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $key => $value ) {
@@ -168,13 +182,15 @@ class Mo_SAML_Logger {
 	}
 
 	/**
-	 * Get the file path of current log file used by plugins.
+	 * Get the file path of the current log file used by plugins.
 	 *
 	 * @param string $handle //file path.
+	 * @return string|false The log file path or false on failure.
 	 */
 	public static function mo_saml_get_log_file_path( $handle ) {
 		if ( function_exists( 'wp_hash' ) ) {
-			return trailingslashit( self::mo_saml_get_saml_log_directory() ) . self::mo_saml_get_log_file_name( $handle );
+			$log_file_path = trailingslashit( self::mo_saml_get_saml_log_directory() ) . self::mo_saml_get_log_file_name( $handle );
+			return str_replace( '\\', '/', $log_file_path );
 		} else {
 			return false;
 		}
@@ -192,7 +208,7 @@ class Mo_SAML_Logger {
 			return sanitize_file_name( implode( '-', array( $handle, $date_suffix, $hash_suffix ) ) . '.log' );
 		} else {
 
-			_doing_it_wrong( __METHOD__, esc_html_e( 'This method should not be called before plugins_loaded.', 'miniorange' ), esc_html( Mo_Saml_Options_Plugin_Constants::VERSION ) );
+			_doing_it_wrong( __METHOD__, esc_html_e( 'This method should not be called before plugins_loaded.', 'miniorange-saml-20-single-sign-on' ), esc_html( Mo_Saml_Options_Plugin_Constants::VERSION ) );
 			return false;
 		}
 	}
@@ -208,7 +224,6 @@ class Mo_SAML_Logger {
 	 * Creates files Index.html for directory listing and local .htaccess rule to avoid hotlinking.
 	 */
 	private static function mo_saml_create_files() {
-
 		$upload_dir = wp_get_upload_dir();
 
 		$files = array(
@@ -227,14 +242,12 @@ class Mo_SAML_Logger {
 
 		foreach ( $files as $file ) {
 			if ( wp_mkdir_p( $file['base'] ) && ! file_exists( trailingslashit( $file['base'] ) . $file['file'] ) ) {
-				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen -- To open the ignoring because wp itself uses these internally.
-				$file_handle = @fopen( trailingslashit( $file['base'] ) . $file['file'], 'wb' );
-				if ( $file_handle ) {
-					//phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite -- To write the ignoring because wp itself uses these internally.
-					fwrite( $file_handle, $file['content'] );
-					//phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- To close the ignoring because wp itself uses these internally.
-					fclose( $file_handle );
+				global $wp_filesystem;
+				if ( ! WP_Filesystem() ) {
+					return;
 				}
+				$file_path = trailingslashit( $file['base'] ) . $file['file'];
+				$wp_filesystem->put_contents( $file_path, $file['content'], FS_CHMOD_FILE );
 			}
 		}
 	}

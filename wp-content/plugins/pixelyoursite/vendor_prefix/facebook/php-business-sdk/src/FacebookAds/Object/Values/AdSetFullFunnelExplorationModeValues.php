@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdSetFullFunnelExplorationModeValues getInstance()
  */
-class AdSetFullFunnelExplorationModeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const EXTENDED_EXPLORATION = 'EXTENDED_EXPLORATION';
-    const LIMITED_EXPLORATION = 'LIMITED_EXPLORATION';
-    const NONE_EXPLORATION = 'NONE_EXPLORATION';
+class AdSetFullFunnelExplorationModeValues extends AbstractEnum {
+
+  const EXTENDED_EXPLORATION = 'EXTENDED_EXPLORATION';
+  const LIMITED_EXPLORATION = 'LIMITED_EXPLORATION';
+  const NONE_EXPLORATION = 'NONE_EXPLORATION';
 }

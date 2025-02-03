@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class EntityAtTextRangeFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const LENGTH = 'length';
-    const NAME = 'name';
-    const OBJECT = 'object';
-    const OFFSET = 'offset';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('id' => 'string', 'length' => 'unsigned int', 'name' => 'string', 'object' => 'Profile', 'offset' => 'unsigned int', 'type' => 'Type');
-    }
+
+class EntityAtTextRangeFields extends AbstractEnum {
+
+  const ID = 'id';
+  const LENGTH = 'length';
+  const NAME = 'name';
+  const OBJECT = 'object';
+  const OFFSET = 'offset';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'string',
+      'length' => 'unsigned int',
+      'name' => 'string',
+      'object' => 'Profile',
+      'offset' => 'unsigned int',
+      'type' => 'Type',
+    );
+  }
 }

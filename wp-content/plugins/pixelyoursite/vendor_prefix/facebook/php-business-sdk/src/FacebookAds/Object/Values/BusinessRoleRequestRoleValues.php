@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,21 +35,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static BusinessRoleRequestRoleValues getInstance()
  */
-class BusinessRoleRequestRoleValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADMIN = 'ADMIN';
-    const ADS_RIGHTS_REVIEWER = 'ADS_RIGHTS_REVIEWER';
-    const VALUE_DEFAULT = 'DEFAULT';
-    const DEVELOPER = 'DEVELOPER';
-    const EMPLOYEE = 'EMPLOYEE';
-    const FINANCE_ANALYST = 'FINANCE_ANALYST';
-    const FINANCE_EDIT = 'FINANCE_EDIT';
-    const FINANCE_EDITOR = 'FINANCE_EDITOR';
-    const FINANCE_VIEW = 'FINANCE_VIEW';
-    const MANAGE = 'MANAGE';
-    const PARTNER_CENTER_ADMIN = 'PARTNER_CENTER_ADMIN';
-    const PARTNER_CENTER_ANALYST = 'PARTNER_CENTER_ANALYST';
-    const PARTNER_CENTER_EDUCATION = 'PARTNER_CENTER_EDUCATION';
-    const PARTNER_CENTER_MARKETING = 'PARTNER_CENTER_MARKETING';
-    const PARTNER_CENTER_OPERATIONS = 'PARTNER_CENTER_OPERATIONS';
+class BusinessRoleRequestRoleValues extends AbstractEnum {
+
+  const ADMIN = 'ADMIN';
+  const ADS_RIGHTS_REVIEWER = 'ADS_RIGHTS_REVIEWER';
+  const VALUE_DEFAULT = 'DEFAULT';
+  const DEVELOPER = 'DEVELOPER';
+  const EMPLOYEE = 'EMPLOYEE';
+  const FINANCE_ANALYST = 'FINANCE_ANALYST';
+  const FINANCE_EDIT = 'FINANCE_EDIT';
+  const FINANCE_EDITOR = 'FINANCE_EDITOR';
+  const FINANCE_VIEW = 'FINANCE_VIEW';
+  const MANAGE = 'MANAGE';
+  const PARTNER_CENTER_ADMIN = 'PARTNER_CENTER_ADMIN';
+  const PARTNER_CENTER_ANALYST = 'PARTNER_CENTER_ANALYST';
+  const PARTNER_CENTER_EDUCATION = 'PARTNER_CENTER_EDUCATION';
+  const PARTNER_CENTER_MARKETING = 'PARTNER_CENTER_MARKETING';
+  const PARTNER_CENTER_OPERATIONS = 'PARTNER_CENTER_OPERATIONS';
 }

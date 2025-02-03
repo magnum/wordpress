@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,20 +35,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ReachFrequencyPredictionInstreamPackagesValues getInstance()
  */
-class ReachFrequencyPredictionInstreamPackagesValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BEAUTY = 'BEAUTY';
-    const ENTERTAINMENT = 'ENTERTAINMENT';
-    const FOOD = 'FOOD';
-    const NORMAL = 'NORMAL';
-    const PREMIUM = 'PREMIUM';
-    const REGULAR_ANIMALS_PETS = 'REGULAR_ANIMALS_PETS';
-    const REGULAR_FOOD = 'REGULAR_FOOD';
-    const REGULAR_GAMES = 'REGULAR_GAMES';
-    const REGULAR_POLITICS = 'REGULAR_POLITICS';
-    const REGULAR_SPORTS = 'REGULAR_SPORTS';
-    const REGULAR_STYLE = 'REGULAR_STYLE';
-    const REGULAR_TV_MOVIES = 'REGULAR_TV_MOVIES';
-    const SPANISH = 'SPANISH';
-    const SPORTS = 'SPORTS';
+class ReachFrequencyPredictionInstreamPackagesValues extends AbstractEnum {
+
+  const BEAUTY = 'BEAUTY';
+  const ENTERTAINMENT = 'ENTERTAINMENT';
+  const FOOD = 'FOOD';
+  const NORMAL = 'NORMAL';
+  const PREMIUM = 'PREMIUM';
+  const REGULAR_ANIMALS_PETS = 'REGULAR_ANIMALS_PETS';
+  const REGULAR_FOOD = 'REGULAR_FOOD';
+  const REGULAR_GAMES = 'REGULAR_GAMES';
+  const REGULAR_POLITICS = 'REGULAR_POLITICS';
+  const REGULAR_SPORTS = 'REGULAR_SPORTS';
+  const REGULAR_STYLE = 'REGULAR_STYLE';
+  const REGULAR_TV_MOVIES = 'REGULAR_TV_MOVIES';
+  const SPANISH = 'SPANISH';
+  const SPORTS = 'SPORTS';
 }

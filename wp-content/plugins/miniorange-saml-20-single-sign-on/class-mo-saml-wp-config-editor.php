@@ -46,11 +46,11 @@ class Mo_SAML_WP_Config_Editor {
 		if ( ! file_exists( $wp_config_path ) ) {
 			update_option( 'mo_saml_message', $basename . __( 'File doesn\'t exist.', 'miniorange-saml-20-single-sign-on' ) );
 			Mo_SAML_Utilities::mo_saml_show_error_message();
+		} else {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading the wp-config.php.
+			$wp_config_src       = file_get_contents( $this->wp_config_path );
+			$this->wp_config_src = str_replace( array( "\n\r", "\r" ), "\n", $wp_config_src );
 		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading the wp-config.php.
-		$wp_config_src       = file_get_contents( $this->wp_config_path );
-		$this->wp_config_src = str_replace( array( "\n\r", "\r" ), "\n", $wp_config_src );
-
 	}
 
 	/**
@@ -65,11 +65,15 @@ class Mo_SAML_WP_Config_Editor {
 			Mo_SAML_Utilities::mo_saml_show_error_message();
 			return false;
 		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents -- Writing config to the wp-config.php.
-		$result = file_put_contents( $this->wp_config_path, $contents, LOCK_EX );
+		global $wp_filesystem;
+		if ( ! WP_Filesystem() ) {
+			return;
+		}
+		$result = $wp_filesystem->put_contents( $this->wp_config_path, $contents, FS_CHMOD_FILE );
 		if ( false === $result ) {
 			update_option( 'mo_saml_message', __( 'Failed to update the WP config file. Please enable the debug-logs manually', 'miniorange-saml-20-single-sign-on' ) );
 			Mo_SAML_Utilities::mo_saml_show_error_message();
+			return false;
 		}
 		update_option( 'mo_saml_message', __( 'Configuration Saved Successfully', 'miniorange-saml-20-single-sign-on' ) );
 		Mo_SAML_Utilities::mo_saml_show_success_message();
@@ -101,7 +105,7 @@ class Mo_SAML_WP_Config_Editor {
 		if ( 'EOF' === $anchor ) {
 			$contents = $this->wp_config_src . $this->mo_saml_wp_config_normalize( $name, $value );
 		} else {
-			if ( false === strpos( $this->wp_config_src, $anchor ) ) {
+			if ( ! is_string( $this->wp_config_src ) || false === strpos( $this->wp_config_src, $anchor ) ) {
 				update_option( 'mo_saml_message', __( 'Unable to locate placement anchor.', 'miniorange-saml-20-single-sign-on' ) );
 				Mo_SAML_Utilities::mo_saml_show_error_message();
 				return false;
@@ -209,21 +213,27 @@ class Mo_SAML_WP_Config_Editor {
 	 */
 	private function mo_saml_wp_config_exists( $name ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading the wp-config.php.
-		$wp_config_src = file_get_contents( $this->wp_config_path );
-
-		if ( ! trim( $wp_config_src ) ) {
-			update_option( 'mo_saml_message', __( '<code>Wp-config.php</code> file is empty.', 'miniorange-saml-20-single-sign-on' ) );
+		if ( ! file_exists( $this->wp_config_path ) ) {
+			$basename = basename( $this->wp_config_path );
+			update_option( 'mo_saml_message', $basename . __( 'File doesn\'t exist.', 'miniorange-saml-20-single-sign-on' ) );
 			Mo_SAML_Utilities::mo_saml_show_error_message();
-			return false;
-		}
-		// Normalize the newline to prevent an issue coming from OSX.
-		$this->wp_config_src = str_replace( array( "\n\r", "\r" ), "\n", $wp_config_src );
-		$this->wp_configs    = $this->mo_saml_wp_config_parse( $this->wp_config_src );
+		} else {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading the wp-config.php.
+			$wp_config_src = file_get_contents( $this->wp_config_path );
 
-		if ( ! isset( $this->wp_configs[ $name ] ) ) {
-			return false;
+			if ( ! trim( $wp_config_src ) ) {
+				update_option( 'mo_saml_message', __( '<code>wp-config.php</code> file is empty.', 'miniorange-saml-20-single-sign-on' ) );
+				Mo_SAML_Utilities::mo_saml_show_error_message();
+				return false;
+			}
+			// Normalize the newline to prevent an issue coming from OSX.
+			$this->wp_config_src = str_replace( array( "\n\r", "\r" ), "\n", $wp_config_src );
+			$this->wp_configs    = $this->mo_saml_wp_config_parse( $this->wp_config_src );
+
+			if ( ! isset( $this->wp_configs[ $name ] ) ) {
+				return false;
+			}
+			return isset( $this->wp_configs[ $name ] );
 		}
-		return isset( $this->wp_configs[ $name ] );
 	}
-
 }

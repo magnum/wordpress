@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdEntityTargetSpendFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMOUNT = 'amount';
-    const HAS_ERROR = 'has_error';
-    const IS_ACCURATE = 'is_accurate';
-    const IS_PRORATED = 'is_prorated';
-    const IS_UPDATING = 'is_updating';
-    public function getFieldTypes()
-    {
-        return array('amount' => 'string', 'has_error' => 'bool', 'is_accurate' => 'bool', 'is_prorated' => 'bool', 'is_updating' => 'bool');
-    }
+
+class AdEntityTargetSpendFields extends AbstractEnum {
+
+  const AMOUNT = 'amount';
+  const HAS_ERROR = 'has_error';
+  const IS_ACCURATE = 'is_accurate';
+  const IS_PRORATED = 'is_prorated';
+  const IS_UPDATING = 'is_updating';
+
+  public function getFieldTypes() {
+    return array(
+      'amount' => 'string',
+      'has_error' => 'bool',
+      'is_accurate' => 'bool',
+      'is_prorated' => 'bool',
+      'is_updating' => 'bool',
+    );
+  }
 }

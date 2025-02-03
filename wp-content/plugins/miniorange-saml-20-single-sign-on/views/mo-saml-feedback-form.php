@@ -19,10 +19,10 @@ function mo_saml_display_saml_feedback_form() {
 	wp_enqueue_script( 'utils' );
 	wp_enqueue_style( 'mo_saml_admin_plugins_page_style', esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'includes/css/style_settings.min.css' ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
 	?>
-	<div id="feedback_modal" class="mo_modal" style="width:90%; margin-left:12%; margin-top:5%; text-align:center;">
+	<div id="mo_saml_feedback_modal" class="mo_modal" style="width:90%; margin-left:12%; margin-top:5%; text-align:center;">
 
 		<div class="mo_modal-content" style="width:50%">
-			<h3 style="margin: 2%; text-align:center;"><b><?php esc_html_e( 'Your feedback', 'miniorange-saml-20-single-sign-on' ); ?></b><span class="mo_close" style="cursor: pointer">&times;</span>
+			<h3 style="margin: 2%; text-align:center;"><b><?php esc_html_e( 'Your feedback', 'miniorange-saml-20-single-sign-on' ); ?></b><span class="mo_saml_close" style="cursor: pointer">&times;</span>
 			</h3>
 			<hr style="width:75%;">			
 			<form name="f" method="post" action="" id="mo_feedback">
@@ -67,8 +67,8 @@ function mo_saml_display_saml_feedback_form() {
 					?>
 					<div class="radio-email" style="text-align:center;">
 
-						<div style="display:inline-block; width:60%;">
-							<input type="email" id="query_mail" name="query_mail" class="mo_saml_feedback_email" placeholder="<?php esc_attr_e( 'Please enter your email address', 'miniorange-saml-20-single-sign-on' ); ?>" required value="<?php echo esc_attr( $email ); ?>" readonly="readonly" />
+						<div class="mo_saml_feedback_email" style="display:inline-block; width:60%;">
+							<input type="email" id="query_mail" name="query_mail" placeholder="<?php esc_attr_e( 'Please enter your email address', 'miniorange-saml-20-single-sign-on' ); ?>" required value="<?php echo esc_attr( $email ); ?>" readonly="readonly" />
 
 							<input type="radio" name="edit" id="edit" onclick="editName()" value="" />
 							<label for="edit"><img class="editable" src="<?php echo esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/edit-icon.webp' ); ?>" />
@@ -86,11 +86,11 @@ function mo_saml_display_saml_feedback_form() {
 					<div class="mo-modal-footer" style="text-align: center;margin-bottom: 2%">
 						<input type="submit" name="miniorange_feedback_submit" class="button button-primary button-large" value="<?php esc_attr_e( 'Send', 'miniorange-saml-20-single-sign-on' ); ?>" />
 						<span width="30%">&nbsp;&nbsp;</span>
-						<input type="button" name="miniorange_skip_feedback" class="button button-primary button-large" value="<?php esc_attr_e( 'Skip', 'miniorange-saml-20-single-sign-on' ); ?>" onclick="document.getElementById('mo_feedback_form_close').submit();" />
+						<input type="button" name="miniorange_skip_feedback" class="button button-primary button-large" value="<?php esc_attr_e( 'Skip', 'miniorange-saml-20-single-sign-on' ); ?>" onclick="document.getElementById('mo_saml_feedback_form_close').submit();" />
 					</div>
 				</div>				
 			</form>
-			<form name="f" method="post" action="" id="mo_feedback_form_close">
+			<form name="f" method="post" action="" id="mo_saml_feedback_form_close">
 				<?php wp_nonce_field( 'mo_skip_feedback' ); ?>
 				<input type="hidden" name="option" value="mo_skip_feedback" />
 			</form>
@@ -100,17 +100,17 @@ function mo_saml_display_saml_feedback_form() {
 	</div>
 
 	<script>
-		jQuery('a[aria-label="Deactivate miniOrange SSO using SAML 2.0"]').click(function() {
+		jQuery('a[id="deactivate-miniorange-saml-20-single-sign-on"]').click(function() {
 
-			var mo_modal = document.getElementById('feedback_modal');
+			var mo_modal = document.getElementById('mo_saml_feedback_modal');
 
-			var span = document.getElementsByClassName("mo_close")[0];
+			var span = document.getElementsByClassName("mo_saml_close")[0];
 
 			mo_modal.style.display = "block";
 			document.querySelector("#query_feedback").focus();
 			span.onclick = function () {
 				mo_modal.style.display = "none";
-				jQuery('#mo_feedback_form_close').submit();
+				jQuery('#mo_saml_feedback_form_close').submit();
 			};
 
 			window.onclick = function (event) {

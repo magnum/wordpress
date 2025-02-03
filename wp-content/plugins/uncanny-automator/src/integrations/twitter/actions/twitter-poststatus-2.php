@@ -3,7 +3,7 @@
 namespace Uncanny_Automator;
 
 /**
- * Class TWITTER_POSTSTATUS
+ * Class TWITTER_POSTSTATUS_2
  *
  * @package Uncanny_Automator
  */
@@ -52,8 +52,8 @@ class TWITTER_POSTSTATUS_2 {
 			'integration'           => self::$integration,
 			'code'                  => $this->action_code,
 			/* translators: Tweet text */
-			'sentence'              => sprintf( __( 'Post {{a tweet:%1$s}} to Twitter', 'uncanny-automator' ), $this->action_meta ),
-			'select_option_name'    => __( 'Post {{a tweet}} to Twitter', 'uncanny-automator' ),
+			'sentence'              => sprintf( __( 'Post {{a tweet:%1$s}} to X/Twitter', 'uncanny-automator' ), $this->action_meta ),
+			'select_option_name'    => __( 'Post {{a tweet}} to X/Twitter', 'uncanny-automator' ),
 			'priority'              => 10,
 			'accepted_args'         => 1,
 			'requires_user'         => false,
@@ -67,7 +67,7 @@ class TWITTER_POSTSTATUS_2 {
 						'textarea',
 						'',
 						true,
-						esc_attr__( 'Messages posted to Twitter have a 280 character limit.', 'uncanny-automator' ),
+						esc_attr__( 'Messages posted to X/Twitter have a 280 character limit.', 'uncanny-automator' ),
 						__( 'Enter the message', 'uncanny-automator' ),
 						278
 					),
@@ -122,15 +122,15 @@ class TWITTER_POSTSTATUS_2 {
 
 			$post_id = isset( $response['data']['id'] ) ? $response['data']['id'] : 0;
 
-			$has_screen_name = ! empty( $response['data']['user']['screen_name'] );
+			$username = $this->functions->get_username();
 
-			if ( 0 !== $post_id && $has_screen_name ) {
+			if ( 0 !== $post_id && ! empty( $username ) ) {
 
 				// The Tweet link.
 				$post_link = strtr(
 					'https://twitter.com/{{screen_name}}/status/{{post_id}}',
 					array(
-						'{{screen_name}}' => $response['data']['user']['screen_name'],
+						'{{screen_name}}' => $username,
 						'{{post_id}}'     => $post_id,
 					)
 				);
@@ -145,7 +145,7 @@ class TWITTER_POSTSTATUS_2 {
 
 		} catch ( \Exception $e ) {
 
-			$error_msg                           = $this->functions->parse_errors( $e->getMessage() );
+			$error_msg                           = $e->getMessage();
 			$action_data['complete_with_errors'] = true;
 			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
 

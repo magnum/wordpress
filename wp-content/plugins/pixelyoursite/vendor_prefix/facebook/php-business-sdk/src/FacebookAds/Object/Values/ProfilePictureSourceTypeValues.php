@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProfilePictureSourceTypeValues getInstance()
  */
-class ProfilePictureSourceTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ALBUM = 'album';
-    const SMALL = 'small';
-    const THUMBNAIL = 'thumbnail';
+class ProfilePictureSourceTypeValues extends AbstractEnum {
+
+  const ALBUM = 'album';
+  const SMALL = 'small';
+  const THUMBNAIL = 'thumbnail';
 }

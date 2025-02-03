@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,42 +21,50 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Traits;
 
 use PYS_PRO_GLOBAL\FacebookAds\Api;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+
 /**
  * @method Api getApi()
  * @method string assureId()
  */
-trait AdLabelAwareCrudObjectTrait
-{
-    /**
-     * Take ad label ids and format them correctly for the request
-     * @param array $adlabel_ids
-     * @return array
-     */
-    protected function formatParams(array $adlabel_ids)
-    {
-        foreach ($adlabel_ids as &$adlabel_id) {
-            $adlabel_id = array('id' => $adlabel_id);
-        }
-        return array('adlabels' => $adlabel_ids);
+trait AdLabelAwareCrudObjectTrait {
+
+  /**
+   * Take ad label ids and format them correctly for the request
+   * @param array $adlabel_ids
+   * @return array
+   */
+  protected function formatParams(array $adlabel_ids) {
+    foreach ($adlabel_ids as &$adlabel_id) {
+      $adlabel_id = array('id' => $adlabel_id);
     }
-    /**
-     * @deprecated use createAdLabel instead
-     * @param array $ad_label_ids
-     */
-    public function addAdLabels(array $ad_label_ids)
-    {
-        $this->getApi()->call('/' . $this->assureId() . '/adlabels', \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, $this->formatParams($ad_label_ids));
-    }
-    /**
-     * @deprecated use deleteAdLabels instead
-     * @param array $ad_label_ids
-     */
-    public function removeAdLabels(array $ad_label_ids)
-    {
-        $this->getApi()->call('/' . $this->assureId() . '/adlabels', \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, $this->formatParams($ad_label_ids));
-    }
+
+    return array('adlabels' => $adlabel_ids);
+  }
+
+  /**
+   * @deprecated use createAdLabel instead
+   * @param array $ad_label_ids
+   */
+  public function addAdLabels(array $ad_label_ids) {
+    $this->getApi()->call(
+      '/'.$this->assureId().'/adlabels',
+      RequestInterface::METHOD_POST,
+      $this->formatParams($ad_label_ids));
+  }
+
+  /**
+   * @deprecated use deleteAdLabels instead
+   * @param array $ad_label_ids
+   */
+  public function removeAdLabels(array $ad_label_ids) {
+    $this->getApi()->call(
+      '/'.$this->assureId().'/adlabels',
+      RequestInterface::METHOD_DELETE,
+      $this->formatParams($ad_label_ids));
+  }
 }

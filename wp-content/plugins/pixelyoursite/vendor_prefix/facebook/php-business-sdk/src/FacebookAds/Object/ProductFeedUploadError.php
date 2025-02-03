@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorAffectedSurfacesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorSeverityValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,58 +41,99 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorSeverityValue
  * pull request for this class.
  *
  */
-class ProductFeedUploadError extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'errors';
-    }
-    /**
-     * @return ProductFeedUploadErrorFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductFeedUploadErrorFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['AffectedSurfaces'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorAffectedSurfacesValues::getInstance()->getValues();
-        $ref_enums['Severity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorSeverityValues::getInstance()->getValues();
-        $ref_enums['ErrorPriority'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductFeedUploadErrorErrorPriorityValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getSamples(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/samples', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadErrorSample(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadErrorSample::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSuggestedRules(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/suggested_rules', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedRuleSuggestion(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedRuleSuggestion::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadError(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ProductFeedUploadError::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class ProductFeedUploadError extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'errors';
+  }
+
+  /**
+   * @return ProductFeedUploadErrorFields
+   */
+  public static function getFieldsEnum() {
+    return ProductFeedUploadErrorFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['AffectedSurfaces'] = ProductFeedUploadErrorAffectedSurfacesValues::getInstance()->getValues();
+    $ref_enums['Severity'] = ProductFeedUploadErrorSeverityValues::getInstance()->getValues();
+    $ref_enums['ErrorPriority'] = ProductFeedUploadErrorErrorPriorityValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getSamples(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/samples',
+      new ProductFeedUploadErrorSample(),
+      'EDGE',
+      ProductFeedUploadErrorSample::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSuggestedRules(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/suggested_rules',
+      new ProductFeedRuleSuggestion(),
+      'EDGE',
+      ProductFeedRuleSuggestion::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new ProductFeedUploadError(),
+      'NODE',
+      ProductFeedUploadError::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

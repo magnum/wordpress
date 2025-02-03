@@ -14,8 +14,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
     <div class="row">
         <div class="col">
             <div class="d-flex justify-content-between">
-                <span class="mt-2">With the pro version, you can fire events on clicks, mouse over and page
-                    scroll:</span>
+                <span class="mt-2">With the pro version, you can fire events on clicks, mouse over elements, post type visits, or page scroll:</span>
                 <a target="_blank" class="btn btn-sm btn-primary float-right" href="https://www.pixelyoursite.com/facebook-pixel-plugin/buy-pixelyoursite-pro?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-upgrade-blue">UPGRADE</a>
             </div>
         </div>
@@ -62,7 +61,6 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
             <div class="col">
                 <p>All the events you configure here will automatically get the following parameters for all the tags:
                     <i>page_title, post_type, post_id, event_URL, user_role, plugin, landing_page (pro), event_time (pro), event_day (pro), event_month (pro), traffic_source (pro), UTMs (pro).</i></p>
-                <p>Exception: Google Analytics Universal will not get all these parameters. Only <i>event_time (pro), event_day (pro), event_month (pro), traffic_source (pro)</i> are sent as custom dimensions.</p>
                 <p>You can add other parameters when you configure the events.</p>
             </div>
         </div>
@@ -105,6 +103,21 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                     <?php foreach ( CustomEventFactory::get() as $event ) : ?>
 
                         <?php
+                        $trigger_type = $event->getTriggerType();
+                        $triggers = $event->getTriggers();
+                        if ( !empty( $triggers ) ) {
+                            $trigger_type = $triggers[0]->getTriggerType();
+                            switch ( $trigger_type ) {
+
+                                case 'page_visit':
+                                    $event_types = 'Page Visit';
+                                    break;
+
+                                case 'home_page':
+                                    $event_types = 'Home Page Visit';
+                                    break;
+                            }
+                        }
 
                         /** @var CustomEvent $event */
 
@@ -138,7 +151,16 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                             ),
                             '_wpnonce' => wp_create_nonce( 'pys_remove_event' ),
                         ) );
+                        $event_type = 'Page Visit';
+                        switch ( $trigger_type ) {
+                            case 'page_visit':
+                                $event_type = 'Page Visit';
+                                break;
 
+                            case 'home_page':
+                                $event_type = 'Home Page Visit';
+                                break;
+                        }
                         ?>
 
                         <tr data-post_id="<?php esc_attr_e( $event->getPostId() ); ?>"
@@ -164,7 +186,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                     text-danger">Remove</a>
                                 </span>
                             </td>
-                            <td>Page Visit</td>
+                            <td><?php echo wp_kses_post( $event_types); ?></td>
                             <td class="networks">
                                 <?php if ( Facebook()->enabled() && $event->isFacebookEnabled() ) : ?>
                                     <i class="fa fa-facebook-square"></i>
@@ -172,13 +194,19 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                     <i class="fa fa-facebook-square" style="opacity: .25;"></i>
                                 <?php endif; ?>
 
-                                <?php if ( GA()->enabled() && $event->isGoogleAnalyticsEnabled() ) : ?>
+                                <?php if ( GA()->enabled() && $event->isUnifyAnalyticsEnabled() ) : ?>
                                     <i class="fa fa-area-chart"></i>
                                 <?php else : ?>
                                     <i class="fa fa-area-chart" style="opacity: .25;"></i>
                                 <?php endif; ?>
 
                                 <i class="fa fa-google" style="opacity: .25;"></i>
+
+                                <?php if ( $event->isGTMEnabled() && $event->isGTMPresent()) : ?>
+                                    <img class="gtm-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/google-tag-manager.png">
+                                <?php else : ?>
+                                    <img class="gtm-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/google-tag-manager.png" style="opacity: 0.25">
+                                <?php endif; ?>
 
                                 <?php if ( Pinterest()->enabled() && $event->isPinterestEnabled() ) : ?>
                                     <i class="fa fa-pinterest-square"></i>

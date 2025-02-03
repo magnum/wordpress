@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleScheduleSpecFields;
+
 /**
  * This class is auto-generated.
  *
@@ -37,18 +38,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleScheduleSpecFields;
  * pull request for this class.
  *
  */
-class AdRuleScheduleSpec extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdRuleScheduleSpecFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleScheduleSpecFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        return $ref_enums;
-    }
+
+class AdRuleScheduleSpec extends AbstractObject {
+
+  /**
+   * @return AdRuleScheduleSpecFields
+   */
+  public static function getFieldsEnum() {
+    return AdRuleScheduleSpecFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    return $ref_enums;
+  }
+
+
 }

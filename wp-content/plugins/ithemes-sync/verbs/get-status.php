@@ -23,18 +23,18 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Status extends Ithemes_Sync_Verb {
-	public static $name = 'get-status';
+	public static $name        = 'get-status';
 	public static $description = 'Retrieve basic details about the site.';
 	
-	private $default_arguments = array(
-		'status_elements' => array(),
-	);
+	private $default_arguments = [
+		'status_elements' => [],
+	];
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
-		if ( ! is_callable( array( $GLOBALS['ithemes-sync-api'], 'run' ) ) ) {
+		if ( ! is_callable( [ $GLOBALS['ithemes-sync-api'], 'run' ] ) ) {
 			return new WP_Error( 'missing-method-api-run', 'The Ithemes_Sync_API::run function is not callable. Unable to generate status details.' );
 		}
 		
@@ -56,21 +56,21 @@ class Ithemes_Sync_Verb_Get_Status extends Ithemes_Sync_Verb {
 		}
 		
 		foreach ( $show_status_elements as $element ) {
-			if ( isset( $status_elements[$element] ) ) {
-				$var = $status_elements[$element];
+			if ( isset( $status_elements[ $element ] ) ) {
+				$var = $status_elements[ $element ];
 				
 				$element_arguments = $arguments;
 				
-				if ( isset( $arguments[$var] ) ) {
-					$element_arguments = $arguments[$var];
+				if ( isset( $arguments[ $var ] ) ) {
+					$element_arguments = $arguments[ $var ];
 				}
 				
-				$data = $GLOBALS['ithemes-sync-api']->run( $status_elements[$element], $element_arguments );
+				$data = $GLOBALS['ithemes-sync-api']->run( $status_elements[ $element ], $element_arguments );
 			} else {
-				$data = "This element is not recognized";
+				$data = 'This element is not recognized';
 			}
 			
-			$status[$element] = $data;
+			$status[ $element ] = $data;
 		}
 		
 		

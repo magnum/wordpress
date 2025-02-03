@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,28 +21,34 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Logger;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\Http\ResponseInterface;
-interface LoggerInterface
-{
-    /**
-     * @param string $level
-     * @param string $message
-     * @param array $context
-     */
-    public function log($level, $message, array $context = array());
-    /**
-     * @param string $level
-     * @param RequestInterface $request
-     * @param array $context
-     */
-    public function logRequest($level, \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface $request, array $context = array());
-    /**
-     * @param string $level
-     * @param ResponseInterface $response
-     * @param array $context
-     */
-    public function logResponse($level, \PYS_PRO_GLOBAL\FacebookAds\Http\ResponseInterface $response, array $context = array());
+
+interface LoggerInterface {
+
+  /**
+   * @param string $level
+   * @param string $message
+   * @param array $context
+   */
+  public function log($level, $message, array $context = array());
+
+  /**
+   * @param string $level
+   * @param RequestInterface $request
+   * @param array $context
+   */
+  public function logRequest(
+    $level, RequestInterface $request, array $context = array());
+
+  /**
+   * @param string $level
+   * @param ResponseInterface $response
+   * @param array $context
+   */
+  public function logResponse(
+    $level, ResponseInterface $response, array $context = array());
 }

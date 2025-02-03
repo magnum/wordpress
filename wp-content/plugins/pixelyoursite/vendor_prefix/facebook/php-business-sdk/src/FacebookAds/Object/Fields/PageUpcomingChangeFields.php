@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PageUpcomingChangeFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CHANGE_TYPE = 'change_type';
-    const EFFECTIVE_TIME = 'effective_time';
-    const ID = 'id';
-    const PAGE = 'page';
-    const PROPOSAL = 'proposal';
-    const TIMER_STATUS = 'timer_status';
-    public function getFieldTypes()
-    {
-        return array('change_type' => 'string', 'effective_time' => 'datetime', 'id' => 'string', 'page' => 'Page', 'proposal' => 'PageChangeProposal', 'timer_status' => 'string');
-    }
+
+class PageUpcomingChangeFields extends AbstractEnum {
+
+  const CHANGE_TYPE = 'change_type';
+  const EFFECTIVE_TIME = 'effective_time';
+  const ID = 'id';
+  const PAGE = 'page';
+  const PROPOSAL = 'proposal';
+  const TIMER_STATUS = 'timer_status';
+
+  public function getFieldTypes() {
+    return array(
+      'change_type' => 'string',
+      'effective_time' => 'datetime',
+      'id' => 'string',
+      'page' => 'Page',
+      'proposal' => 'PageChangeProposal',
+      'timer_status' => 'string',
+    );
+  }
 }

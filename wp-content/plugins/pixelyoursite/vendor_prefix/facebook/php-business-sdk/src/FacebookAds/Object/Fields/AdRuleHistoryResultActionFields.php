@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdRuleHistoryResultActionFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTION = 'action';
-    const FIELD = 'field';
-    const NEW_VALUE = 'new_value';
-    const OLD_VALUE = 'old_value';
-    public function getFieldTypes()
-    {
-        return array('action' => 'string', 'field' => 'string', 'new_value' => 'string', 'old_value' => 'string');
-    }
+
+class AdRuleHistoryResultActionFields extends AbstractEnum {
+
+  const ACTION = 'action';
+  const FIELD = 'field';
+  const NEW_VALUE = 'new_value';
+  const OLD_VALUE = 'old_value';
+
+  public function getFieldTypes() {
+    return array(
+      'action' => 'string',
+      'field' => 'string',
+      'new_value' => 'string',
+      'old_value' => 'string',
+    );
+  }
 }

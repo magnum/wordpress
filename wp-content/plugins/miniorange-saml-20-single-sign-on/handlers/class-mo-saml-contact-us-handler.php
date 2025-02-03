@@ -44,8 +44,6 @@ class Mo_SAML_Contact_Us_Handler {
 		$query = sanitize_text_field( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_QUERY ] );
 		$phone = sanitize_text_field( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_PHONE ] );
 
-		$plugin_config = mo_saml_miniorange_import_export( true, true );
-
 		if ( true === $call_setup ) {
 			$local_timezone   = 'Asia/Kolkata';
 			$call_datetime    = $call_date . $call_time;
@@ -53,18 +51,18 @@ class Mo_SAML_Contact_Us_Handler {
 			$ist_date         = new DateTime( gmdate( 'Y-m-d H:i:s', $convert_datetime ), new DateTimeZone( $time_zone ) );
 
 			$ist_date->setTimezone( new DateTimeZone( $local_timezone ) );
-			$query = $query . '<br><br>Meeting Details: (' . $time_zone . ') ' . gmdate( 'd M, Y  H:i', $convert_datetime ) . ' [IST Time -> ' . $ist_date->format( 'd M, Y  H:i' ) . '] <br><br> Plugin Configuration: ' . $plugin_config;
+			$query = $query . '<br><br>Meeting Details: (' . $time_zone . ') ' . gmdate( 'd M, Y  H:i', $convert_datetime ) . ' [IST Time -> ' . $ist_date->format( 'd M, Y  H:i' ) . ']';
 		} else {
-			$query = $query . '<br><br>Plugin Configuration: ' . $plugin_config;
+			$query = $query;
 		}
 
 		$customer = new Mo_SAML_Customer();
 		$response = $customer->mo_saml_submit_contact_us( $email, $phone, $query, $call_setup );
 
-		if ( ! is_null( $response ) && false !== $response ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::QUERY_SUBMITTED );
+		if ( ! is_null( $response ) && false !== $response && 'Query submitted.' === $response ) {
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::mo_saml_translate( 'QUERY_SUBMITTED' ) );
 		} else {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::QUERY_NOT_SUBMITTED );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'QUERY_NOT_SUBMITTED' ) );
 		}
 
 		$post_save->mo_saml_post_save_action();
@@ -84,9 +82,9 @@ class Mo_SAML_Contact_Us_Handler {
 		}
 
 		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( $validate_fields_array ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::CONTACT_EMAIL_EMPTY );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'CONTACT_EMAIL_EMPTY' ) );
 		} elseif ( ! filter_var( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_EMAIL ], FILTER_VALIDATE_EMAIL ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::CONTACT_EMAIL_INVALID );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'CONTACT_EMAIL_INVALID' ) );
 		}
 		if ( isset( $post_save ) ) {
 			$post_save->mo_saml_post_save_action();
@@ -104,7 +102,7 @@ class Mo_SAML_Contact_Us_Handler {
 		$validate_fields_array = array( sanitize_text_field( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_CALL_TIME ] ), sanitize_text_field( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_CALL_DATE ] ), sanitize_text_field( $post_array[ Mo_Saml_Contact_Us_Constants::CUSTOMER_TIMEZONE ] ) );
 
 		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( $validate_fields_array ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::CALL_SETUP_DETAILS_EMPTY );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'CALL_SETUP_DETAILS_EMPTY' ) );
 		}
 
 		if ( isset( $post_save ) ) {
@@ -113,5 +111,4 @@ class Mo_SAML_Contact_Us_Handler {
 		}
 		return true;
 	}
-
 }

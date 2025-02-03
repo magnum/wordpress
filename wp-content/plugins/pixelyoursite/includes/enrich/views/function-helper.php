@@ -30,7 +30,7 @@ function printUtm($utms) {
             ?>
             <tr>
                 <th><?=$key?>:</th>
-                <td><?=$utmList[$key]?></td>
+                <td><?=$utmList[$key]; ?></td>
             </tr>
             <?php
         }

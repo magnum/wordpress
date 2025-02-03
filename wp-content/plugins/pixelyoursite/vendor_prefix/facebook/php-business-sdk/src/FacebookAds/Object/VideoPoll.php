@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\VideoPollFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollActionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollStatusValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,50 +40,97 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollStatusValues;
  * pull request for this class.
  *
  */
-class VideoPoll extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return VideoPollFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\VideoPollFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Status'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollStatusValues::getInstance()->getValues();
-        $ref_enums['Action'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollActionValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getPollOptions(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/poll_options', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'EDGE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\VideoPoll(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\VideoPoll::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('action' => 'action_enum', 'close_after_voting' => 'bool', 'default_open' => 'bool', 'show_gradient' => 'bool', 'show_results' => 'bool');
-        $enums = array('action_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\VideoPollActionValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\VideoPoll(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\VideoPoll::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class VideoPoll extends AbstractCrudObject {
+
+  /**
+   * @return VideoPollFields
+   */
+  public static function getFieldsEnum() {
+    return VideoPollFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Status'] = VideoPollStatusValues::getInstance()->getValues();
+    $ref_enums['Action'] = VideoPollActionValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getPollOptions(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/poll_options',
+      new AbstractCrudObject(),
+      'EDGE',
+      array(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new VideoPoll(),
+      'NODE',
+      VideoPoll::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function updateSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'action' => 'action_enum',
+      'close_after_voting' => 'bool',
+      'default_open' => 'bool',
+      'show_gradient' => 'bool',
+      'show_results' => 'bool',
+    );
+    $enums = array(
+      'action_enum' => VideoPollActionValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/',
+      new VideoPoll(),
+      'NODE',
+      VideoPoll::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

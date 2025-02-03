@@ -13,7 +13,6 @@ function getCompleteRegistrationEventParamsV4() {
             'content_name'    => get_the_title(),
             'event_url'       => \PixelYourSite\getCurrentPageUrl(true),
             'method'          => \PixelYourSite\getUserRoles(),
-            'non_interaction' => PixelYourSite\GA()->getOption( 'complete_registration_event_non_interactive' ),
         ),
     );
 }

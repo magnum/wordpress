@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PrivacyFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ALLOW = 'allow';
-    const DENY = 'deny';
-    const DESCRIPTION = 'description';
-    const FRIENDS = 'friends';
-    const NETWORKS = 'networks';
-    const VALUE = 'value';
-    public function getFieldTypes()
-    {
-        return array('allow' => 'string', 'deny' => 'string', 'description' => 'string', 'friends' => 'string', 'networks' => 'string', 'value' => 'string');
-    }
+
+class PrivacyFields extends AbstractEnum {
+
+  const ALLOW = 'allow';
+  const DENY = 'deny';
+  const DESCRIPTION = 'description';
+  const FRIENDS = 'friends';
+  const NETWORKS = 'networks';
+  const VALUE = 'value';
+
+  public function getFieldTypes() {
+    return array(
+      'allow' => 'string',
+      'deny' => 'string',
+      'description' => 'string',
+      'friends' => 'string',
+      'networks' => 'string',
+      'value' => 'string',
+    );
+  }
 }

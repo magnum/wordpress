@@ -2,6 +2,7 @@
 
 namespace cybot\cookiebot\addons\controller\addons;
 
+use cybot\cookiebot\exceptions\addons\InstallationException;
 use cybot\cookiebot\lib\buffer\Buffer_Output_Interface;
 use cybot\cookiebot\lib\Cookie_Consent_Interface;
 use cybot\cookiebot\lib\script_loader_tag\Script_Loader_Tag_Interface;
@@ -9,6 +10,7 @@ use cybot\cookiebot\lib\Settings_Service_Interface;
 use Exception;
 
 abstract class Base_Cookiebot_Plugin_Addon extends Base_Cookiebot_Addon {
+
 
 	const PLUGIN_FILE_PATH = '';
 
@@ -50,12 +52,12 @@ abstract class Base_Cookiebot_Plugin_Addon extends Base_Cookiebot_Addon {
 
 	/**
 	 * @return string
-	 * @throws Exception
+	 * @throws InstallationException
 	 */
 	final public function get_version() {
 		$plugin_data = $this->get_plugin_data();
 		if ( ! isset( $plugin_data['Version'] ) ) {
-			throw new Exception( 'Check if plugin is installed before calling get_version()' );
+			throw new InstallationException( 'Check if plugin is installed before calling get_version()' );
 		}
 		return $plugin_data['Version'];
 	}

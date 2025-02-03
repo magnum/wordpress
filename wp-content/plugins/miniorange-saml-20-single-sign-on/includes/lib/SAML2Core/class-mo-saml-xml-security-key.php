@@ -325,7 +325,7 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	public function mo_saml_generate_session_key() {
 		if ( ! isset( $this->crypt_params['keysize'] ) ) {
-			throw new Exception( 'Unknown key size for type "' . $this->type . '".' );
+			throw new Exception( 'Unknown key size for type "' . esc_html( $this->type ) . '".' );
 		}
 		$key_size = $this->crypt_params['keysize'];
 
@@ -482,12 +482,16 @@ class Mo_SAML_XML_Security_Key {
 			$auth_tag  = openssl_random_pseudo_bytes( self::AUTHTAG_LENGTH );
 			$encrypted = openssl_encrypt( $data, $this->crypt_params['cipher'], $this->key, OPENSSL_RAW_DATA, $this->iv, $auth_tag );
 		} else {
-			$data      = $this->mo_saml_pad_iso_10126( $data, $this->crypt_params['blocksize'] );
+			try {
+				$data = $this->mo_saml_pad_iso_10126( $data, $this->crypt_params['blocksize'] );
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid block size' );
+			}
 			$encrypted = openssl_encrypt( $data, $this->crypt_params['cipher'], $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $this->iv );
 		}
 
 		if ( false === $encrypted ) {
-			throw new Exception( 'Failure encrypting Data (openssl symmetric) - ' . openssl_error_string() );
+			throw new Exception( 'Failure encrypting Data (openssl symmetric) - ' . esc_html( openssl_error_string() ) );
 		}
 		return $this->iv . $encrypted . $auth_tag;
 	}
@@ -518,7 +522,7 @@ class Mo_SAML_XML_Security_Key {
 		}
 
 		if ( false === $decrypted ) {
-			throw new Exception( 'Failure decrypting Data (openssl symmetric) - ' . openssl_error_string() );
+			throw new Exception( 'Failure decrypting Data (openssl symmetric) - ' . esc_html( openssl_error_string() ) );
 		}
 		return null !== $auth_tag ? $decrypted : $this->mo_saml_unpad_iso_10126( $decrypted );
 	}
@@ -532,7 +536,7 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	private function mo_saml_encrypt_public( $data ) {
 		if ( ! openssl_public_encrypt( $data, $encrypted, $this->key, $this->crypt_params['padding'] ) ) {
-			throw new Exception( 'Failure encrypting Data (openssl public) - ' . openssl_error_string() );
+			throw new Exception( 'Failure encrypting Data (openssl public) - ' . esc_html( openssl_error_string() ) );
 		}
 		return $encrypted;
 	}
@@ -546,7 +550,7 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	private function mo_saml_decrypt_public( $data ) {
 		if ( ! openssl_public_decrypt( $data, $decrypted, $this->key, $this->crypt_params['padding'] ) ) {
-			throw new Exception( 'Failure decrypting Data (openssl public) - ' . openssl_error_string() );
+			throw new Exception( 'Failure decrypting Data (openssl public) - ' . esc_html( openssl_error_string() ) );
 		}
 		return $decrypted;
 	}
@@ -560,7 +564,7 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	private function mo_saml_encrypt_private( $data ) {
 		if ( ! openssl_private_encrypt( $data, $encrypted, $this->key, $this->crypt_params['padding'] ) ) {
-			throw new Exception( 'Failure encrypting Data (openssl private) - ' . openssl_error_string() );
+			throw new Exception( 'Failure encrypting Data (openssl private) - ' . esc_html( openssl_error_string() ) );
 		}
 		return $encrypted;
 	}
@@ -574,7 +578,7 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	private function mo_saml_decrypt_private( $data ) {
 		if ( ! openssl_private_decrypt( $data, $decrypted, $this->key, $this->crypt_params['padding'] ) ) {
-			throw new Exception( 'Failure decrypting Data (openssl private) - ' . openssl_error_string() );
+			throw new Exception( 'Failure decrypting Data (openssl private) - ' . esc_html( openssl_error_string() ) );
 		}
 		return $decrypted;
 	}
@@ -592,7 +596,7 @@ class Mo_SAML_XML_Security_Key {
 			$algo = $this->crypt_params['digest'];
 		}
 		if ( ! openssl_sign( $data, $signature, $this->key, $algo ) ) {
-			throw new Exception( 'Failure Signing Data: ' . openssl_error_string() . ' - ' . $algo );
+			throw new Exception( 'Failure Signing Data: ' . esc_html( openssl_error_string() ) . ' - ' . esc_html( $algo ) );
 		}
 		return $signature;
 	}
@@ -629,13 +633,18 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	public function mo_saml_encrypt_data( $data ) {
 		if ( 'openssl' === $this->crypt_params['library'] ) {
-			switch ( $this->crypt_params['type'] ) {
-				case 'symmetric':
-					return $this->mo_saml_encrypt_symmetric( $data );
-				case 'public':
-					return $this->mo_saml_encrypt_public( $data );
-				case 'private':
-					return $this->mo_saml_encrypt_private( $data );
+			try {
+				switch ( $this->crypt_params['type'] ) {
+					case 'symmetric':
+						return $this->mo_saml_encrypt_symmetric( $data );
+					// phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.TerminatingComment -- Show error instead of return.
+					case 'public':
+						return $this->mo_saml_encrypt_public( $data );
+					case 'private':
+						return $this->mo_saml_encrypt_private( $data );
+				}
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Encryption failure' );
 			}
 		}
 	}
@@ -648,13 +657,20 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	public function mo_saml_decrypt_data( $data ) {
 		if ( 'openssl' === $this->crypt_params['library'] ) {
-			switch ( $this->crypt_params['type'] ) {
-				case 'symmetric':
-					return $this->mo_saml_decrypt_symmetric( $data );
-				case 'public':
-					return $this->mo_saml_decrypt_public( $data );
-				case 'private':
-					return $this->mo_saml_decrypt_private( $data );
+			try {
+				switch ( $this->crypt_params['type'] ) {
+					// phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.TerminatingComment -- Show error instead of return.
+					case 'symmetric':
+						return $this->mo_saml_decrypt_symmetric( $data );
+					// phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.TerminatingComment -- Show error instead of return.
+					case 'public':
+						return $this->mo_saml_decrypt_public( $data );
+					case 'private':
+						return $this->mo_saml_decrypt_private( $data );
+				}
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Decryption failure' );
+
 			}
 		}
 	}
@@ -667,8 +683,13 @@ class Mo_SAML_XML_Security_Key {
 	 */
 	public function mo_saml_sign_data( $data ) {
 		switch ( $this->crypt_params['library'] ) {
+			// phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.TerminatingComment -- Show error instead of return.
 			case 'openssl':
-				return $this->mo_saml_sign_open_ssl( $data );
+				try {
+					return $this->mo_saml_sign_open_ssl( $data );
+				} catch ( Exception $exception ) {
+					wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Signing Data' );
+				}
 			case ( self::HMAC_SHA1 ):
 				return hash_hmac( 'sha1', $data, $this->key, true );
 		}
@@ -723,29 +744,29 @@ class Mo_SAML_XML_Security_Key {
 	 * Make an ASN segment.
 	 *
 	 * @param int    $type Segment type.
-	 * @param string $string Data.
+	 * @param string $data Data.
 	 * @return null|string
 	 */
-	public static function mo_saml_make_asn_segment( $type, $string ) {
+	public static function mo_saml_make_asn_segment( $type, $data ) {
 		switch ( $type ) {
 			case 0x02:
-				if ( ord( $string ) > 0x7f ) {
-					$string = chr( 0 ) . $string;
+				if ( ord( $data ) > 0x7f ) {
+					$data = chr( 0 ) . $data;
 				}
 				break;
 			case 0x03:
-				$string = chr( 0 ) . $string;
+				$data = chr( 0 ) . $data;
 				break;
 		}
 
-		$length = strlen( $string );
+		$length = strlen( $data );
 
 		if ( $length < 128 ) {
-			$output = sprintf( '%c%c%s', $type, $length, $string );
+			$output = sprintf( '%c%c%s', $type, $length, $data );
 		} elseif ( $length < 0x0100 ) {
-			$output = sprintf( '%c%c%c%s', $type, 0x81, $length, $string );
+			$output = sprintf( '%c%c%c%s', $type, 0x81, $length, $data );
 		} elseif ( $length < 0x010000 ) {
-			$output = sprintf( '%c%c%c%c%s', $type, 0x82, $length / 0x0100, $length % 0x0100, $string );
+			$output = sprintf( '%c%c%c%c%s', $type, 0x82, $length / 0x0100, $length % 0x0100, $data );
 		} else {
 			$output = null;
 		}
@@ -785,9 +806,9 @@ class Mo_SAML_XML_Security_Key {
 	/**
 	 * Serializes the key.
 	 *
-	 * @param mixed $parent Key.
+	 * @param mixed $key Key.
 	 */
-	public function mo_saml_serialize_key( $parent ) {
+	public function mo_saml_serialize_key( $key ) {
 	}
 
 	/**
@@ -835,5 +856,4 @@ class Mo_SAML_XML_Security_Key {
 		Mo_SAML_XML_Sec_Enc::staticLocateKeyInfo( $obj_key, $element );
 		return $obj_key;
 	}
-
 }

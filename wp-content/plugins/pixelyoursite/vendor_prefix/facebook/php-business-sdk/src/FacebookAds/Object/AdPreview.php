@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPreviewFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewAdFormatValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewRenderTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,27 +40,29 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewRenderTypeValues;
  * pull request for this class.
  *
  */
-class AdPreview extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'previews';
-    }
-    /**
-     * @return AdPreviewFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPreviewFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['AdFormat'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewAdFormatValues::getInstance()->getValues();
-        $ref_enums['RenderType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPreviewRenderTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdPreview extends AbstractObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'previews';
+  }
+
+  /**
+   * @return AdPreviewFields
+   */
+  public static function getFieldsEnum() {
+    return AdPreviewFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['AdFormat'] = AdPreviewAdFormatValues::getInstance()->getValues();
+    $ref_enums['RenderType'] = AdPreviewRenderTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ShopFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FB_SALES_CHANNEL = 'fb_sales_channel';
-    const ID = 'id';
-    const IG_SALES_CHANNEL = 'ig_sales_channel';
-    public function getFieldTypes()
-    {
-        return array('fb_sales_channel' => 'Object', 'id' => 'string', 'ig_sales_channel' => 'Object');
-    }
+
+class ShopFields extends AbstractEnum {
+
+  const FB_SALES_CHANNEL = 'fb_sales_channel';
+  const ID = 'id';
+  const IG_SALES_CHANNEL = 'ig_sales_channel';
+  const WORKSPACE = 'workspace';
+
+  public function getFieldTypes() {
+    return array(
+      'fb_sales_channel' => 'Object',
+      'id' => 'string',
+      'ig_sales_channel' => 'Object',
+      'workspace' => 'Object',
+    );
+  }
 }

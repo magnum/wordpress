@@ -2,25 +2,16 @@
 /**
  * @var string $two_week_review_ignore
  * @var string $two_week_review_temp
+ * @var string $visit_review_temp
  */
 ?>
 <li>
 	<span class="dashicons dashicons-external"></span>
-	<a href="https://wordpress.org/support/plugin/cookiebot/reviews?filter=5&rate=5#new-post" target="_blank">
+	<a href="https://wordpress.org/support/plugin/cookiebot/reviews?filter=5&rate=5#new-post" target="_blank"
+		rel="noopener">
 		<?php
 		echo esc_html__(
-			'Sure! I\'d love to!',
-			'cookiebot'
-		);
-		?>
-	</a>
-</li>
-<li>
-	<span class="dashicons dashicons-smiley"></span>
-	<a href="<?php echo esc_html( $two_week_review_ignore ); ?>">
-		<?php
-		echo esc_html__(
-			'I\'ve already left a review',
+			'Absolutely, you deserve it!',
 			'cookiebot'
 		);
 		?>
@@ -28,10 +19,10 @@
 </li>
 <li>
 	<span class="dashicons dashicons-calendar-alt"></span>
-	<a href="<?php echo esc_html( $two_week_review_temp ); ?>">
+	<a href="<?php echo esc_html( $visit_review_temp ); ?>">
 		<?php
 		echo esc_html__(
-			'Maybe Later',
+			'Maybe later?',
 			'cookiebot'
 		);
 		?>
@@ -42,7 +33,7 @@
 	<a href="<?php echo esc_html( $two_week_review_ignore ); ?>">
 		<?php
 		echo esc_html__(
-			'Never show again',
+			'I`ve already left my feedback',
 			'cookiebot'
 		);
 		?>

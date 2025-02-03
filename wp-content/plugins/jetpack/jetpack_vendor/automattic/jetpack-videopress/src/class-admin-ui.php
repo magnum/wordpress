@@ -13,7 +13,7 @@ use Automattic\Jetpack\Connection\Initial_State as Connection_Initial_State;
 use Automattic\Jetpack\Connection\Manager as Connection_Manager;
 use Automattic\Jetpack\Current_Plan;
 use Automattic\Jetpack\My_Jetpack\Products as My_Jetpack_Products;
-use Automattic\Jetpack\Status as Status;
+use Automattic\Jetpack\Status;
 use Automattic\Jetpack\Terms_Of_Service;
 use Automattic\Jetpack\Tracking;
 
@@ -34,15 +34,8 @@ class Admin_UI {
 	 * @return void
 	 */
 	public static function init() {
-		$page_suffix = Admin_Menu::add_menu(
-			__( 'Jetpack VideoPress', 'jetpack-videopress-pkg' ),
-			_x( 'VideoPress', 'The Jetpack VideoPress product name, without the Jetpack prefix', 'jetpack-videopress-pkg' ),
-			'manage_options',
-			self::ADMIN_PAGE_SLUG,
-			array( __CLASS__, 'plugin_settings_page' ),
-			99
-		);
-		add_action( 'load-' . $page_suffix, array( __CLASS__, 'admin_init' ) );
+
+		add_action( 'admin_menu', array( __CLASS__, 'enable_menu' ) );
 
 		add_action( 'admin_footer-upload.php', array( __CLASS__, 'attachment_details_two_column_template' ) );
 		add_action( 'admin_footer-post.php', array( __CLASS__, 'attachment_details_template' ), 20 );
@@ -50,6 +43,23 @@ class Admin_UI {
 		add_filter( 'get_edit_post_link', array( __CLASS__, 'edit_video_link' ), 10, 3 );
 
 		add_action( 'admin_init', array( __CLASS__, 'remove_jetpack_hooks' ) );
+	}
+
+	/**
+	 * Enable the menu, separately to init due to translations needing to run early for the page suffix.
+	 *
+	 * @return void
+	 */
+	public static function enable_menu() {
+		$page_suffix = Admin_Menu::add_menu(
+			__( 'Jetpack VideoPress', 'jetpack-videopress-pkg' ),
+			_x( 'VideoPress', 'The Jetpack VideoPress product name, without the Jetpack prefix', 'jetpack-videopress-pkg' ),
+			'manage_options',
+			self::ADMIN_PAGE_SLUG,
+			array( __CLASS__, 'plugin_settings_page' ),
+			3
+		);
+		add_action( 'load-' . $page_suffix, array( __CLASS__, 'admin_init' ) );
 	}
 
 	/**
@@ -149,7 +159,7 @@ class Admin_UI {
 		}
 
 		// Initial JS state including JP Connection data.
-		wp_add_inline_script( self::JETPACK_VIDEOPRESS_PKG_NAMESPACE, Connection_Initial_State::render(), 'before' );
+		Connection_Initial_State::render_script( self::JETPACK_VIDEOPRESS_PKG_NAMESPACE );
 		wp_add_inline_script( self::JETPACK_VIDEOPRESS_PKG_NAMESPACE, self::render_initial_state(), 'before' );
 	}
 

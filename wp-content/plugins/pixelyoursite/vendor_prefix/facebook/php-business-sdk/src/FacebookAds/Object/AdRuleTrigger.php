@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleTriggerFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleTriggerOperatorValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleTriggerTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleTriggerTypeValues;
  * pull request for this class.
  *
  */
-class AdRuleTrigger extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdRuleTriggerFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleTriggerFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Operator'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleTriggerOperatorValues::getInstance()->getValues();
-        $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleTriggerTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdRuleTrigger extends AbstractObject {
+
+  /**
+   * @return AdRuleTriggerFields
+   */
+  public static function getFieldsEnum() {
+    return AdRuleTriggerFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Operator'] = AdRuleTriggerOperatorValues::getInstance()->getValues();
+    $ref_enums['Type'] = AdRuleTriggerTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row">
             <div class="col">
                 <h2 class="section-title">WooCommerce Reports <?php renderProBadge(); ?></h2>
-            </div>
+                </div>
         </div>
         <div class="container">
             <div class="row" style="padding:40px">
@@ -23,6 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
                         Visualize your data inside the plugin, or download it as CSV. </p>
                     <h3 class="text-center" style="margin-top:40px">Get detailed info about products sold by each campaign, ad set, or ad</h3>
                     <a href="https://www.pixelyoursite.com/woocommerce-first-party-reports?utm_source=free-plugin-reports-page-woo&utm_medium=free-plugin-reports-page-woo&utm_campaign=free-plugin-reports-page-woo&utm_content=free-plugin-reports-page-woo&utm_term=free-plugin-reports-page-woo"
+                       target="_blank" class="btn btn-save" style="margin-top:30px">Click to find more</a>
+                    <h3 class="text-center" style="margin-top:40px">Analyse your WooCommerce data with ChatGPT</h3>
+                    <a href="https://www.pixelyoursite.com/pixelyoursite-and-chatgpt?utm_source=free-plugin-reports-page-woo&utm_medium=free-plugin-reports-page-woo&utm_campaign=free-plugin-reports-page-woo&utm_content=free-plugin-reports-page-woo&utm_term=free-plugin-reports-page-woo"
                        target="_blank" class="btn btn-save" style="margin-top:30px">Click to find more</a>
                 </div>
             </div>

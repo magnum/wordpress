@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,28 +34,46 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAssetFeedSpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AD_FORMATS = 'ad_formats';
-    const ADDITIONAL_DATA = 'additional_data';
-    const ASSET_CUSTOMIZATION_RULES = 'asset_customization_rules';
-    const AUTOTRANSLATE = 'autotranslate';
-    const BODIES = 'bodies';
-    const CALL_TO_ACTION_TYPES = 'call_to_action_types';
-    const CALL_TO_ACTIONS = 'call_to_actions';
-    const CAPTIONS = 'captions';
-    const CAROUSELS = 'carousels';
-    const DESCRIPTIONS = 'descriptions';
-    const EVENTS = 'events';
-    const GROUPS = 'groups';
-    const IMAGES = 'images';
-    const LINK_URLS = 'link_urls';
-    const OPTIMIZATION_TYPE = 'optimization_type';
-    const POSTS = 'posts';
-    const TITLES = 'titles';
-    const VIDEOS = 'videos';
-    public function getFieldTypes()
-    {
-        return array('ad_formats' => 'list<string>', 'additional_data' => 'Object', 'asset_customization_rules' => 'list<Object>', 'autotranslate' => 'list<string>', 'bodies' => 'list<AdAssetFeedSpecBody>', 'call_to_action_types' => 'list<CallToActionTypes>', 'call_to_actions' => 'list<Object>', 'captions' => 'list<AdAssetFeedSpecCaption>', 'carousels' => 'list<Object>', 'descriptions' => 'list<AdAssetFeedSpecDescription>', 'events' => 'list<Object>', 'groups' => 'list<AdAssetFeedSpecGroupRule>', 'images' => 'list<AdAssetFeedSpecImage>', 'link_urls' => 'list<AdAssetFeedSpecLinkURL>', 'optimization_type' => 'string', 'posts' => 'list<Object>', 'titles' => 'list<AdAssetFeedSpecTitle>', 'videos' => 'list<AdAssetFeedSpecVideo>');
-    }
+
+class AdAssetFeedSpecFields extends AbstractEnum {
+
+  const AD_FORMATS = 'ad_formats';
+  const ADDITIONAL_DATA = 'additional_data';
+  const ASSET_CUSTOMIZATION_RULES = 'asset_customization_rules';
+  const AUTOTRANSLATE = 'autotranslate';
+  const BODIES = 'bodies';
+  const CALL_TO_ACTION_TYPES = 'call_to_action_types';
+  const CALL_TO_ACTIONS = 'call_to_actions';
+  const CAPTIONS = 'captions';
+  const CAROUSELS = 'carousels';
+  const DESCRIPTIONS = 'descriptions';
+  const EVENTS = 'events';
+  const GROUPS = 'groups';
+  const IMAGES = 'images';
+  const LINK_URLS = 'link_urls';
+  const OPTIMIZATION_TYPE = 'optimization_type';
+  const TITLES = 'titles';
+  const VIDEOS = 'videos';
+
+  public function getFieldTypes() {
+    return array(
+      'ad_formats' => 'list<string>',
+      'additional_data' => 'Object',
+      'asset_customization_rules' => 'list<Object>',
+      'autotranslate' => 'list<string>',
+      'bodies' => 'list<AdAssetFeedSpecBody>',
+      'call_to_action_types' => 'list<CallToActionTypes>',
+      'call_to_actions' => 'list<Object>',
+      'captions' => 'list<AdAssetFeedSpecCaption>',
+      'carousels' => 'list<Object>',
+      'descriptions' => 'list<AdAssetFeedSpecDescription>',
+      'events' => 'list<Object>',
+      'groups' => 'list<AdAssetFeedSpecGroupRule>',
+      'images' => 'list<AdAssetFeedSpecImage>',
+      'link_urls' => 'list<AdAssetFeedSpecLinkURL>',
+      'optimization_type' => 'string',
+      'titles' => 'list<AdAssetFeedSpecTitle>',
+      'videos' => 'list<AdAssetFeedSpecVideo>',
+    );
+  }
 }

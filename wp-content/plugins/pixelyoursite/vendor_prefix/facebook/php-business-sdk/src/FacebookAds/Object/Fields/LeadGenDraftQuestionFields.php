@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LeadGenDraftQuestionFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONDITIONAL_QUESTIONS_CHOICES = 'conditional_questions_choices';
-    const CONDITIONAL_QUESTIONS_GROUP_ID = 'conditional_questions_group_id';
-    const DEPENDENT_CONDITIONAL_QUESTIONS = 'dependent_conditional_questions';
-    const INLINE_CONTEXT = 'inline_context';
-    const KEY = 'key';
-    const LABEL = 'label';
-    const OPTIONS = 'options';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('conditional_questions_choices' => 'list<LeadGenConditionalQuestionsGroupChoices>', 'conditional_questions_group_id' => 'string', 'dependent_conditional_questions' => 'list<LeadGenConditionalQuestionsGroupQuestions>', 'inline_context' => 'string', 'key' => 'string', 'label' => 'string', 'options' => 'list<LeadGenQuestionOption>', 'type' => 'string');
-    }
+
+class LeadGenDraftQuestionFields extends AbstractEnum {
+
+  const CONDITIONAL_QUESTIONS_CHOICES = 'conditional_questions_choices';
+  const CONDITIONAL_QUESTIONS_GROUP_ID = 'conditional_questions_group_id';
+  const DEPENDENT_CONDITIONAL_QUESTIONS = 'dependent_conditional_questions';
+  const INLINE_CONTEXT = 'inline_context';
+  const KEY = 'key';
+  const LABEL = 'label';
+  const OPTIONS = 'options';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'conditional_questions_choices' => 'list<LeadGenConditionalQuestionsGroupChoices>',
+      'conditional_questions_group_id' => 'string',
+      'dependent_conditional_questions' => 'list<LeadGenConditionalQuestionsGroupQuestions>',
+      'inline_context' => 'string',
+      'key' => 'string',
+      'label' => 'string',
+      'options' => 'list<LeadGenQuestionOption>',
+      'type' => 'string',
+    );
+  }
 }

@@ -214,6 +214,7 @@ class The_Neverending_Home_Page {
 			// Otherwise, if a widget area ID or array of IDs was provided in the footer_widgets parameter, check if any contains any widgets.
 			// It is safe to use `is_active_sidebar()` before the sidebar is registered as this function doesn't check for a sidebar's existence when determining if it contains any widgets.
 			if ( function_exists( 'infinite_scroll_has_footer_widgets' ) ) {
+				// @phan-suppress-next-line PhanUndeclaredFunction -- Checked above. See also https://github.com/phan/phan/issues/1204.
 				$settings['footer_widgets'] = (bool) infinite_scroll_has_footer_widgets();
 			} elseif ( is_array( $settings['footer_widgets'] ) ) {
 				$sidebar_ids                = $settings['footer_widgets'];
@@ -381,7 +382,7 @@ class The_Neverending_Home_Page {
 
 		// This is to cope with an issue in certain themes or setups where posts are returned but found_posts is 0.
 		if ( 0 === $entries ) {
-			return (bool) ( count( self::wp_query()->posts ) < $posts_per_page );
+			return (bool) ( ! is_countable( self::wp_query()->posts ) || ( count( self::wp_query()->posts ) < $posts_per_page ) );
 		}
 		$paged = max( 1, self::wp_query()->get( 'paged' ) );
 
@@ -548,7 +549,7 @@ class The_Neverending_Home_Page {
 				'_inc/build/infinite-scroll/infinity-customizer.min.js',
 				'modules/infinite-scroll/infinity-customizer.js'
 			),
-			array( 'customize-base' ),
+			array( 'jquery', 'customize-base' ),
 			JETPACK__VERSION . '-is5.0.0', // Added for ability to cachebust on WP.com.
 			true
 		);
@@ -652,7 +653,7 @@ class The_Neverending_Home_Page {
 		if ( preg_match_all( '/".*?("|$)|((?<=[\t ",+])|^)[^\t ",+]+/', self::wp_query()->get( 's' ), $matches ) ) {
 			$search_terms = self::wp_query()->query_vars['search_terms'];
 			// if the search string has only short terms or stopwords, or is 10+ terms long, match it as sentence
-			if ( empty( $search_terms ) || count( $search_terms ) > 9 ) {
+			if ( empty( $search_terms ) || ! is_countable( $search_terms ) || count( $search_terms ) > 9 ) {
 				$search_terms = array( self::wp_query()->get( 's' ) );
 			}
 		} else {
@@ -661,7 +662,7 @@ class The_Neverending_Home_Page {
 
 		// actual testing. As search query combines multiple keywords with AND, it's enough to check if any of the keywords is present in the title
 		$term = current( $search_terms );
-		if ( ! empty( $term ) && false !== strpos( $post->post_title, $term ) ) {
+		if ( ! empty( $term ) && str_contains( $post->post_title, $term ) ) {
 			return true;
 		}
 
@@ -752,11 +753,12 @@ class The_Neverending_Home_Page {
 
 			$sort_field = self::get_query_sort_field( $query );
 
-			if ( 'post_date' !== $sort_field || 'DESC' !== $_REQUEST['query_args']['order'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- no changes made to the site.
+			if ( 'post_date' !== $sort_field ||
+			! isset( $_REQUEST['query_args']['order'] ) || 'DESC' !== $_REQUEST['query_args']['order'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- no changes made to the site.
 				return $where;
 			}
 
-			$query_before = sanitize_text_field( wp_unslash( $_REQUEST['query_before'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- no changes made to the site.
+			$query_before = isset( $_REQUEST['query_before'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['query_before'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- no changes made to the site.
 
 			if ( empty( $query_before ) ) {
 				return $where;
@@ -770,6 +772,8 @@ class The_Neverending_Home_Page {
 			 * will always return results prior to (descending sort)
 			 * or before (ascending sort) the last post date.
 			 *
+			 * @deprecated 14.0
+			 *
 			 * @module infinite-scroll
 			 *
 			 * @param string $clause SQL Date query.
@@ -777,9 +781,9 @@ class The_Neverending_Home_Page {
 			 * @param string $operator @deprecated Query operator.
 			 * @param string $last_post_date @deprecated Last Post Date timestamp.
 			 */
-			$operator       = 'ASC' === $_REQUEST['query_args']['order'] ? '>' : '<'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- no changes to the site.
-			$last_post_date = sanitize_text_field( wp_unslash( $_REQUEST['last_post_date'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- no changes to the site.
-			$where         .= apply_filters( 'infinite_scroll_posts_where', $clause, $query, $operator, $last_post_date );
+			$operator       = '<';
+			$last_post_date = isset( $_REQUEST['last_post_date'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['last_post_date'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- no changes to the site
+			$where         .= apply_filters_deprecated( 'infinite_scroll_posts_where', array( $clause, $query, $operator, $last_post_date ), '14.0', '' );
 		}
 
 		return $where;
@@ -1024,7 +1028,7 @@ class The_Neverending_Home_Page {
 			}
 
 			// Slashes everywhere we need them
-			if ( 0 !== strpos( $path, '/' ) ) {
+			if ( ! str_starts_with( $path, '/' ) ) {
 				$path = '/' . $path;
 			}
 
@@ -1152,7 +1156,7 @@ class The_Neverending_Home_Page {
 					// Jetpack block scripts should always be sent, even if they've been
 					// sent before. These scripts only run once on when loaded, they don't
 					// watch for new blocks being added.
-					if ( 0 === strpos( $script_name, 'jetpack-block-' ) ) {
+					if ( str_starts_with( $script_name, 'jetpack-block-' ) ) {
 						return true;
 					}
 
@@ -1173,13 +1177,16 @@ class The_Neverending_Home_Page {
 						continue;
 					}
 
+					$before_handle = $wp_scripts->get_inline_script_data( $handle, 'before' );
+					$after_handle  = $wp_scripts->get_inline_script_data( $handle, 'after' );
+
 					// Provide basic script data
 					$script_data = array(
 						'handle'        => $handle,
 						'footer'        => ( is_array( $wp_scripts->in_footer ) && in_array( $handle, $wp_scripts->in_footer, true ) ),
 						'extra_data'    => $wp_scripts->print_extra_script( $handle, false ),
-						'before_handle' => $wp_scripts->print_inline_script( $handle, 'before', false ),
-						'after_handle'  => $wp_scripts->print_inline_script( $handle, 'after', false ),
+						'before_handle' => $before_handle,
+						'after_handle'  => $after_handle,
 					);
 
 					// Base source
@@ -1471,6 +1478,7 @@ class The_Neverending_Home_Page {
 					if ( false !== $callback && is_callable( $callback ) ) {
 						rewind_posts();
 						ob_start();
+
 						add_action( 'infinite_scroll_render', $callback );
 
 						/**
@@ -1479,6 +1487,9 @@ class The_Neverending_Home_Page {
 						 * for more details as to why it was introduced.
 						 */
 						do_action( 'infinite_scroll_render' );
+
+						// Fire wp_head to ensure that all necessary scripts are enqueued. Output isn't used, but scripts are extracted in self::action_wp_footer.
+						wp_head();
 
 						$results['html'] = ob_get_clean();
 						remove_action( 'infinite_scroll_render', $callback );
@@ -1535,6 +1546,11 @@ class The_Neverending_Home_Page {
 					the_post();
 
 					sharing_register_post_for_share_counts( get_the_ID() );
+				}
+
+				// If sharing counts are not initialized for any reason, we initialize them here.
+				if ( ! is_array( $jetpack_sharing_counts ) ) {
+					$jetpack_sharing_counts = array();
 				}
 
 				$results['postflair'] = array_flip( $jetpack_sharing_counts );
@@ -1776,7 +1792,7 @@ class The_Neverending_Home_Page {
 	 */
 	public function filter_grunion_redirect_url( $url ) {
 		// Remove IS query args, if present
-		if ( false !== strpos( $url, 'infinity=scrolling' ) ) {
+		if ( str_contains( $url, 'infinity=scrolling' ) ) {
 			$url = remove_query_arg(
 				array(
 					'infinity',
@@ -1971,7 +1987,7 @@ class The_Neverending_Home_Page {
 	protected function amp_footer_template() {
 		ob_start();
 		?>
-<amp-next-page max-pages="<?php echo esc_attr( $this->amp_get_max_pages() ); ?>">
+<amp-next-page max-pages="<?php echo esc_attr( static::amp_get_max_pages() ); ?>">
 	<script type="application/json">
 		[
 			<?php echo wp_json_encode( $this->amp_next_page() ); ?>

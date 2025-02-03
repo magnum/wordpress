@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,173 +21,181 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\Client;
 use PYS_PRO_GLOBAL\FacebookAds\Http\SimpleRequest;
 use PYS_PRO_GLOBAL\FacebookAds\Exception\Exception;
+
 use ArrayAccess;
-class AdsPixelSettings implements \ArrayAccess
-{
-    /**
-     * @var string
-     */
-    const SIGNALS_JSON_CONFIG_PATH = 'signals/config/json';
-    /**
-     * Associative array for storing property values
-     * @var mixed[]
-     */
-    protected $container = array();
-    /**
-     * Constructor
-     * @param mixed[] $data Associated array of property value initializing the model
-     */
-    public function __construct(array $data = null)
-    {
-        $this->container['enable_automatic_matching'] = isset($data['enableAutomaticMatching']) ? $data['enableAutomaticMatching'] : null;
-        $this->container['enabled_automatic_matching_fields'] = isset($data['enabledAutomaticMatchingFields']) ? $data['enabledAutomaticMatchingFields'] : null;
-        $this->container['pixel_id'] = isset($data['pixel_id']) ? $data['pixel_id'] : null;
-    }
-    /**
-     * Factory method to build the settings given a pixel id
-     * @param string $pixelId
-     * @return AdsPixelId
-     */
-    public static function buildFromPixelId($pixelId)
-    {
-        $response = self::callPixelSettingsEndpoint($pixelId);
-        if ($response !== null) {
-            $jsonString = $response->getBody();
-            $pixelSettingsAsDict = \json_decode($jsonString, \true);
-            if (\array_key_exists('errorMessage', $pixelSettingsAsDict)) {
-                return null;
-            }
-            $pixelSettingsAsDict['matchingConfig']['pixel_id'] = $pixelId;
-            return new \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\AdsPixelSettings($pixelSettingsAsDict['matchingConfig']);
-        }
+
+class AdsPixelSettings implements ArrayAccess {
+
+  /**
+   * @var string
+   */
+  const SIGNALS_JSON_CONFIG_PATH = 'signals/config/json';
+
+  /**
+   * Associative array for storing property values
+   * @var mixed[]
+   */
+  protected $container = array();
+
+   /**
+   * Constructor
+   * @param mixed[] $data Associated array of property value initializing the model
+   */
+  public function __construct(array $data = null) {
+    $this->container['enable_automatic_matching'] = isset($data['enableAutomaticMatching']) ? $data['enableAutomaticMatching'] : null;;
+    $this->container['enabled_automatic_matching_fields'] = isset($data['enabledAutomaticMatchingFields']) ? $data['enabledAutomaticMatchingFields'] : null;
+    $this->container['pixel_id'] = isset($data['pixel_id']) ? $data['pixel_id'] : null;
+  }
+
+  /**
+   * Factory method to build the settings given a pixel id
+   * @param string $pixelId
+   * @return AdsPixelId
+   */
+  public static function buildFromPixelId($pixelId){
+    $response = self::callPixelSettingsEndpoint($pixelId);
+    if( $response !== null ){
+      $jsonString = $response->getBody();
+      $pixelSettingsAsDict = json_decode($jsonString, true);
+      if (array_key_exists('errorMessage', $pixelSettingsAsDict)){
         return null;
+      }
+      $pixelSettingsAsDict['matchingConfig']['pixel_id'] = $pixelId;
+      return new AdsPixelSettings($pixelSettingsAsDict['matchingConfig']);
     }
-    /**
-     * @param string $pixelId
-     * @return SimpleRequest
-     */
-    private static function callPixelSettingsEndpoint($pixelId)
-    {
-        $path = \sprintf("%s/%s/", self::SIGNALS_JSON_CONFIG_PATH, $pixelId);
-        $client = new \PYS_PRO_GLOBAL\FacebookAds\Http\Client();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\Http\SimpleRequest($client);
-        $request->setPath($path);
-        try {
-            return $client->sendRequest($request);
-        } catch (\PYS_PRO_GLOBAL\FacebookAds\Exception\Exception $e) {
-            return null;
-        }
+    return null;
+  }
+
+  /**
+   * @param string $pixelId
+   * @return SimpleRequest
+  */
+  private static function callPixelSettingsEndpoint($pixelId){
+    $path = sprintf("%s/%s/", self::SIGNALS_JSON_CONFIG_PATH, $pixelId);
+    $client = new Client();
+    $request = new SimpleRequest($client);
+    $request->setPath($path);
+    try{
+      return $client->sendRequest($request);
     }
-    /**
-     * Get Pixel Id.
-     * @return string pixel id
-     */
-    public function getPixelId()
-    {
-        return $this->container['pixel_id'];
+    catch(Exception $e){
+      return null;
     }
-    /**
-     * Sets Pixel id.
-     * @param string $pixelId
-     * @return $this
-     */
-    public function setPixelId($pixelId)
-    {
-        $this->container['pixel_id'] = $pixelId;
-        return $this;
+  }
+
+  /**
+   * Get Pixel Id.
+   * @return string pixel id
+   */
+  public function getPixelId() {
+    return $this->container['pixel_id'];
+  }
+
+
+  /**
+   * Sets Pixel id.
+   * @param string $pixelId
+   * @return $this
+   */
+  public function setPixelId($pixelId) {
+    $this->container['pixel_id'] = $pixelId;
+    return $this;
+  }
+
+  /**
+   * Get Enable automatic matching.
+   * @return bool enable automatic matching
+   */
+  public function getEnableAutomaticMatching() {
+    return $this->container['enable_automatic_matching'];
+  }
+
+
+  /**
+   * Sets Enable automatic matching.
+   * @param bool $enableAutomaticMatching
+   * @return $this
+   */
+  public function setEnableAutomaticMatching($enableAutomaticMatching) {
+    $this->container['enable_automatic_matching'] = $enableAutomaticMatching;
+    return $this;
+  }
+
+  /**
+   * Get Enabled automatic matching fields.
+   * @return array enabled automatic matching fields
+   */
+  public function getEnabledAutomaticMatchingFields() {
+    return $this->container['enabled_automatic_matching_fields'];
+  }
+
+
+  /**
+   * Sets Enabled automatic matching fields.
+   * @param array $enabledAutomaticMatchingFields
+   * @return $this
+   */
+  public function setEnabledAutomaticMatchingFields($enabledAutomaticMatchingFields) {
+    $this->container['enabled_automatic_matching_fields'] = $enabledAutomaticMatchingFields;
+    return $this;
+  }
+
+  /**
+   * Returns true if offset exists. False otherwise.
+   * @param integer $offset Offset
+   * @return boolean
+   */
+  public function offsetExists($offset) : bool {
+    return isset($this->container[$offset]);
+  }
+
+  /**
+   * Gets offset.
+   * @param integer $offset Offset
+   * @return mixed
+   */
+  public function offsetGet($offset) : mixed {
+    return isset($this->container[$offset]) ? $this->container[$offset] : null;
+  }
+
+  /**
+   * Sets value based on offset.
+   * @param integer $offset Offset
+   * @param mixed $value Value to be set
+   * @return void
+   */
+  public function offsetSet($offset, $value) : void {
+    if (is_null($offset)) {
+      $this->container[] = $value;
+    } else {
+      $this->container[$offset] = $value;
     }
-    /**
-     * Get Enable automatic matching.
-     * @return bool enable automatic matching
-     */
-    public function getEnableAutomaticMatching()
-    {
-        return $this->container['enable_automatic_matching'];
+  }
+
+  /**
+   * Unsets offset.
+   * @param integer $offset Offset
+   * @return void
+   */
+  public function offsetUnset($offset) : void {
+    unset($this->container[$offset]);
+  }
+
+  /**
+   * Gets the string presentation of the object
+   * @return string
+   */
+  public function __toString() {
+    if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
+      return json_encode($this, JSON_PRETTY_PRINT);
     }
-    /**
-     * Sets Enable automatic matching.
-     * @param bool $enableAutomaticMatching
-     * @return $this
-     */
-    public function setEnableAutomaticMatching($enableAutomaticMatching)
-    {
-        $this->container['enable_automatic_matching'] = $enableAutomaticMatching;
-        return $this;
-    }
-    /**
-     * Get Enabled automatic matching fields.
-     * @return array enabled automatic matching fields
-     */
-    public function getEnabledAutomaticMatchingFields()
-    {
-        return $this->container['enabled_automatic_matching_fields'];
-    }
-    /**
-     * Sets Enabled automatic matching fields.
-     * @param array $enabledAutomaticMatchingFields
-     * @return $this
-     */
-    public function setEnabledAutomaticMatchingFields($enabledAutomaticMatchingFields)
-    {
-        $this->container['enabled_automatic_matching_fields'] = $enabledAutomaticMatchingFields;
-        return $this;
-    }
-    /**
-     * Returns true if offset exists. False otherwise.
-     * @param integer $offset Offset
-     * @return boolean
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->container[$offset]);
-    }
-    /**
-     * Gets offset.
-     * @param integer $offset Offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
-    }
-    /**
-     * Sets value based on offset.
-     * @param integer $offset Offset
-     * @param mixed $value Value to be set
-     * @return void
-     */
-    public function offsetSet($offset, $value)
-    {
-        if (\is_null($offset)) {
-            $this->container[] = $value;
-        } else {
-            $this->container[$offset] = $value;
-        }
-    }
-    /**
-     * Unsets offset.
-     * @param integer $offset Offset
-     * @return void
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->container[$offset]);
-    }
-    /**
-     * Gets the string presentation of the object
-     * @return string
-     */
-    public function __toString()
-    {
-        if (\defined('JSON_PRETTY_PRINT')) {
-            // use JSON pretty print
-            return \json_encode($this, \JSON_PRETTY_PRINT);
-        }
-        return \json_encode($this);
-    }
+    return json_encode($this);
+  }
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ApplicationAnPlatformsValues getInstance()
  */
-class ApplicationAnPlatformsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ANDROID = 'ANDROID';
-    const DESKTOP = 'DESKTOP';
-    const GALAXY = 'GALAXY';
-    const INSTANT_ARTICLES = 'INSTANT_ARTICLES';
-    const IOS = 'IOS';
-    const MOBILE_WEB = 'MOBILE_WEB';
-    const OCULUS = 'OCULUS';
-    const UNKNOWN = 'UNKNOWN';
-    const XIAOMI = 'XIAOMI';
+class ApplicationAnPlatformsValues extends AbstractEnum {
+
+  const ANDROID = 'ANDROID';
+  const DESKTOP = 'DESKTOP';
+  const GALAXY = 'GALAXY';
+  const INSTANT_ARTICLES = 'INSTANT_ARTICLES';
+  const IOS = 'IOS';
+  const MOBILE_WEB = 'MOBILE_WEB';
+  const OCULUS = 'OCULUS';
+  const UNKNOWN = 'UNKNOWN';
+  const XIAOMI = 'XIAOMI';
 }

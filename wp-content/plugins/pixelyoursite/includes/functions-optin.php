@@ -5,8 +5,36 @@ namespace PixelYourSite;
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
+add_action( 'wp_ajax_pys_optin_add',  'PixelYourSite\pys_optin_add' );
+add_action( 'wp_ajax_nopriv_pys_optin_add', 'PixelYourSite\pys_optin_add' );
+add_action( 'admin_notices', 'PixelYourSite\adminRenderOptinNotices', 9 );
+function pys_optin_add()
+{
+    $body = array(
+        'action'  => 'optin_add',
+        'data'  => $_POST
+    );
 
-add_action( 'admin_notices', 'PixelYourSite\adminRenderOptinNotices' );
+    $response = wp_remote_post( 'https://www.pixelyoursite.com', array(
+        'timeout'   => 30,
+        'sslverify' => false,
+        'user-agent' => 'PixelYourSite/' . PYS_FREE_VERSION . '; ' . get_bloginfo( 'url' ),
+        'body'      => $body
+    ) );
+
+
+    if (is_wp_error($response)) {
+        wp_send_json_error(null, 420);
+    } else {
+        $body = wp_remote_retrieve_body($response);
+        $decoded_body = json_decode($body, true); // Decode the body to an array
+        if (isset($decoded_body['data'])) {
+            wp_send_json_success($decoded_body['data']); // Return only the 'data' part
+        } else {
+            wp_send_json_error('Invalid response format', 422);
+        }
+    }
+}
 function adminRenderOptinNotices() {
     
     if ( ! current_user_can( 'manage_pys' ) ) {
@@ -17,14 +45,14 @@ function adminRenderOptinNotices() {
     $user_id = $user->ID;
 
     // never show again for opted-in users
-    if ( get_user_meta( $user_id, 'pys_core_opted_in_dismissed_at', true ) ) {
+    if ( get_option( 'pys_core_opted_in_dismissed_at' ) || get_user_meta( $user_id, 'pys_core_opted_in_dismissed_at', true ) ) {
         return;
     }
     
-    $second_time_dismissed_at = get_user_meta( $user_id, 'pys_core_optin_second_time_dismissed_at', true );
-    $first_time_dismissed_at = get_user_meta( $user_id, 'pys_core_optin_first_time_dismissed_at', true );
+    $second_time_dismissed_at = get_option( 'pys_core_optin_second_time_dismissed_at' ) ?? get_user_meta( $user_id, 'pys_core_optin_second_time_dismissed_at', true );
+    $first_time_dismissed_at = get_option( 'pys_core_optin_first_time_dismissed_at' ) ?? get_user_meta( $user_id, 'pys_core_optin_first_time_dismissed_at', true );
     
-    if ( get_user_meta( $user_id, 'pys_core_optin_third_time_dismissed_at', true ) ) {
+    if ( get_option( 'pys_core_optin_third_time_dismissed_at' ) || get_user_meta( $user_id, 'pys_core_optin_third_time_dismissed_at', true ) ) {
         return; // was dismissed 3 times
     } elseif ( $second_time_dismissed_at ) {
         $month_ago = time() - MONTH_IN_SECONDS;
@@ -69,7 +97,7 @@ function adminRenderOptinNotices() {
             padding-bottom: 15px;
         }
         .pys-notice-content h4 {
-            margin-bottom: 10px;
+            margin-bottom: 10px!important;
         }
         .pys-notice-logo {
             margin-right: 15px;
@@ -158,7 +186,7 @@ function adminRenderOptinNotices() {
             });
             
             jQuery.ajax({
-                url: 'https://pixelyoursite.com/wp-admin/admin-ajax.php',
+                url: ajaxurl,
                 method: 'POST',
                 crossDomain: true,
                 data: {

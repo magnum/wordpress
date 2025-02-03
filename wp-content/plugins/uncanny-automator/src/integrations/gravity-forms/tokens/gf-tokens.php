@@ -531,7 +531,11 @@ class Gf_Tokens {
 
 				// Return the formattted time according to the selected time zone
 				$value = date_i18n( "$date_format $time_format", strtotime( $expiry_date ) );
+
+				return $value;
 			}
+
+			return '';
 		}
 
 		/**
@@ -555,17 +559,22 @@ class Gf_Tokens {
 		$label = $this->get_field_label( $gf_form, $meta_key, $entry );
 		$value = $this->get_field_value( $entry, $meta_key );
 
-		$field_object = (array) \GFAPI::get_field( $gf_form, $meta_key );
-		$field_type   = ( isset( $field_object['type'] ) ) ? (string) $field_object['type'] : '';
+		$field_object = \GFAPI::get_field( $gf_form, $meta_key );
+		$field_type   = ( isset( $field_object->type ) ) ? (string) $field_object->type : '';
 
 		if ( 'list' === $field_type && ! empty( $value ) ) {
 			$field_data = maybe_unserialize( $value );
 			$value      = is_array( $field_data ) ? join( ', ', $field_data ) : '';
 		}
+
 		if ( 'multiselect' === $field_type && ! empty( $value ) ) {
 			if ( Automator()->utilities->is_json_string( $value ) ) {
 				$value = join( ', ', json_decode( $value ) );
 			}
+		}
+
+		if ( 'survey' === $field_type && ! empty( $value ) ) {
+			$value = $field_object->get_value_export( $entry, $token_info[1], true );
 		}
 
 		return $this->should_fetch_label( $token_info ) ? $label : $value;

@@ -10,7 +10,8 @@ defined('ABSPATH') or die('Direct access not allowed');
 
 
 class ServerEventHelper {
-
+    private static $fbp;
+    private static $fbc;
     /**
      * @param SingleEvent $event
      * @return Event | null
@@ -35,16 +36,39 @@ class ServerEventHelper {
             ->setClientIpAddress(self::getIpAddress())
             ->setClientUserAgent(self::getHttpUserAgent());
 
-
-        $fbp = self::getFbp();
-        $fbc = self::getFbc();
-
-        if(!$fbp && $wooOrder) {
-            $fbp = ServerEventHelper::getFbStatFromOrder('fbp',$wooOrder);
+        if (!self::getFbp() && (!isset($eventParams['_fbp']) || !$eventParams['_fbp']) && !headers_sent()) {
+            self::setFbp('fb.1.' . time() . '.' . rand(1000000000, 9999999999));
+            if(!headers_sent()){
+                setcookie("_fbp", self::getFbp(), 2147483647,'/', PYS()->general_domain);
+            }
         }
-        if(!$fbc && $wooOrder) {
-            $fbc = ServerEventHelper::getFbStatFromOrder('fbc',$wooOrder);
+
+        if (!self::getFbc() && self::getUrlParameter('fbclid')) {
+            $fbclid = self::getUrlParameter('fbclid');
+            if($fbclid){
+                self::setFbc('fb.1.' . time() . '.' . $fbclid );
+                if(!headers_sent()){
+                    setcookie("_fbc", self::$fbc, 2147483647,'/', PYS()->general_domain);
+                }
+            }
         }
+
+        $fbp = '';
+        $fbc = '';
+
+        if ($wooOrder) {
+            $fbp = ServerEventHelper::getFbStatFromOrder('fbp', $wooOrder);
+            $fbc = ServerEventHelper::getFbStatFromOrder('fbc', $wooOrder);
+        }
+
+// Checking that the values are not empty and setting alternative values if they are missing
+        if(empty($fbp)) {
+            $fbp = self::getFbp() ?? $eventParams['_fbp'] ?? '';
+        }
+        if (empty($fbc)) {
+            $fbc = self::getFbc() ?? $eventParams['_fbc'] ?? '';
+        }
+
 
         $user_data->setFbp($fbp);
         $user_data->setFbc($fbc);
@@ -158,14 +182,37 @@ class ServerEventHelper {
 
         return $request_uri;
     }
+    static function getUrlParameter($sParam) {
+        $sPageURL = $_SERVER['QUERY_STRING'];
+        $sURLVariables = explode('&', $sPageURL);
 
+        foreach ($sURLVariables as $sURLVariable) {
+            $sParameterName = explode('=', $sURLVariable);
+
+            if ($sParameterName[0] === $sParam) {
+                return isset($sParameterName[1]) ? urldecode($sParameterName[1]) : true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function setFbp($fbp) {
+        self::$fbp = $fbp;
+    }
+
+    public static function setFbc($fbc) {
+        self::$fbc = $fbc;
+    }
     public static function getFbp() {
         $fbp = null;
 
         if (!empty($_COOKIE['_fbp'])) {
             $fbp = $_COOKIE['_fbp'];
         }
-
+        elseif (!empty(self::$fbp)){
+            $fbp = self::$fbp;
+        }
         return $fbp;
     }
 
@@ -175,7 +222,9 @@ class ServerEventHelper {
         if (!empty($_COOKIE['_fbc'])) {
             $fbc = $_COOKIE['_fbc'];
         }
-
+        elseif (!empty(self::$fbc)){
+            $fbc = self::$fbc;
+        }
         return $fbc;
     }
 
@@ -186,7 +235,7 @@ class ServerEventHelper {
          * Add purchase WooCommerce Advanced Matching params
          */
         if ( PixelYourSite\isWooCommerceActive() && isEventEnabled( 'woo_purchase_enabled' ) &&
-            ($wooOrder || ( is_order_received_page() && wooIsRequestContainOrderId() ))
+            ($wooOrder || ( PYS()->woo_is_order_received_page() && wooIsRequestContainOrderId() ))
         ) {
             if(wooIsRequestContainOrderId()) {
                 $order_id = wooGetOrderIdFromRequest();
@@ -199,48 +248,56 @@ class ServerEventHelper {
             if ( $order ) {
 
                 if ( PixelYourSite\isWooCommerceVersionGte( '3.0.0' ) ) {
+
+					$user_firstname = $order->get_billing_first_name();
+					$user_lastname = $order->get_billing_last_name();
+					$user_phone = $order->get_billing_phone();
+					$user_email = $order->get_billing_email();
+
                     if($order->get_billing_postcode()) {
                         $userData->setZipCode($order->get_billing_postcode());
                     }
                     if($order->get_billing_country()) {
                         $userData->setCountryCode(strtolower($order->get_billing_country()));
                     }
-                    if($order->get_billing_email()) {
-                        $userData->setEmail($order->get_billing_email());
-                    }
-
-                    if($order->get_billing_phone()) {
-                        $userData->setPhone($order->get_billing_phone());
-                    }
-
-                    if($order->get_billing_first_name()) {
-                        $userData->setFirstName($order->get_billing_first_name());
-                    }
-
-                    if($order->get_billing_last_name()) {
-                        $userData->setLastName($order->get_billing_last_name());
-                    }
-
                     if($order->get_billing_city()) {
                         $userData->setCity($order->get_billing_city());
                     }
-
                     if($order->get_billing_state()) {
                         $userData->setState($order->get_billing_state());
                     }
-
+                    if($order->get_meta( 'external_id' )){
+                        $external_id = $order->get_meta( 'external_id' );
+                        if (!empty($external_id)) {
+                            $userData->setExternalId($external_id);
+                        }
+                    }
                 } else {
+					$user_firstname = $order->billing_first_name;
+					$user_lastname = $order->billing_last_name;
+					$user_phone = $order->billing_phone;
+					$user_email = $order->billing_email;
+
                     if($order->billing_postcode) {
                         $userData->setZipCode($order->billing_postcode);
                     }
                     $userData->setCountryCode(strtolower($order->billing_country));
-                    $userData->setEmail($order->billing_email);
-                    $userData->setPhone($order->billing_phone);
-                    $userData->setFirstName($order->billing_first_name);
-                    $userData->setLastName($order->billing_last_name);
                     $userData->setCity($order->billing_city);
                     $userData->setState($order->billing_state);
+                    if(get_post_meta( $order_id, 'external_id', true )){
+                        $external_id = get_post_meta( $order_id, 'external_id', true );
+                        if (!empty($external_id)) {
+                            $userData->setExternalId($external_id);
+                        }
+                    }
                 }
+
+				$user_persistence_data = get_persistence_user_data( $user_email, $user_firstname, $user_lastname, $user_phone );
+				if ( !empty( $user_persistence_data[ 'fn' ] ) ) $userData->setFirstName( $user_persistence_data[ 'fn' ] );
+				if ( !empty( $user_persistence_data[ 'ln' ] ) ) $userData->setLastName( $user_persistence_data[ 'ln' ] );
+				if ( !empty( $user_persistence_data[ 'em' ] ) ) $userData->setEmail( $user_persistence_data[ 'em' ] );
+				if ( !empty( $user_persistence_data[ 'tel' ] ) ) $userData->setPhone( $user_persistence_data[ 'tel' ] );
+
             } else {
                 return ServerEventHelper::getRegularUserData();
             }
@@ -258,17 +315,25 @@ class ServerEventHelper {
                 }
                 $user_info = edd_get_payment_meta_user_info($payment_id);
                 $email = edd_get_payment_user_email($payment_id);
-                if($email) {
-                    $userData->setEmail($email);
-                }
+				$user_firstname = $user_lastname = $user_email = '';
 
+				if ( isset($user_info[ 'first_name' ]) && $user_info[ 'first_name' ] ) {
+					$user_firstname = $user_info[ 'first_name' ];
+				}
+				if (isset($user_info[ 'last_name' ]) &&  $user_info[ 'last_name' ] ) {
+					$user_lastname = $user_info[ 'last_name' ];
+				}
+				if ( $email ) {
+					$user_email = $email;
+				}
 
-                if(isset($user_info['first_name']))
-                    $userData->setFirstName($user_info['first_name']);
-                if(isset($user_info['last_name']))
-                    $userData->setLastName($user_info['last_name']);
+				$user_persistence_data = get_persistence_user_data( $user_email, $user_firstname, $user_lastname, '' );
+				if ( !empty( $user_persistence_data[ 'fn' ] ) ) $userData->setFirstName( $user_persistence_data[ 'fn' ] );
+				if ( !empty( $user_persistence_data[ 'ln' ] ) ) $userData->setLastName( $user_persistence_data[ 'ln' ] );
+				if ( !empty( $user_persistence_data[ 'em' ] ) ) $userData->setEmail( $user_persistence_data[ 'em' ] );
+				if ( !empty( $user_persistence_data[ 'tel' ] ) ) $userData->setPhone( $user_persistence_data[ 'tel' ] );
 
-            } else {
+			} else {
                 return ServerEventHelper::getRegularUserData();
             }
         }
@@ -283,23 +348,23 @@ class ServerEventHelper {
         $userData = new UserData();
         if ( $user->ID ) {
             // get user regular data
-            $userData->setFirstName($user->get( 'user_firstname' ));
-            $userData->setLastName($user->get( 'user_lastname' ));
-            $userData->setEmail($user->get( 'user_email' ));
+			$user_firstname = $user->get( 'user_firstname' );
+			$user_lastname = $user->get( 'user_lastname' );
+			$user_phone = $user->get( 'billing_phone' );
 
             /**
              * Add common WooCommerce Advanced Matching params
              */
             if ( PixelYourSite\isWooCommerceActive() ) {
                 // if first name is not set in regular wp user meta
-                if (empty($userData->getFirstName())) {
-                    $userData->setFirstName($user->get('billing_first_name'));
-                }
+				if ( empty( $user_firstname ) ) {
+					$user_firstname = $user->get( 'billing_first_name' );
+				}
 
                 // if last name is not set in regular wp user meta
-                if (empty($userData->getLastName())) {
-                    $userData->setLastName($user->get('billing_last_name'));
-                }
+				if ( empty( $user_lastname ) ) {
+					$user_lastname = $user->get( 'billing_last_name' );
+				}
 
                 if($user->get('billing_phone'))
                     $userData->setPhone($user->get('billing_phone'));
@@ -313,11 +378,24 @@ class ServerEventHelper {
                     $userData->setZipCode($user->get('billing_postcode'));
                 }
             }
+			$user_persistence_data = get_persistence_user_data( $user->get( 'user_email' ), $user_firstname, $user_lastname, $user_phone );
+            if(PixelYourSite\EventsManager::isTrackExternalId()){
+                if (!empty(PixelYourSite\PYS()->get_pbid())) {
+                    $userData->setExternalId(PixelYourSite\PYS()->get_pbid());
+                }
+            }
         } else {
-            // $userData->setFirstName("undefined");
-            // $userData->setLastName("undefined");
-            // $userData->setEmail("undefined");
+			$user_persistence_data = get_persistence_user_data( '', '', '', '' );
+            if (PixelYourSite\EventsManager::isTrackExternalId() && isset($_COOKIE['pbid'])) {
+                $userData->setExternalId($_COOKIE['pbid']);
+            }
         }
+
+		if ( !empty( $user_persistence_data[ 'fn' ] ) ) $userData->setFirstName( $user_persistence_data[ 'fn' ] );
+		if ( !empty( $user_persistence_data[ 'ln' ] ) ) $userData->setLastName( $user_persistence_data[ 'ln' ] );
+		if ( !empty( $user_persistence_data[ 'em' ] ) ) $userData->setEmail( $user_persistence_data[ 'em' ] );
+		if ( !empty( $user_persistence_data[ 'tel' ] ) ) $userData->setPhone( $user_persistence_data[ 'tel' ] );
+
         return $userData;
     }
 

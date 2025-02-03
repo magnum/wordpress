@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdPlacePageSetFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT_ID = 'account_id';
-    const ID = 'id';
-    const LOCATION_TYPES = 'location_types';
-    const NAME = 'name';
-    const PAGES_COUNT = 'pages_count';
-    const PARENT_PAGE = 'parent_page';
-    const TARGETED_AREA_TYPE = 'targeted_area_type';
-    public function getFieldTypes()
-    {
-        return array('account_id' => 'string', 'id' => 'string', 'location_types' => 'list<string>', 'name' => 'string', 'pages_count' => 'int', 'parent_page' => 'Page', 'targeted_area_type' => 'TargetedAreaType');
-    }
+
+class AdPlacePageSetFields extends AbstractEnum {
+
+  const ACCOUNT_ID = 'account_id';
+  const ID = 'id';
+  const LOCATION_TYPES = 'location_types';
+  const NAME = 'name';
+  const PAGES_COUNT = 'pages_count';
+  const PARENT_PAGE = 'parent_page';
+  const TARGETED_AREA_TYPE = 'targeted_area_type';
+
+  public function getFieldTypes() {
+    return array(
+      'account_id' => 'string',
+      'id' => 'string',
+      'location_types' => 'list<string>',
+      'name' => 'string',
+      'pages_count' => 'int',
+      'parent_page' => 'Page',
+      'targeted_area_type' => 'TargetedAreaType',
+    );
+  }
 }

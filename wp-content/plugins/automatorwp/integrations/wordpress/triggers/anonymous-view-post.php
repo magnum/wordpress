@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Anonymous_View_Post extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_anonymous_view_post';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_anonymous_view_post';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -116,4 +127,5 @@ class AutomatorWP_WordPress_Anonymous_View_Post extends AutomatorWP_Integration_
 
 }
 
-new AutomatorWP_WordPress_Anonymous_View_Post();
+new AutomatorWP_WordPress_Anonymous_View_Post( 'wordpress' );
+new AutomatorWP_WordPress_Anonymous_View_Post( 'posts' );

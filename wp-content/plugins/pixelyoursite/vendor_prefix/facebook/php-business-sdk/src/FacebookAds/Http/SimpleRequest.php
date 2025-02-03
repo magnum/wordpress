@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,42 +21,54 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http;
 
-class SimpleRequest extends \PYS_PRO_GLOBAL\FacebookAds\Http\Request
-{
-    /**
-     * @var string
-     */
-    const DEFAULT_WWWW_BASE_DOMAIN = 'connect.facebook.net';
-    /**
-     * @param Client $client
-     */
-    public function __construct(\PYS_PRO_GLOBAL\FacebookAds\Http\Client $client)
-    {
-        parent::__construct($client);
-        //Setting the curl options inside the client to avoid SSL certificates usage
-        $client->getAdapter()->setOpts(new \ArrayObject(array(\CURLOPT_CONNECTTIMEOUT => 10, \CURLOPT_TIMEOUT => 60, \CURLOPT_RETURNTRANSFER => \true, \CURLOPT_HEADER => \true, \CURLOPT_SSL_VERIFYPEER => 0)));
+class SimpleRequest extends Request{
+
+  /**
+   * @var string
+   */
+  const DEFAULT_WWWW_BASE_DOMAIN = 'connect.facebook.net';
+
+  /**
+   * @param Client $client
+   */
+  public function __construct(Client $client) {
+    parent::__construct($client);
+    //Setting the curl options inside the client to avoid SSL certificates usage
+    $client -> getAdapter()->setOpts( new \ArrayObject(array(
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 60,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_SSL_VERIFYPEER => 0)));
+  }
+
+  /**
+   * @return string
+   */
+  public function getDomain() {
+    if ($this->domain === null) {
+      $this->domain = sprintf(
+        "%s",
+        self::DEFAULT_WWWW_BASE_DOMAIN);
     }
-    /**
-     * @return string
-     */
-    public function getDomain()
-    {
-        if ($this->domain === null) {
-            $this->domain = \sprintf("%s", self::DEFAULT_WWWW_BASE_DOMAIN);
-        }
-        return $this->domain;
+
+    return $this->domain;
+  }
+
+  /**
+   * @return string
+   */
+  public function getUrl() {
+    $delimiter = null;
+    if ($this->getQueryParams()->count() ) {
+      $delimiter = strpos($this->getPath(), '?') ? '&' : '?';
     }
-    /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        $delimiter = null;
-        if ($this->getQueryParams()->count()) {
-            $delimiter = \strpos($this->getPath(), '?') ? '&' : '?';
-        }
-        return $this->getProtocol() . $this->getDomain() . '/' . $this->getPath() . $delimiter . \http_build_query($this->getQueryParams()->export(), '', '&');
-    }
+    return $this->getProtocol().$this->getDomain()
+        .'/'.$this->getPath()
+        .$delimiter
+        .http_build_query($this->getQueryParams()->export(), '', '&');
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AppRequestFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTION_TYPE = 'action_type';
-    const APPLICATION = 'application';
-    const CREATED_TIME = 'created_time';
-    const DATA = 'data';
-    const FROM = 'from';
-    const ID = 'id';
-    const MESSAGE = 'message';
-    const OBJECT = 'object';
-    const TO = 'to';
-    public function getFieldTypes()
-    {
-        return array('action_type' => 'string', 'application' => 'Application', 'created_time' => 'datetime', 'data' => 'string', 'from' => 'Object', 'id' => 'string', 'message' => 'string', 'object' => 'Object', 'to' => 'Object');
-    }
+
+class AppRequestFields extends AbstractEnum {
+
+  const ACTION_TYPE = 'action_type';
+  const APPLICATION = 'application';
+  const CREATED_TIME = 'created_time';
+  const DATA = 'data';
+  const FROM = 'from';
+  const ID = 'id';
+  const MESSAGE = 'message';
+  const OBJECT = 'object';
+  const TO = 'to';
+
+  public function getFieldTypes() {
+    return array(
+      'action_type' => 'string',
+      'application' => 'Application',
+      'created_time' => 'datetime',
+      'data' => 'string',
+      'from' => 'Object',
+      'id' => 'string',
+      'message' => 'string',
+      'object' => 'Object',
+      'to' => 'Object',
+    );
+  }
 }

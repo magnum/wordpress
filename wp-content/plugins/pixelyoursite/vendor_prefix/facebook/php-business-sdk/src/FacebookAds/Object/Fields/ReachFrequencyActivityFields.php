@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ReachFrequencyActivityFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT_ID = 'account_id';
-    const CAMPAIGN_ACTIVE = 'campaign_active';
-    const CAMPAIGN_STARTED = 'campaign_started';
-    const CREATIVE_UPLOADED = 'creative_uploaded';
-    const IO_APPROVED = 'io_approved';
-    const SF_LINK = 'sf_link';
-    public function getFieldTypes()
-    {
-        return array('account_id' => 'string', 'campaign_active' => 'bool', 'campaign_started' => 'bool', 'creative_uploaded' => 'bool', 'io_approved' => 'bool', 'sf_link' => 'string');
-    }
+
+class ReachFrequencyActivityFields extends AbstractEnum {
+
+  const ACCOUNT_ID = 'account_id';
+  const CAMPAIGN_ACTIVE = 'campaign_active';
+  const CAMPAIGN_STARTED = 'campaign_started';
+  const CREATIVE_UPLOADED = 'creative_uploaded';
+  const IO_APPROVED = 'io_approved';
+  const SF_LINK = 'sf_link';
+
+  public function getFieldTypes() {
+    return array(
+      'account_id' => 'string',
+      'campaign_active' => 'bool',
+      'campaign_started' => 'bool',
+      'creative_uploaded' => 'bool',
+      'io_approved' => 'bool',
+      'sf_link' => 'string',
+    );
+  }
 }

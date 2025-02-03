@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,28 +35,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static BusinessVerticalValues getInstance()
  */
-class BusinessVerticalValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADVERTISING = 'ADVERTISING';
-    const AUTOMOTIVE = 'AUTOMOTIVE';
-    const CONSUMER_PACKAGED_GOODS = 'CONSUMER_PACKAGED_GOODS';
-    const ECOMMERCE = 'ECOMMERCE';
-    const EDUCATION = 'EDUCATION';
-    const ENERGY_AND_UTILITIES = 'ENERGY_AND_UTILITIES';
-    const ENTERTAINMENT_AND_MEDIA = 'ENTERTAINMENT_AND_MEDIA';
-    const FINANCIAL_SERVICES = 'FINANCIAL_SERVICES';
-    const GAMING = 'GAMING';
-    const GOVERNMENT_AND_POLITICS = 'GOVERNMENT_AND_POLITICS';
-    const HEALTH = 'HEALTH';
-    const LUXURY = 'LUXURY';
-    const MARKETING = 'MARKETING';
-    const NON_PROFIT = 'NON_PROFIT';
-    const ORGANIZATIONS_AND_ASSOCIATIONS = 'ORGANIZATIONS_AND_ASSOCIATIONS';
-    const OTHER = 'OTHER';
-    const PROFESSIONAL_SERVICES = 'PROFESSIONAL_SERVICES';
-    const RESTAURANT = 'RESTAURANT';
-    const RETAIL = 'RETAIL';
-    const TECHNOLOGY = 'TECHNOLOGY';
-    const TELECOM = 'TELECOM';
-    const TRAVEL = 'TRAVEL';
+class BusinessVerticalValues extends AbstractEnum {
+
+  const ADVERTISING = 'ADVERTISING';
+  const AUTOMOTIVE = 'AUTOMOTIVE';
+  const CONSUMER_PACKAGED_GOODS = 'CONSUMER_PACKAGED_GOODS';
+  const ECOMMERCE = 'ECOMMERCE';
+  const EDUCATION = 'EDUCATION';
+  const ENERGY_AND_UTILITIES = 'ENERGY_AND_UTILITIES';
+  const ENTERTAINMENT_AND_MEDIA = 'ENTERTAINMENT_AND_MEDIA';
+  const FINANCIAL_SERVICES = 'FINANCIAL_SERVICES';
+  const GAMING = 'GAMING';
+  const GOVERNMENT_AND_POLITICS = 'GOVERNMENT_AND_POLITICS';
+  const HEALTH = 'HEALTH';
+  const LUXURY = 'LUXURY';
+  const MARKETING = 'MARKETING';
+  const NON_PROFIT = 'NON_PROFIT';
+  const ORGANIZATIONS_AND_ASSOCIATIONS = 'ORGANIZATIONS_AND_ASSOCIATIONS';
+  const OTHER = 'OTHER';
+  const PROFESSIONAL_SERVICES = 'PROFESSIONAL_SERVICES';
+  const RESTAURANT = 'RESTAURANT';
+  const RETAIL = 'RETAIL';
+  const TECHNOLOGY = 'TECHNOLOGY';
+  const TELECOM = 'TELECOM';
+  const TRAVEL = 'TRAVEL';
 }

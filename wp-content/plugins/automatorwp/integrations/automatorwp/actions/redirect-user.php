@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action {
 
-    public $integration = 'automatorwp';
-    public $action = 'automatorwp_redirect_user';
+    /**
+     * Initialize the action
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_redirect_user';
+
+        parent::__construct();
+
+    }
 
     /**
      * URL to redirect
@@ -22,15 +33,6 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
      * @var string $url
      */
     public $url = '';
-
-    /**
-     * The action result
-     *
-     * @since 1.0.0
-     *
-     * @var string $result
-     */
-    public $result = '';
 
     /**
      * Register the trigger
@@ -166,8 +168,8 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
         
         // Get the redirect URL for this user
         $url = get_option( 'automatorwp_redirect_url_' . $user_id, '' );
-        
-        $url = esc_url( $url );
+
+        $url = esc_url( $url, null, 'edit' );
 
         if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
             $url = '';
@@ -248,4 +250,5 @@ class AutomatorWP_WordPress_Redirect_User extends AutomatorWP_Integration_Action
 
 }
 
-new AutomatorWP_WordPress_Redirect_User();
+new AutomatorWP_WordPress_Redirect_User( 'automatorwp' );
+new AutomatorWP_WordPress_Redirect_User( 'redirect' );

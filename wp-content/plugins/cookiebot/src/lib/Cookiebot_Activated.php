@@ -1,4 +1,5 @@
 <?php
+
 namespace cybot\cookiebot\lib;
 
 use cybot\cookiebot\addons\Cookiebot_Addons;
@@ -6,6 +7,7 @@ use cybot\cookiebot\admin_notices\Cookiebot_Recommendation_Notice;
 use Exception;
 
 class Cookiebot_Activated {
+
 
 	/**
 	 * @throws Exception
@@ -19,10 +21,10 @@ class Cookiebot_Activated {
 	}
 
 	private function delay_notice_recommandation_when_it_is_first_activation() {
-		//Delay display of recommendation notice in 3 days if not activated earlier
-		if ( get_option( Cookiebot_Recommendation_Notice::COOKIEBOT_RECOMMENDATION_OPTION_KEY, false ) === false ) {
-			//Not set yet - this must be first activation - delay in 3 days
-			update_option( Cookiebot_Recommendation_Notice::COOKIEBOT_RECOMMENDATION_OPTION_KEY, strtotime( '+3 days' ) );
+		// Delay display of recommendation notice in 3 days if not activated earlier
+		if ( get_option( Cookiebot_Recommendation_Notice::COOKIEBOT_NOTICE_OPTION_KEY, false ) === false ) {
+			// Not set yet - this must be first activation - delay in 3 days
+			update_option( Cookiebot_Recommendation_Notice::COOKIEBOT_NOTICE_OPTION_KEY, strtotime( '+3 days' ) );
 		}
 	}
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeApplinkTreatmentValues getInstance()
  */
-class AdCreativeApplinkTreatmentValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTOMATIC = 'automatic';
-    const DEEPLINK_WITH_APPSTORE_FALLBACK = 'deeplink_with_appstore_fallback';
-    const DEEPLINK_WITH_WEB_FALLBACK = 'deeplink_with_web_fallback';
-    const WEB_ONLY = 'web_only';
+class AdCreativeApplinkTreatmentValues extends AbstractEnum {
+
+  const AUTOMATIC = 'automatic';
+  const DEEPLINK_WITH_APPSTORE_FALLBACK = 'deeplink_with_appstore_fallback';
+  const DEEPLINK_WITH_WEB_FALLBACK = 'deeplink_with_web_fallback';
+  const WEB_ONLY = 'web_only';
 }

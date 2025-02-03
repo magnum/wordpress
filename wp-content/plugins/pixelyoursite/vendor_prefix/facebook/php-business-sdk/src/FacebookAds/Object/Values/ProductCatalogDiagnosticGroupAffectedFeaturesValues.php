@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductCatalogDiagnosticGroupAffectedFeaturesValues getInstance()
  */
-class ProductCatalogDiagnosticGroupAffectedFeaturesValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUGMENTED_REALITY = 'augmented_reality';
-    const CHECKOUT = 'checkout';
+class ProductCatalogDiagnosticGroupAffectedFeaturesValues extends AbstractEnum {
+
+  const AUGMENTED_REALITY = 'augmented_reality';
+  const CHECKOUT = 'checkout';
 }

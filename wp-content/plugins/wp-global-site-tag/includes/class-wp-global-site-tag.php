@@ -56,6 +56,7 @@ class WP_Global_Site_Tag {
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
+	protected $sanitizer;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -70,7 +71,7 @@ class WP_Global_Site_Tag {
 		if ( defined( 'DA_WP_GST' ) ) {
 			$this->version = DA_WP_GST;
 		} else {
-			$this->version = '1.0.6';
+			$this->version = '1.0.7';
 		}
 		$this->plugin_name = 'wp-global-site-tag';
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,20 +21,20 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Signal;
 
-class Util
-{
-    /**
-     * @param capi_data conversion api data
-     * @param bdapi_data business data api data
-     * @return array
-     */
-    public static function constructResponse($capi_data, $bdapi_data)
-    {
-        $response = array();
-        $response['business_data_api'] = $bdapi_data;
-        $response['conversion_api'] = $capi_data;
-        return $response;
-    }
+class Util {
+  /**
+   * @param capi_data conversion api data
+   * @param bdapi_data business data api data
+   * @return array
+   */
+  public static function constructResponse($capi_data,$bdapi_data) {
+    $response = array();
+    $response['business_data_api'] = $bdapi_data;
+    $response['conversion_api'] = $capi_data;
+    return $response;
+  }
+
 }

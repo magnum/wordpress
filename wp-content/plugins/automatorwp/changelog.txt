@@ -1,5 +1,423 @@
 == Changelog ==
 
+= 4.4.7 =
+
+* **New Features**
+* New integration: Formatter.
+* Formatter: New action: Convert string into format.
+* Formatter: New action: Round number into format.
+* New integration: Generator.
+* Generator: New action: Generate a hash.
+* Generator: New action: Generate a nonce.
+* **Improvements**
+* Improved organization of triggers into independent groups.
+
+= 4.4.6 =
+
+* **New Features**
+* New integration: Kali Forms.
+* Kali Forms: New trigger: User submits a form.
+* Kali Forms: New trigger: Guest submits a form.
+* New integration: Pretty Links.
+* Pretty Links: New trigger: User clicks a pretty link.
+* New integration: weForms.
+* weForms: New trigger: User submits a form.
+* weForms: New trigger: Guest submits a form.
+* **Improvements**
+* Added conditions for All Users and All Posts automations.
+
+= 4.4.5 =
+
+* **Developer Notes**
+* Tested in WordPress 6.6.
+
+= 4.4.4 =
+
+* **Improvements**
+* WordPress: Improved labels in actions related to metas.
+* **Bug Fixes**
+* Mailchimp: Fixed bug related to tags selection.
+
+= 4.4.3 =
+
+* **Improvements**
+* WordPress: Add field in action Create Post to add the post to a category.
+
+= 4.4.2 =
+
+* **Improvements**
+* Mailchimp: Updated Mailchimp templates API calls.
+
+= 4.4.1 =
+
+* **Improvements**
+* Get the WordPress email from & from name as default.
+
+= 4.4.0 =
+
+* **New Features**
+* Added the field "From Name" in the "Send email" action.
+* **Improvements**
+* Ensure that from name & email address is applied to the email sent from the action "Send email".
+* Improve the options form display in the action "Send email".
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
+= 4.3.9 =
+
+* **Improvements**
+* Fluent Forms: Support to checkbox fields.
+
+= 4.3.8 =
+
+* **Bug fixes**
+* GamiPress: Improved check for delete post triggers.
+
+= 4.3.7 =
+
+* **Bug fixes**
+* GamiPress: Fixed tag selection in user fields.
+
+= 4.3.6 =
+
+* **Improvements**
+* WordPress: Check for delete post triggers.
+* **Bug Fixes**
+* MailerLite: Fixed bug related to add subscribers trigger.
+
+= 4.3.5 =
+
+* **Bug Fixes**
+* Bug fixed to avoid launching triggers related to post updates twice.
+* ActiveCampaign: Fixed a PHP warning related to user information.
+
+= 4.3.4 =
+
+* **Bug Fixes**
+* Fixed bug related to Webhooks tags.
+
+= 4.3.3 =
+
+* **Improvements**
+* Added tags for post taxonomies.
+
+= 4.3.2 =
+
+* **New Features**
+* Availability to create Action Tags.
+* **Improvements**
+* Ensure compatibility of form integrations with the new Trigger Tags.
+* WPCode: Ensure compatibility with PRO version.
+
+= 4.3.1 =
+
+* **Bug Fixes**
+* SureCart: Fixed bug to get the customer data correctly.
+
+= 4.3.0 =
+
+* **New Features**
+* New integration: ARForms.
+* ARForms: New trigger: User submits a form.
+* ARForms: New trigger: Guest submits a form.
+* New integration: ConvertKit.
+* ConvertKit: New action: Add user to form.
+* ConvertKit: New action: Add user to sequence.
+* ConvertKit: New action: Add tag to user.
+* ConvertKit: New action: Remove tag from user.
+
+= 4.2.2 =
+
+* **Improvements**
+* BuddyBoss: Improvements in the preview link function when adding activity.
+
+= 4.2.1 =
+
+* **Bug Fixes**
+* BuddyPress: Added compatibility with BuddyPress 12.0.0.
+
+= 4.2.0 =
+
+* **Bug Fixes**
+* MailerLite: First name and last name can be added when a user is subscribed to a group.
+
+= 4.1.0 =
+
+* **Bug Fixes**
+* ClickUp: Fixed typo.
+* MailerLite: Fixed typo.
+* Restrict Content PRO: Fixed expiration date in Add Membership action when is empty.
+
+= 4.0.0 =
+
+* **Improvements**
+* WordPress: Added filters on "Update post" triggers to allow override all parameters.
+
+= 3.9.0 =
+
+* **Improvements**
+* Improved SQL queries to add indexes.
+
+= 3.8.0 =
+
+* **Improvements**
+* Improved support for strict mode databases.
+
+= 3.7.0 =
+
+* **Improvements**
+* Ensure times option in triggers does not allow value zero.
+* Added confitions to WordPress triggers related to metas.
+
+= 3.6.0 =
+
+* **Improvements**
+* Ensure compatibility with PHP 8.2.
+
+= 3.5.0 =
+
+* **Bug Fixes**
+* Fluent Forms: Fixed anonymous trigger.
+* Restrict Content Pro: Fixed expiration date in Add Membership action.
+
+= 3.4.0 =
+
+* **Improvements**
+* Added checks to avoid unnecessary ajax requests.
+
+= 3.3.0 =
+
+* **Bug Fixes**
+* Check call to API to avoid warnings due to integrations.
+
+= 3.2.0 =
+
+* **New Features**
+* New integration: ClickUp.
+* ClickUp: New action: Add comment to a task.
+* ClickUp: New action: Add tag to a task.
+* ClickUp: New action: Create a list.
+* ClickUp: New action: Create a new task in list.
+* New integration: Kadence Blocks.
+* Kadence Blocks: New trigger: User submits a form.
+* Kadence Blocks: New trigger: Guest submits a form.
+* New integration: WP All Import.
+* WP All Import: New trigger: User completes an import.
+* WP All Import: New trigger: User imports posts of a type.
+
+= 3.1.0 =
+
+* **Bug Fixes**
+* Check call to API to avoid warnings due to integrations.
+
+= 3.0.0 =
+
+* **Bug Fixes**
+* ARMember: Fixed compatibility with ARMember Complete Membership.
+
+= 2.8.0 =
+
+* **New Features**
+* New integration: ARMember.
+* ARMember: New trigger: User added to a membership plan.
+* ARMember: New action: Add user to membership plan.
+* New integration: WooCommerce Shipstation.
+* WooCommerce Shipstation: New trigger: User\'s order gets shipped.
+* New integration: Code Snippets.
+* Code Snippets: New action: Activate a snippet.
+* Code Snippets: New action: Deactivate a snippet.
+* **Bug Fixes**
+* Fixed input fields to allow value 0.
+* WooCommerce: Fixed tag "woocommerce_order_number".
+
+= 2.7.7 =
+
+* **Bug Fixes**
+* Restrict Content PRO: Fixed detection of Restrict Content PRO plugin.
+
+= 2.7.6 =
+
+* **Bug Fixes**
+* Fixed JS error.
+
+= 2.7.5 =
+
+* **New Features**
+* New integration: Gravity Kit.
+* Gravity Kit: New trigger: User gets entry approved in form.
+* Gravity Kit: New trigger: Guest gets entry approved in form.
+* New integration: WPCode.
+* WPCode: New action: Activate a snippet.
+* WPCode: New action: Deactivate a snippet.
+
+= 2.7.4 =
+
+* **New Features**
+* New integration: Charitable.
+* Charitable: New trigger: User makes a donation.
+* Charitable: New trigger: Guest makes a donation.
+
+= 2.7.3 =
+
+* **Improvements**
+* Added filter to handle tags in schedule actions.
+
+= 2.7.2 =
+
+* **New Features**
+* New integration: Thrive Leads
+* Thrive Leads: New trigger: User submits any/specific form.
+* Thrive Leads: New trigger: Guest submits any/specific form.
+* New integration: Thrive Ovation
+* Thrive Ovation: New trigger: User submits a testimonial.
+* Thrive Ovation: New trigger: Guest submits a testimonial.
+
+= 2.7.1 =
+
+* **Bug Fixes**
+* Fluent Forms: Fixed deprecated hooks to adapt to Fluent Forms latest version.
+
+= 2.7.0 =
+
+* **Bug Fixes**
+* WPLMS: Updated to the WPLMS latest version.
+
+= 2.6.9 =
+
+* **Bug Fixes**
+* Prevent incorrect formatting of the URL in the "Redirect user to URL" action.
+
+= 2.6.8 =
+
+* **New Features**
+* Added a clear all logs button on logs list view.
+* Added post date and modified date tags (GMT version too).
+* New action: Run an all users automation.
+* New action: Run an all posts automation.
+
+= 2.6.7 =
+
+* **Bug Fixes**
+* MailerLite: Fixed bug on MailerLite connection.
+* Paid Memberships Pro: Fixed trigger "User cancels a subscription of a membership level" to adapt to latest version of Paid Memberships Pro.
+
+= 2.6.6 =
+
+* **New Features**
+* New integration: MailerLite
+* MailerLite: New action: Add/Update user to MailerLite.
+* MailerLite: New action: Add user to group.
+
+= 2.6.5.1 =
+
+* **Developer Notes**
+* Fixed PHP notices caused by add_submenu_page() function when passing null as first parameter.
+
+= 2.6.5 =
+
+* **Improvements**
+* BuddyBoss: Improved checking to ensure BuddyBoss functions exist.
+
+= 2.6.4 =
+
+* **Improvements**
+* BuddyBoss: Improved trigger "User updates profile information" to avoid launch it when information did not change.
+
+= 2.6.3 =
+
+* **Improvements**
+* Advanced Custom Fields: Improved the selection of fields for all types of posts.
+* Advanced Custom Fields: Improved trigger "User updates post field with a value" will be launched when the field value is added the first time.
+* JetEngine: Trigger works only with JetEngine types.
+
+= 2.6.2 =
+
+* **New Features**
+* New integration: JetEngine.
+* JetEngine: New trigger: User publishes a post of a type.
+* **Improvements**
+* WordPress: Improved trigger "User meta gets updated with a value" to work when a value is added.
+
+= 2.6.1 =
+
+* **New Features**
+* New integration: Easy Affiliate.
+* Easy Affiliate: New trigger: User becomes an affiliate.
+* Easy Affiliate: New trigger: User earns a referral.
+
+= 2.6.0 =
+
+* **New Features**
+* New integration: SureCart.
+* SureCart: New trigger: User makes a purchase.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
+= 2.5.9.1 =
+
+* **Improvements**
+* Improved escaping of SQL queries.
+
+= 2.5.9 =
+
+* **Improvements**
+* Added more nonce checks to prevent CSRF attacks.
+* Added more sanitization checks to database queries.
+
+= 2.5.8 =
+
+* **Improvements**
+* AffiliateWP: Updated "User becomes an affiliate" trigger to adapt to AffiliateWP new version.
+
+= 2.5.7 =
+
+* **Improvements**
+* WordPress: New field to update Display Name on action "Update User".
+
+= 2.5.6 =
+
+* **Bug Fixes**
+* Fixed logs clean up recurring schedule when Action Scheduler is active.
+
+= 2.5.5 =
+
+* **Improvements**
+* Performance improvements while loading integrations.
+* Added an extra check to prevent issues if an old integration is active.
+* Removed backward compatibility for free integrations since they have been removed 1 year ago.
+
+= 2.5.4 =
+
+* **Developer Notes**
+* Added new hooks to extend the automation clone functionality.
+* **Bug Fixes**
+* ActiveCampaign: Fixed a PHP warning related to webhooks.
+
+= 2.5.3 =
+
+* **Improvements**
+* Improved the auto logs cleanup to work even with large amounts of logs entries.
+
+= 2.5.2 =
+
+* **Improvements**
+* BuddyBoss: Added check for updated activities to avoid send notifications.
+
+= 2.5.1 =
+
+* **Improvements**
+* Added more nonce checks to prevent CSRF attacks.
+
+= 2.5.0 =
+
+* **Improvements**
+* Meta Box: Added support for custom types.
+* **Bug Fixes**
+* FluentCRM: Fixed function to get the WordPress user ID.
+* WP Fusion: Fixed triggers to handle "Any" tag.
+* **Developer Notes**
+* Moved old changelog to changelog.txt.
+
 = 2.4.9 =
 
 * **Bug Fixes**

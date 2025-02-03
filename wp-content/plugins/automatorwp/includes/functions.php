@@ -37,9 +37,12 @@ function automatorwp_dashicon( $dashicon = 'automatorwp', $tag = 'i' ) {
  */
 function automatorwp_send_email( $args = array() ) {
 
+    global $automatorwp_email_args;
+
     // Parse the email required args
     $email = wp_parse_args( $args, array(
         'from'          => '',
+        'from_name'     => '',
         'to'            => '',
         'cc'            => '',
         'bcc'           => '',
@@ -48,6 +51,16 @@ function automatorwp_send_email( $args = array() ) {
         'headers'       => array(),
         'attachments'   => array(),
     ) );
+
+    // Initialize from
+    if( empty( $email['from'] ) ) {
+        $email['from'] = get_bloginfo( 'admin_email' );
+    }
+
+    // Initialize from name
+    if( empty( $email['from_name'] ) ) {
+        $email['from_name'] = get_bloginfo( 'name' );
+    }
 
     /**
      * Filter available to override the email arguments before process them
@@ -104,11 +117,17 @@ function automatorwp_send_email( $args = array() ) {
      */
     $email = apply_filters( 'automatorwp_email_args', $email, $args );
 
+    $automatorwp_email_args = $email;
+
+    add_filter( 'wp_mail_from', 'automatorwp_get_email_from_address' );
+    add_filter( 'wp_mail_from_name', 'automatorwp_get_email_from_name' );
     add_filter( 'wp_mail_content_type', 'automatorwp_set_html_content_type' );
 
     // Send the email
     $result = wp_mail( $email['to'], $email['subject'], $email['message'], $email['headers'], $email['attachments'] );
 
+    remove_filter( 'wp_mail_from', 'automatorwp_get_email_from_address' );
+    remove_filter( 'wp_mail_from_name', 'automatorwp_get_email_from_name' );
     remove_filter( 'wp_mail_content_type', 'automatorwp_set_html_content_type' );
 
     /**
@@ -135,6 +154,48 @@ function automatorwp_send_email( $args = array() ) {
     }
 
     return $result;
+
+}
+
+/**
+ * Function to get the mail from email address
+ *
+ * @since 1.0.0
+ *
+ * @param string $from
+ *
+ * @return string
+ */
+function automatorwp_get_email_from_address( $from = '' ) {
+
+    global $automatorwp_email_args;
+
+    if( is_array( $automatorwp_email_args ) && isset( $automatorwp_email_args['from'] ) ) {
+        return sanitize_email( $automatorwp_email_args['from'] );
+    }
+
+    return $from;
+
+}
+
+/**
+ * Function to get the mail from name
+ *
+ * @since 1.0.0
+ *
+ * @param string $from_name
+ *
+ * @return string
+ */
+function automatorwp_get_email_from_name( $from_name = '' ) {
+
+    global $automatorwp_email_args;
+
+    if( is_array( $automatorwp_email_args ) && isset( $automatorwp_email_args['from_name'] ) ) {
+        return wp_specialchars_decode( $automatorwp_email_args['from_name'] );
+    }
+
+    return $from_name;
 
 }
 

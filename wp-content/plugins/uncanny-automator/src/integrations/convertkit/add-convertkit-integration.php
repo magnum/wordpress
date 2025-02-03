@@ -27,11 +27,11 @@ class Add_ConvertKit_Integration {
 
 		$this->set_integration( 'CONVERTKIT' );
 
-		$this->set_name( 'ConvertKit' );
+		$this->set_name( 'Kit' );
 
-		$this->set_icon( __DIR__ . '/img/convertkit-icon.svg' );
+		$this->set_icon( __DIR__ . '/img/kit-icon.svg' );
 
-		$this->set_connected( get_option( 'automator_convertkit_client', false ) );
+		$this->set_connected( automator_get_option( 'automator_convertkit_client', false ) );
 
 		$this->set_settings_url( automator_get_premium_integrations_settings_url( 'convertkit' ) );
 

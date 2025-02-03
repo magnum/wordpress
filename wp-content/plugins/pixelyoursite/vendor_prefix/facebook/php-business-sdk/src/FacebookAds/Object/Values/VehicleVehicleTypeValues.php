@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static VehicleVehicleTypeValues getInstance()
  */
-class VehicleVehicleTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BOAT = 'BOAT';
-    const CAR_TRUCK = 'CAR_TRUCK';
-    const COMMERCIAL = 'COMMERCIAL';
-    const MOTORCYCLE = 'MOTORCYCLE';
-    const OTHER = 'OTHER';
-    const POWERSPORT = 'POWERSPORT';
-    const RV_CAMPER = 'RV_CAMPER';
-    const TRAILER = 'TRAILER';
+class VehicleVehicleTypeValues extends AbstractEnum {
+
+  const BOAT = 'BOAT';
+  const CAR_TRUCK = 'CAR_TRUCK';
+  const COMMERCIAL = 'COMMERCIAL';
+  const MOTORCYCLE = 'MOTORCYCLE';
+  const OTHER = 'OTHER';
+  const POWERSPORT = 'POWERSPORT';
+  const RV_CAMPER = 'RV_CAMPER';
+  const TRAILER = 'TRAILER';
 }

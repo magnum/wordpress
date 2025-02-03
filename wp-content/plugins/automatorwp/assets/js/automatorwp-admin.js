@@ -124,6 +124,7 @@
     $('body').on('click', '.automatorwp-automation-item-action-move-up, .automatorwp-automation-item-action-move-down', function(e) {
 
         var item = $(this).closest('.automatorwp-automation-item');
+        var type_class = '.automatorwp-' + ( item.hasClass('automatorwp-trigger') ? 'trigger' : 'action' );
         var items_list = $(this).closest('.automatorwp-automation-items');
         var direction = ( $(this).hasClass('automatorwp-automation-item-action-move-up') ? 'up' : 'down' );
         var sibling_item;
@@ -139,9 +140,9 @@
         }
 
         if( direction === 'up' ) {
-            $('#' + item.attr('id')).insertBefore( '#' + sibling_item.attr('id') );
+            $('#' + item.attr('id') + type_class).insertBefore( '#' + sibling_item.attr('id') + type_class );
         } else {
-            $('#' + item.attr('id')).insertAfter( '#' + sibling_item.attr('id') );
+            $('#' + item.attr('id') + type_class).insertAfter( '#' + sibling_item.attr('id') + type_class );
         }
 
         // Update items position
@@ -186,8 +187,8 @@
 
                 if( response.success ) {
 
-                    // Remove trigger tags
-                    if( item_type === 'trigger' ) {
+                    // Remove trigger and action tags
+                    if( item_type === 'trigger' || item_type === 'action' ) {
                         $('.automatorwp-automation-tag-selector optgroup[data-id="' + id + '"]').remove();
                     }
 
@@ -544,7 +545,7 @@
                     }
 
                     // Add tags to all tags selectors
-                    if( item_type === 'trigger' && response.data.tags_html.length ) {
+                    if( (item_type === 'trigger' || item_type === 'action') && response.data.tags_html.length ) {
                         $( response.data.tags_html ).appendTo('.automatorwp-automation-tag-selector');
                     }
 
@@ -657,7 +658,7 @@
                     }
 
                     // Add tags to all tags selectors
-                    if( item_type === 'trigger' && response.data.tags_html.length ) {
+                    if( (item_type === 'trigger' || item_type === 'action') && response.data.tags_html.length ) {
                         $( response.data.tags_html ).appendTo('.automatorwp-automation-tag-selector');
                     }
 
@@ -763,7 +764,7 @@
                     // Update the item label
                     item.find('.automatorwp-automation-item-label').html( response.data.edit_html );
 
-                    if( item_type === 'trigger' ) {
+                    if( item_type === 'trigger' || item_type === 'action' ) {
                         // Update the option display on tags selector
                         $('.automatorwp-automation-tag-selector optgroup[data-id="' + id + '"]').attr('label', response.data.edit_html );
 
@@ -1413,6 +1414,8 @@
             items_per_loop = $('input#users_per_loop').val();
         } else if( automation_type === 'all-posts' ) {
             items_per_loop = $('input#posts_per_loop').val();
+        } else if( automation_type === 'import-file' ) {
+            items_per_loop = $('input#lines_per_loop').val();
         }
 
         // Disable the button and switch labels
@@ -1449,6 +1452,8 @@
             items_per_loop = $('input#users_per_loop').val();
         } else if( automation_type === 'all-posts' ) {
             items_per_loop = $('input#posts_per_loop').val();
+        } else if( automation_type === 'import-file' ) {
+            items_per_loop = $('input#lines_per_loop').val();
         }
 
         automatorwp_run_automation( automation_id, items_per_loop );
@@ -1479,15 +1484,14 @@
  *
  * @since 1.0.0
  *
- * @param {Object} element
+ * @param {Object} list
  */
-function automatorwp_update_items_position( element ) {
+function automatorwp_update_items_position( list ) {
 
     var $ = $ || jQuery;
 
-    var items = element.find('.automatorwp-automation-item');
+    var items = list.find('.automatorwp-automation-item');
     var items_order = {};
-    var items_order_for_tags = [];
     var current_position = 0;
 
     // Loop through each item
@@ -1505,14 +1509,11 @@ function automatorwp_update_items_position( element ) {
 
         items_order[$(this).find('input.id').val()] = index;
 
-        // Setup a custom array for tags
-        items_order_for_tags.push( $(this).find('input.id').val() );
-
     });
 
     if( Object.entries(items_order).length ) {
 
-        var item_type = element.hasClass('automatorwp-triggers') ? 'trigger' : 'action';
+        var item_type = list.hasClass('automatorwp-triggers') ? 'trigger' : 'action';
 
         // Update automation items order trough ajax
         $.ajax({
@@ -1537,17 +1538,73 @@ function automatorwp_update_items_position( element ) {
             }
         });
 
-        if( item_type === 'trigger' ) {
+    }
 
-            // Update tags selector optgroups order
-            $.each(items_order_for_tags, function( index, id ) {
+    // Update the tags order
+    automatorwp_update_tags_selector_order();
 
-                $('.automatorwp-automation-tag-selector').each(function() {
+}
+
+/**
+ * Update tags selector order
+ *
+ * @since 1.0.0
+ */
+function automatorwp_update_tags_selector_order() {
+
+    var $ = $ || jQuery;
+
+    var items = $('.automatorwp-automation-item');
+    var items_order = {};
+    var triggers_sep = false;
+    var actions_sep = false;
+    var tags_index = 0;
+    var prefix = 't:';
+
+    // Loop through each item
+    items.each(function( index, value ) {
+
+        if( $(this).hasClass('automatorwp-trigger') ) {
+            prefix = 't:';
+        } else {
+            prefix = 'a:';
+        }
+
+        // Triggers separator
+        if( ! triggers_sep && $(this).hasClass('automatorwp-trigger') ) {
+            triggers_sep = true;
+            items_order[tags_index] = 'triggers_sep';
+            tags_index++;
+        }
+
+        // Actions separator
+        if( ! actions_sep && $(this).hasClass('automatorwp-action') ) {
+            actions_sep = true;
+            items_order[tags_index] = 'actions_sep';
+            tags_index++;
+        }
+
+        // Set up a custom array for tags
+        items_order[tags_index] = prefix + $(this).find('input.id').val();
+        tags_index++;
+    });
+
+    if( Object.entries(items_order).length ) {
+
+        // Update tags selector order
+        $.each(items_order, function( index, id ) {
+
+            $('.automatorwp-automation-tag-selector').each(function() {
+
+                if( id === 'triggers_sep' || id === 'actions_sep' ) {
+                    $(this).find('option[value="' + id + '"]').appendTo(this);
+                } else {
                     $(this).find('optgroup[data-id="' + id + '"]').appendTo(this);
-                });
+                }
 
             });
-        }
+
+        });
 
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdAccountClaimObjectiveValues getInstance()
  */
-class AdAccountClaimObjectiveValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
-    const COLLABORATIVE_ADS = 'COLLABORATIVE_ADS';
-    const HOME_LISTING = 'HOME_LISTING';
-    const MEDIA_TITLE = 'MEDIA_TITLE';
-    const PRODUCT = 'PRODUCT';
-    const TRAVEL = 'TRAVEL';
-    const VEHICLE = 'VEHICLE';
-    const VEHICLE_OFFER = 'VEHICLE_OFFER';
+class AdAccountClaimObjectiveValues extends AbstractEnum {
+
+  const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
+  const COLLABORATIVE_ADS = 'COLLABORATIVE_ADS';
+  const HOME_LISTING = 'HOME_LISTING';
+  const MEDIA_TITLE = 'MEDIA_TITLE';
+  const PRODUCT = 'PRODUCT';
+  const TRAVEL = 'TRAVEL';
+  const VEHICLE = 'VEHICLE';
+  const VEHICLE_OFFER = 'VEHICLE_OFFER';
 }

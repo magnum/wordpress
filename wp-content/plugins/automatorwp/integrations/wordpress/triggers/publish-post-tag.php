@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Publish_Post_Tag extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_publish_post_tag';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_publish_post_tag';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -159,4 +170,5 @@ class AutomatorWP_WordPress_Publish_Post_Tag extends AutomatorWP_Integration_Tri
 
 }
 
-new AutomatorWP_WordPress_Publish_Post_Tag();
+new AutomatorWP_WordPress_Publish_Post_Tag( 'wordpress' );
+new AutomatorWP_WordPress_Publish_Post_Tag( 'posts' );

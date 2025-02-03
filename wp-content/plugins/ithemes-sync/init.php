@@ -1,43 +1,55 @@
 <?php
 /*
-Plugin Name: iThemes Sync
-Plugin URI: http://ithemes.com/sync
-Description: Manage updates to your WordPress sites easily in one place.
-Author: iThemes
-Version: 2.1.13
-Author URI: http://ithemes.com/
-Domain Path: /lang/
-iThemes Package: ithemes-sync
-*/
+ * Plugin Name: Solid Central
+ * Plugin URI: https://solidwp.com/central
+ * Description: Maximize and amplify your admin with remote, multi-site management. One centralized dashboard to save time.
+ * Author: SolidWP
+ * Version: 3.2.1
+ * Requires at least: 6.4
+ * Requires PHP: 7.0
+ * Author URI: https://solidwp.com/
+ * Domain Path: /lang/
+ * iThemes Package: ithemes-sync
+ */
 
 if ( ! empty( $GLOBALS['ithemes_sync_path'] ) ) {
+	/** @var string $active_plugin_path */
 	$active_plugin_path = preg_replace( '|^' . preg_quote( ABSPATH, '|' ) . '|', '', $GLOBALS['ithemes_sync_path'] );
-	$this_plugin_path = preg_replace( '|^' . preg_quote( ABSPATH, '|' ) . '|', '', dirname( __FILE__ ) );
+	/** @var string $this_plugin_path */
+	$this_plugin_path = preg_replace( '|^' . preg_quote( ABSPATH, '|' ) . '|', '', __DIR__ );
 
 	if ( $active_plugin_path != $this_plugin_path ) {
 
-		add_action( 'all_admin_notices', function(){
-			echo '<div class="error"><p>';
-			echo sprintf( __( 'Only one iThemes Sync plugin can be active at a time. The plugin at <code>%1$s</code> is running while the plugin at <code>%2$s</code> was skipped in order to prevent errors. Please deactivate the plugin that you do not wish to use.', 'it-l10n-ithemes-sync' ), $active_plugin_path, $this_plugin_path );
-			echo '</p></div>';
-		}, 0 );
+		add_action(
+			'all_admin_notices',
+			function () use ( $active_plugin_path, $this_plugin_path ) {
+				echo '<div class="error"><p>';
+				printf(
+					wp_kses(
+						/* translators: 1: Active plugin path, 2: This plugin path */
+						__(
+							'Only one Solid Central plugin can be active at a time. The plugin at <code>%1$s</code> is running while the plugin at <code>%2$s</code> was skipped in order to prevent errors. Please deactivate the plugin that you do not wish to use.',
+							'it-l10n-ithemes-sync'
+						),
+						[
+							'code' => [],
+						]
+					),
+					esc_html( $active_plugin_path ),
+					esc_html( $this_plugin_path )
+				);
+				echo '</p></div>';
+			},
+			0
+		);
 	}
 
 	return;
 }
 
-// Show warning PHP versions < 5.6
-if ( PHP_VERSION_ID < 50600 ) {
-	add_action( 'admin_notices', function () {
-		echo '<div class="notice notice-error"><p>';
-		echo __( 'iThemes Sync requires PHP 5.6 or greater. Please update you PHP version to ensure all features work properly.', 'it-l10n-ithemes-sync' );
-		echo '</p></div>';
-	}, 0 );
-}
+$GLOBALS['ithemes_sync_path'] = __DIR__;
 
-$GLOBALS['ithemes_sync_path'] = dirname( __FILE__ );
-
-require( $GLOBALS['ithemes_sync_path'] . '/load.php' );
+require $GLOBALS['ithemes_sync_path'] . '/load.php';
 
 /**
  * On activation, set a time, frequency and name of an action hook to be scheduled.
@@ -45,10 +57,11 @@ require( $GLOBALS['ithemes_sync_path'] . '/load.php' );
  * @since 1.12.0
  */
 function ithemes_sync_activation() {
-    if ( ! wp_next_scheduled ( 'ithemes_sync_daily_schedule' ) ) {
-	    wp_schedule_event( strtotime( 'Tomorrow 2AM' ), 'daily', 'ithemes_sync_daily_schedule' );
+	if ( ! wp_next_scheduled( 'ithemes_sync_daily_schedule' ) ) {
+		wp_schedule_event( strtotime( 'Tomorrow 2AM' ), 'daily', 'ithemes_sync_daily_schedule' );
 	}
 }
+
 register_activation_hook( __FILE__, 'ithemes_sync_activation' );
 
 /**
@@ -57,6 +70,7 @@ register_activation_hook( __FILE__, 'ithemes_sync_activation' );
  * @since 1.12.0
  */
 function ithemes_sync_deactivation() {
-    wp_clear_scheduled_hook( 'ithemes_sync_daily_schedule' );
+	wp_clear_scheduled_hook( 'ithemes_sync_daily_schedule' );
 }
+
 register_deactivation_hook( __FILE__, 'ithemes_sync_deactivation' );

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,34 +21,36 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http\Adapter;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\Client;
-abstract class AbstractAdapter implements \PYS_PRO_GLOBAL\FacebookAds\Http\Adapter\AdapterInterface
-{
-    /**
-     * @var Client
-     */
-    protected $client;
-    /**
-     * @param Client $client
-     */
-    public function __construct(\PYS_PRO_GLOBAL\FacebookAds\Http\Client $client)
-    {
-        $this->client = $client;
-    }
-    /**
-     * @return Client
-     */
-    public function getClient()
-    {
-        return $this->client;
-    }
-    /**
-     * @return string
-     */
-    public function getCaBundlePath()
-    {
-        return $this->getClient()->getCaBundlePath();
-    }
+
+abstract class AbstractAdapter implements AdapterInterface {
+
+  /**
+   * @var Client
+   */
+  protected $client;
+
+  /**
+   * @param Client $client
+   */
+  public function __construct(Client $client) {
+    $this->client = $client;
+  }
+
+  /**
+   * @return Client
+   */
+  public function getClient() {
+    return $this->client;
+  }
+
+  /**
+   * @return string
+   */
+  public function getCaBundlePath() {
+    return $this->getClient()->getCaBundlePath();
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceDataSourceFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceDataSourceSubTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceDataSourceTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceDataSourceTypeValues;
  * pull request for this class.
  *
  */
-class CustomAudienceDataSource extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return CustomAudienceDataSourceFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceDataSourceFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['SubType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceDataSourceSubTypeValues::getInstance()->getValues();
-        $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CustomAudienceDataSourceTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class CustomAudienceDataSource extends AbstractObject {
+
+  /**
+   * @return CustomAudienceDataSourceFields
+   */
+  public static function getFieldsEnum() {
+    return CustomAudienceDataSourceFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['SubType'] = CustomAudienceDataSourceSubTypeValues::getInstance()->getValues();
+    $ref_enums['Type'] = CustomAudienceDataSourceTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

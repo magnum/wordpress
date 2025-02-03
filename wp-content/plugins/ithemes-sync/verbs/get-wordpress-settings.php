@@ -12,14 +12,14 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
-	public static $name = 'get-wordpress-settings';
-	public static $description = 'Retrieve Settings from the WordPress options system along with supporting data from various WP functions.';
-	public static $status_element_name = 'wp-settings';
+	public static $name                      = 'get-wordpress-settings';
+	public static $description               = 'Retrieve Settings from the WordPress options system along with supporting data from various WP functions.';
+	public static $status_element_name       = 'wp-settings';
 	public static $show_in_status_by_default = false;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
-	private $response = array();
+	private $response = [];
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
@@ -45,20 +45,20 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 * Populates version data for various techs
 	 */
 	private function set_versions() {
-		$this->response['versions'] = array(
+		$this->response['versions'] = [
 			'wp'         => $GLOBALS['wp_version'],
 			'db'         => get_option( 'db_version' ),
 			'db-initial' => get_option( 'initial_db_version' ),
 			'php'        => phpversion(),
-		);
+		];
 	}
 
 	/**
 	 * Options we need
 	 */
 	private function set_options() {
-		$this->response['options'] = array(
-			'is_multisite'                  => defined('MULTISITE' ) && MULTISITE === true,
+		$this->response['options'] = [
+			'is_multisite'                  => defined( 'MULTISITE' ) && MULTISITE === true,
 			// General
 			'blogname'                      => get_option( 'blogname' ),
 			'blogdescription'               => get_option( 'blogdescription' ),
@@ -72,7 +72,7 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 			'use_smilies'                   => get_option( 'use_smilies' ),
 			'use_balanceTags'               => get_option( 'use_balanceTags' ),
 			'default_category'              => get_option( 'default_category' ),
-			'default_post_format'           => get_option( 'default_post_format'),
+			'default_post_format'           => get_option( 'default_post_format' ),
 			'link_manager_enabled'          => get_option( 'link_manager_enabled' ),
 			'default_link_category'         => get_option( 'default_link_category' ),
 			'blog_public'                   => get_option( 'blog_public' ),
@@ -114,7 +114,7 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 			'large_size_w'                  => get_option( 'large_size_w' ),
 			'large_size_h'                  => get_option( 'large_size_h' ),
 			'uploads_use_yearmonth_folders' => get_option( 'uploads_use_yearmonth_folders' ),
-		);
+		];
 	}
 
 	/**
@@ -126,12 +126,12 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 * @return array
 	 */
 	private function set_user_roles() {
-		require_once( ABSPATH . 'wp-admin/includes/user.php' );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
 		$roles = get_editable_roles();
-		foreach( $roles as $i => $d ) {
-			$user_roles[$i] = $d['name'];
+		foreach ( $roles as $i => $d ) {
+			$user_roles[ $i ] = $d['name'];
 		}
-		$this->response['user_roles'] = empty( $user_roles ) ? array() : $user_roles;
+		$this->response['user_roles'] = empty( $user_roles ) ? [] : $user_roles;
 	}
 
 	/**
@@ -153,8 +153,8 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 */
 	private function set_timezone_options() {
 
-		$current_offset  = get_option('gmt_offset');
-		$tzstring        = get_option('timezone_string');
+		$current_offset  = get_option( 'gmt_offset' );
+		$tzstring        = get_option( 'timezone_string' );
 		$check_zone_info = true;
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
@@ -166,28 +166,28 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 			$check_zone_info = false;
 			if ( 0 == $current_offset ) {
 				$tzstring = 'UTC+0';
-			} else if ( $current_offset < 0 ) {
+			} elseif ( $current_offset < 0 ) {
 				$tzstring = 'UTC' . $current_offset;
 			} else {
 				$tzstring = 'UTC+' . $current_offset;
 			}
 		}
 
-		$this->response['timezone']['options'] = explode("\n", wp_timezone_choice( $tzstring, get_user_locale() ));
+		$this->response['timezone']['options'] = explode( "\n", wp_timezone_choice( $tzstring, get_user_locale() ) );
 	}
 
 	/**
 	 * Generate date format select options
 	 */
 	private function set_date_format_options() {
-		$custom = true;
-		$formats = array_unique( apply_filters( 'date_formats', array( __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+		$custom  = true;
+		$formats = array_unique( apply_filters( 'date_formats', [ __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ] ) );
 		foreach ( $formats as $format ) {
-			$date_formats[$format] = date_i18n( $format );
-			$custom = ( $format === $this->response['options']['date_format'] ) ? false : $custom;
+			$date_formats[ $format ] = date_i18n( $format );
+			$custom                  = ( $format === $this->response['options']['date_format'] ) ? false : $custom;
 		}
-		$this->response['date_format_options'] = $date_formats;
-		$this->response['date_format_custom_selected']  = $custom;
+		$this->response['date_format_options']         = $date_formats;
+		$this->response['date_format_custom_selected'] = $custom;
 	}
 
 	/**
@@ -195,13 +195,13 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 */
 	private function set_time_format_options() {
 		$custom  = true;
-		$formats = array_unique( apply_filters( 'time_formats', array( __( 'g:i a' ), 'g:i A', 'H:i' ) ) );
+		$formats = array_unique( apply_filters( 'time_formats', [ __( 'g:i a' ), 'g:i A', 'H:i' ] ) );
 		foreach ( $formats as $format ) {
-			$time_formats[$format] = date_i18n( $format );
-			$custom = ( $format === $this->response['options']['time_format'] ) ? false : $custom;
+			$time_formats[ $format ] = date_i18n( $format );
+			$custom                  = ( $format === $this->response['options']['time_format'] ) ? false : $custom;
 		}
-		$this->response['time_format_options'] = $time_formats;
-		$this->response['time_format_custom_selected']  = $custom;
+		$this->response['time_format_options']         = $time_formats;
+		$this->response['time_format_custom_selected'] = $custom;
 	}
 
 	/**
@@ -209,20 +209,29 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 */
 	private function set_day_of_week_options() {
 		global $wp_locale;
-		$options = array();
+		$options = [];
 
-		for ($day_index = 0; $day_index <= 6; $day_index++) :
-			$selected = ( get_option( 'start_of_week' ) == $day_index ) ? 'selected="selected"' : '';
-            $options[] = "\n\t<option value='" . esc_attr( $day_index ) . "' $selected>" . $wp_locale->get_weekday( $day_index ) . '</option>';
+		for ( $day_index = 0; $day_index <= 6; $day_index++ ) :
+			$selected  = ( get_option( 'start_of_week' ) == $day_index ) ? 'selected="selected"' : '';
+			$options[] = "\n\t<option value='" . esc_attr( $day_index ) . "' $selected>" . $wp_locale->get_weekday( $day_index ) . '</option>';
 		endfor;
 		$this->response['day_of_week_options'] = $options;
 	}
 	
-	/* Generate Default Category select options
+	/*
+	Generate Default Category select options
 	 *
 	 */
 	private function set_default_category_options() {
-		$this->response['default_category_options'] = wp_dropdown_categories(array('hide_empty' => 0, 'name' => 'default_category', 'orderby' => 'name', 'selected' => get_option('default_category'), 'hierarchical' => true));
+		$this->response['default_category_options'] = wp_dropdown_categories(
+			[
+				'hide_empty'   => 0,
+				'name'         => 'default_category',
+				'orderby'      => 'name',
+				'selected'     => get_option( 'default_category' ),
+				'hierarchical' => true,
+			] 
+		);
 	}
 
 	/**
@@ -236,13 +245,29 @@ class Ithemes_Sync_Verb_Get_Wordpress_Settings extends Ithemes_Sync_Verb {
 	 * Generates page list options
 	 */
 	private function set_page_on_front_select_options() {
-		$this->response['page_on_front_options'] = wp_dropdown_pages( array( 'name' => 'page_on_front', 'echo' => 0, 'show_option_none' => __( '&mdash; Select &mdash;'     ), 'option_none_value' => '0', 'selected' => get_option( 'page_on_front' ) ) );
+		$this->response['page_on_front_options'] = wp_dropdown_pages(
+			[
+				'name'              => 'page_on_front',
+				'echo'              => 0,
+				'show_option_none'  => __( '&mdash; Select &mdash;' ),
+				'option_none_value' => '0',
+				'selected'          => get_option( 'page_on_front' ),
+			] 
+		);
 	}
 
 	/**
 	 * Generates page list options
 	 */
 	private function set_page_for_posts_select_options() {
-		$this->response['page_for_posts_options'] = wp_dropdown_pages( array( 'name' => 'page_for_posts', 'echo' => 0, 'show_option_none' => __( '&mdash; Select &mdash;'     ), 'option_none_value' => '0', 'selected' => get_option( 'page_for_posts' ) ) );
+		$this->response['page_for_posts_options'] = wp_dropdown_pages(
+			[
+				'name'              => 'page_for_posts',
+				'echo'              => 0,
+				'show_option_none'  => __( '&mdash; Select &mdash;' ),
+				'option_none_value' => '0',
+				'selected'          => get_option( 'page_for_posts' ),
+			] 
+		);
 	}
 }

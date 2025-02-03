@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedOverrideTypeValues getInstance()
  */
-class ProductFeedOverrideTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CATALOG_SEGMENT_CUSTOMIZE_DEFAULT = 'CATALOG_SEGMENT_CUSTOMIZE_DEFAULT';
-    const COUNTRY = 'COUNTRY';
-    const LANGUAGE = 'LANGUAGE';
-    const LANGUAGE_AND_COUNTRY = 'LANGUAGE_AND_COUNTRY';
-    const LOCAL = 'LOCAL';
+class ProductFeedOverrideTypeValues extends AbstractEnum {
+
+  const BATCH_API_LANGUAGE_OR_COUNTRY = 'BATCH_API_LANGUAGE_OR_COUNTRY';
+  const CATALOG_SEGMENT_CUSTOMIZE_DEFAULT = 'CATALOG_SEGMENT_CUSTOMIZE_DEFAULT';
+  const COUNTRY = 'COUNTRY';
+  const LANGUAGE = 'LANGUAGE';
+  const LANGUAGE_AND_COUNTRY = 'LANGUAGE_AND_COUNTRY';
+  const LOCAL = 'LOCAL';
 }

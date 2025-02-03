@@ -2,10 +2,12 @@
 
 namespace cybot\cookiebot\lib\traits;
 
+use cybot\cookiebot\exceptions\InvalidClassConstantException;
 use Exception;
 use InvalidArgumentException;
 
 trait Class_Constant_Override_Validator_Trait {
+
 
 	/**
 	 * @param array $fixed_class_constant_names
@@ -26,8 +28,15 @@ trait Class_Constant_Override_Validator_Trait {
 	protected function validate_fixed_class_constant( $fixed_class_constant_name ) {
 		$value_self   = constant( 'self::' . $fixed_class_constant_name );
 		$value_static = constant( 'static::' . $fixed_class_constant_name );
+
 		if ( $value_self !== $value_static ) {
-			throw new Exception( 'Class constant "' . $fixed_class_constant_name . '" should be changed by ' . static::class );
+			throw new InvalidClassConstantException(
+				sprintf(
+					'Class constant "%s" should be changed by %s',
+					$fixed_class_constant_name,
+					static::class
+				)
+			);
 		}
 	}
 
@@ -53,7 +62,13 @@ trait Class_Constant_Override_Validator_Trait {
 		}
 		$value = constant( 'static::' . $required_string_constant_name );
 		if ( empty( $value ) || ! is_string( $value ) ) {
-			throw new Exception( 'Class constant "' . $required_string_constant_name . '" must be a non-empty string in ' . static::class );
+			throw new InvalidClassConstantException(
+				sprintf(
+					'Class constant "%s" must be a non-empty string in %s',
+					$required_string_constant_name,
+					static::class
+				)
+			);
 		}
 	}
 
@@ -79,7 +94,13 @@ trait Class_Constant_Override_Validator_Trait {
 		}
 		$value = constant( 'static::' . $required_boolean_constant_name );
 		if ( ! is_bool( $value ) ) {
-			throw new Exception( 'Class constant "' . $required_boolean_constant_name . '" must be a boolean in ' . static::class );
+			throw new InvalidClassConstantException(
+				sprintf(
+					'Class constant "%s" must be a boolean in %s',
+					$required_boolean_constant_name,
+					static::class
+				)
+			);
 		}
 	}
 
@@ -96,7 +117,7 @@ trait Class_Constant_Override_Validator_Trait {
 
 	/**
 	 * @param $required_array_constant_name
-	 * @param array|null $allowed_item_values
+	 * @param array|null                   $allowed_item_values
 	 *
 	 * @throws Exception
 	 */
@@ -106,12 +127,25 @@ trait Class_Constant_Override_Validator_Trait {
 		}
 		$value = constant( 'static::' . $required_array_constant_name );
 		if ( empty( $value ) || ! is_array( $value ) ) {
-			throw new Exception( 'Class constant "' . $required_array_constant_name . '" must be an array in ' . static::class );
+			throw new InvalidClassConstantException(
+				sprintf(
+					'Class constant "%s" must be an array in %s',
+					$required_array_constant_name,
+					static::class
+				)
+			);
 		}
 		if ( ! empty( $allowed_item_values ) ) {
 			foreach ( $value as $item ) {
 				if ( ! in_array( $item, $allowed_item_values, true ) ) {
-					throw new Exception( 'Class constant "' . $required_array_constant_name . '" array items should be one of "' . implode( ', ', $allowed_item_values ) . '" in ' . static::class );
+					throw new InvalidClassConstantException(
+						sprintf(
+							'Class constant "%s" array items should be one of "%s" in %s',
+							$required_array_constant_name,
+							implode( ', ', $allowed_item_values ),
+							static::class
+						)
+					);
 				}
 			}
 		}

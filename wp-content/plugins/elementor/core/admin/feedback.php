@@ -62,22 +62,15 @@ class Feedback extends Module {
 			ELEMENTOR_ASSETS_URL . 'js/admin-feedback' . $suffix . '.js',
 			[
 				'elementor-common',
+				'wp-i18n',
 			],
 			ELEMENTOR_VERSION,
 			true
 		);
 
 		wp_enqueue_script( 'elementor-admin-feedback' );
-	}
 
-	/**
-	 * @since 2.3.0
-	 * @deprecated 3.1.0
-	 */
-	public function localize_feedback_dialog_settings() {
-		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.1.0' );
-
-		return [];
+		wp_set_script_translations( 'elementor-admin-feedback', 'elementor' );
 	}
 
 	/**
@@ -165,6 +158,10 @@ class Feedback extends Module {
 		$wpnonce = Utils::get_super_global_value( $_POST, '_wpnonce' ); // phpcs:ignore -- Nonce verification is made in `wp_verify_nonce()`.
 		if ( ! wp_verify_nonce( $wpnonce, '_elementor_deactivate_feedback_nonce' ) ) {
 			wp_send_json_error();
+		}
+
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			wp_send_json_error( 'Permission denied' );
 		}
 
 		$reason_key = Utils::get_super_global_value( $_POST, 'reason_key' ) ?? '';

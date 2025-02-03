@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CreditPartitionActionOptionsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LIABILITY_TYPE = 'liability_type';
-    const PARTITION_TYPE = 'partition_type';
-    const SEND_BILL_TO = 'send_bill_to';
-    public function getFieldTypes()
-    {
-        return array('liability_type' => 'Object', 'partition_type' => 'Object', 'send_bill_to' => 'Object');
-    }
+
+class CreditPartitionActionOptionsFields extends AbstractEnum {
+
+  const LIABILITY_TYPE = 'liability_type';
+  const PARTITION_TYPE = 'partition_type';
+  const SEND_BILL_TO = 'send_bill_to';
+
+  public function getFieldTypes() {
+    return array(
+      'liability_type' => 'Object',
+      'partition_type' => 'Object',
+      'send_bill_to' => 'Object',
+    );
+  }
 }

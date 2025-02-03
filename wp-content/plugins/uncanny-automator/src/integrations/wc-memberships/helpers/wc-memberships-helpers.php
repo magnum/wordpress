@@ -16,14 +16,13 @@ class Wc_Memberships_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Wc_Memberships_Helpers constructor.
 	 */
 	public function __construct() {
 
-		$this->load_options = true;
 	}
 
 	/**
@@ -48,6 +47,7 @@ class Wc_Memberships_Helpers {
 		$include_all = key_exists( 'include_all', $args ) ? $args['include_all'] : '';
 		$is_any      = key_exists( 'is_any', $args ) ? $args['is_any'] : false;
 		$end_point   = key_exists( 'endpoint', $args ) ? $args['endpoint'] : '';
+		$relevant    = key_exists( 'include_relevant_tokens', $args ) ? $args['include_relevant_tokens'] : false;
 
 		$args = array(
 			'post_type'      => 'wc_membership_plan',
@@ -69,6 +69,14 @@ class Wc_Memberships_Helpers {
 			'endpoint'        => $end_point,
 			'options'         => $options,
 		);
+
+		if ( $relevant ) {
+			$option['relevant_tokens'] = array(
+				$option_code              => $label,
+				'WCMMEMBERSHIPPLANPOSTID' => esc_attr__( 'Membership plan post ID', 'uncanny-automator' ),
+				'WCMMEMBERSHIPPOSTID'     => esc_attr__( 'Membership post ID', 'uncanny-automator' ),
+			);
+		}
 
 		return apply_filters( 'uap_option_all_wc_variable_products', $option );
 	}

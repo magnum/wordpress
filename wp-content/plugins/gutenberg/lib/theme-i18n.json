@@ -1,5 +1,6 @@
 {
 	"title": "Style variation name",
+	"description": "Style variation description",
 	"settings": {
 		"typography": {
 			"fontSizes": [
@@ -37,6 +38,20 @@
 				}
 			]
 		},
+		"dimensions": {
+			"aspectRatios": [
+				{
+					"name": "Aspect ratio name"
+				}
+			]
+		},
+		"shadow": {
+			"presets": [
+				{
+					"name": "Shadow name"
+				}
+			]
+		},
 		"blocks": {
 			"*": {
 				"typography": {
@@ -60,6 +75,18 @@
 					"gradients": [
 						{
 							"name": "Gradient name"
+						}
+					],
+					"duotone": [
+						{
+							"name": "Duotone name"
+						}
+					]
+				},
+				"dimensions": {
+					"aspectRatios": [
+						{
+							"name": "Aspect ratio name"
 						}
 					]
 				},

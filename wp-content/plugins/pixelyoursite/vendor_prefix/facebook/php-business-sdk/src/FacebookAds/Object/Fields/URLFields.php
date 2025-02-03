@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class URLFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DEVELOPMENT_INSTANT_ARTICLE = 'development_instant_article';
-    const ENGAGEMENT = 'engagement';
-    const ID = 'id';
-    const INSTANT_ARTICLE = 'instant_article';
-    const OG_OBJECT = 'og_object';
-    const OWNERSHIP_PERMISSIONS = 'ownership_permissions';
-    const SCOPES = 'scopes';
-    public function getFieldTypes()
-    {
-        return array('development_instant_article' => 'InstantArticle', 'engagement' => 'Object', 'id' => 'string', 'instant_article' => 'InstantArticle', 'og_object' => 'Object', 'ownership_permissions' => 'Object', 'scopes' => 'Object');
-    }
+
+class URLFields extends AbstractEnum {
+
+  const DEVELOPMENT_INSTANT_ARTICLE = 'development_instant_article';
+  const ENGAGEMENT = 'engagement';
+  const ID = 'id';
+  const INSTANT_ARTICLE = 'instant_article';
+  const OG_OBJECT = 'og_object';
+  const OWNERSHIP_PERMISSIONS = 'ownership_permissions';
+  const SCOPES = 'scopes';
+
+  public function getFieldTypes() {
+    return array(
+      'development_instant_article' => 'InstantArticle',
+      'engagement' => 'Object',
+      'id' => 'string',
+      'instant_article' => 'InstantArticle',
+      'og_object' => 'Object',
+      'ownership_permissions' => 'Object',
+      'scopes' => 'Object',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ReachFrequencyPredictionBuyingTypeValues getInstance()
  */
-class ReachFrequencyPredictionBuyingTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUCTION = 'AUCTION';
-    const DEPRECATED_REACH_BLOCK = 'DEPRECATED_REACH_BLOCK';
-    const FIXED_CPM = 'FIXED_CPM';
-    const MIXED = 'MIXED';
-    const REACHBLOCK = 'REACHBLOCK';
-    const RESEARCH_POLL = 'RESEARCH_POLL';
-    const RESERVED = 'RESERVED';
+class ReachFrequencyPredictionBuyingTypeValues extends AbstractEnum {
+
+  const AUCTION = 'AUCTION';
+  const DEPRECATED_REACH_BLOCK = 'DEPRECATED_REACH_BLOCK';
+  const FIXED_CPM = 'FIXED_CPM';
+  const MIXED = 'MIXED';
+  const REACHBLOCK = 'REACHBLOCK';
+  const RESEARCH_POLL = 'RESEARCH_POLL';
+  const RESERVED = 'RESERVED';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdPreviewFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BODY = 'body';
-    const CREATIVE = 'creative';
-    const POST = 'post';
-    const AD_FORMAT = 'ad_format';
-    const PRODUCT_ITEM_IDS = 'product_item_ids';
-    public function getFieldTypes()
-    {
-        return array('body' => 'string');
-    }
+
+class AdPreviewFields extends AbstractEnum {
+
+  const BODY = 'body';
+  const CREATIVE = 'creative';
+  const POST = 'post';
+  const AD_FORMAT = 'ad_format';
+  const PRODUCT_ITEM_IDS = 'product_item_ids';
+
+  public function getFieldTypes() {
+    return array(
+      'body' => 'string',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdsPixelStatsResultFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsPixelStatsResultAggregationValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,26 +39,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsPixelStatsResultAggregationValue
  * pull request for this class.
  *
  */
-class AdsPixelStatsResult extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'stats';
-    }
-    /**
-     * @return AdsPixelStatsResultFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdsPixelStatsResultFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Aggregation'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdsPixelStatsResultAggregationValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdsPixelStatsResult extends AbstractObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'stats';
+  }
+
+  /**
+   * @return AdsPixelStatsResultFields
+   */
+  public static function getFieldsEnum() {
+    return AdsPixelStatsResultFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Aggregation'] = AdsPixelStatsResultAggregationValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

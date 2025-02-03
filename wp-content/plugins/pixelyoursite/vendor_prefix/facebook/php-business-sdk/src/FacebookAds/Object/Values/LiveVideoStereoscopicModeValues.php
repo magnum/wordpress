@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static LiveVideoStereoscopicModeValues getInstance()
  */
-class LiveVideoStereoscopicModeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LEFT_RIGHT = 'LEFT_RIGHT';
-    const MONO = 'MONO';
-    const TOP_BOTTOM = 'TOP_BOTTOM';
+class LiveVideoStereoscopicModeValues extends AbstractEnum {
+
+  const LEFT_RIGHT = 'LEFT_RIGHT';
+  const MONO = 'MONO';
+  const TOP_BOTTOM = 'TOP_BOTTOM';
 }

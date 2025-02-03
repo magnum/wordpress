@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,31 +35,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static EventCategoryValues getInstance()
  */
-class EventCategoryValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ART_EVENT = 'ART_EVENT';
-    const BOOK_EVENT = 'BOOK_EVENT';
-    const CLASS_EVENT = 'CLASS_EVENT';
-    const COMEDY_EVENT = 'COMEDY_EVENT';
-    const CONFERENCE_EVENT = 'CONFERENCE_EVENT';
-    const DANCE_EVENT = 'DANCE_EVENT';
-    const DINING_EVENT = 'DINING_EVENT';
-    const FAMILY_EVENT = 'FAMILY_EVENT';
-    const FESTIVAL_EVENT = 'FESTIVAL_EVENT';
-    const FITNESS = 'FITNESS';
-    const FOOD_TASTING = 'FOOD_TASTING';
-    const FUNDRAISER = 'FUNDRAISER';
-    const LECTURE = 'LECTURE';
-    const MEETUP = 'MEETUP';
-    const MOVIE_EVENT = 'MOVIE_EVENT';
-    const MUSIC_EVENT = 'MUSIC_EVENT';
-    const NEIGHBORHOOD = 'NEIGHBORHOOD';
-    const NIGHTLIFE = 'NIGHTLIFE';
-    const OTHER = 'OTHER';
-    const RELIGIOUS_EVENT = 'RELIGIOUS_EVENT';
-    const SHOPPING = 'SHOPPING';
-    const SPORTS_EVENT = 'SPORTS_EVENT';
-    const THEATER_EVENT = 'THEATER_EVENT';
-    const VOLUNTEERING = 'VOLUNTEERING';
-    const WORKSHOP = 'WORKSHOP';
+class EventCategoryValues extends AbstractEnum {
+
+  const CLASSIC_LITERATURE = 'CLASSIC_LITERATURE';
+  const COMEDY = 'COMEDY';
+  const CRAFTS = 'CRAFTS';
+  const DANCE = 'DANCE';
+  const DRINKS = 'DRINKS';
+  const FITNESS_AND_WORKOUTS = 'FITNESS_AND_WORKOUTS';
+  const FOODS = 'FOODS';
+  const GAMES = 'GAMES';
+  const GARDENING = 'GARDENING';
+  const HEALTHY_LIVING_AND_SELF_CARE = 'HEALTHY_LIVING_AND_SELF_CARE';
+  const HEALTH_AND_MEDICAL = 'HEALTH_AND_MEDICAL';
+  const HOME_AND_GARDEN = 'HOME_AND_GARDEN';
+  const MUSIC_AND_AUDIO = 'MUSIC_AND_AUDIO';
+  const PARTIES = 'PARTIES';
+  const PROFESSIONAL_NETWORKING = 'PROFESSIONAL_NETWORKING';
+  const RELIGIONS = 'RELIGIONS';
+  const SHOPPING_EVENT = 'SHOPPING_EVENT';
+  const SOCIAL_ISSUES = 'SOCIAL_ISSUES';
+  const SPORTS = 'SPORTS';
+  const THEATER = 'THEATER';
+  const TV_AND_MOVIES = 'TV_AND_MOVIES';
+  const VISUAL_ARTS = 'VISUAL_ARTS';
 }

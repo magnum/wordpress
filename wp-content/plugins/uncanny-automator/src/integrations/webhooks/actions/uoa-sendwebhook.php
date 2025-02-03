@@ -17,12 +17,10 @@ class UOA_SENDWEBHOOK {
 	 * Set up Automator action constructor.
 	 */
 	public function __construct() {
-
 		$this->setup_action();
 
 		// Migrate existing WP -> Webhook action.
 		$this->maybe_migrate_wp_webhooks();
-
 	}
 
 	/**
@@ -33,11 +31,8 @@ class UOA_SENDWEBHOOK {
 	protected function setup_action() {
 
 		$this->set_integration( 'WEBHOOKS' );
-
 		$this->set_action_code( 'WPSENDWEBHOOK' );
-
 		$this->set_action_meta( 'WPWEBHOOK' );
-
 		$this->set_author( 'Uncanny Automator' );
 
 		$this->set_support_link(
@@ -52,7 +47,7 @@ class UOA_SENDWEBHOOK {
 		/* translators: Action - Uncanny Automator */
 		$this->set_sentence(
 			sprintf(
-				/* translators: Trigger sentence */
+			/* translators: Trigger sentence */
 				esc_attr__( 'Send data to {{a webhook:%1$s}}', 'uncanny-automator' ),
 				$this->get_action_meta()
 			)
@@ -78,6 +73,14 @@ class UOA_SENDWEBHOOK {
 
 		$this->set_background_processing( true );
 
+		// add filter to inject tokens
+		add_filter(
+			'automator_action_' . $this->get_action_code() . '_tokens_renderable',
+			array( $this, 'inject_webhooks_response_tokens' ),
+			99,
+			3
+		);
+
 		$this->register_action();
 	}
 
@@ -90,7 +93,7 @@ class UOA_SENDWEBHOOK {
 
 		$option_key = 'automator_wpwebhooks_action_moved';
 
-		if ( 'yes' === get_option( $option_key ) ) {
+		if ( 'yes' === automator_get_option( $option_key ) ) {
 			return;
 		}
 
@@ -105,7 +108,8 @@ class UOA_SENDWEBHOOK {
 		);
 
 		if ( empty( $current_actions ) ) {
-			update_option( $option_key, 'yes', false );
+			automator_update_option( $option_key, 'yes', true );
+
 			return;
 		}
 
@@ -115,7 +119,7 @@ class UOA_SENDWEBHOOK {
 			update_post_meta( $action_id, 'integration_name', 'Webhooks' );
 		}
 
-		update_option( $option_key, 'yes', false );
+		automator_update_option( $option_key, 'yes', true );
 
 	}
 }

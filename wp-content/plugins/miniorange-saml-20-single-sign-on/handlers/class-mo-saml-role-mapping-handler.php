@@ -27,7 +27,7 @@ class Mo_SAML_Role_Mapping_Handler {
 
 		$db_handler->mo_saml_save_options( $save_array );
 
-		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::UPDATED_DEFAULT_ROLE, 'DEFAULT_ROLE_ID', $save_array );
+		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::mo_saml_translate( 'UPDATED_DEFAULT_ROLE' ), 'DEFAULT_ROLE_ID', $save_array );
 		$post_save->mo_saml_post_save_action();
 	}
 }

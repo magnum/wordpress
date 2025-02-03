@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedEncodingValues getInstance()
  */
-class ProductFeedEncodingValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTODETECT = 'AUTODETECT';
-    const LATIN1 = 'LATIN1';
-    const UTF16BE = 'UTF16BE';
-    const UTF16LE = 'UTF16LE';
-    const UTF32BE = 'UTF32BE';
-    const UTF32LE = 'UTF32LE';
-    const UTF8 = 'UTF8';
+class ProductFeedEncodingValues extends AbstractEnum {
+
+  const AUTODETECT = 'AUTODETECT';
+  const LATIN1 = 'LATIN1';
+  const UTF16BE = 'UTF16BE';
+  const UTF16LE = 'UTF16LE';
+  const UTF32BE = 'UTF32BE';
+  const UTF32LE = 'UTF32LE';
+  const UTF8 = 'UTF8';
 }

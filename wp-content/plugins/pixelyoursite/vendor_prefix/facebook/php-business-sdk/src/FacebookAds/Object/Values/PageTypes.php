@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,21 +21,23 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @deprecated page_types are read-only in v2.7 and to be removed in v2.8
  * @method static PageTypes getInstance()
  */
-class PageTypes extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESKTOP_FEED = 'desktopfeed';
-    const HOME = 'home';
-    const INSTAGRAM_STREAM = 'instagramstream';
-    const LEGACY_EXTERNAL = 'legacyexternal';
-    const LOGOUT = 'logout';
-    const MOBILE_EXTERNAL = 'mobileexternal';
-    const MOBILE_FEED = 'mobilefeed';
-    const RIGHT_COLUMN = 'rightcolumn';
+class PageTypes extends AbstractEnum {
+
+  const DESKTOP_FEED = 'desktopfeed';
+  const HOME = 'home';
+  const INSTAGRAM_STREAM = 'instagramstream';
+  const LEGACY_EXTERNAL = 'legacyexternal';
+  const LOGOUT = 'logout';
+  const MOBILE_EXTERNAL = 'mobileexternal';
+  const MOBILE_FEED = 'mobilefeed';
+  const RIGHT_COLUMN = 'rightcolumn';
 }

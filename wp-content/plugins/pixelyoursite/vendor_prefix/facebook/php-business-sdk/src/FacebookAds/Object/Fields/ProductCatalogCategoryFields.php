@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductCatalogCategoryFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CRITERIA_VALUE = 'criteria_value';
-    const DESCRIPTION = 'description';
-    const DESTINATION_URI = 'destination_uri';
-    const IMAGE_URL = 'image_url';
-    const NAME = 'name';
-    const NUM_ITEMS = 'num_items';
-    const TOKENS = 'tokens';
-    const DATA = 'data';
-    public function getFieldTypes()
-    {
-        return array('criteria_value' => 'string', 'description' => 'string', 'destination_uri' => 'string', 'image_url' => 'string', 'name' => 'string', 'num_items' => 'int', 'tokens' => 'map<string, string>', 'data' => 'list<map>');
-    }
+
+class ProductCatalogCategoryFields extends AbstractEnum {
+
+  const CRITERIA_VALUE = 'criteria_value';
+  const DESCRIPTION = 'description';
+  const DESTINATION_URI = 'destination_uri';
+  const IMAGE_URL = 'image_url';
+  const NAME = 'name';
+  const NUM_ITEMS = 'num_items';
+  const TOKENS = 'tokens';
+  const DATA = 'data';
+
+  public function getFieldTypes() {
+    return array(
+      'criteria_value' => 'string',
+      'description' => 'string',
+      'destination_uri' => 'string',
+      'image_url' => 'string',
+      'name' => 'string',
+      'num_items' => 'int',
+      'tokens' => 'map<string, string>',
+      'data' => 'list<map>',
+    );
+  }
 }

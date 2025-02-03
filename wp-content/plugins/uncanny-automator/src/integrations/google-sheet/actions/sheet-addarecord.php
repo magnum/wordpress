@@ -45,6 +45,7 @@ class SHEET_ADDARECORD {
 	public function define_action() {
 
 		$action = array(
+			'is_deprecated'         => true,
 			'author'                => Automator()->get_author_name( $this->action_code ),
 			'support_link'          => Automator()->get_author_support_link( $this->action_code, 'knowledge-base/google-sheets/' ),
 			'is_pro'                => false,
@@ -110,6 +111,7 @@ class SHEET_ADDARECORD {
 					array(
 						'option_code'       => 'WORKSHEET_FIELDS',
 						'input_type'        => 'repeater',
+						'relevant_tokens'   => array(),
 						'label'             => __( 'Row', 'uncanny-automator' ),
 						'description'       => '',
 						'required'          => true,
@@ -195,9 +197,9 @@ class SHEET_ADDARECORD {
 				// Create array with the data we're going to send
 				let dataToBeSent = {
 					action: 'get_worksheet_ROWS_GOOGLESHEETS',
-					nonce: UncannyAutomator.nonce,
+					nonce: UncannyAutomator._site.rest.nonce,
 
-					recipe_id: UncannyAutomator.recipe.id,
+					recipe_id: UncannyAutomator._recipe.recipe_id,
 					item_id: data.item.id,
 					drive: data.values.GSDRIVE,
 					sheet: data.values.GSSPREADSHEET,
@@ -415,7 +417,6 @@ class SHEET_ADDARECORD {
 		if ( $check_all_empty ) {
 			// log error no heading found.
 			$error_msg                           = __( 'Trying to add an empty row.', 'uncanny-automator' );
-			$action_data['do-nothing']           = true;
 			$action_data['complete_with_errors'] = true;
 			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
 
@@ -431,7 +432,6 @@ class SHEET_ADDARECORD {
 
 		} catch ( \Exception $e ) {
 			$error_msg                           = $e->getMessage();
-			$action_data['do-nothing']           = true;
 			$action_data['complete_with_errors'] = true;
 			Automator()->complete_action( $user_id, $action_data, $recipe_id, $error_msg );
 

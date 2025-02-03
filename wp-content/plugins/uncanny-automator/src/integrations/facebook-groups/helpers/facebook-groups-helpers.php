@@ -77,8 +77,8 @@ class Facebook_Groups_Helpers {
 		// Add an ajax endpoint for listing groups.
 		add_action( 'wp_ajax_ua_facebook_group_list_groups', array( $this, 'list_groups' ) );
 
-		// Check if token is still valid or not.
-		add_action( 'admin_init', array( $this, 'maybe_add_admin_notice' ) );
+		// Add an ajax endpoint for validating groups.
+		add_action( 'wp_ajax_automator_facebook_groups_verify_app_install', array( $this, 'verify_install' ) );
 
 		// Defer loading of settings page to current_screen so we can check if its recipe page.
 		add_action(
@@ -98,27 +98,44 @@ class Facebook_Groups_Helpers {
 	 */
 	public function has_live_integration() {
 
-		return ! empty( Automator()->get->get_integration_publish_actions( 'FACEBOOK_GROUPS' ) );
+		return ! empty( $this->fetch_live_actions() );
+
+	}
+
+	/**
+	 * Fetches live Facebook Group actions.
+	 *
+	 * @return array{}|array{array{ID:string,post_status:string}}
+	 */
+	protected function fetch_live_actions() {
+
+		$results = Automator()->utilities->fetch_live_integration_actions( 'FACEBOOK_GROUPS' );
+
+		return (array) $results;
 
 	}
 
 	/**
 	 * Shows  admin notice depending on number of days
 	 *
+	 * @deprecated 5.10
+	 *
 	 * Return void.
 	 */
 	public function maybe_add_admin_notice() {
 
-		$token_info = get_option( self::TOKEN_INFO );
-
 		$n_days = $this->get_token_days_remaining( $this->get_token_info() );
+
+		$fb_groups_integration = Automator()->get_integration( 'FACEBOOK_GROUPS' );
+
+		if ( isset( $fb_groups_integration['connected'] ) && false === $fb_groups_integration['connected'] ) {
+			return;
+		}
 
 		$token_notice_n_days = apply_filters( 'automator_facebook_group_token_notice_n_days', 14 );
 
 		if ( $n_days <= $token_notice_n_days && $this->has_live_integration() ) {
-
-			add_action( 'admin_notices', array( $this, 'admin_notice_template' ) );
-
+			add_action( 'automator_show_internal_admin_notice', array( $this, 'admin_notice_template' ) );
 		}
 
 	}
@@ -203,7 +220,7 @@ class Facebook_Groups_Helpers {
 		}
 
 		// Otherwise, request from the API.
-		$settings = get_option( self::OPTION_KEY );
+		$settings = automator_get_option( self::OPTION_KEY );
 
 		$body = array(
 			'action'       => 'list_groups',
@@ -232,7 +249,7 @@ class Facebook_Groups_Helpers {
 				// Cache the list of groups.
 				set_transient( 'ua_facebook_group_items', $items, MINUTE_IN_SECONDS * 5 );
 				// Then save to options table.
-				update_option( 'ua_facebook_group_saved_groups', $items );
+				automator_update_option( 'ua_facebook_group_saved_groups', $items );
 			}
 
 			wp_send_json(
@@ -257,6 +274,45 @@ class Facebook_Groups_Helpers {
 
 	}
 
+	/**
+	 * Verifies app installation for Facebook Group.
+	 *
+	 * @return void
+	 */
+	public function verify_install() {
+
+		if ( current_user_can( 'manage_option' ) ) {
+			wp_die( 'Unauthorized', 401 );
+		}
+
+		if ( wp_verify_nonce( filter_input( INPUT_POST, 'nonce' ), 'verify_install' ) ) {
+			wp_die( 'Unauthenticated', 403 );
+		}
+
+		try {
+			$response = $this->api_request(
+				array(
+					'action'   => 'verify_app_install',
+					'group_id' => filter_input( INPUT_POST, 'group_id' ),
+				)
+			);
+
+			wp_send_json( $response, 200 );
+
+		} catch ( \Exception $e ) {
+
+			wp_send_json(
+				array(
+					'data' => array(
+						'error' => $e->getMessage(),
+					),
+				),
+				400
+			);
+
+		}
+
+	}
 	/**
 	 * Endpoint wp_ajax callback. Capture user token.
 	 *
@@ -306,7 +362,7 @@ class Facebook_Groups_Helpers {
 			$settings['user-info'] = $this->get_user_information( $settings['user']['id'], $settings['user']['token'] );
 
 			// Updates the option value to settings.
-			update_option( self::OPTION_KEY, $settings );
+			automator_update_option( self::OPTION_KEY, $settings );
 
 		}
 
@@ -327,8 +383,6 @@ class Facebook_Groups_Helpers {
 		if ( wp_verify_nonce( filter_input( INPUT_GET, 'nonce', FILTER_DEFAULT ), self::OPTION_KEY ) ) {
 
 			try {
-
-				$this->deauthorized_app( get_option( self::OPTION_KEY, false ) );
 
 				$this->remove_credentials();
 
@@ -444,7 +498,7 @@ class Facebook_Groups_Helpers {
 			return false;
 		}
 
-		$settings = get_option( self::OPTION_KEY );
+		$settings = automator_get_option( self::OPTION_KEY );
 
 		$user_connected = $this->get_user_connected();
 
@@ -466,7 +520,7 @@ class Facebook_Groups_Helpers {
 			return false;
 		}
 
-		return get_option( self::OPTION_KEY );
+		return automator_get_option( self::OPTION_KEY );
 
 	}
 
@@ -478,10 +532,10 @@ class Facebook_Groups_Helpers {
 	private function remove_credentials() {
 
 		// Delete the option key.
-		delete_option( self::OPTION_KEY );
+		automator_delete_option( self::OPTION_KEY );
 
 		// Delete the token info.
-		delete_option( self::TOKEN_INFO );
+		automator_delete_option( self::TOKEN_INFO );
 
 		// Delete transients.
 		delete_transient( self::TOKEN_INFO );
@@ -489,7 +543,7 @@ class Facebook_Groups_Helpers {
 		delete_transient( 'ua_facebook_group_items' );
 
 		// Refresh the last requested option.
-		delete_option( '_automator_facebook_groups_last_requested' );
+		automator_delete_option( '_automator_facebook_groups_last_requested' );
 
 		return true;
 
@@ -542,7 +596,7 @@ class Facebook_Groups_Helpers {
 	 */
 	public function get_user_access_token() {
 
-		$option = get_option( self::OPTION_KEY );
+		$option = automator_get_option( self::OPTION_KEY );
 
 		return isset( $option['user']['token'] ) ? $option['user']['token'] : '';
 
@@ -555,7 +609,7 @@ class Facebook_Groups_Helpers {
 	 */
 	public function get_saved_groups() {
 
-		$saved_groups = get_option( 'ua_facebook_group_saved_groups' );
+		$saved_groups = automator_get_option( 'ua_facebook_group_saved_groups' );
 
 		$items = array();
 
@@ -623,6 +677,7 @@ class Facebook_Groups_Helpers {
 	 */
 	public function click_handler( $action_meta = '' ) {
 		ob_start();
+		$request_url = admin_url( 'admin-ajax.php' );
 		?>
 		<script>
 			function ($button, data, modules) {
@@ -638,10 +693,11 @@ class Facebook_Groups_Helpers {
 				// Begin AJAX Request.
 				jQuery.ajax({
 					method: 'POST',
-					url: '<?php echo esc_url( AUTOMATOR_API_URL . self::API_ENDPOINT ); ?>',
+					url: '<?php echo esc_url( $request_url ); ?>',
 					data: {
-						action: 'verify_app_install',
-						group_id: selected_group_id
+						action: 'automator_facebook_groups_verify_app_install',
+						group_id: selected_group_id,
+						nonce: '<?php esc_js( wp_create_nonce( 'verify_install' ) ); ?>'
 					},
 					success: function (response) {
 
@@ -732,7 +788,7 @@ class Facebook_Groups_Helpers {
 		}
 
 		// Check credentials if token is empty.
-		if ( false === get_option( self::TOKEN_INFO ) ) {
+		if ( false === automator_get_option( self::TOKEN_INFO ) ) {
 			$this->check_credentials();
 		}
 
@@ -769,7 +825,7 @@ class Facebook_Groups_Helpers {
 
 				set_transient( self::TOKEN_INFO, $response['data']['data'], 5 * MINUTE_IN_SECONDS ); // Only make a HTTP Request call once every 5 minutes.
 
-				update_option( self::TOKEN_INFO, $response['data']['data'] );
+				automator_update_option( self::TOKEN_INFO, $response['data']['data'] );
 
 				return true;
 
@@ -779,7 +835,7 @@ class Facebook_Groups_Helpers {
 
 		} catch ( \Exception $e ) {
 
-			delete_option( self::TOKEN_INFO );
+			automator_delete_option( self::TOKEN_INFO );
 
 			return false;
 
@@ -794,7 +850,7 @@ class Facebook_Groups_Helpers {
 	 */
 	public function get_token_info() {
 
-		return get_option( self::TOKEN_INFO, false );
+		return automator_get_option( self::TOKEN_INFO, false );
 
 	}
 

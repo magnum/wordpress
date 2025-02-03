@@ -139,20 +139,6 @@ class AutomatorWP_LearnPress_User_Course extends AutomatorWP_Integration_Action 
 
             // Force the order status update
             $order->update_status( 'completed' );
-
-            // Create a new user item
-            $user_item_data = array(
-                'user_id' => $user->get_id(),
-                'item_id' => $course_id,
-                'ref_id'  => $order_id,
-                'status'  => LP_COURSE_ENROLLED,
-                'graduation' => LP_COURSE_GRADUATION_IN_PROGRESS,
-            );
-
-            $user_item_new = new LP_User_Item_Course( $user_item_data );
-
-            // Save the user item
-            $user_item_new->update();
                     
         }
 

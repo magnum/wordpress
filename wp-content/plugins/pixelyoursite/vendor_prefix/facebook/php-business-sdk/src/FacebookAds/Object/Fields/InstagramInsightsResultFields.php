@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class InstagramInsightsResultFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const ID = 'id';
-    const NAME = 'name';
-    const PERIOD = 'period';
-    const TITLE = 'title';
-    const VALUES = 'values';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'id' => 'string', 'name' => 'string', 'period' => 'string', 'title' => 'string', 'values' => 'list<InstagramInsightsValue>');
-    }
+
+class InstagramInsightsResultFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const ID = 'id';
+  const NAME = 'name';
+  const PERIOD = 'period';
+  const TITLE = 'title';
+  const TOTAL_VALUE = 'total_value';
+  const VALUES = 'values';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'period' => 'string',
+      'title' => 'string',
+      'total_value' => 'Object',
+      'values' => 'list<InstagramInsightsValue>',
+    );
+  }
 }

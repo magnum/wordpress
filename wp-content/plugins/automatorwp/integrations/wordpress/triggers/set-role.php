@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Set_Role extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_set_role';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_set_role';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -94,4 +105,5 @@ class AutomatorWP_WordPress_Set_Role extends AutomatorWP_Integration_Trigger {
 
 }
 
-new AutomatorWP_WordPress_Set_Role();
+new AutomatorWP_WordPress_Set_Role( 'wordpress' );
+new AutomatorWP_WordPress_Set_Role( 'users' );

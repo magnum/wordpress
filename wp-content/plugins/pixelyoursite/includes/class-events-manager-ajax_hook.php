@@ -23,15 +23,19 @@ class AjaxHookEventManager {
      * @return mixed|null
      */
     static function getPendingEvent($name,$unset) {
-        $events = WC()->session->get( 'pys_events', array() );
-
-        if(isset($events[$name]) ) {
-            $event = $events[$name];
-            if($unset){
-                unset($events[$name]);
-                WC()->session->set( 'pys_events', $events );
+        if ( function_exists( 'WC' ) ) {
+            if(!WC()->session) return null;
+            $session_data = WC()->session->get_session_data();
+            $events = isset( $session_data['pys_events'] ) ? WC()->session->get( 'pys_events', array() ) : array();
+            if (isset($events[$name])) {
+                $event = $events[$name];
+                if ($unset) {
+                    unset($events[$name]);
+                    WC()->session->set('pys_events', $events);
+                }
+                return $event;
             }
-            return $event;
+            return null;
         }
         return null;
     }
@@ -94,16 +98,14 @@ class AjaxHookEventManager {
         }
         $standardParams = getStandardParams();
 
-        PYS()->getLog()->debug('trackWooAddToCartEvent is_ajax_request '.$is_ajax_request);
+        PYS()->getLog()->debug('trackWooAddToCartEvent is_hook_request '.$is_ajax_request);
         $dataList = [];
         foreach ( PYS()->getRegisteredPixels() as $pixel ) {
 
             if( !empty($variation_id)
                 && $variation_id > 0
-                && ( !$pixel->getOption( 'woo_variable_as_simple' )
-                    || ( $pixel->getSlug() == "facebook"
-                        && !Facebook\Helpers\isDefaultWooContentIdLogic()
-                    )
+                && (($pixel->getSlug() == 'ga' && !GATags()->getOption( 'woo_variable_as_simple')) ||
+                    ( $pixel->getSlug() == "facebook" && !Facebook\Helpers\isDefaultWooContentIdLogic())
                 )
             ) {
                 $_product_id = $variation_id;
@@ -126,18 +128,17 @@ class AjaxHookEventManager {
 
             // prepare event data
             $eventData = $event->getData();
-            $eventData = EventsManager::filterEventParams($eventData,"woo");
+            $eventData = EventsManager::filterEventParams($eventData,"woo",['event_id'=>$event->getId(),'pixel'=>$pixel->getSlug()]);
 
             $dataList[$pixel->getSlug()] = $eventData;
 
             if($pixel->getSlug() == "facebook" && Facebook()->isServerApiEnabled()) {
-
-                if($is_ajax_request) {
-                    FacebookServer()->sendEventsNow([$event]);
-                } else {
-                    FacebookServer()->sendEventsAsync([$event]);
-                }
+                FacebookServer()->sendEventsNow([$event]);
             }
+
+			if($pixel->getSlug() == "pinterest" && Pinterest()->isServerApiEnabled()) {
+                PinterestServer()->sendEventsNow(array($event));
+			}
         }
         AjaxHookEventManager::addPendingEvent("woo_add_to_cart_on_button_click",$dataList);
     }

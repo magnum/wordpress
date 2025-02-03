@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,23 +34,40 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessUserFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS = 'business';
-    const EMAIL = 'email';
-    const FINANCE_PERMISSION = 'finance_permission';
-    const FIRST_NAME = 'first_name';
-    const ID = 'id';
-    const IP_PERMISSION = 'ip_permission';
-    const LAST_NAME = 'last_name';
-    const MARKED_FOR_REMOVAL = 'marked_for_removal';
-    const NAME = 'name';
-    const PENDING_EMAIL = 'pending_email';
-    const ROLE = 'role';
-    const TITLE = 'title';
-    const TWO_FAC_STATUS = 'two_fac_status';
-    public function getFieldTypes()
-    {
-        return array('business' => 'Business', 'email' => 'string', 'finance_permission' => 'string', 'first_name' => 'string', 'id' => 'string', 'ip_permission' => 'string', 'last_name' => 'string', 'marked_for_removal' => 'bool', 'name' => 'string', 'pending_email' => 'string', 'role' => 'string', 'title' => 'string', 'two_fac_status' => 'string');
-    }
+
+class BusinessUserFields extends AbstractEnum {
+
+  const BUSINESS = 'business';
+  const BUSINESS_ROLE_REQUEST = 'business_role_request';
+  const EMAIL = 'email';
+  const FINANCE_PERMISSION = 'finance_permission';
+  const FIRST_NAME = 'first_name';
+  const ID = 'id';
+  const IP_PERMISSION = 'ip_permission';
+  const LAST_NAME = 'last_name';
+  const MARKED_FOR_REMOVAL = 'marked_for_removal';
+  const NAME = 'name';
+  const PENDING_EMAIL = 'pending_email';
+  const ROLE = 'role';
+  const TITLE = 'title';
+  const TWO_FAC_STATUS = 'two_fac_status';
+
+  public function getFieldTypes() {
+    return array(
+      'business' => 'Business',
+      'business_role_request' => 'BusinessRoleRequest',
+      'email' => 'string',
+      'finance_permission' => 'string',
+      'first_name' => 'string',
+      'id' => 'string',
+      'ip_permission' => 'string',
+      'last_name' => 'string',
+      'marked_for_removal' => 'bool',
+      'name' => 'string',
+      'pending_email' => 'string',
+      'role' => 'string',
+      'title' => 'string',
+      'two_fac_status' => 'string',
+    );
+  }
 }

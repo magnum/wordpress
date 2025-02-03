@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdKeywordsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BRANDS = 'brands';
-    const PRODUCT_CATEGORIES = 'product_categories';
-    const PRODUCT_NAMES = 'product_names';
-    const SEARCH_TERMS = 'search_terms';
-    public function getFieldTypes()
-    {
-        return array('brands' => 'list<string>', 'product_categories' => 'list<string>', 'product_names' => 'list<string>', 'search_terms' => 'list<string>');
-    }
+
+class AdKeywordsFields extends AbstractEnum {
+
+  const BRANDS = 'brands';
+  const PRODUCT_CATEGORIES = 'product_categories';
+  const PRODUCT_NAMES = 'product_names';
+  const SEARCH_TERMS = 'search_terms';
+
+  public function getFieldTypes() {
+    return array(
+      'brands' => 'list<string>',
+      'product_categories' => 'list<string>',
+      'product_names' => 'list<string>',
+      'search_terms' => 'list<string>',
+    );
+  }
 }

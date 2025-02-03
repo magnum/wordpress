@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductCatalogDiagnosticGroupTypeValues getInstance()
  */
-class ProductCatalogDiagnosticGroupTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AR_VISIBILITY_ISSUES = 'AR_VISIBILITY_ISSUES';
-    const ATTRIBUTES_INVALID = 'ATTRIBUTES_INVALID';
-    const ATTRIBUTES_MISSING = 'ATTRIBUTES_MISSING';
-    const CATEGORY = 'CATEGORY';
-    const CHECKOUT = 'CHECKOUT';
-    const IMAGE_QUALITY = 'IMAGE_QUALITY';
-    const LOW_QUALITY_TITLE_AND_DESCRIPTION = 'LOW_QUALITY_TITLE_AND_DESCRIPTION';
-    const POLICY_VIOLATION = 'POLICY_VIOLATION';
-    const SHOPS_VISIBILITY_ISSUES = 'SHOPS_VISIBILITY_ISSUES';
+class ProductCatalogDiagnosticGroupTypeValues extends AbstractEnum {
+
+  const AR_VISIBILITY_ISSUES = 'AR_VISIBILITY_ISSUES';
+  const ATTRIBUTES_INVALID = 'ATTRIBUTES_INVALID';
+  const ATTRIBUTES_MISSING = 'ATTRIBUTES_MISSING';
+  const CATEGORY = 'CATEGORY';
+  const CHECKOUT = 'CHECKOUT';
+  const IMAGE_QUALITY = 'IMAGE_QUALITY';
+  const LOW_QUALITY_TITLE_AND_DESCRIPTION = 'LOW_QUALITY_TITLE_AND_DESCRIPTION';
+  const POLICY_VIOLATION = 'POLICY_VIOLATION';
+  const SHOPS_VISIBILITY_ISSUES = 'SHOPS_VISIBILITY_ISSUES';
 }

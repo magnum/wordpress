@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedDelimiterValues getInstance()
  */
-class ProductFeedDelimiterValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTODETECT = 'AUTODETECT';
-    const BAR = 'BAR';
-    const COMMA = 'COMMA';
-    const SEMICOLON = 'SEMICOLON';
-    const TAB = 'TAB';
-    const TILDE = 'TILDE';
+class ProductFeedDelimiterValues extends AbstractEnum {
+
+  const AUTODETECT = 'AUTODETECT';
+  const BAR = 'BAR';
+  const COMMA = 'COMMA';
+  const SEMICOLON = 'SEMICOLON';
+  const TAB = 'TAB';
+  const TILDE = 'TILDE';
 }

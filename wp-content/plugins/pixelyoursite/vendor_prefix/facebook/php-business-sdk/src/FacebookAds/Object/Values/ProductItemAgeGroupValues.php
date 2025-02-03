@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemAgeGroupValues getInstance()
  */
-class ProductItemAgeGroupValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADULT = 'adult';
-    const ALL_AGES = 'all ages';
-    const INFANT = 'infant';
-    const KIDS = 'kids';
-    const NEWBORN = 'newborn';
-    const TEEN = 'teen';
-    const TODDLER = 'toddler';
+class ProductItemAgeGroupValues extends AbstractEnum {
+
+  const ADULT = 'adult';
+  const ALL_AGES = 'all ages';
+  const INFANT = 'infant';
+  const KIDS = 'kids';
+  const NEWBORN = 'newborn';
+  const TEEN = 'teen';
+  const TODDLER = 'toddler';
 }

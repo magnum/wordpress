@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
-use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 /**
  * This class is auto-generated.
  *
@@ -33,7 +33,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ContentDeliveryReportFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
+class ContentDeliveryReportFields extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const CONTENT_NAME = 'content_name';
     const CONTENT_URL = 'content_url';

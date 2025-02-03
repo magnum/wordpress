@@ -1,259 +1,172 @@
-===PixelYourSite - Your smart PIXEL (TAG) Manager===
+===PixelYourSite - Your smart PIXEL (TAG) & API Manager===
 Contributors: PixelYourSite
-Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, head & footer scripts, Pinterest tag
+Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.1
-Stable tag: 9.3.2
+Tested up to: 6.7
+Stable tag: 10.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Meta Pixel (Facebook Pixel) & Conversion API (CAPI), Google Analytics 4 (GA4) or the old Universal, plus ANY other script. WooCommerce and EDD with Facebook Dynamic Product Ads and Google Magnetisation tracking. Track any action with events. Pinterest Tag support via a dedicated paid add-on. Dedicated paid Bing Tag add-on.
+Add your Meta Pixel (the old Facebook Pixel) with Conversion API support, Google Analytics (GA4) with Google Consent Mode support, or Google Tag Manager. The plugin also offers Head and Footer scripts with various options. 
 
 == Description ==
-**Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, add your Google Analytics 4 (GA4) or an old Universal property with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
+**PixelYourSite Free Version: Complete Tracking Solution for the Meta Pixel, Google Analytics 4, and Google Tag Manager.**
 
-PixelYourSite's Automatic Events will track important actions and send them to all your configured pixels (searches, form submit, comments, downloads). Use these events to understand your visitors' behaviour inside Google Analytics, or to create audiences and conversions for Meta (Facebook), or Google.
+Easily integrate Meta Pixel with full Conversion API support, Google Analytics 4, and Google Tag Manager into your WordPress site. Plus, use our simple Head and Footer script option to add any custom script you need for advanced tracking and optimization. The Pinterest Tag can be implemented via this [paid add-on](https://www.pixelyoursite.com/pinterest-tag). Similar paid add-on for the [Bing tag](https://www.pixelyoursite.com/plugins/pixelyoursite-professional/bing-tag-add-on)
 
-You can fire your own events with zero coding.
+**Free training:** 
 
-**WooCommerce** and **Easy Digital Downloads** are fully supported, with Facebook Dynamic Ads pixel setup and Google Analytics Enhanced Ecommerce.
+We have a YouTube channel called [PixelYourSite](https://www.youtube.com/channel/UCnie2zvwAjTLz9B4rqvAlFQ) where we explain a lot of stuff about the plugin, Meta API, Google Analytics, Google Ads, TikTok and so on. Check this to learn how to install the Meta Pixel with Conversion API support, how to test it, and how to improve your Event Match Quality score (EMQ):
 
-Take a look at this video to see Facebook Conversion API in action:
+[youtube https://www.youtube.com/watch?v=fAwsayYLo5s]
 
-[youtube https://www.youtube.com/watch?v=k_bL53qDE0E]
+**PixelYourSite will help you:**
 
-IMPORTANT:: Facebook Pixel Conversion API: [Learn how to enable and test Conversion API events](https://www.pixelyoursite.com/facebook-conversion-api-capi)
+* Install the Meta Pixel with Conversion API support. 
+
+* Install Google Analytics 4 (GA4).
+
+* Install Google Tag Manager and push events into the data layer with ZERO coding (NEW).
+
+* Configure Google Consent Mode: [check this dedicated page for more details](https://www.pixelyoursite.com/google-consent-mode-v2-wordpress).
+
+* Configure Google Tag Manager Server-Side Tagging for our native GA4 script: [more details here](https://www.pixelyoursite.com/google-server-side-tagging-with-pixelyoursite).
+
+* Install any other scripts with our Head & Footer option. 
+
+
+**PixelYourSite & WooCommerce:**
+
+* All e-commerce speciffic events are automatically  fired.
+
+* All parameters required for dynamic ads (Meta or Google) are present.
+
+* Flexible options for product IDs (default IDs, or SKU).
+
+* The plugin can also use Facebook for WooCommerce product ID logic. You can use our advanced tracking and Facebook for WooCommerce catalogs.
+
+* Client data is used to improve Meta EMQ score for the API events.
+
+
+**PixelYourSite & Easy Digital Downloads:**
+
+* All e-commerce speciffic events are automatically  fired.
+
+* All parameters required for dynamic ads (Meta or Google) are present.
+
+* Client data is used to improve Meta EMQ score for the API events.
+
+
+**Track key actions with our automated events:**
+
+* Searches (search keywords are tracked as parameters).
+
+* Form submissions.
+
+* User signups.
+
+* User login.
+
+* Downloads (file names and type are tracked as parameters).
+
+* Comments.
+
+* Page scroll.
+
+* Time on page. 
+
+
+**Track other actions with your own events:** 
+
+* Configure any standard or custom event for Meta, GA4, or GTM.
+
+
+**Head & Footer functionality. Add your own scripts:**
+
+* On all pages. 
+
+* On speciffic pages.
+
+* On the WooCommerce order received page.
+
+* For all devices, for desktop, or mobile only. 
+
+
+**Consent & GDPR**:
+
+* The plugin integrates with some of the most popular consent solutions. 
+
+* It has consent filters allowing other consent plugins to control our scripts and cookies. 
+
+* It can fire GA4 tags with Google Consent Mode granted.
+
+* It's fully integrated with [ConsentMagic](https://www.pixelyoursite.com/plugins/consentmagic).
+
+
+**Google Tag Manager**
+
+PixelYourSite is known for its easy integration of the Meta Pixel, Google Analytics, TikTok (paid), Pinterest (paid add-on), and Bing (paid add-on). What makes it special is its new Google Tag Manager integration, pushing all events into the GTM data layer with no coding required.
+
+GTM Container Import: to simplify GTM setup we offer you a GTM Container Import file that will configure triggers for all our events and variables for all our parameters. Version 1.0 of this file comes with Google Analytics 4 tags pre-configured: [Watch this video to learn more](https://www.youtube.com/watch?v=qKJ3mmCgT3M).
+
+
+**Key resources:**
+
 
 Learn how to [verify your domain on Facebook](https://www.pixelyoursite.com/verify-domain-facebook)
 
-Learn how to track key actions with [Automated Events](https://www.pixelyoursite.com/global-events)
+Learn how to handle [Google Consent Mode V2](https://www.pixelyoursite.com/google-consent-mode-v2-wordpress)
 
-NEW: Track and store traffic source, landing page, and UTMs for WooCommerce orders: [click to find more](https://www.pixelyoursite.com/woocommerce-first-party-reports)
+Learn how to improve [Meta EMQ Score](https://www.pixelyoursite.com/facebook-event-match-quality-score)
 
-NEW: Track and store traffic source, landing page and UTMs for Easy Digital Downloads orders: [click to find more](https://www.pixelyoursite.com/easy-digital-downloads-first-party-reports)
+Learn how tot track [WordPress Forms](https://www.pixelyoursite.com/track-wordpress-forms)
 
-TRACK EVERYTHING WITH A SINGLE PLUGIN:
+Learn more about [Automated Events](https://www.pixelyoursite.com/global-events)
 
-* The Meta Pixel (Facebook Pixel): one click install
+Learn more about [Native WooCommerce Reports](https://www.pixelyoursite.com/woocommerce-first-party-reports)
 
-* Facebook Conversion API: add a token and we send all events using CAPI
+Learn how to [analyse PixelYourSite data with ChatGPT](https://www.pixelyoursite.com/pixelyoursite-and-chatgpt)
 
-* Google Analytics: one click install
+Learn how to [setup GTM server side tagging with the native GA4 integration](https://www.pixelyoursite.com/google-server-side-tagging-with-pixelyoursite)
 
-* Google Analytics 4: for details, watch [this video](https://www.youtube.com/watch?v=fwegcsO-yrc)
 
-* ANY script: add any other script with our flexible Head & Footer option
 
-* The Pinterest Tag: via [paid add-on](https://www.pixelyoursite.com/pinterest-tag)
+**Even more features with our paid plugins:**
 
-* Google Ads (formerly AdWords) [pro feature](https://www.pixelyoursite.com/google-ads-tag)
 
-* Microsoft (BING) UET tag [paid add-on](https://www.pixelyoursite.com/bing-tag)
+PixelYourSite development is supported by our paying customers. We've turned [PixelYourSite Professional](https://www.pixelyoursite.com/plugins/pixelyoursite-professional) into a powerful tracking tool. Alongside it, we offer a range of plugins, like the [WooCommerce Feed Plugin](https://www.pixelyoursite.com/plugins/product-catalog-feed-for-woocommerce) and our consent management solution, [ConsentMagic](https://www.pixelyoursite.com/plugins/consentmagic).
 
-* Learn how to track both UA and GA4 properties at the same time (paid feature): [watch video](https://www.youtube.com/watch?v=JUuss5sewxg)
 
-* Learn how to fire multiple Facebook Pixels with CAPI support (paid feature): [watch video](https://www.youtube.com/watch?v=HM98mGZshvc)
+The list of paid feature is long and growing:
 
 
+* Support for Google Ads tags.
 
-FANTASTIC WOOCOMMERCE INTEGRATION:
+* Support for TikTok tags.
 
-* Meta Pixel (Facebook Pixel): every e-commerce related event is fired automatically. Conversion value is tracked for each event. All the events are 
+* Pinterest and Bing support via paid add-ons. 
 
-* Dynamic Product Ads ready (content_ids and content_type parameters always present).
+* More automated events, tracking even more key actions. 
 
-* Facebook Conversion API: every e-commerce event is sent using CAPI.
+* More parameters for our events, including landing page, traffic source, or UTMs tracking.
 
-* Google Analytics: Enhanced Ecommerce implementation.
+* More triggers for your own events: Clicks on links and CSS Selectors, Number of Page Views, Mouse over CSS Selectors, Embedded video views, Email link click, Page scroll, Post type, and direct integrations with various Form plugins plus Elementor forms.
 
-* GA4: Monetisation data.
+* Better tracking of user data for an improved EMQ score, including the ability to get user data from forms, or URLs.
 
-* Head & Footer scripts: you can insert scripts on the WooCommerce “order-received” page.
+* Improved tracking of WooCommerce and EDD purchases.
 
-* Pinterest e-commerce events with paid add-on.
+* Support for multiple tags.
 
-* TikTok e-commerce events with the paid version of the plugin.
+* The possibility to configure where to fire or hide a particular tag based on flexible conditions. 
 
+* Native WooCommerce and EDD reporting.
 
+* ... and many more!
 
 
-EASY DIGITAL DOWNLOADS INTEGRATION:
-
-The EDD integration works just like the WooCommerce integration, with full Dynamic Product Ads Facebook Pixel Support, Google Analytics Enhanced Ecommerce, and Pinterest Tag e-commerce events.
-
-
-
-TRACK KEY ACTIONS WITH AUTOMATED EVENTS:
-
-The AUTOMATED EVENTS capture important actions like form submit, comments, downloads, page scroll, and time on page. Use them to measure your users' behaviour inside Google Analytics, or to create custom audiences and conversions on Meta (Facebook), and Google Analytics. 
-
-
-
-FIRE YOUR OWN EVENTS:
-
-You can easily configure your own events and send them to all or just some of the networks (Facebook, Google, Pinterest).
-
-You can fire standard or custom events using triggers like:
-
-* URL contains.
-
-* URL equals.
-
-* Delay event: fire after X seconds.
-
-
-
-**CONSENT, GDPR, CCPA SUPPORT:**
-
-
-PixelYourSite is fully integrated with [ConsentMagic.com](https://www.consentmagic.com)
-
-And it works with some of the most popular “cookie consent” plugins.
-
-
-Additionally we offer filters that developers can use to create their own custom integrations. These filters can control the way each pixel works.
-
-
-
-FACEBOOK FOR WOOCOMMERCE INTEGRATION:
-
-You can use Facebook for WooCommerce plugin along with PixelYourSite. This will let you benefit from all our advanced pixel features and still have a Facebook page shop.
-
-When Facebook for WooCommerce is detected, the plugin will offer you the option to use their ID logic for all the WooCommerce specific events. This will ensure product matching between your site and their Product Catalog.
-
-[More details in this dedicated article](https://www.pixelyoursite.com/facebook-for-woocommerce-pixelyoursite)
-
-
-
-OTHER USEFUL FEATURES:
-
-* Facebook Manual Advanced Matching.
-
-* Remove Facebook default events.
-
-* Google Analytics cross-domain measurement.
-
-* Google Analytics Enhanced Link Attribution.
-
-* Google Analytics Anonymize IPs.
-
-
-**EVEN MORE FEATURES WITH THE PRO VERSION:**
-
-
-[PixelYourSite Pro](https://www.pixelyoursite.com/) is used by thousands of businesses already and will offer you some extraordinary features.
-
-
-Full PixelYourSite Professional and **CartFlows** integration: [watch video for details](https://www.pixelyoursite.com/cartflows-and-pixelyoursite)
-
-
-TikTok Tag support with [PixelYourSite Professional](https://www.pixelyoursite.com/tiktok-tag-pixelyoursite).
-
-
-
-EVEN MORE AUTOMATED EVENTS:
-
-You can capture clicks on internal or external links, embedded video views, clicks on phone numbers or emails, user signups, logins, clicks on AdSense ads.
-
-
-
-EVEN MORE EVENTS’ TRIGGERS:
-
-On top of the free triggers (URL equals and URL contains), the pro version will let you fire more complex events:
-
-
-* Clicks on CSS Selector: you can target virtually any clicks, like buttons, images etc.
-
-* Mouse over CSS Selector
-
-* Page Scroll: you can fire an event when any or a particular page is scrolled down to a percent.
-
-
-
-EVEN MORE FACEBOOK EVENTS PARAMETERS:
-
-The pro version will track a vast amount of data for each event, like the traffic source, UTMs, your visitor’s browser’s time (hour, day, month).
-
-These parameters can be used for [Custom Audiences or Custom Conversions](https://www.pixelyoursite.com/facebook-pixel-plugin/custom-audiences-conversions)
-
-
-
-EVEN MORE GOOGLE ANALYTICS FEATURES:
-
-Support for Google Optimize (free A/B testing service by Google).
-
-On top of the free version data, [the pro version](https://www.pixelyoursite.com/google-analytics) will track a number of useful Custom Dimensions.
-
-Browser’s hour, day, and month. They are useful if you sell globally and what to know at what time your visitors take a particular action (their time, not your server’s or Google Analytics time).
-Dynamic Remarketing vertical custom dimensions (Retail or Custom vertical). Useful if you want to configure dynamic remarketing via your Analytics account.
-
-
-
-EVEN MORE HEAD & FOOTER OPTIONS:
-
-The pro version [Head & Footer](https://www.pixelyoursite.com/head-footer-scripts) lets you use dynamic values: [id], [title], [categories], [email], [first_name], [last_name].
-
-For WooCommerce you’ll have some additional dynamic values: [order_number], [order_subtotal], [order_total], [currency].
-
-
-
-EVEN MORE WOOCOMMERCE FEATURES:
-
-* Identify your most valuable customers with our Advanced Marketing Events. Useful to create Facebook Lookalikes or Google Similar Audiences.
-
-* CSV Export for Facebook Custom Audiences with Lifetime Value. Useful for Facebook LTV Lookalikes.
-
-* Super flexible events value configuration (include/exclude tax and shipping, use full price or a price percent for each event).
-
-* Track the Lifetime Value for your customers as Purchase event parameter.
-
-* Lots of extra parameters for the Facebook Purchase event. Useful to create advanced Custom Audiences.
-
-* Fire the Purchase event on transaction only.
-
-* Track WooCommerce affiliate buttons clicks.
-
-* Track WooCommerce PayPal Standard clicks.
-
-* [Google Ads Dynamic Remarketing parameters](https://www.pixelyoursite.com/google-ads-tag)
-
-
-For more info on how the pro version can help you with your Facebook Pixel, [visit this WooCommerce  - Facebook Pixel page](https://www.pixelyoursite.com/facebook-pixel-plugin/woocommerce-facebook-pixel)
-
-
-
-GOOGLE ADS TAG (FORMER ADWORDS):
-
-* The Pro version will implement the [Google Ads Tag](https://www.pixelyoursite.com/google-ads-tag) with Dynamic Retargeting support for WooCommerce and Easy Digital Downloads.
-
-* Each Global event will be sent to Google Ads too, and you can configure Google Ads conversions.
-
-* Add conversion label to any WooCommerce or EDD event.
-
-* Enhanced Conversions.
-
-
-
-NOT ENOUGH? GET MORE WITH THE SUPER PACK:
-
-With the [Super Pack](https://www.pixelyoursite.com/super-pack) you get 5 extra add-ons:
-
-* Multiple pixels: add multiple Facebook pixels, Google Analytics, or Google Ads tags
-
-* Remove a pixel from a particular page
-
-* Dynamic parameters for events
-
-* WooCommerce custom “thank you pages”
-AMP support
-
-
-The super pack comes as a free bonus with our [Advanced and Agency licenses](https://www.pixelyoursite.com/facebook-pixel-plugin/buy-pixelyoursite-pro).
-
-
-
-DON’T MISS:
+DON'T MISS:
 
 
 **Documentation**: learn how to use PixelYourSite free plugin. [Click here for the HELP articles](https://www.pixelyoursite.com/pixelyoursite-free-version)
@@ -412,7 +325,7 @@ There are a few you should consider:
 
 *We had a problem with Mamaya, a retargeting service.
 
-*It won’t work with LeadPages or any similar system because those pages are generated outside WordPress.
+*It won't work with LeadPages or any similar system because those pages are generated outside WordPress.
 
 *Some clients reported problems with Thrive landing pages. This happens because Thrive removes other plugins JS files.
 
@@ -441,10 +354,10 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 == Screenshots ==
 
 1. Add your Facebook pixel ID, Google Analytics ID, or Pinterest ID.
-2. You don’t have to copy/paste all the Facebook pixel code, but just the pixel ID. You can find it in your Ads Manager, under the Pixels link.
+2. You don't have to copy/paste all the Facebook pixel code, but just the pixel ID. You can find it in your Ads Manager, under the Pixels link.
 3. You just need your Google Analytics Tracking ID, not the full code.
 4. You simply need your Pinterest Tag ID.
-5. You can exclude user roles from tracking (like Admin), so they won’t affect your stats.
+5. You can exclude user roles from tracking (like Admin), so they won't affect your stats.
 6. You can allow other user roles to use the plugin.
 7. The Global Events are fired automatically, tracking important actions and data.
 8. The GeneralEvent is fired on every page, tracking important data about your content.
@@ -461,11 +374,469 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 19. Test your Facebook pixel with Pixel Helper Chrome extension.
 20. Test your Google Analytics code with Google Tag Assistant Chrome extension.
 21. Test your Pinterest tag with the Pinterest Tag Helper Chrome extension.
-22. With the Head & Footer option you an add ANY script. There’s an option to insert scripts on the  WooCommerce order-received page .
-23. You’ll have an option to insert scripts on any pages or posts.
+22. With the Head & Footer option you an add ANY script. There's an option to insert scripts on the  WooCommerce order-received page .
+23. You'll have an option to insert scripts on any pages or posts.
+
 
 
 == Changelog ==
+
+= PixelYourSite 10.0.4 =
+
+January 16, 2025
+
+* New Meta settings allow you to disable event parameters that can track Protected Health Information (PHI). Recommended for websites with medical content. 
+
+* Fixing some possible issues with WooCommerce events values when taxes are used. 
+
+* Fixing a possible issue with Sunshine Photo Cart Checkout
+
+* Fixing a possible issue with Cookiebot. 
+
+* Fixing a small problem with GTM scripts when the option is turned OFF. 
+
+* Updating the UI to reflect pro triggers for WooCommerce websites. 
+
+
+= PixelYourSite 10.0.3.1 =
+
+December 27, 2024
+
+* Small code changes to ensure that Google tags installed by third-party solutions are in no way affected by the plugin when no Google tag ID is present in the settings. 
+
+= PixelYourSite 10.0.3 =
+
+December 17, 2024
+
+* New options allow control of how tracking works for subdomains-domain environments (our native landing page, traffic source, and UTMs tracking). The free version tracks this data for WooCommerce and EDD orders. The pro version tracks it as events parameters too, and makes it available in dedicated reports.
+
+* A new event that tracks 404 errors – Google Analytics (default ON) and GTM (default OFF). 
+
+
+= PixelYourSite 10.0.2 =
+
+December 4, 2024
+
+* New events trigger that allows you to easily track the home page.
+
+* Fixing possible issues with GTM scripts controls.
+
+* Fixing a bug with the GTM container template download resulting in an empty file. 
+
+* Security enhancements. 
+
+= PixelYourSite 10.0.1.2 =
+
+November 25, 2024
+
+* New option that allows to hide our tracking values on the WooCommerce and Easy Digital Downloads order pages. 
+
+* Fix for a possible issue with Elementor Pro.
+
+= PixelYourSite 10.0.1.1 =
+
+November 21, 2024
+
+* Fix for a possible conflict with Elementor Pro.
+
+= PixelYourSite 10.0.1 =
+
+November 19, 2024
+
+* New options related to our native Google Tags data layer are available on the Google Tags Settings page. You can choose between our default names (dataLayerPYS – RECOMMENDED), the usual name, dataLayer (it can create conflicts when using our native tags along our GTM integration), or a custom name. These options are useful if there are conflicts between our names and the names declared by external scripts. 
+
+* Send just the data layer option for our GTM integration. 
+
+* WooCommerce and EDD events values updated: value options will now affect all the tags. We recommend sending value to Purchase events, but value is also supported for product events, cart events, and checkout events.
+
+* ON/OFF options for each tag added on the main page. We removed almost similar options from the tags settings pages. 
+
+* New options for GTM custom events: add automated parameters in the data layer, remove the customTrigger object, use a custom name for the custom parameters object. 
+
+* Fixing a small bug related to the GTM object name used to track custom event parameters. 
+
+
+
+= PixelYourSite 10.0.0 =
+
+October 29, 2024
+
+This is a major update, it's highly recommended to clear all your caches.
+
+* New integration with Google Tag Manager.
+
+* GTM Container import file. Version 1.0 of the file will configure triggers for all our events, variables for all our parameters, and GA4 tags. You must edit the GA4 ID variable. 
+
+* Improve capabilities to block bots from triggering events. 
+
+* An option to exclude bots from being blocked based on user-agent name. Useful for websites using cache pre-load options.
+
+* A new option to disable all native tags directly from the main page. 
+
+* Various small UI changes to reflect recent changes in the paid version. 
+
+* New video links. 
+
+* Video notifications updated and simplified. We reduced the number of notifications from 9 to 3. Users that already saw them, might see a single new one about the new GTM features and Meta EMQ score. 
+
+* Declaring compatibility with the recent WooCommerce version. 
+
+
+
+= PixelYourSite 9.7.2 =
+
+August 28, 2024
+
+* Fix for a possible bug related to Litespeed cache. 
+
+* Fix for a possible bug related to Funnelkit checkout pages.
+
+* Fix related to the URL parameters events trigger logic.
+
+* Security enhancement related to the API logs. Now access is restricted based on the pluginâ€™s permission settings. Only user types with permission can download the logs. 
+
+* UI changes to reflect some of the new PRO version features (Google Tag user data support  for multiple values, URL parameters tracking for API user data events, form fields tracking for events parameters, data persistency option for API user data, WSForm integration). 
+
+
+= PixelYourSite 9.7.1 =
+
+July 31, 2024
+
+* New Global Settings page. We move all the global settings from the dashboard to this dedicated page. 
+
+* New options regarding external IDs. We now store a temporary value for external IDs using transients for up to 10 minutes, creating the premises to detect returning traffic based on IP addresses even when itâ€™s done from a different browser or device. This can be turned OFF on the Global Settings page.
+
+* Improved way to generate external IDs to fix missing values in some instances.
+
+* Possible improvements to the way we fire the Purhcase event for some particular WooCommerce setups. 
+
+* Various UI changes to reflect new features in the pro version, like the page view number trigger for events. 
+
+* Declaring compatibility with WordPress 6.6.
+
+= PixelYourSite 9.7.0.1 =
+
+July 15, 2024
+
+* Fixing possible error, Uncaught Error: Call to a member function get_price() on bool
+
+* Fixing possible error, database error The SELECT would examine more than MAX_JOIN_SIZE rows
+
+* Fixing possible error, PHP Warning: Undefined array key "HTTP_USER_AGENT"
+
+* Declaring WooCommerce 9.1 compatibility.
+
+= PixelYourSite 9.7.0 =
+
+July 9, 2024
+
+* Unified event ID logic that can help with Google Tag Manager server-side integration when browser and APIs are used. 
+
+* Fixing possible  issues with WPRocket.
+
+* Fixing a possible issue with Fluent Form events. 
+
+* Declaring compatibility for the current WooCommerce version.
+
+* Other small code improvements.
+
+
+= PixelYourSite 9.6.2 =
+
+* The GA4 server container URL option is OFF by default.
+ 
+* Code improvements.
+
+* New video links.
+
+* WooCommerce 9.0 support declared. 
+
+= PixelYourSite 9.6.1.1 =
+
+* Improving the way the plugin works when caches or multiple caches are used. Fixing possible issues with event IDs, and API events. 
+
+* Fixing a possible issue with WooCommerce ViewContent value.
+
+* Fixing a possible issue with the GA4 server container URL. 
+
+* Fixing other small bugs and warnings. 
+
+
+= PixelYourSite 9.6.1 =
+
+* New options for the Google Analytics tags related to GTM server containers. This is still in beta.
+
+* New ON/OFF Ajax option for API events. It allows you to disable Ajax for static API events if there are problems when loading the page (such as updating the WooCommerce cart).
+
+* Fixing a possible problem with API events triggered by crawlers, or other non-visitor-related activities. This resulted in a very large number or API events compared to browser events. 
+
+* The crawler filter for API events is always turned ON. 
+
+* Improving the way we track and generate fbp. This can lead in time to better conversion tracking.
+
+* New video links and small UI changes.
+
+
+
+
+= PixelYourSite 9.6.0.1 =
+
+* Fix for a possible error when no Meta pixel ID was configured. 
+
+* WooCommerce 8.9 compatibility declared. 
+
+* Video updated on the plugin's Description page. 
+
+
+= PixelYourSite 9.6.0 =
+
+* Google Analytics server container Url: you can send GA4 data to a GTM server side container. 
+
+* Notifications will be closed for all users, not just the one clicking on the hide option.
+
+* Fixing various warnings and small bugs( PHP Warning: Undefined array key)
+
+
+= PixelYourSite 9.5.5 =
+
+* Fixing a possible issue where the tags were permanently blocked by some consent plugins.
+
+
+= PixelYourSite 9.5.4 =
+
+* Improvements in how we track Meta Conversion API fbc parameters. 
+
+* Changes regarding ConsentMagic cache option. 
+
+* WooCommerce 8.7 compatibility. 
+
+
+= PixelYourSite 9.5.3 =
+
+* Google Consent Mode is activated by default. You can change this on the Google Tags Settings page. The plugin sends Google events with consent parameters values as â€œgrantedâ€. Itâ€™s recommended you have a consent plugin that manages usersâ€™ consent. Our own solution is called ConsentMagic. 
+
+* New option to disable PHP session use. If you have problems with PHP sessions, turn this OFF. 
+
+* Fixing various bugs and code improvements. 
+
+= PixelYourSite 9.5.2 =
+
+* Automated events parameters for Google tags were updated to match the data sent to the other type of tags. These parameters can be used to create custom dimensions.
+
+* Fixing a possible issue on WooCommerce order confirmation pages for non-existing order IDs.
+
+* Fixing a possible issue related to importing Google custom events configured with the free plugin when the pro version is installed.
+
+* Video links updated.
+
+= PixelYourSite 9.5.1.1 =
+
+* Fix for an issue related to PHP sessions.
+
+
+= PixelYourSite 9.5.1 =
+
+* Fix for an issue with Google Analytics missing the default PageView event fired by the tag.
+
+* Additional changes to the Real Cookie Banner related code to avoid some possible issues. 
+
+
+= PixelYourSite 9.5.0.1 =
+
+* Fix for a conflict with Real Cookie Banner.
+
+= PixelYourSite 9.5.0 =
+
+* Google Consent Mode V2 option that will configure the Google Analytics tag with consent granted. Recommended for websites that use a consent plugin that blocks/unblocks the tags based on users' preferences, or websites that don't need to block Google tags (non EU traffic).
+
+* Google Consent Mode V2 support via dedicated filters. Recommended for consent plugin developers. 
+
+* Google Consent Mode V2 full integration with the ConsentMagic plugin. [Details here)[https://www.pixelyoursite.com/google-consent-mode-v2-wordpress]
+
+* New video links (new features, or updated videos).
+
+* New option: disable noscript. 
+
+* Fixing various bugs and code improvements. 
+
+
+= PixelYourSite 9.4.7.1 =
+
+* Fixing a possible issue related to external ID option. 
+
+* Fixing small bugs and code improvements.
+
+
+
+= PixelYourSite 9.4.7 =
+
+* Ensuring that a notification about Ajax and consent integrations can be closed. 
+
+* Fixing a possible issue with events external IDs.
+
+* Text updates and small UI changes. 
+
+* WooCommerce compatibility check. 
+
+
+= PixelYourSite 9.4.6 =
+
+* Support for WooCommerce custom fees for the Purchase event value. Now the fees will be included in the value. 
+
+* Fix for a possible issue with external IDs when coaches are used. 
+
+* Improvements related to how we handle excluded IPs. 
+
+* Improvements related to how we handle Elementor custom thank you pages for WooCommerce.
+
+* Declaring compatibility with WooCommerce 8.1.
+
+
+= PixelYourSite 9.4.5.1 =
+
+* Fix for a possible fatal error on related to an empty WooCommerce cart.
+
+
+= PixelYourSite 9.4.5 =
+
+* New view_cart event for WooCommerce sent to GA4.
+
+* Fix for a possible warning related to header being set. 
+
+* Small changes to ensure full compatibility with WooCommerce HPOS.
+
+
+= PixelYourSite 9.4.4 =
+
+* Fixing a number of bugs from the previous version that could break Elementor or Divi editors, or post previews.
+
+
+= PixelYourSite 9.4.3 =
+
+* Expanding the pys_gdpr_ajax_enabled filter to control the cookie-related filters
+
+* Fixing possible Error message: Uncaught Error: Call to a member function.
+
+* Fixing possible Warning: Cannot modify header information ...plugins/pixelyoursite/includes/class-events-manager.php on line 573.
+
+* Video link updates to include a video about ChatGPT and PixelYourSite.
+
+
+= PixelYourSite 9.4.2 =
+
+* Declaring compatibility with WordPress 6.3.
+
+* Declaring compatibility with WooCommerce 8.0.
+
+* Fixing a bug that could result in a warning regarding "Cannot modify header information". 
+
+
+= PixelYourSite 9.4.1 =
+
+* Fixing a few small code issues that could result in warnings.
+
+* Ensuring compatibility with the recent versions of Pinterest and Bing paid add-ons.
+
+* Video link updates.
+
+* Declaring compatibility with WooCommerce 7.9.
+
+
+= PixelYourSite 9.4.0.1 =
+
+* Fix for a possible issue, Fatal error: Uncaught Error: Call to undefined function PixelYourSite\Tiktok()..
+
+
+= PixelYourSite 9.4.0 =
+
+* External ID support for Meta browser and API events.
+
+* Fix for an issue with Contact Form 7 forms within Elementor popups where the form was not correctly tracked. 
+
+* Code changes required by the Pinterest add-on for API support.
+
+
+= PixelYourSite 9.3.9 =
+
+* New consent filters that can control the pluginâ€™s cookies, explained on the pluginâ€™s Consent page. 
+
+* Fixing a possible issue with non-script tags and consent filters.
+
+* Fixing a possible issue resulting in traffic source, landing page and UTMs not being tracked as events parameters, or stored for WooCommerce orders.
+
+* WooCommerce 7.8.0 compatibility check.
+
+
+= PixelYourSite 9.3.8.1 =
+
+* Fixing a possible error related to GA4 WooCommerce category tracking, resulting in a warning triggered on the order confirmation page. 
+
+
+= PixelYourSite 9.3.8=
+
+* New options related to WooCommerce variable products and Google Analytics 4 (GA4).
+
+* Support for multiple WooCommerce categories tracking with Google Analytics 4 (GA4).
+
+* Fixing some issues related to Head and Footer scripts.
+
+* Fixing a possible issue with the WooCommerce purchase event resulting in the event being fired on the wrong pay page.
+
+* Meta SDK update.
+
+
+= PixelYourSite 9.3.7=
+
+* Support for Elementor Pro WooCommerce custom thank you pages ensuring the purchase event is fired.
+
+* Additional checks for user role permissions for the Head and Footer option. Only roles with unfiltered_html permission will be able to use it. Thatâ€™s admin for single WordPress or super admin for multisite. These permissions can be controlled with dedicated plugins. 
+
+* Fix for a possible issue with Easy Digital Downloads add-to-cart events, where the events were not fired in some instances. 
+
+* Fix for a potential problem related to CompleteRegistration events not respecting settings.
+
+* UI and text changes to reflect paid version new features related to Google Measurement Protocol.
+
+
+= PixelYourSite 9.3.6=
+
+* Notification for users that don't have the Meta CAPI token.
+
+* Small code changes to ensure compatibility with ConsentMagic.
+
+* Fixing a potential problem with traffic data stored for WooCommerce orders.
+
+* Small UI changes.
+
+
+= PixelYourSite 9.3.5=
+
+* Fix for an issue with the additional data we track for WooCommerce or Easy Digital Downloads orders. 
+
+
+= PixelYourSite 9.3.4 =
+
+* WooCommerce 7.5 compatibility check.
+
+* Fixing a possible conflict with Oxygen Builder.
+
+* Fixing a possible bug with sites using themes that are missing some default scripts, resulting in tags not being fired. 
+
+* Fixing various deprecation warnings.
+
+* Fix for Fatal error: Access level to PixelYourSite\FormEventForminator::__construct
+
+
+= PixelYourSite 9.3.3 =
+
+* The Form automatic event will fire when forms are successfully submitted for the following plugins: Contact Form 7, Forminator, WP Forms, Formidable Pro, Ninja Forms, and Fluent Forms. For forms added by different means, we will fire the event when the submit button is clicked.
+
+* New option that allows to remove the plugin's name from the browser's console. 
+
+* Changes to ensure compatibility with the recent changes from the ConsentMagic plugin.
+
+* WooCommerce 7.4 compatibility. 
+
 
 = PixelYourSite 9.3.2 =
 
@@ -474,7 +845,7 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 = PixelYourSite 9.3.1 =
 
-* Fixing a bug related to missing custom parameters for Meta CAPI events configured on the plugin’s Events page.
+* Fixing a bug related to missing custom parameters for Meta CAPI events configured on the pluginâ€™s Events page.
 
 * Declaring WooCommerce 7.3 compatibility.
 
@@ -506,9 +877,9 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 * New: hide the plugin for custom IP addresses. 
 
-* Track WooCommerce’s extra data (traffic source, landing pages, UTMs) even when no tag is installed in the plugin.
+* Track WooCommerceâ€™s extra data (traffic source, landing pages, UTMs) even when no tag is installed in the plugin.
 
-* Confirmation dialog when deleting events on the plugin’s Events page.
+* Confirmation dialog when deleting events on the pluginâ€™s Events page.
 
 * Google Consent Mode compatibility with ConsentMagic.
 
@@ -574,25 +945,25 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 * WooCommerce variable products speed improvement.
 
-* Code improvement to avoid a possible error for sites that don’t use WooCommerce.
+* Code improvement to avoid a possible error for sites that donâ€™t use WooCommerce.
 
 * New filter that lets developers get the Facebook CAPI event IDs.
 Usage example:
 
-add_filter(“pys_before_send_fb_server_event”,”pys_test”,10,3);
+add_filter(â€œpys_before_send_fb_server_eventâ€,â€pys_testâ€,10,3);
 function pys_test($event,$pixelId,$eventId) {
-error_log(“Send event for pixel $pixelId id = $eventId”);
+error_log(â€œSend event for pixel $pixelId id = $eventIdâ€);
 return $event;
 }
 
 It is called before the event is sent to the FB server
 3 parameters:
 
-– the first one is the event object with all the data
+â€“ the first one is the event object with all the data
 
-– the second is the pixel id
+â€“ the second is the pixel id
 
-– and the third is the event id, rendered it separately
+â€“ and the third is the event id, rendered it separately
 
 You need to take into account that our events are mainly sent via Ajax after the page has loaded.
 
@@ -751,7 +1122,7 @@ You need to take into account that our events are mainly sent via Ajax after the
 
 = PixelYourSite 8.2.1 =
 
-* New options to turn ON/OFF most global, WooCommerce, Easy Digital Downloads events parameters. Use it if Facebook shows privacy warnings related to some parameters. [You have a video](https://www.youtube.com/watch?v=sM9yNkBK6Eg) about it linked on the plugin’s main page. 
+* New options to turn ON/OFF most global, WooCommerce, Easy Digital Downloads events parameters. Use it if Facebook shows privacy warnings related to some parameters. [You have a video](https://www.youtube.com/watch?v=sM9yNkBK6Eg) about it linked on the pluginâ€™s main page. 
 
 * WooCommerce 5.3 compatibility check.
 
@@ -766,7 +1137,7 @@ You need to take into account that our events are mainly sent via Ajax after the
 
 = PixelYourSite 8.1.1 =
 
-* Remove parameters from event_source-url. This is a mandatory parameter for Facebook Conversion API events. If the URL contains parameters that include personal data, it will trigger privacy working on Facebook. To avoid this problem we are now removing all URL parameters for this event. If you think you need them, you have toggle to add them back on the plugin’s main page.
+* Remove parameters from event_source-url. This is a mandatory parameter for Facebook Conversion API events. If the URL contains parameters that include personal data, it will trigger privacy working on Facebook. To avoid this problem we are now removing all URL parameters for this event. If you think you need them, you have toggle to add them back on the pluginâ€™s main page.
 
 * Dynamic Ads for Blogs events are now OFF by default.
 
@@ -864,13 +1235,13 @@ This is a major update. Please [visit this page](https://www.pixelyoursite.com/p
 
 * New section showing how many active events you have.
 
-* A new set of common parameters added to all events from all installed tags. You can find a list of the common parameters on the plugin’s main page.
+* A new set of common parameters added to all events from all installed tags. You can find a list of the common parameters on the pluginâ€™s main page.
 
-* A new Signal event that replaces most Global Events. You can find its settings on the plugin’s main page.
+* A new Signal event that replaces most Global Events. You can find its settings on the pluginâ€™s main page.
 
-* We removed the GeneralEvent. If you have audiences or conversions based on it, you need to replace them. It’s a good idea to use the default Page View event instead.
+* We removed the GeneralEvent. If you have audiences or conversions based on it, you need to replace them. Itâ€™s a good idea to use the default Page View event instead.
 
-* All events fired automatically (Signal, Search, WooCommerce events, Easy Digital Download events) have a new ON/OFF button visible before you open the event’s settings.
+* All events fired automatically (Signal, Search, WooCommerce events, Easy Digital Download events) have a new ON/OFF button visible before you open the eventâ€™s settings.
 
 * We turned off some of the less popular WooCommerce and EDD events. You can turn them back on if you need to.
 
@@ -880,488 +1251,10 @@ This is a major update. Please [visit this page](https://www.pixelyoursite.com/p
 
 * Fix: issue with Oxygen builder.
 
-* Fix: Uncaught Error: Class ‘PYS_PRO_GLOBAL
+* Fix: Uncaught Error: Class â€˜PYS_PRO_GLOBAL
 
 * Other small code changes.
 
-
-= PixelYourSite 7.2.1.1 =
-
-* Simple update to remove some unwanted files from v7.2.1
-
-
-= PixelYourSite 7.2.1 =
-
-* Google Analytics 4 support. For details, watch [this video](https://www.youtube.com/watch?v=CCVBD_bD-Y0)
-
-* Facebook API update. This will fix the problem some old pixel IDs had in sending CAPI events. 
-
-* Country and ZIP added to WooCommerce Facebook CAPI events when possible.
-
-* Facebook CAPI Purchase event will send client information for non-logged-in clients too.
-
-* WordPress 5.6 compatibility.
-
-* WooCommerce 4.8 compatibility.
-
-
-
-= PixelYourSite 7.2.0 =
-
-
-* NEW: Facebook Conversion API works for all the pixel events.
-
-* Ajax option for the Facebook Pixel when Conversion API is enabled. This helps to avoid problems with caches. You can learn more about these problems from [this video](https://www.youtube.com/watch?v=YH6ve7qj1hw)
-
-* ViewContent, AddToCart, InitiateCheckout events related to WooCommerce have value turned ON by default. The reasons are explained in [this video](https://www.youtube.com/watch?v=neH2Hc6xXUU)
-
-* Small change to the contents parameter for some Facebook Pixel events that had the potential to trigger a warning related to currency or value. 
-
-
-= PixelYourSite 7.1.14 =
-
-* We removed the EventID parameter when Facebook Conversion API is not configured.
-
-* If you have Conversion API configured, we recommend to check if your cache plugin stores the EventID. [Watch this video to learn more](https://www.youtube.com/watch?v=YH6ve7qj1hw&)
-
-= PixelYourSite 7.1.13 =
-
-* NEW: Facebook Conversion API (former server-side events) works for all standard events automatically fired by the plugin. We will expand this feature to all events soon.
-
-* Facebook Conversion API update.
-
-
-= PixelYourSite 7.1.12 =
-
-* FIX: Possible issue with Easy Digital Download Purchase Event.
-
-* FIX: Possible issue with [Cost of Goods](https://www.pixelyoursite.com/plugins/woocommerce-cost-of-goods) values for variable products. 
-
-* WooCommerce 4.4 compatibility check.
-
-
-
-= PixelYourSite 7.1.11 =
-
-* FIX: Facebook Pixel server-side events token field was missing for Easy Digital Downloads.
-
-* FIX: Possible error when [Cost of Goods](https://www.pixelyoursite.com/plugins/woocommerce-cost-of-goods) value was used for WooCommerce Facebook Pixel events.
-
-* Wordpress 5.5 compatibility.
-
-
-= PixelYourSite 7.1.10 =
-
-* Small improvements related to "Facebook for WooCommerce" ID logic.
-
-* Small UI update to reflect a new option from the PRO version (Events by post_type).
-
-* WooCommerce 4.3 compatibility.
-
-
-= PixelYourSite 7.1.9 =
-
-* Fix for a potential issue where AddToCart value was NaN
-
-* Automatically deactivation of the free version when installing the pro plugin
-
-* Facebook server-side API update
-
-* Remove CompleteRegistration from code when the event is send server-side - [hiding the profit](https://www.pixelyoursite.com/strategy/track-profit-and-total-for-facebook-ads)
-
-* Code update to declare WooCommerce 4.2 compatibility
-
-
-
-= PixelYourSite 7.1.8 =
-
-* NEW: Facebook Pixel server-side events for WooCommerce. It works for the Purchase and CompleteRegistration event.
-
-* NEW: Fire the CompleteRegistration event for each WooCommerce transaction and configure it to use PROFIT as value. You can send this event server-side only (hide it from the browser). This is useful if you want to track both the TOTAL and the PROFIT generated by your ads. Requires [WooCommerce Cost of Goods plugin by PixelYourSite](https://www.pixelyoursite.com/woocommerce-cost-of-goods)
-
-* FIX: Potential issue related to the Pinterest Tag add-on and WooCommerce events. Some events were not fired if there was no Facebook Pixel installed. You need to update the Pinterest Tag add-on too.
-
-* Declare compatibility with WooCommerce 4.1
-
-= PixelYourSite 7.1.6 =
-
-* This is a minor update that ensures compatibility with the latest changes from the [WooCommerce Cost of Goods plugin by PixelYourSite](https://www.pixelyoursite.com/woocommerce-cost-of-goods)
-
-= PixelYourSite 7.1.6 =
-
-* Small code update to declare WooCommerce 4.0 compatibility.
-
-* Fixes for some issues related to file paths. In some environments this was causing error on Elementor or WooCommerce admin pages.
-
-* A new option to use PROFIT as value for your Facebook Pixel WooCommerce events. It works with  the [WooCommerce Cost of Goods plugin by PixelYourSite](https://www.pixelyoursite.com/woocommerce-cost-of-goods)
-
-= PixelYourSite 7.1.5 =
-
-* New features: Facebook Dynamic Ads events for blog posts. Simulate the DPA required events on normal blog posts. We will soon release a dedicated plugin that will help you import your blog content into a Facebook Product Catalog.
-
-* Google Analytics Enhanced Ecommerce: we removed the variation name from the product title and we added it as a separate parameter. 
-
-* Google Analytics Enhanced Ecommerce: we fixed an error with variable products category.
-
-* Elementor: we fixed an error that was deleting Head & Footer scripts when a page was saved using Elementor.
-
-* UI updates to reflect new paid features: fire custom events once in X hours; Google Analytics list performance tracking.
-
-* Small code change to declare WooCommerce 3.9 compatibility.
-
-
-= PixelYourSite 7.1.4 =
-
-* Minor code changes to declare compatibility with WordPress 5.3 and WooCommerce 3.8.
-
-
-= PixelYourSite 7.1.3 =
-
-* Adding new options for WooCommerce and EDD events IDs: select between ID or SKU, use prefixes and postfixes, treat variable products like simple products. These features will work with the Pinterest add-on v2.0.8 (free), and the Bing add-on v1.0.2 (paid).
-
-* Fix for an old bug related to how On Page Events triggers work. In previous versions, final slashes were ignored for both “URL Match” and “URL Contains” conditions. This was fixed with this release.
-Recommendation: if you have manually added events using the On-Page trigger, test them to make sure they work as expected.
-
-* Fix for a bug related to the Pinterest add-on. In previous versions, the WooCommerce Checkout and PageVisit events could not be turned ON/OFF.
-
-
-
-= PixelYourSite 7.1.2 =
-
-* Name change - we removed "Facebook" from the plugin title, as per Facebook's request. The plugin will still offer great Facebook Pixel integration.
-
-* Banner update - we removed "Facebook" from our banners, as per Facebook's request.
-
-* Security and code improvements
-
-
-= PixelYourSite 7.1.1 =
-
-* Compatibility with WooCommerce 3.7
-
-* New structure for the Form and Comment events. It will help you better identify what actions have fired the events.
-
-Form Event for the Facebook Pixel and the Pinterest Tag:
-
-- form_class: a new parameter pulling the CSS class when it exits.
-- form_id: a new parameter pulling the CSS ID when it exits.
-
-Form event on Google Analytics:
-
-- event_categoty: Form.
-- event_action: the CSS class or ID (makes easier for you to identify the form).
-- event_label: the text on the form’s button.
-
-Comment event  on Google Analytics:
-
-- event_categoty: Comment.
-- event_action: the “post type” (page, products, post, etc) comment.
-- event_label: the URL where the comment was posted.
-
-= PixelYourSite 7.1.0 =
-
-* This update ads support for our paid Microsoft (BING) UET Tag add-on.
-
-= PixelYourSite 7.0.5 =
-
-* Fixing a potential problem with Pinterest PageVisit and Checkout events when the Facebook Pixel was deactivated (for the Pinterest add-on users only).
-
-
-= PixelYourSite 7.0.4 =
-
-* New Feature: Google Analytics cross-domain measurement. Tell Analytics to see sessions on two related sites (such as an ecommerce site and a separate shopping cart site) as a single session.
-
-* UI changes to reflect some new features our PRO version has (Google Optimize, add conversion label to WooCommerce and EDD Google Ads events).
-
-* Pinterest add-on missing license notice.
-
-* Remove the pixels when you edit something with Elementor.
-
-= PixelYourSite 7.0.3 =
-
-* Fix: Google Analytics purchase event was missing the transaction ID, blocking Enhanced Ecommerce tracking.
-
-* Fix: Head & Footer option was stripping backslashes from custom code on post or pages.
-
-= PixelYourSite 7.0.2 =
-
-* IMPORTANT: fix for some fatal errors that could be triggered by the Pinterest add-on on WooCommerce and Easy Digital Downloads orders.
-
-= PixelYourSite 7.0.1 =
-
-* Fix for missing cookie dependency issue (GDPR integrations).
-
-* Adding developer Facebook ID in the pixel code (used internally by Facebook to identify partners activity).
-
-= PixelYourSite 7.0.0 =
-
-* Version 7.0.0 is a complete rewrite of the plugin, adding a lot more features.
-
-* New Google Analytics integration with Enhanced Ecommerce support for WooCommerce and Easy Digital Downloads.
-
-* Pinterest Tag support via free add-on.
-
-* Add ANY other script with the new Head & Footer option. It supports global or per-page scripts. You have the possibility to add scripts on the WooCommerce order-received page.
-
-* The Global Events will automatically track important actions: searches, form submit, comments, downloads.
-
-* You can configure your own events using “URL match” or URL include triggers” and add a “delay event” in seconds.
-
-* Every event can be sent to Facebook, Google Analytics, or Pinterest.
-
-* You can enable Facebook Advanced Matching.
-
-* The Pinterest Tag supports Enhanced Matching.
-
-* Google Analytics supports Enhanced Link Attribution and Anonymize IP.
-
-* The WooCommerce integrations tracks remove from cart as an event and has support for Google Enhanced Ecommerce tracking.
-
-* You can now grant permissions to manage the plugin based on the user’s role.
-
-* We’ve extended our GDPR integrations with twom more “cookie consent” plugins.
-
-* We’ve added filters for developers to control each pixel, plus a filter to control our AJAX option (useful to make GDPR custom integrations cache friendly).
-
-
-= PixelYourSite 5.3.3 =
-
-* Facebook for WooCommerce compatibility fix: we modify ViewCategory content_type parameter in order to ensure product matching when Facebook for WooCommerce id logic is used.
-
-* WordPress 5.0 compatibility check.
-
-= PixelYourSite 5.3.2 =
-
-* Facebook Pixel Standard Events updated to include the new ones that Facebook released. <a href="https://www.pixelyoursite.com/new-facebook-pixel-standard-events" target="_blank"> Details here</a>
-
-
-= PixelYourSite 5.3.1 =
-
-* GDPR related update - we've implemented a dedicated filter to disable pixel tracking before consent: pys_disable_by_gdpr
-
-* GDPR related update - we've added built-in integration with Ginger – EU Cookie Law plugin and Cookiebot
-
-= PixelYourSite 5.3.0 =
-
-* Additional improvements to the WooCommerce AddToCart event ("Cannot read property 'data' of undefined" error with some AJAX based themes)
-
-* Fixing potential security issue
-
-
-= PixelYourSite 5.2.1 =
-
-* AddToCart small improvements to ensure compatibility with some themes using AJAX cart
-
-* Plugin name update
-
-= PixelYourSite 5.2.0 =
-
-* Fixing a possible error with the add to cart button when WooCommerce and WPML are installed on some hostings (we were able to replicate it on SiteGround servers only)
-
-* Enabling the AddToCart event on the Cart page when WooCommerce "Redirect to the cart page after successful addition" option is active. This will ensure that the events are captured.
-
-* Other small improvements to the code related to the AddToCart event
-
-= PixelYourSite 5.1.0 =
-
-* Fixing possible compatibility problem with Facebook for WooCommerce extension
-* Improving Facebook for WooCommerce ID logic
-
-= PixelYourSite 5.0.9 =
-
-* ViewCategory - new WooCommerce event, compatible with Facebook Dynamic Product Ads (DPA)
-
-* New WooCommerce events parameter: contents - A list of JSON object that contains the product ids associated with the event as well as additional information about the products. It can help with DPA
-
-* Declaring compatibility with WooCommerce 3.2.6
-
-= PixelYourSite 5.0.8 =
-
-* AddToCart new option: fire the event on the Checkout Page. It will be helpful for some websites with customized structure.
-
-* The AddToCart event was improved to work with AJAX buttons on single product pages. This will help to catch events on a number of themes that use AJAX on the product pages.
-
-* We made additional changes to ensure compatibility with Facebook for WooCommerce latest version.
-
-
-= PixelYourSite 5.0.7 =
-
-* Purchase event 0 value error fixed (there wasn't any value parameter when the order value was zero)
-
-
-= PixelYourSite 5.0.6 =
-
-
-* Facebook for WooCommerce extension integration updated to match the new ID logic (PixelYourSite can be used together with Facebook for WooCommerce extension - this way you can have a Facebook shop without losing our powerful pixel features)
-
-
-= PixelYourSite 5.0.5.2 =
-
-
-* Quick fix for a small error with our previous release (we didn't include all the files)
-
-
-= PixelYourSite 5.0.5 =
-
-* Treat WooCommerce variable products like simple products - useful if your Product Catalog doesn't include variations. When ON, ViewContent content_type will be product and the main item ID will be used for all events instead of the variation item.
-
-= PixelYourSite 5.0.4 =
-
-* Changed WooCommerce ViewContent event content_type to product_group for variable products
-
-= PixelYourSite 5.0.3 =
-
-* WooCommerce and EDD content_ids potential issue fix (the content was not correctly wrapped, leaving room for errors when SKU was used instead of the default WordPress IDs)
-
-= PixelYourSite 5.0.2 =
-
-* Added agent identifier (dvpixelyoursite) as we were directly requested by Facebook
-* Checked and confirmed WooCommerce 3 compatibility
-* Dynamic WooCommerce Events Value based on the product price
-* Facebook for WooCommerce support
-
-= PixelYourSite 5.0.1 =
-
-* WooCommerce 2.7 compatibility update: we made sure everything works with the latest WooCommerce version.
-
-= PixelYourSite 5.0 =
-
-* Easy Digital Downloads Integration - Dynamic Ads (promote a product catalog) are fully supported.
-
-* WooCommerce & Easy Digital Downloads events global value.
-
-= PixelYourSite 4.0.3 =
-
-* Important security updates
-
-= PixelYourSite 4.0.2 =
-
-* WordPress 4.7 compatibility checked
-
-* Manage Events buttons fixed - they were not looking right on WP 4.7
-
-= PixelYourSite 4.0.1 =
-
-* fixing minor bugs
-
-= PixelYourSite 4.0.0 =
-
-* From version 4.0 the plugin uses JS to trigger the code. This allows us to add new useful features.
-
-* Delay Event option added for the GeneralEvent
-
-* Head/Footer option - you can decide where the pixel JS will be called. The default setting is in the page head.
-
-* Various text changes to reflect the new pro features
-
-* WooCommerce SKU id possible error fix
-
-
-= PixelYourSite 3.1.0 =
-
-* Changing GeneralEvent parameters names to avoid Pixel Helper warning (post_id and post_type are now being used)
-
-* Updating new pro features (tracking tags, advanced matching)
-
-* Minor fixes and code changes
-
-= PixelYourSite 3.0.3 =
-
-* Fixing PHP warnings and errors
-
-* Fixing encoding problems
-
-* Fixing incompatibility with some themes
-
-= PixelYourSite 3.0.2 =
-
-* Small fixes related to some possible HTML errors
-
-* Admin Notice modifications
-
-= PixelYourSite 3.0.1 =
-
-* Fixing potential problem with importing settings from older versions
-
-
-= PixelYourSite 3.0 =
-
-This is a major release, with a new design and new features:
-
-* Completely new design
-
-* New GeneralEvent feature for improved Custom Audience building (with a free guide)
-
-* ON/OFF option for user roles
-
-* Improved Events and Dynamic Events control
-
-* Facebook Dynamic Ads Pixel Setup for WooCommerce
-
-
-= PixelYourSite 2.2.4 =
-
-* Fixed a few back*end errors and conflicts
-
-* Adding new currencies
-
-= PixelYourSite 2.2.3 =
-
-* Learning links updated
-
-* Minor PHP warning fixed
-
-= PixelYourSite 2.2.2 =
-
-* Minor fix for admin notice
-
-= PixelYourSite 2.2.1 =
-
-* Fixing not closing admin notice error
-
-
-= PixelYourSite 2.2 =
-
-* Introducing Dynamic Events (pro)
-
-* Introducing our new Learning Section
-
-= PixelYourSite 2.1 =
-
-* Introducing new WooCommerce Paypal Standard events (pro)
-
-= PixelYourSite 2.0 =
-
-* This update adds full control on Standard Events, with the possibility to define all the available parameters for each event
-
-* You can also add the code for each event with the new event text field. This also lets you define custom events
-
-* WooCommerce Affiliate Products events: you can define events that will trigger on affiliate buttons clicks
-
-* Fixed a potential error for the WooCommerce Purchase Event
-
-= PixelYourSite 1.05 =
-
-* Updated offer for the PRO version
-
-= PixelYourSite 1.04 =
-
-* Fixed fresh install error (when no settings saved)
-
-= PixelYourSite 1.03 =
-
-* Fixed "Select options" error for variable products on categories pages
-
-= PixelYourSite 1.02 =
-
-* Fixed currency symbol error
-* Added super special offer for the PRO version
-
-= PixelYourSite 1.01 =
-
-* Dynamic AddToCart event for WooCommerce (the AddToCart event will trigger when a users click on the add to cart button)
-* Dynamic AddToCart works with WooCommerce short-codes.
-* Fixed a false error that was reported for the Purchase WooCommerce event by Pixel Helper extension on the Thank You page.
 
 = PixelYourSite 1.0 =
 

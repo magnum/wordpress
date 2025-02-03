@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,32 +21,38 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static CustomAudienceTypes getInstance()
  */
-class CustomAudienceTypes extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    /**
-     * @var string
-     */
-    const ID = 'UID';
-    /**
-     * @var string
-     */
-    const CLAIM = 'CLAIM';
-    /**
-     * @var string
-     */
-    const EMAIL = 'EMAIL_SHA256';
-    /**
-     * @var string
-     */
-    const PHONE = 'PHONE_SHA256';
-    /**
-     * @var string
-     */
-    const MOBILE_ADVERTISER_ID = 'MOBILE_ADVERTISER_ID';
+class CustomAudienceTypes extends AbstractEnum {
+
+  /**
+   * @var string
+   */
+  const ID = 'UID';
+
+  /**
+   * @var string
+   */
+  const CLAIM = 'CLAIM';
+
+  /**
+   * @var string
+   */
+  const EMAIL = 'EMAIL_SHA256';
+
+  /**
+   * @var string
+   */
+  const PHONE = 'PHONE_SHA256';
+
+  /**
+   * @var string
+   */
+  const MOBILE_ADVERTISER_ID = 'MOBILE_ADVERTISER_ID';
 }

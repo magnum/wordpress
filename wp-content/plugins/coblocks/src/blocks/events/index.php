@@ -13,10 +13,15 @@
  *
  * @return string Returns the events content.
  */
-function coblocks_render_events_block( $attributes, $content ) {
+function coblocks_render_coblocks_events_block( $attributes, $content ) {
 
 	if ( empty( $attributes['externalCalendarUrl'] ) ) {
 		return $content;
+	}
+
+	// If externalCalendarUrl contains a localhost URL, return an error message.
+	if ( strpos( $attributes['externalCalendarUrl'], 'localhost' ) !== false || strpos( $attributes['externalCalendarUrl'], '127.0' ) !== false ) {
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred. localhost URLs are not permitted.', 'coblocks' ) . '</div></div>';
 	}
 
 	try {
@@ -34,12 +39,12 @@ function coblocks_render_events_block( $attributes, $content ) {
 				'use_timezone_with_r_rules'     => false,
 			)
 		);
-		$ical->init_url( $attributes['externalCalendarUrl'] );
+		$ical->initUrl( esc_url_raw( $attributes['externalCalendarUrl'] ) ); // @codingStandardsIgnoreLine.
 
 		if ( 'all' === $attributes['eventsRange'] ) {
-			$events = $ical->events_from_range();
+			$events = $ical->eventsFromRange(); // @codingStandardsIgnoreLine.
 		} else {
-			$events = $ical->events_from_interval( $attributes['eventsRange'] );
+			$events = $ical->eventsFromInterval( $attributes['eventsRange'] ); // @codingStandardsIgnoreLine.
 		}
 		// Limit to 100 events.
 		$events = array_slice( $events, 0, 100 );
@@ -72,8 +77,8 @@ function coblocks_render_events_block( $attributes, $content ) {
 		foreach ( $events as $event ) {
 			$events_layout .= '<div class="wp-block-coblocks-event-item swiper-slide">';
 
-			$dtstart           = $ical->ical_date_to_date_time( $event->dtstart_array[3] );
-			$dtend             = $ical->ical_date_to_date_time( $event->dtend_array[3] );
+			$dtstart           = $ical->icalDateToDateTime( $event->dtstart_array[3] ); // @codingStandardsIgnoreLine.
+			$dtend             = $ical->icalDateToDateTime( $event->dtend_array[3] ); // @codingStandardsIgnoreLine.
 			$start_date_string = strtotime( $dtstart->format( 'YmdHis' ) );
 			$end_date_string   = strtotime( $dtend->format( 'YmdHis' ) );
 			$year              = gmdate( 'Y', $start_date_string );
@@ -164,6 +169,18 @@ function coblocks_render_events_block( $attributes, $content ) {
 					$location
 				);
 
+			} else {
+
+				$events_layout .= coblocks_render_single_day_event_item(
+					$start_date,
+					$month,
+					$year,
+					$title,
+					$description,
+					null,
+					$location
+				);
+
 			}
 
 			$events_layout .= '</div>';
@@ -171,8 +188,8 @@ function coblocks_render_events_block( $attributes, $content ) {
 
 		$events_layout .= '</div>';
 
-		$events_layout .= '<button class="wp-coblocks-events-nav-button__prev" id="wp-coblocks-event-swiper-prev" style="visibility: hidden" />';
-		$events_layout .= '<button class="wp-coblocks-events-nav-button__next" id="wp-coblocks-event-swiper-next" style="visibility: hidden" />';
+		$events_layout .= sprintf( '<button class="wp-coblocks-events-nav-button__prev" id="wp-coblocks-event-swiper-prev" style="visibility: hidden" aria-label="%s"/>', __( 'Previous post', 'coblocks' ) );
+		$events_layout .= sprintf( '<button class="wp-coblocks-events-nav-button__next" id="wp-coblocks-event-swiper-next" style="visibility: hidden" aria-label="%s"/>', __( 'Next post', 'coblocks' ) );
 
 		$events_layout .= '</div>';
 
@@ -266,29 +283,3 @@ function coblocks_render_multi_day_event_item( $start_date, $end_date, ...$event
 function coblocks_render_single_day_event_item( ...$event_data ) {
 	return coblocks_render_event_item( ...$event_data );
 }
-
-/**
- * Registers the `events` block on server.
- */
-function coblocks_register_events_block() {
-
-	// Return early if this function does not exist.
-	if ( ! function_exists( 'register_block_type' ) ) {
-		return;
-	}
-
-	// Load attributes from block.json.
-	ob_start();
-	include COBLOCKS_PLUGIN_DIR . 'src/blocks/events/block.json';
-	$metadata = json_decode( ob_get_clean(), true );
-
-	register_block_type(
-		'coblocks/events',
-		array(
-			'attributes'      => $metadata['attributes'],
-			'render_callback' => 'coblocks_render_events_block',
-		)
-	);
-}
-
-add_action( 'init', 'coblocks_register_events_block' );

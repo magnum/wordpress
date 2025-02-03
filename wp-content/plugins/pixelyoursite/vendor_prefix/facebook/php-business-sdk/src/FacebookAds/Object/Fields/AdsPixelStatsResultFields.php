@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdsPixelStatsResultFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AGGREGATION = 'aggregation';
-    const DATA = 'data';
-    const START_TIME = 'start_time';
-    public function getFieldTypes()
-    {
-        return array('aggregation' => 'string', 'data' => 'list<AdsPixelStats>', 'start_time' => 'datetime');
-    }
+
+class AdsPixelStatsResultFields extends AbstractEnum {
+
+  const AGGREGATION = 'aggregation';
+  const DATA = 'data';
+  const START_TIME = 'start_time';
+
+  public function getFieldTypes() {
+    return array(
+      'aggregation' => 'string',
+      'data' => 'list<AdsPixelStats>',
+      'start_time' => 'datetime',
+    );
+  }
 }

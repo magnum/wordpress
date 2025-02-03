@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PageBackdatedTimeGranularityValues getInstance()
  */
-class PageBackdatedTimeGranularityValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DAY = 'day';
-    const HOUR = 'hour';
-    const MIN = 'min';
-    const MONTH = 'month';
-    const NONE = 'none';
-    const YEAR = 'year';
+class PageBackdatedTimeGranularityValues extends AbstractEnum {
+
+  const DAY = 'day';
+  const HOUR = 'hour';
+  const MIN = 'min';
+  const MONTH = 'month';
+  const NONE = 'none';
+  const YEAR = 'year';
 }

@@ -2,8 +2,6 @@
 
 namespace Uncanny_Automator;
 
-use SureCart\Models\Purchase;
-
 /**
  * Class SureCart_Tokens
  *
@@ -11,6 +9,11 @@ use SureCart\Models\Purchase;
  */
 class SureCart_Tokens {
 
+	/**
+	 * common_tokens
+	 *
+	 * @return array
+	 */
 	public function common_tokens() {
 
 		$tokens = array(
@@ -169,6 +172,11 @@ class SureCart_Tokens {
 		return apply_filters( 'automator_surecart_product_tokens', $tokens );
 	}
 
+	/**
+	 * shipping_tokens
+	 *
+	 * @return array
+	 */
 	public function shipping_tokens() {
 
 		$tokens = array(
@@ -201,11 +209,17 @@ class SureCart_Tokens {
 	public function billing_tokens() {
 
 		$tokens = array(
-			'BILLING_NAME'  => array(
+			'BILLING_NAME'       => array(
 				'name' => __( 'Billing name', 'uncanny-automator' ),
 			),
-			'BILLING_EMAIL' => array(
+			'BILLING_EMAIL'      => array(
 				'name' => __( 'Billing email', 'uncanny-automator' ),
+			),
+			'BILLING_FIRST_NAME' => array(
+				'name' => __( 'Billing first name', 'uncanny-automator' ),
+			),
+			'BILLING_LAST_NAME'  => array(
+				'name' => __( 'Billing last name', 'uncanny-automator' ),
 			),
 		);
 
@@ -251,7 +265,7 @@ class SureCart_Tokens {
 			'ORDER_ID'               => $purchase_data->initial_order->id,
 			'SUBSCRIPTION_ID'        => isset( $purchase_data->subscription->id ) ? $purchase_data->subscription->id : '',
 			'ORDER_NUMBER'           => $purchase_data->initial_order->number,
-			'ORDER_DATE'             => date( get_option( 'date_format', 'F j, Y' ), $purchase_data->initial_order->created_at ),
+			'ORDER_DATE'             => gmdate( get_option( 'date_format', 'F j, Y' ), $purchase_data->initial_order->created_at ),
 			'ORDER_STATUS'           => $purchase_data->initial_order->status,
 			'ORDER_PAID_AMOUNT'      => $this->format_amount( $chekout->charge->amount ),
 			'ORDER_SUBTOTAL'         => $this->format_amount( $chekout->subtotal_amount ),
@@ -405,8 +419,10 @@ class SureCart_Tokens {
 		}
 
 		$parsed = $parsed + array(
-			'BILLING_NAME'  => empty( $checkout->name ) ? '' : $checkout->name,
-			'BILLING_EMAIL' => empty( $checkout->email ) ? '' : $checkout->email,
+			'BILLING_NAME'       => empty( $checkout->name ) ? '' : $checkout->name,
+			'BILLING_FIRST_NAME' => empty( $checkout->first_name ) ? '' : $checkout->first_name,
+			'BILLING_LAST_NAME'  => empty( $checkout->last_name ) ? '' : $checkout->last_name,
+			'BILLING_EMAIL'      => empty( $checkout->email ) ? '' : $checkout->email,
 		);
 
 		return apply_filters( 'automator_surecart_hydrate_billing_tokens', $parsed, $data );
@@ -591,10 +607,22 @@ class SureCart_Tokens {
 		}
 	}
 
+	/**
+	 * format_amount
+	 *
+	 * @param  mixed $amount
+	 * @return mixed
+	 */
 	public function format_amount( $amount ) {
 		return $amount / 100;
 	}
 
+	/**
+	 * get_hydrated_purchase
+	 *
+	 * @param  mixed $id
+	 * @return \SureCart\Models\Purchase
+	 */
 	public function get_hydrated_purchase( $id ) {
 		return \SureCart\Models\Purchase::with( array( 'initial_order', 'order.checkout', 'checkout.shipping_address', 'checkout.payment_method', 'checkout.discount', 'discount.coupon', 'checkout.charge', 'product', 'product.downloads', 'download.media', 'license.activations', 'line_items', 'line_item.price', 'subscription' ) )->find( $id );
 	}

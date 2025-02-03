@@ -12,10 +12,10 @@ Version History
 
 
 class Ithemes_Sync_Verb_Update_Show_Sync extends Ithemes_Sync_Verb {
-	public static $name = 'update-show-sync';
-	public static $description = 'Controls whether the Sync plugin and the iThemes Sync page shows up in the WordPress Dashboard.';
+	public static $name        = 'update-show-sync';
+	public static $description = 'Controls whether the Central plugin and the Solid Central page shows up in the WordPress Dashboard.';
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {
@@ -27,12 +27,12 @@ class Ithemes_Sync_Verb_Update_Show_Sync extends Ithemes_Sync_Verb {
 		}
 		
 		
-		$options = $GLOBALS['ithemes-sync-settings']->get_options();
+		$options              = $GLOBALS['ithemes-sync-settings']->get_options();
 		$options['show_sync'] = $arguments['show_sync'];
 		
 		$GLOBALS['ithemes-sync-settings']->update_options( $options );
 		
 		
-		return array( 'success' => 1 );
+		return [ 'success' => 1 ];
 	}
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCampaignFrequencyControlSpecsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const EVENT = 'event';
-    const INTERVAL_DAYS = 'interval_days';
-    const MAX_FREQUENCY = 'max_frequency';
-    public function getFieldTypes()
-    {
-        return array('event' => 'string', 'interval_days' => 'unsigned int', 'max_frequency' => 'unsigned int');
-    }
+
+class AdCampaignFrequencyControlSpecsFields extends AbstractEnum {
+
+  const EVENT = 'event';
+  const INTERVAL_DAYS = 'interval_days';
+  const MAX_FREQUENCY = 'max_frequency';
+
+  public function getFieldTypes() {
+    return array(
+      'event' => 'string',
+      'interval_days' => 'unsigned int',
+      'max_frequency' => 'unsigned int',
+    );
+  }
 }

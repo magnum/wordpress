@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,16 +35,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdSetOptimizationSubEventValues getInstance()
  */
-class AdSetOptimizationSubEventValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const NONE = 'NONE';
-    const TRAVEL_INTENT = 'TRAVEL_INTENT';
-    const TRAVEL_INTENT_BUCKET_01 = 'TRAVEL_INTENT_BUCKET_01';
-    const TRAVEL_INTENT_BUCKET_02 = 'TRAVEL_INTENT_BUCKET_02';
-    const TRAVEL_INTENT_BUCKET_03 = 'TRAVEL_INTENT_BUCKET_03';
-    const TRAVEL_INTENT_BUCKET_04 = 'TRAVEL_INTENT_BUCKET_04';
-    const TRAVEL_INTENT_BUCKET_05 = 'TRAVEL_INTENT_BUCKET_05';
-    const TRAVEL_INTENT_NO_DESTINATION_INTENT = 'TRAVEL_INTENT_NO_DESTINATION_INTENT';
-    const TRIP_CONSIDERATION = 'TRIP_CONSIDERATION';
-    const VIDEO_SOUND_ON = 'VIDEO_SOUND_ON';
+class AdSetOptimizationSubEventValues extends AbstractEnum {
+
+  const NONE = 'NONE';
+  const TRAVEL_INTENT = 'TRAVEL_INTENT';
+  const TRAVEL_INTENT_BUCKET_01 = 'TRAVEL_INTENT_BUCKET_01';
+  const TRAVEL_INTENT_BUCKET_02 = 'TRAVEL_INTENT_BUCKET_02';
+  const TRAVEL_INTENT_BUCKET_03 = 'TRAVEL_INTENT_BUCKET_03';
+  const TRAVEL_INTENT_BUCKET_04 = 'TRAVEL_INTENT_BUCKET_04';
+  const TRAVEL_INTENT_BUCKET_05 = 'TRAVEL_INTENT_BUCKET_05';
+  const TRAVEL_INTENT_NO_DESTINATION_INTENT = 'TRAVEL_INTENT_NO_DESTINATION_INTENT';
+  const TRIP_CONSIDERATION = 'TRIP_CONSIDERATION';
+  const VIDEO_SOUND_ON = 'VIDEO_SOUND_ON';
 }

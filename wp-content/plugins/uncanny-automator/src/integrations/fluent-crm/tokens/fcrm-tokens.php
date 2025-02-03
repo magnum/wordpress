@@ -47,7 +47,22 @@ class Fcrm_Tokens {
 
 		$trigger_meta = $args['meta'];
 
-		// All subscriber fields
+		$trigger_code = $args['triggers_meta']['code'];
+
+		// Allow Pro to add its trigger code.
+		$contact_id_token_enabled_triggers = $this->get_contact_id_token_enabled_triggers( $tokens, $args );
+
+		// Add 'Contact ID' to a set of triggers using trigger code.
+		if ( in_array( $trigger_code, $contact_id_token_enabled_triggers, true ) ) {
+			$tokens[] = array(
+				'tokenId'         => 'contact_id',
+				'tokenName'       => esc_html__( 'Contact ID', 'uncanny-automator' ),
+				'tokenType'       => 'int',
+				'tokenIdentifier' => $trigger_meta,
+			);
+		}
+
+		// All subscriber fields.
 		foreach ( Subscriber::mappables() as $key => $label ) {
 			$tokens[] = array(
 				'tokenId'         => $key,
@@ -55,6 +70,16 @@ class Fcrm_Tokens {
 				'tokenType'       => 'text',
 				'tokenIdentifier' => $trigger_meta,
 			);
+
+			// Add 'Company Name' token.
+			if ( 'company_id' === $key ) {
+				$tokens[] = array(
+					'tokenId'         => 'company_name',
+					'tokenName'       => esc_html__( 'Primary Company Name', 'uncanny-automator' ),
+					'tokenType'       => 'text',
+					'tokenIdentifier' => $trigger_meta,
+				);
+			}
 		}
 
 		// All custom subscriber fields
@@ -92,8 +117,21 @@ class Fcrm_Tokens {
 			}
 
 			$trigger_log_id = isset( $replace_args['trigger_log_id'] ) ? absint( $replace_args['trigger_log_id'] ) : 0;
-			$trigger_id     = $pieces[0];
-			$trigger_meta   = $pieces[2];
+
+			$trigger_id   = $pieces[0];
+			$trigger_meta = $pieces[2];
+
+			$contact_related_tokens = array(
+				'FCRMLIST',
+				'ANONFCRMUSERSTATUSUPDATED',
+				'FCRMTAG',
+			);
+
+			if ( in_array( $pieces[1], $contact_related_tokens, true )
+				&& 'contact_id' === $pieces[2] ) {
+				// Get the subscriber ID.
+				return $this->get_subscriber_id_from_log( $trigger_id, $trigger_log_id );
+			}
 
 			if (
 				( 'FCRMUSERLIST' === $pieces['1'] && 'FCRMLIST' === $trigger_meta ) ||
@@ -118,7 +156,7 @@ class Fcrm_Tokens {
 						// String. The trigger meta.
 						$trigger_log_id,
 						// Integer. The trigger log id.
-							$trigger_id
+						$trigger_id
 						// Integer. The trigger id.
 					)
 				);
@@ -209,9 +247,14 @@ class Fcrm_Tokens {
 				);
 
 				if ( absint( $entry ) ) {
-					$subscriber = Subscriber::where( 'id', absint( $entry ) )->first();
-
+					$subscriber    = Subscriber::where( 'id', absint( $entry ) )->first();
 					$contact_field = $pieces['2'];
+
+					// Handle Primary Company Name token
+					if ( 'company_name' === $contact_field ) {
+						return $this->get_primary_company_name( $subscriber );
+					}
+
 					if ( isset( $subscriber->$contact_field ) ) {
 						// its a standard field
 						return $subscriber->$contact_field;
@@ -232,6 +275,41 @@ class Fcrm_Tokens {
 		}//end if
 
 		return $value;
+	}
+
+	/**
+	 * Get Primary Company Name
+	 *
+	 * @param \Subscriber $subscriber
+	 *
+	 * @return string
+	 */
+	public function get_primary_company_name( $subscriber ) {
+
+		if ( ! $subscriber instanceof Subscriber ) {
+			return '-';
+		}
+
+		// Ensure that the subscriber has a company ID.
+		if ( ! isset( $subscriber->company_id ) || empty( $subscriber->company_id ) ) {
+			return '-';
+		}
+
+		// Get the company.
+		if ( ! class_exists( '\FluentCrm\App\Models\Company' ) ) {
+			return '-';
+		}
+		$company = \FluentCrm\App\Models\Company::find( $subscriber->company_id );
+		if ( ! $company instanceof \FluentCrm\App\Models\Company ) {
+			return '-';
+		}
+
+		// Get the company name.
+		if ( isset( $company->name ) && ! empty( $company->name ) ) {
+			return $company->name;
+		}
+
+		return '-';
 	}
 
 	/**
@@ -341,6 +419,50 @@ class Fcrm_Tokens {
 		}
 
 		return $value;
+
+	}
+
+	/**
+	 * Retrieve the subscriber ID from the log.
+	 *
+	 * @param int $trigger_id
+	 * @param int $trigger_log_id
+	 *
+	 * @return int The subscriber ID.
+	 */
+	protected function get_subscriber_id_from_log( $trigger_id, $trigger_log_id ) {
+
+		global $wpdb;
+
+		$subscriber_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_value
+				FROM {$wpdb->prefix}uap_trigger_log_meta
+				WHERE meta_key = 'subscriber_id'
+				AND automator_trigger_log_id = %d
+				AND automator_trigger_id = %d
+				LIMIT 0, 1",
+				$trigger_log_id,
+				$trigger_id
+			)
+		);
+
+		return absint( $subscriber_id );
+
+	}
+
+	public function get_contact_id_token_enabled_triggers( $tokens, $args ) {
+
+		return apply_filters(
+			'automator_fluent_crm_token_contact_id',
+			array(
+				'ANONFCRMUSERLIST',
+				'ANONFCRMUSERTAG',
+			),
+			$tokens,
+			$args,
+			$this
+		);
 
 	}
 

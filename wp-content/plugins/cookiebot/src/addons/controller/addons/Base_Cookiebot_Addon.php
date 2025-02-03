@@ -10,9 +10,11 @@ use cybot\cookiebot\lib\traits\Class_Constant_Override_Validator_Trait;
 use cybot\cookiebot\lib\traits\Extra_Information_Trait;
 use Exception;
 use InvalidArgumentException;
+use UnexpectedValueException;
 use function cybot\cookiebot\lib\cookiebot_addons_output_cookie_types;
 
 abstract class Base_Cookiebot_Addon {
+
 
 	use Class_Constant_Override_Validator_Trait;
 	use Extra_Information_Trait;
@@ -149,10 +151,9 @@ abstract class Base_Cookiebot_Addon {
 				$this->buffer_output
 			);
 
-			if ( $alternative_version_addon_instance->is_addon_installed() ) {
-				if ( version_compare( $alternative_version_addon_instance->get_version(), $version_string, '<=' ) ) {
-					return $alternative_version_addon_instance;
-				}
+			if ( $alternative_version_addon_instance->is_addon_installed() &&
+				version_compare( $alternative_version_addon_instance->get_version(), $version_string, '<=' ) ) {
+				return $alternative_version_addon_instance;
 			}
 		}
 		return null;
@@ -247,7 +248,10 @@ abstract class Base_Cookiebot_Addon {
 	 * @since 1.8.0
 	 */
 	final public function get_placeholder_helper() {
-		return '<p>Merge tags you can use in the placeholder text:</p><ul><li>%cookie_types - Lists required cookie types</li><li>[renew_consent]text[/renew_consent] - link to display cookie settings in frontend</li></ul>';
+		return '<p>Merge tags you can use in the placeholder text:</p>
+				<ul><li>%cookie_types - Lists required cookie types</li>
+				<li>[renew_consent]text[/renew_consent] - link to display cookie settings in frontend</li>
+				</ul>';
 	}
 
 	/**
@@ -318,11 +322,11 @@ abstract class Base_Cookiebot_Addon {
 		}
 
 		if ( ! is_string( $path ) || $path === '' ) {
-			throw new Exception( 'Invalid $path argument or SVN_URL_DEFAULT_SUB_PATH class constant override in ' . static::class );
+			throw new InvalidArgumentException( 'Invalid $path argument or SVN_URL_DEFAULT_SUB_PATH class constant override in ' . static::class );
 		}
 
 		if ( ! is_string( static::SVN_URL_BASE_PATH ) || static::SVN_URL_BASE_PATH === '' ) {
-			throw new Exception( 'The addon class does not correctly override the SVN_URL_BASE_PATH class constant in ' . static::class );
+			throw new UnexpectedValueException( 'The addon class does not correctly override the SVN_URL_BASE_PATH class constant in ' . static::class );
 		}
 
 		return static::SVN_URL_BASE_PATH . $path;

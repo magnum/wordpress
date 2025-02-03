@@ -24,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once 'mo-saml-xmlseclibs.php';
-use \RobRichards\XMLSecLibs\Mo_SAML_XML_Security_Key;
-use \RobRichards\XMLSecLibs\Mo_SAML_XML_Security_DSig;
-use \RobRichards\XMLSecLibs\Mo_SAML_XML_Sec_Enc;
+use RobRichards\XMLSecLibs\Mo_SAML_XML_Security_Key;
+use RobRichards\XMLSecLibs\Mo_SAML_XML_Security_DSig;
+use RobRichards\XMLSecLibs\Mo_SAML_XML_Sec_Enc;
 
 /**
  * This class contains collections of various static functions used across the plugin.
@@ -63,7 +63,7 @@ class Mo_SAML_Utilities {
 	 * @return string
 	 */
 	public static function mo_saml_generate_random_bytes( $length ) {
-
+		self::mo_saml_check_required_extensions_installed();
 		return openssl_random_pseudo_bytes( $length );
 	}
 
@@ -162,6 +162,108 @@ class Mo_SAML_Utilities {
 
 		return $ret;
 	}
+
+	/**
+	 * Get the list of required PHP extensions that are currently disabled.
+	 *
+	 * This function checks a predefined list of required PHP extensions and returns
+	 * an array of extensions that are not currently installed or enabled on the server.
+	 *
+	 * @return array List of disabled PHP extensions.
+	 */
+	public static function mo_saml_get_disabled_extensions() {
+		$required_php_extensions = Mo_Saml_Required_PHP_Extensions::PHP_EXTENSIONS;
+		$disable_extensions      = array();
+
+		foreach ( $required_php_extensions as $key => $value ) {
+			if ( ! self::mo_saml_required_extensions_installed( $key ) ) {
+				array_push( $disable_extensions, $value );
+			}
+		}
+
+		return $disable_extensions;
+	}
+
+	/**
+	 * Function to check extenstion installed or not.
+	 *
+	 * @param string $extension_name The name of the PHP extension to check for.
+	 *
+	 * @return boolean
+	 */
+	public static function mo_saml_required_extensions_installed( $extension_name ) {
+		return in_array( $extension_name, get_loaded_extensions(), true ) ? true : false;
+	}
+
+	/**
+	 * Check if the required extensions are installed and handle errors appropriately.
+	 *
+	 * @param string $option To check whether the request is from test configuration or sso flow.
+	 */
+	public static function mo_saml_check_required_extensions_installed( $option = '' ) {
+		self::mo_saml_display_extension_error( 'dom', 'WPSAMLERR015', $option );
+		self::mo_saml_display_extension_error( 'openssl', 'WPSAMLERR020', $option );
+		self::mo_saml_display_extension_error( 'curl', 'WPSAMLERR032', $option );
+	}
+
+	/**
+	 * Check if a specific extension is installed and displays errors as per their invocation context(test configuration or sso flow).
+	 *
+	 * @param string $extension The extension to check.
+	 * @param string $error_code_key The error code key to retrieve the error code.
+	 * @param string $option To check whether the request is from test configuration or sso flow.
+	 */
+	private static function mo_saml_display_extension_error( $extension, $error_code_key, $option ) {
+		if ( ! self::mo_saml_required_extensions_installed( $extension ) ) {
+			$error_code = Mo_Saml_Options_Enum_Error_Codes::$error_codes[ $error_code_key ];
+			if ( 'testConfig' === $option ) {
+				mo_saml_display_test_config_error_page( $error_code );
+				exit;
+			}
+			self::mo_saml_die( $error_code );
+		}
+	}
+
+	/**
+	 * Function to display the UI of the not installed extensions in plugin.
+	 *
+	 * @return void
+	 */
+	public static function mo_saml_extension_disabled_modal() {
+
+		$valid_pages = Mo_Saml_Plugin_Pages::PLUGIN_PAGES;
+
+        //phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Ignore the nonce verification.
+		if ( ! empty( $_GET['page'] ) && ( in_array( $_GET['page'], $valid_pages, true ) ) ) {
+
+			$disable_extensions = self::mo_saml_get_disabled_extensions();
+
+			if ( ! empty( $disable_extensions ) ) {
+				echo '
+                <div class="mo_saml_activate_modal">
+                    <div class="mo_saml_model_container">
+                        <div class="mo_saml_modal_content">
+                            <div class="mo_saml_modal_content_header">
+                                <img src="' . esc_attr( plugin_dir_url( __FILE__ ) ) . 'images/miniorange_logo.webp" width="57px" height="56px">
+                                <span class="mo_saml_modal_content_header-title">miniOrange SSO using SAML 2.0</span></br>
+                            </div>
+                            <div class="mo_saml_modal_content_extenstions"></br><span class="mo_saml_modal_content_extenstions-warning"><span class="mo_saml_modal_content_extenstions-warning2">Warning: Plugin disabled because required PHP extensions are missing.<br><br></span><span> Please enable the following PHP extensions:</span><br>';
+									echo '<ol>';
+				foreach ( $disable_extensions as $item ) {
+					echo '<li>' . esc_attr( $item ) . '</li>';
+				}
+									echo '</ol></span><br>
+                                    <span>Please refresh the page after enabling the above extensions.</span>
+                            </div>';
+							echo '<hr><p class="mo_saml_support_info">For any further issues, please send an email to <a href="mailto: samlsupport@xecurify.com"><i>samlsupport@xecurify.com</i></a></p>
+                        </div>
+                    </div>
+                </div>';
+				exit();
+			}
+		}
+	}
+
 	/**
 	 * Converts Date to Timestamp.
 	 *
@@ -174,7 +276,7 @@ class Mo_SAML_Utilities {
 		// We use a very strict regex to parse the timestamp.
 		$regex = '/^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)T(\\d\\d):(\\d\\d):(\\d\\d)(?:\\.\\d+)?Z$/D';
 		if ( preg_match( $regex, $time, $matches ) === 0 ) {
-			echo sprintf( 'Invalid SAML2 timestamp passed to xsDateTimeToTimestamp: ' . esc_html( $time ) );
+			printf( 'Invalid SAML2 timestamp passed to xsDateTimeToTimestamp: ' . esc_html( $time ) );
 			exit;
 		}
 
@@ -196,15 +298,15 @@ class Mo_SAML_Utilities {
 	/**
 	 * Extract strings from Assertion.
 	 *
-	 * @param  DOMElement $parent Instance of DOMElement.
+	 * @param  DOMElement $dom_parent Instance of DOMElement.
 	 * @param  string     $namespace_url Contains namespace value.
 	 * @param  string     $local_name Contains AuthenticatingAuthority or Audience Value.
 	 * @return array
 	 */
-	public static function mo_saml_extract_strings( DOMElement $parent, $namespace_url, $local_name ) {
+	public static function mo_saml_extract_strings( DOMElement $dom_parent, $namespace_url, $local_name ) {
 		$ret = array();
 		//phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Can not convert into Snakecase, since it is a part of DOMElement class.	
-		for ( $node = $parent->firstChild; null !== $node; $node = $node->nextSibling ) {
+		for ( $node = $dom_parent->firstChild; null !== $node; $node = $node->nextSibling ) {
 			//phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Can not convert into Snakecase, since it is a part of DOMElement class.
 			if ( $node->namespaceURI !== $namespace_url || $node->localName !== $local_name ) {
 				continue;
@@ -219,7 +321,7 @@ class Mo_SAML_Utilities {
 	 * Validate the SAML Response.
 	 *
 	 * @param  DOMElement $root Instance of DOMElement.
-	 * @return string
+	 * @return array|bool
 	 */
 	public static function mo_saml_validate_element( DOMElement $root ) {
 		/* Create an XML security object. */
@@ -237,20 +339,23 @@ class Mo_SAML_Utilities {
 			/* We don't have a signature element to validate. */
 			return false;
 		} elseif ( $signature_length > 1 ) {
-			echo sprintf( 'XMLSec: more than one signature element in root.' );
+			printf( 'XMLSec: more than one signature element in root.' );
 			exit;
 		}
 
 		$signature_element          = $signature_element[0];
 		$obj_xml_sec_dsig->sig_node = $signature_element;
 
-		/* Canonicalize the XMLDSig SignedInfo element in the message. */
-		$obj_xml_sec_dsig->canonicalize_signed_info();
-
-		/* Validate referenced xml nodes. */
-		if ( ! $obj_xml_sec_dsig->validate_reference() ) {
-			echo sprintf( 'XMLSec: digest validation failed' );
-			exit;
+		try {
+			/* Canonicalize the XMLDSig SignedInfo element in the message. */
+			$obj_xml_sec_dsig->canonicalize_signed_info();
+			/* Validate referenced xml nodes. */
+			if ( ! $obj_xml_sec_dsig->validate_reference() ) {
+				printf( 'XMLSec: digest validation failed' );
+				exit;
+			}
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid SAML Response' );
 		}
 
 		/* Check that $root is one of the signed nodes. */
@@ -268,7 +373,7 @@ class Mo_SAML_Utilities {
 		}
 
 		if ( ! $root_signed ) {
-			echo sprintf( 'XMLSec: The root element is not signed.' );
+			printf( 'XMLSec: The root element is not signed.' );
 			exit;
 		}
 
@@ -301,12 +406,12 @@ class Mo_SAML_Utilities {
 
 		$sig_method = self::mo_saml_xp_query( $obj_xml_sec_dsig->sig_node, './ds:SignedInfo/ds:SignatureMethod' );
 		if ( empty( $sig_method ) ) {
-			echo sprintf( 'Missing SignatureMethod element' );
+			printf( 'Missing SignatureMethod element' );
 			exit();
 		}
 		$sig_method = $sig_method[0];
 		if ( ! $sig_method->hasAttribute( 'Algorithm' ) ) {
-			echo sprintf( 'Missing Algorithm-attribute on SignatureMethod element.' );
+			printf( 'Missing Algorithm-attribute on SignatureMethod element.' );
 			exit;
 		}
 		$algo = $sig_method->getAttribute( 'Algorithm' );
@@ -317,7 +422,7 @@ class Mo_SAML_Utilities {
 
 		/* Check the signature. */
 		if ( ! $obj_xml_sec_dsig->verify( $key ) ) {
-			echo sprintf( 'Unable to validate Signature' );
+			printf( 'Unable to validate Signature' );
 			exit;
 		}
 	}
@@ -338,16 +443,20 @@ class Mo_SAML_Utilities {
 
 		$key_info = openssl_pkey_get_details( $key->key );
 		if ( false === $key_info ) {
-			echo sprintf( 'Unable to get key details from XMLSecurityKey.' );
+			printf( 'Unable to get key details from XMLSecurityKey.' );
 			exit;
 		}
 		if ( ! isset( $key_info['key'] ) ) {
-			echo sprintf( 'Missing key in public key details.' );
+			printf( 'Missing key in public key details.' );
 			exit;
 		}
 
 		$new_key = new Mo_SAML_XML_Security_Key( $algorithm, array( 'type' => $type ) );
-		$new_key->mo_saml_load_key( $key_info['key'] );
+		try {
+			$new_key->mo_saml_load_key( $key_info['key'] );
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Key' );
+		}
 
 		return $new_key;
 	}
@@ -379,7 +488,6 @@ class Mo_SAML_Utilities {
 			$error_code = Mo_Saml_Options_Enum_Error_Codes::$error_codes['WPSAMLERR008'];
 			self::mo_saml_die( $error_code );
 		}
-
 	}
 	/**
 	 * Process the SAML Response.
@@ -404,6 +512,9 @@ class Mo_SAML_Utilities {
 
 		/* Validate Response-element destination. */
 		$msg_destination = $response->mo_saml_get_destination();
+		if ( strpos( $msg_destination, '?' ) ) {
+			$msg_destination = substr( $msg_destination, 0, strpos( $msg_destination, '?' ) );
+		}
 		if ( substr( $msg_destination, -1 ) === '/' ) {
 			$msg_destination = substr( $msg_destination, 0, -1 );
 		}
@@ -413,7 +524,7 @@ class Mo_SAML_Utilities {
 
 		if ( null !== $msg_destination && $msg_destination !== $current_url ) {
 			Mo_SAML_Logger::mo_saml_add_log( 'Destination in response doesn\'t match the current URL. Destination is "' . esc_url( $msg_destination ) . '", current URL is "' . esc_url( $current_url ) . '".', Mo_SAML_Logger::ERROR );
-			echo sprintf( 'Destination in response doesn\'t match the current URL. Destination is "' . esc_url( $msg_destination ) . '", current URL is "' . esc_url( $current_url ) . '".' );
+			printf( 'Destination in response doesn\'t match the current URL. Destination is "' . esc_url( $msg_destination ) . '", current URL is "' . esc_url( $current_url ) . '".' );
 			exit;
 		}
 
@@ -451,9 +562,9 @@ class Mo_SAML_Utilities {
 		$last_exception = null;
 
 		$key = new Mo_SAML_XML_Security_Key( Mo_SAML_XML_Security_Key::RSA_SHA1, array( 'type' => 'public' ) );
-		$key->mo_saml_load_key( $pem_cert );
-
 		try {
+			$key->mo_saml_load_key( $pem_cert );
+
 			/*
 			 * Make sure that we have a valid signature
 			 */
@@ -469,7 +580,6 @@ class Mo_SAML_Utilities {
 		} else {
 			return false;
 		}
-
 	}
 
 
@@ -504,10 +614,9 @@ class Mo_SAML_Utilities {
 					);
 					$error_code = Mo_Saml_Options_Enum_Error_Codes::$error_codes['WPSAMLERR009'];
 					if ( 'testValidate' === $relay_state ) {
-						$error_cause   = $error_code['cause'];
-						$error_message = $error_code['testConfig_msg'];
-						mo_saml_display_test_config_error_page( $error_code['code'], $error_cause, $error_message );
-						mo_saml_download_logs( $error_cause, $error_message );
+						$display_metadata_mismatch = '<p><strong>Audience URI configured in Identity Provider: </strong>' . $audiences[0] . '<p>
+						<p><strong>Audience URI configured in the plugin\'s Service Provider Metadata Tab: </strong>' . esc_html( $sp_entity_id ) . '</p>';
+						mo_saml_display_test_config_error_page( $error_code, $display_metadata_mismatch );
 						exit;
 					} else {
 						self::mo_saml_die( $error_code );
@@ -528,11 +637,9 @@ class Mo_SAML_Utilities {
 			);
 			$error_code = Mo_Saml_Options_Enum_Error_Codes::$error_codes['WPSAMLERR010'];
 			if ( 'testValidate' === $relay_state ) {
-				$error_cause   = $error_code['cause'];
-				$error_message = $error_code['testConfig_msg'];
+				update_option( Mo_Saml_Sso_Constants::MO_SAML_VALID_AGAINST_ENTITY_ID, $issuer_to_validate_against );
 				update_option( Mo_Saml_Sso_Constants::MO_SAML_REQUIRED_ISSUER, $issuer );
-				mo_saml_display_test_config_error_page( $error_code['code'], $error_cause, $error_message );
-				mo_saml_download_logs( $error_cause, $error_message );
+				wp_safe_redirect( admin_url() . '?page=mo_saml_settings&option=test_config_error_wpsamlerr010' );
 				exit;
 			} else {
 					self::mo_saml_die( $error_code );
@@ -562,7 +669,6 @@ class Mo_SAML_Utilities {
 				"-----END CERTIFICATE-----\n";
 
 			return $pem;
-
 	}
 	/**
 	 * Santize the Certificate.
@@ -856,10 +962,53 @@ class Mo_SAML_Utilities {
 		$query_str = is_null( $query_str ) ? '' : $query_str;
 		parse_str( $query_str, $query_params );
 		//phpcs:ignore WordPress.Security.NonceVerification.Missing -- NonceVerification is not required here.
-		if ( ( isset( $_POST['option'] ) && ( 'mo_skip_feedback' === $_POST['option'] || 'mo_feedback' === $_POST['option'] ) ) || ! empty( $query_params['page'] ) && strpos( $query_params['page'], 'mo_saml' ) !== false ) {
+		if ( ( isset( $_POST['option'] ) && ( 'mo_skip_feedback' === $_POST['option'] || 'mo_feedback' === $_POST['option'] ) ) || ( ! empty( $query_params['page'] ) && strpos( $query_params['page'], 'mo_saml' ) !== false ) ) {
 			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Function to sanitize the $_POST array.
+	 *
+	 * @param array $array_option Array to sanitize.
+	 * @return array Sanitized array values.
+	 */
+	public static function mo_saml_sanitize_post_array( $array_option ) {
+		foreach ( $array_option as $key => $value ) {
+			if ( 'saml_x509_certificate' === $key ) {
+				$array_option[ $key ] = $value;
+			} else {
+				$array_option[ $key ] = sanitize_text_field( $value );
+			}
+		}
+		return $array_option;
+	}
+
+	/**
+	 * Get URL of current page.
+	 *
+	 * @return bool|string
+	 */
+	public static function mo_saml_get_current_page_url() {
+		//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Don't need to unslash a possible URL.
+		$http_host = isset( $_SERVER['HTTP_HOST'] ) ? esc_url_raw( $_SERVER['HTTP_HOST'] ) : '';
+		//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Don't need to unslash a possible URL.
+		$is_https = ( isset( $_SERVER['HTTPS'] ) && strcasecmp( esc_url_raw( $_SERVER['HTTPS'] ), 'on' ) === 0 );
+
+		if ( filter_var( $http_host, FILTER_VALIDATE_URL ) ) {
+			$http_host = wp_parse_url( $http_host, PHP_URL_HOST );
+		}
+		//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Don't need to unslash a URI.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( $_SERVER['REQUEST_URI'] ) : '';
+		if ( substr( $request_uri, 0, 1 ) === '/' ) {
+			$request_uri = substr( $request_uri, 1 );
+		}
+		if ( strpos( $request_uri, '?option=saml_user_login' ) !== false ) {
+			//phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Don't need to unslash a URI.
+			return strtok( esc_url_raw( $_SERVER['REQUEST_URI'] ), '?' );
+		}
+		$relay_state = 'http' . ( $is_https ? 's' : '' ) . '://' . $http_host . '/' . $request_uri;
+		return $relay_state;
+	}
 }

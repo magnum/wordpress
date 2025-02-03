@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -36,6 +36,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecLay
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecOverlayPositionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecOverlayShapeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecTextFontValues;
+
 /**
  * This class is auto-generated.
  *
@@ -44,25 +45,27 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecTex
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataImageLayerSpec extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdCreativeLinkDataImageLayerSpecFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeLinkDataImageLayerSpecFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['BlendingMode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecBlendingModeValues::getInstance()->getValues();
-        $ref_enums['FrameSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecFrameSourceValues::getInstance()->getValues();
-        $ref_enums['ImageSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecImageSourceValues::getInstance()->getValues();
-        $ref_enums['LayerType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecLayerTypeValues::getInstance()->getValues();
-        $ref_enums['OverlayPosition'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecOverlayPositionValues::getInstance()->getValues();
-        $ref_enums['OverlayShape'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecOverlayShapeValues::getInstance()->getValues();
-        $ref_enums['TextFont'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageLayerSpecTextFontValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdCreativeLinkDataImageLayerSpec extends AbstractObject {
+
+  /**
+   * @return AdCreativeLinkDataImageLayerSpecFields
+   */
+  public static function getFieldsEnum() {
+    return AdCreativeLinkDataImageLayerSpecFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['BlendingMode'] = AdCreativeLinkDataImageLayerSpecBlendingModeValues::getInstance()->getValues();
+    $ref_enums['FrameSource'] = AdCreativeLinkDataImageLayerSpecFrameSourceValues::getInstance()->getValues();
+    $ref_enums['ImageSource'] = AdCreativeLinkDataImageLayerSpecImageSourceValues::getInstance()->getValues();
+    $ref_enums['LayerType'] = AdCreativeLinkDataImageLayerSpecLayerTypeValues::getInstance()->getValues();
+    $ref_enums['OverlayPosition'] = AdCreativeLinkDataImageLayerSpecOverlayPositionValues::getInstance()->getValues();
+    $ref_enums['OverlayShape'] = AdCreativeLinkDataImageLayerSpecOverlayShapeValues::getInstance()->getValues();
+    $ref_enums['TextFont'] = AdCreativeLinkDataImageLayerSpecTextFontValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

@@ -21,36 +21,40 @@ class Ithemes_Updater_Information {
 	public static function get_theme_information( $path ) {
 		return self::get_plugin_information( "$path/style.css" );
 	}
-	
+
 	public static function get_plugin_information( $path ) {
 		require_once( $GLOBALS['ithemes_updater_path'] . '/packages.php' );
 		$details = Ithemes_Updater_Packages::get_full_details();
-		
+
 		if ( ! isset( $details['packages'][$path] ) )
 			return false;
-		
-		
+
+
 		$package = $details['packages'][$path];
-		
+
 		require_once( $GLOBALS['ithemes_updater_path'] . '/functions.php' );
 		require_once( $GLOBALS['ithemes_updater_path'] . '/information.php' );
-		
+
 		$changelog = Ithemes_Updater_API::get_package_changelog( $package['package'], $details['packages'][$path]['installed'] );
-		
-		
+
+		if ( is_wp_error( $changelog ) ) {
+			/* translators: 1. Error message, 2. Error code */
+			$changelog = sprintf( __( '<p>Unable to get changelog data at this time.</p><p>%1$s (%2$s)</p>', 'it-l10n-ithemes-sync' ), esc_html( $changelog->get_error_message() ), esc_html( $changelog->get_error_code() ) );
+		}
+
+
 		$info = array(
-			'name'          => Ithemes_Updater_Functions::get_package_name( $package['package'] ),
+			'name'          => esc_html( Ithemes_Updater_Functions::get_package_name( $package['package'] ) ),
 			'slug'          => dirname( $path ),
-			'version'       => $package['available'],
-			'author'        => '<a href="http://ithemes.com/">iThemes</a>',
-			'download_link' => $package['package-url'],
-			
-			'sections' => array(
+			'version'       => isset( $package['available'] ) ? $package['available'] : '',
+			'author'        => '<a href="https://solidwp.com/">SolidWP</a>',
+			'download_link' => isset( $package['package-url'] ) ? $package['package-url'] : '',
+			'sections'      => array(
 				'changelog'    => $changelog,
 			),
 		);
-		
-		
+
+
 		return (object) $info;
 	}
 }

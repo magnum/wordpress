@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Delete_User extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_delete_user';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_delete_user';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the action
@@ -110,4 +121,5 @@ class AutomatorWP_WordPress_Delete_User extends AutomatorWP_Integration_Action {
 
 }
 
-new AutomatorWP_WordPress_Delete_User();
+new AutomatorWP_WordPress_Delete_User( 'wordpress' );
+new AutomatorWP_WordPress_Delete_User( 'users' );

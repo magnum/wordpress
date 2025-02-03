@@ -1,7 +1,9 @@
 <?php
 
-
 namespace Uncanny_Automator;
+
+use Uncanny_Automator\Recipe\Log_Properties;
+use Uncanny_Automator\Services\Properties;
 
 /**
  * Class Automator_Recipe_Process_Complete
@@ -9,6 +11,9 @@ namespace Uncanny_Automator;
  * @package Uncanny_Automator
  */
 class Automator_Recipe_Process_Complete {
+
+	use Log_Properties;
+
 	/**
 	 * @var
 	 */
@@ -17,6 +22,11 @@ class Automator_Recipe_Process_Complete {
 	 * @var $this
 	 */
 	public $user;
+
+	/**
+	 * @var Automator_Pro_Recipe_Process_Complete
+	 */
+	public $anon;
 
 	/**
 	 * Automator_Recipe_Process constructor.
@@ -58,13 +68,13 @@ class Automator_Recipe_Process_Complete {
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'complete_trigger', 'ERROR: You are trying to complete a trigger without providing a trigger_id.', $this );
+			Automator()->wp_error->add_error( 'complete_trigger', 'ERROR: You are trying to complete a trigger without providing a trigger_id.', $this );
 
 			return null;
 		}
 
 		if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-			Automator()->error->add_error( 'complete_trigger', 'ERROR: You are trying to complete a trigger without providing a recipe_id.', $this );
+			Automator()->wp_error->add_error( 'complete_trigger', 'ERROR: You are trying to complete a trigger without providing a recipe_id.', $this );
 
 			return null;
 		}
@@ -81,7 +91,7 @@ class Automator_Recipe_Process_Complete {
 		$trigger_integration = Automator()->get->trigger_integration_from_trigger_code( $trigger_code );
 		if ( 0 === Automator()->plugin_status->get( $trigger_integration ) ) {
 			// The plugin for this action is NOT active
-			Automator()->error->add_error( 'complete_trigger', 'ERROR: You are trying to complete ' . $trigger_code . ' and the plugin ' . $trigger_integration . ' is not active.', $this );
+			Automator()->wp_error->add_error( 'complete_trigger', 'ERROR: You are trying to complete ' . $trigger_code . ' and the plugin ' . $trigger_integration . ' is not active.', $this );
 
 			return null;
 		}
@@ -107,17 +117,70 @@ class Automator_Recipe_Process_Complete {
 
 		// The trigger is now completed
 		do_action_deprecated( 'uap_trigger_completed', array( $process_further ), '3.0', 'automator_trigger_completed' );
+
 		do_action( 'automator_trigger_completed', $process_further );
 
-		// If all triggers for the recipe are completed
+		// If all triggers for the recipe are completed.
 		if ( $maybe_continue_recipe_process && $this->triggers_completed( $recipe_id, $user_id, $recipe_log_id, $args ) ) {
+
+			// Store the historical count of a recipe
+			$this->add_recipe_count( $recipe_id );
+
 			// All triggers are completed. Now fix the $args. See function.
 			$args = $this->maybe_get_triggers_of_a_recipe( $args );
 
-			$this->complete_actions( $recipe_id, $user_id, $recipe_log_id, $args );
+			// Flow type determines if the recipe contains linear only.
+			$flow_type = apply_filters( 'automator_triggers_completed_run_flow_type', 'linear', $recipe_id, $user_id, $recipe_log_id, $args, $this );
+
+			if ( 'linear' === $flow_type ) {
+				// If it does, run all actions that are 'linear'.
+				$this->complete_actions( $recipe_id, $user_id, $recipe_log_id, $args );
+			}
+
+			// Support custom flow types.
+			do_action( 'automator_actions_completed_run_flow', $flow_type, $recipe_id, $user_id, $recipe_log_id, $args );
+
 		}
 
+		$this->add_backtrace_property( $args );
+
 		return true;
+
+	}
+
+	/**
+	 * Adds a backtrace property to all triggers.
+	 *
+	 * @param mixed $args - Automator process args.
+	 *
+	 * @return void
+	 */
+	public function add_backtrace_property( $args ) {
+
+		$is_enabled = apply_filters( 'automator_log_backtrace_property_enabled', true, $args );
+
+		// Bail if disabled.
+		if ( false === $is_enabled ) {
+			return;
+		}
+
+		$stack_trace = explode( ' ', wp_debug_backtrace_summary() );
+
+		$properties = new Properties();
+
+		$properties->add_item(
+			array(
+				'type'       => 'code',
+				'label'      => __( 'Trigger backtrace (for support)', 'uncanny-automator' ),
+				'value'      => var_export( $stack_trace, true ), // phpcs:ignore
+				'attributes' => array(
+					'code_language' => 'PHP',
+				),
+			)
+		);
+
+		$properties->record_trigger_properties( array( 'args' => $args ) );
+
 	}
 
 	/**
@@ -134,7 +197,7 @@ class Automator_Recipe_Process_Complete {
 	public function triggers_completed( $recipe_id = 0, $user_id = 0, $recipe_log_id = 0, $args = array() ) {
 
 		if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-			Automator()->error->add_error( 'triggers_completed', 'ERROR: You are trying to check if triggers are completed without providing a recipe_id.', $this );
+			Automator()->wp_error->add_error( 'triggers_completed', 'ERROR: You are trying to check if triggers are completed without providing a recipe_id.', $this );
 
 			return null;
 		}
@@ -151,7 +214,7 @@ class Automator_Recipe_Process_Complete {
 
 				if ( 0 === Automator()->plugin_status->get( $trigger_integration ) ) {
 					// The plugin for this trigger is NOT active
-					Automator()->error->add_error( 'complete_trigger', 'ERROR: You are trying to complete ' . $recipe_trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. @recipe_id ' . $recipe_id, $this );
+					Automator()->wp_error->add_error( 'complete_trigger', 'ERROR: You are trying to complete ' . $recipe_trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. @recipe_id ' . $recipe_id, $this );
 				}
 
 				$trigger_completed                         = Automator()->db->trigger->is_completed( $user_id, $recipe_trigger['ID'], $recipe_id, $recipe_log_id, true, $args );
@@ -233,91 +296,220 @@ class Automator_Recipe_Process_Complete {
 	 * @return bool
 	 */
 	public function complete_actions( $recipe_id = null, $user_id = null, $recipe_log_id = null, $args = array() ) {
-		$recipe_action_data = Automator()->get_recipe_data( 'uo-action', $recipe_id );
 
-		foreach ( $recipe_action_data as $action_data ) {
+		$actions = (array) Automator()->get_recipe_data( 'uo-action', $recipe_id );
 
-			$action_code                  = $action_data['meta']['code'];
-			$action_status                = $action_data['post_status'];
-			$action_data['recipe_log_id'] = $recipe_log_id;
-			$action_integration           = Automator()->get->action_integration_from_action_code( $action_code );
+		// No recipe actions found.
+		if ( empty( $actions ) ) {
 
-			if ( 1 === Automator()->plugin_status->get( $action_integration ) && 'publish' === (string) $action_status ) {
-				// The plugin for this action is active .. execute
-				$action_execution_function = Automator()->get->action_execution_function_from_action_code( $action_code );
+			// Check for closures.
+			$has_closure = (array) Automator()->get_recipe_data( 'uo-closure', $recipe_id );
 
-				$valid_function = true;
-				if ( null === $action_execution_function ) {
-					$valid_function = false;
-				} elseif ( is_array( $action_execution_function ) && ! method_exists( $action_execution_function[0], $action_execution_function[1] ) ) {
-					$valid_function = false;
-				} elseif ( is_string( $action_execution_function ) && ! function_exists( $action_execution_function ) ) {
-					$valid_function = false;
-				}
+			// No actions and no closures - complete the recipe with errors.
+			if ( empty( $has_closure ) ) {
+				Automator()->db->recipe->mark_complete( $recipe_log_id, Automator_Status::COMPLETED_WITH_ERRORS );
 
-				$action_data['completed']     = Automator_Status::NOT_COMPLETED;
-				$action_data['action_log_id'] = $this->create_action( $user_id, $action_data, $recipe_id, null, $recipe_log_id, $args );
+				return false;
+			}
 
-				if ( ! $valid_function ) {
-					$error_message                       = Automator()->error_message->get( 'action-function-not-exist' );
-					$action_data['complete_with_errors'] = true;
-					$this->action( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
-				} else {
+			// Have closures, complete the recipe.
+			Automator()->db->recipe->mark_complete( $recipe_log_id, Automator_Status::COMPLETED );
+			// This action hook is fired just before the closures are run.
+			do_action( 'automator_recipe_process_complete_complete_actions_before_closures', $recipe_id, $user_id, $recipe_log_id, $args );
 
-					//fallback...
-					$action_data['args'] = $args;
+			$this->closures( $recipe_id, $user_id, $recipe_log_id, $args );
 
-					/*
-					 * See function notes
-					 *
-					 * @since 2.8
-					 */
-					$action_data = $this->parse_custom_value( $action_data, $user_id, $recipe_id, $args );
+			return true;
+		}
 
-					/**
-					 * @since 4.6 adding `action_meta` to args to deal the issue with do_shortcode filter
-					 */
-					$action_args                = $args;
-					$action_args['action_meta'] = isset( $action_data['meta'] ) ? $action_data['meta'] : array();
+		// Recipe actions found - complete them.
+		$recipe_actions_data = apply_filters(
+			'automator_process_complete_actions',
+			$actions,
+			$recipe_id,
+			$user_id,
+			$recipe_log_id,
+			$args
+		);
 
-					$action = array(
-						'user_id'     => $user_id,
-						'action_data' => $action_data,
-						'recipe_id'   => $recipe_id,
-						'args'        => $action_args,
-					);
+		do_action( 'automator_before_process_complete_actions', $recipe_id, $user_id, $recipe_log_id, $actions, $args );
 
-					$action = apply_filters( 'automator_before_action_executed', $action );
+		// Run individual action on behalf of the user.
+		foreach ( $recipe_actions_data as $action_data ) {
 
-					if ( isset( $action['process_further'] ) ) {
+			$completed = $this->complete_action( $action_data, $recipe_id, $user_id, $recipe_log_id, $args );
 
-						if ( false === $action['process_further'] ) {
-							Utilities::log( 'Action was skipped by uap_before_action_executed filter.' );
-							continue;
-						}
-
-						unset( $action['process_further'] );
-					}
-
-					call_user_func_array( $action_execution_function, $action );
-				}
-			} elseif ( 'draft' === (string) $action_status ) {
+			if ( false === $completed ) {
+				Utilities::log(
+					Automator()->wp_error->get_messages( 'complete_action' ),
+					'Method complete_action has returned false',
+					AUTOMATOR_DEBUG_MODE,
+					'complete_actions'
+				);
 				continue;
-			} elseif ( 0 === Automator()->plugin_status->get( $action_integration ) ) {
-				$error_message                       = Automator()->error_message->get( 'action-not-active' );
-				$action_data['complete_with_errors'] = true;
-				$this->action( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
-			} else {
-				$error_message                       = esc_attr__( 'Unknown error occurred.', 'uncanny-automator' );
-				$action_data['complete_with_errors'] = true;
-				Automator()->error->add_error( 'complete_action', $error_message, array( $action_data, $this ) );
-				$this->action( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
 			}
 		}
+
+		// This action hook is fired just before the closures are run.
+		do_action( 'automator_recipe_process_complete_complete_actions_before_closures', $recipe_id, $user_id, $recipe_log_id, $args );
+
+		// Update the count of the recipe
+		Automator()->db->recipe->update_count( $recipe_id );
 
 		$this->closures( $recipe_id, $user_id, $recipe_log_id, $args );
 
 		return true;
+
+	}
+
+	/**
+	 * Individually complete the action.
+	 *
+	 * @param mixed[] $action_data
+	 * @param int $recipe_id
+	 * @param int $user_id
+	 * @param int $recipe_log_id
+	 * @param array $args
+	 */
+	public function complete_action( $action_data, $recipe_id, $user_id, $recipe_log_id, $args ) {
+
+		$action_code                  = $action_data['meta']['code'];
+		$action_status                = $action_data['post_status'];
+		$action_data['recipe_log_id'] = $recipe_log_id;
+		$action_integration           = Automator()->get->action_integration_from_action_code( $action_code );
+
+		if ( 'draft' === (string) $action_status ) {
+			return false;
+		}
+
+		try {
+
+			if ( 0 === Automator()->plugin_status->get( $action_integration ) ) {
+				throw new \Exception( Automator()->error_message->get( 'action-not-active' ) );
+			}
+
+			// The plugin for this action is active .. execute
+			$action_execution_function = Automator()->get->action_execution_function_from_action_code( $action_code );
+
+			$this->verify_execution_function( $action_execution_function );
+
+			$action_data['completed'] = Automator_Status::NOT_COMPLETED;
+
+			// Creates action log if there is no loop key in $action_data array.
+			$should_create_action = ! isset( $action_data['loop'] );
+
+			if ( true === $should_create_action ) {
+				$action_data['action_log_id'] = $this->create_action( $user_id, $action_data, $recipe_id, null, $recipe_log_id, $args );
+			}
+
+			// Fallback.
+			$action_data['args'] = $args;
+
+			/**
+			 * @since 2.8 - See method parse_custom_value
+			 */
+			$action_data = $this->parse_custom_value( $action_data, $user_id, $recipe_id, $args );
+
+			/**
+			 * @since 4.6 adding `action_meta` to args to deal the issue with do_shortcode filter
+			 */
+			$action_args                = $args;
+			$action_args['action_meta'] = isset( $action_data['meta'] ) ? $action_data['meta'] : array();
+
+			$action = array(
+				'user_id'     => $user_id,
+				'action_data' => $action_data,
+				'recipe_id'   => $recipe_id,
+				'args'        => $action_args,
+			);
+
+			$action = apply_filters( 'automator_before_action_executed', $action, $args );
+
+			if ( isset( $action['process_further'] ) ) {
+
+				do_action( 'automator_action_been_process_further', $action );
+
+				if ( false === $action['process_further'] ) {
+					$action = apply_filters( 'automator_action_complete_action_skipped', $action, $args );
+					Automator()->wp_error->add_error( 'complete_action', 'Action was skipped by uap_before_action_executed filter' );
+
+					return false;
+				}
+
+				unset( $action['process_further'] );
+
+			}
+
+			call_user_func_array( $action_execution_function, $action );
+
+		} catch ( \Error $e ) {
+			$error_message = $e->getMessage();
+			$this->create_error_property( $e->getTraceAsString() );
+			$this->complete_with_error( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
+		} catch ( \Exception $e ) {
+			$error_message = $e->getMessage();
+			$this->create_error_property( $e->getTraceAsString() );
+			$this->complete_with_error( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
+		}
+	}
+
+	/**
+	 * Creates error property for stack trace.
+	 *
+	 * @param string $stack_trace
+	 *
+	 * @return void
+	 */
+	protected function create_error_property( $stack_trace ) {
+		$this->set_log_properties(
+			array(
+				'type'       => 'code',
+				'label'      => _x( 'Stacktrace', 'Uncanny Automator', 'uncanny-automator' ),
+				'value'      => $stack_trace,
+				'attributes' => array(
+					'code_language' => 'json',
+				),
+			)
+		);
+	}
+
+	/**
+	 * @param $action_execution_function
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function verify_execution_function( $action_execution_function ) {
+
+		$error = Automator()->error_message->get( 'action-function-not-exist' );
+
+		if ( null === $action_execution_function ) {
+			throw new \Exception( $error );
+		}
+
+		if ( is_array( $action_execution_function ) && ! method_exists( $action_execution_function[0], $action_execution_function[1] ) ) {
+			throw new \Exception( $error );
+		}
+
+		if ( is_string( $action_execution_function ) && ! function_exists( $action_execution_function ) ) {
+			throw new \Exception( $error );
+		}
+	}
+
+	/**
+	 * @param $user_id
+	 * @param $action_data
+	 * @param $recipe_id
+	 * @param $error_message
+	 * @param $recipe_log_id
+	 * @param $args
+	 *
+	 * @return void
+	 */
+	public function complete_with_error( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args ) {
+		$action_data['complete_with_errors'] = true;
+		Automator()->wp_error->add_error( 'complete_action', $error_message, array( $action_data, $this ) );
+		$this->action( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
 	}
 
 	/**
@@ -342,13 +534,13 @@ class Automator_Recipe_Process_Complete {
 		$action_id = (int) $action_data['ID'];
 
 		if ( null === $action_id || ! is_numeric( $action_id ) ) {
-			Automator()->error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a action_id.', $this );
+			Automator()->wp_error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a action_id.', $this );
 
 			return null;
 		}
 
 		if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-			Automator()->error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a recipe_id.', $this );
+			Automator()->wp_error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a recipe_id.', $this );
 
 			return null;
 		}
@@ -358,7 +550,7 @@ class Automator_Recipe_Process_Complete {
 		}
 
 		if ( is_null( $recipe_log_id ) || empty( $recipe_log_id ) ) {
-			Automator()->error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a recipe_log_id.', $this );
+			Automator()->wp_error->add_error( 'complete_action', 'ERROR: You are trying to complete an action without providing a recipe_log_id.', $this );
 
 			return null;
 		}
@@ -398,6 +590,8 @@ class Automator_Recipe_Process_Complete {
 		$error_message = $this->get_action_error_message( $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
 
 		$process_further = apply_filters( 'automator_before_action_created', true, $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
+
+		do_action( 'automator_before_action_completed_after_message_and_process_further', $do_action_args, $error_message, $process_further );
 
 		if ( ! $process_further ) {
 			return;
@@ -443,7 +637,50 @@ class Automator_Recipe_Process_Complete {
 			$args['complete_with_notice'] = true;
 		}
 
+		// Allows Action to tell Automator to prevent process completion.
+		if ( isset( $args['process_recipe_completion'] ) && false === $args['process_recipe_completion'] ) {
+			return;
+		}
+
+		// Every action sends an action token value. In this case, we need 'action_status'.
+		self::action_tokens_hydrate_default( $do_action_args );
+
 		$this->recipe( $recipe_id, $user_id, $recipe_log_id, $args );
+
+	}
+
+	/**
+	 * @param mixed[] $process_args
+	 *
+	 * @return void
+	 */
+	public static function action_tokens_hydrate_default( $process_args ) {
+
+		// Load the hydrator class from Automator.
+		$hydrator = Automator()->action_tokens()->hydrator();
+
+		$action_log_id = $process_args['action_log_id'] ?? null;
+
+		$status = Automator()->db->action->get_action_log_completion_status( $action_log_id );
+
+		// Hydrate the tokens.
+		$value = array(
+			'ACTION_RUN_STATUS' => Automator_Status::name( $status ),
+		);
+
+		$user_id   = $process_args['user_id'] ?? null;
+		$action_id = $process_args['action_id'] ?? null;
+
+		if ( ! isset( $user_id, $action_id, $action_log_id ) ) {
+			return false;
+		}
+
+		$hydrator->set_user_id( $user_id );
+		$hydrator->set_action_id( $action_id );
+		$hydrator->set_action_log_id( $action_log_id );
+		$hydrator->set_process_args( $process_args );
+
+		return $hydrator->hydrate( $value );
 
 	}
 
@@ -461,12 +698,11 @@ class Automator_Recipe_Process_Complete {
 
 		$message = '';
 
-		$has_action_data_defined_error = key_exists( 'complete_with_errors', $action_data ) || key_exists( 'complete_with_notice', $action_data );
+		$possible_error_msg_keys = key_exists( 'complete_with_errors', $action_data ) || key_exists( 'complete_with_notice', $action_data ) || key_exists( 'do-nothing', $action_data );
 
-		if ( ! empty( $error_message ) && $has_action_data_defined_error ) {
+		if ( ! empty( $error_message ) && $possible_error_msg_keys ) {
 
 			$message = $error_message;
-
 		}
 
 		if ( key_exists( 'user_action_message', $args ) && ! empty( $args['user_action_message'] ) ) {
@@ -487,7 +723,6 @@ class Automator_Recipe_Process_Complete {
 		}
 
 		return apply_filters( 'automator_get_action_error_message', $message, $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
-
 	}
 
 	/**
@@ -538,7 +773,6 @@ class Automator_Recipe_Process_Complete {
 		}
 
 		return apply_filters( 'automator_get_action_completed_status', $completed, $user_id, $action_data, $recipe_id, $error_message, $recipe_log_id, $args );
-
 	}
 
 	/**
@@ -579,7 +813,7 @@ class Automator_Recipe_Process_Complete {
 	}
 
 	/**
-	 * this code is to parse new "Use custom value" functionality before an action
+	 * This code is to parse new "Use custom value" functionality before an action
 	 * function is called. We will not have to modify each integration to support it.
 	 *
 	 * @param $action_data
@@ -661,7 +895,10 @@ class Automator_Recipe_Process_Complete {
 		 */
 
 		$run_number = Automator()->get->next_run_number( $recipe_id, $user_id, true );
-		if ( $recipe_log_id && Automator()->db->recipe->get_scheduled_actions_count( $recipe_log_id, $args ) > 0 ) {
+
+		$scheduled_actions_count = Automator()->db->recipe->get_scheduled_actions_count( $recipe_log_id, $args );
+
+		if ( $recipe_log_id && $scheduled_actions_count > 0 ) {
 			$completed = Automator_Status::IN_PROGRESS;
 		} elseif ( ( is_array( $args ) && key_exists( 'do-nothing', $args ) ) ) {
 			$completed  = Automator_Status::DID_NOTHING;
@@ -683,30 +920,47 @@ class Automator_Recipe_Process_Complete {
 			'3.0',
 			'automator_before_recipe_completed'
 		);
+
 		do_action( 'automator_before_recipe_completed', $recipe_id, $user_id, $recipe_log_id, $args );
 
 		if ( null === $recipe_log_id ) {
+
 			if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-				Automator()->error->add_error( 'complete_recipe', 'ERROR: You are trying to completed a recipe without providing a recipe_id', $this );
+				Automator()->wp_error->add_error( 'complete_recipe', 'ERROR: You are trying to completed a recipe without providing a recipe_id', $this );
 
 				return null;
 			}
+
 			$recipe_log_id = Automator()->db->recipe->add( $user_id, $recipe_id, $completed, $run_number );
+
 		} else {
+
+			$completed = apply_filters( 'automator_recipe_process_complete_status', $completed, $args );
+
 			Automator()->db->recipe->mark_complete( $recipe_log_id, $completed );
+
 		}
 
 		// If actions error occurred, change the recipe status to 2
 		$maybe_error = Automator()->db->action->get_error_message( $recipe_log_id );
 
 		if ( ! empty( $maybe_error ) ) {
+
 			$skip     = false;
 			$message  = $maybe_error->error_message;
 			$complete = $maybe_error->completed;
 
-			if ( strpos( $message, 'Existing user found matching' ) || strpos( $message, 'User not found matching' ) || strpos( $message, 'User found matching' ) ) {
-				$skip = true;
-			} elseif ( strpos( $message, 'New user created' ) || strpos( $message, 'Create new user failed' ) ) {
+			// Determine whether the error message is coming from the user selector.
+			$is_user_selector_matching_message = self::is_user_selector_matching_message( $message );
+
+			// Determine whether the user selector has created or has failed creating a new user.
+			$is_user_selector_user_creation_message = self::is_user_selector_user_creation_message( $message );
+
+			// Determine whether the error message is from failed condition block.
+			$is_condition_block_failed_message = self::is_condition_block_failed_message( $message );
+
+			// @^todo: The following if-then-else logic could be wrapped in a method with a filter, and the user-selector logic could be moved to pro that applies the filter to invoke its logic.
+			if ( $is_user_selector_matching_message || $is_user_selector_user_creation_message || $is_condition_block_failed_message ) {
 				$skip = true;
 			} elseif ( Automator_Status::DID_NOTHING === (int) $complete ) {
 				$skip = true;
@@ -717,9 +971,33 @@ class Automator_Recipe_Process_Complete {
 			}
 
 			if ( ! $skip ) {
+
 				$comp = Automator_Status::DID_NOTHING === absint( $completed ) ? Automator_Status::DID_NOTHING : $complete;
+
 				Automator()->db->recipe->mark_complete_with_error( $recipe_id, $recipe_log_id, $comp );
-				do_action( 'automator_recipe_completed_with_errors', $recipe_id, $user_id, $recipe_log_id, $args );
+
+				$args['message']   = $message;
+				$args['completed'] = $complete;
+
+				if ( Automator_Status::COMPLETED_WITH_ERRORS === absint( $comp ) ) {
+					do_action( 'automator_recipe_completed_with_errors', $recipe_id, $user_id, $recipe_log_id, $args );
+				}
+			}
+
+			// Determine whether there are any user selector notices.
+			$contains_user_selector_notice = $is_user_selector_matching_message || $is_user_selector_user_creation_message;
+
+			/**
+			 * If there are any actions that has completed with errors already
+			 * and the recipe contains atleast one action that is in-progress,
+			 * Complete the recipe with 'In progress with errors'.
+			 *
+			 * @^todo - Conflicting logic with user-selector: See task for reference #https://app.clickup.com/t/8688p3bxk
+			 *
+			 * @since 5.8.0.3 - Added condition to handle user selector notice.
+			 */
+			if ( $scheduled_actions_count > 0 && ! $contains_user_selector_notice && ! $is_condition_block_failed_message ) {
+				Automator()->db->recipe->mark_complete_with_error( $recipe_id, $recipe_log_id, Automator_Status::IN_PROGRESS_WITH_ERROR );
 			}
 		}
 
@@ -734,10 +1012,84 @@ class Automator_Recipe_Process_Complete {
 			'3.0',
 			'automator_recipe_completed'
 		);
+
 		do_action( 'automator_recipe_completed', $recipe_id, $user_id, $recipe_log_id, $args );
 
 		return true;
 	}
+
+	/**
+	 * Determines whether the error message is from failed condition block.
+	 *
+	 * @param $error_message
+	 *
+	 * @return bool
+	 */
+	public static function is_condition_block_failed_message( $error_message ) {
+		$error_message = strtolower( $error_message );
+		$substrings    = array( 'failed condition', 'failed conditions' );
+
+		return self::substring_exists( $substrings, $error_message );
+	}
+
+	/**
+	 * Determines whether the error message is from user selector's user creation.
+	 *
+	 * @param string $error_message
+	 *
+	 * @todo - Maybe move from free to pro.
+	 *
+	 * @return boolean
+	 */
+	public static function is_user_selector_user_creation_message( $error_message ) {
+
+		$error_message = strtolower( $error_message );
+		$substrings    = array( 'new user created', 'creating a new user failed' );
+
+		return self::substring_exists( $substrings, $error_message );
+	}
+
+	/**
+	 * Determine whether the error message is coming from user selector's user matching.
+	 *
+	 * @param string $error_message
+	 *
+	 * @todo - Maybe move from free to pro.
+	 *
+	 * @return boolean
+	 */
+	public static function is_user_selector_matching_message( $error_message ) {
+
+		$error_message = strtolower( $error_message );
+		$substrings    = array( 'existing user was found', 'user was not found', 'user found matching' );
+
+		return self::substring_exists( $substrings, $error_message );
+
+	}
+
+	/**
+	 * Determine whether any of the strings existing in a specific string.
+	 *
+	 * @param string[] $substrings
+	 * @param string $string
+	 *
+	 * @todo - Maybe move in utility.
+	 *
+	 * @return bool
+	 */
+	private static function substring_exists( $substrings, $string ) {
+
+		foreach ( $substrings as $substring ) {
+			// Check if the substring is found within the larger string.
+			if ( strpos( $string, $substring ) !== false ) {
+				return true; // If any substring is found, return true.
+			}
+		}
+
+		// If we reach here, none of the substrings were found.
+		return false;
+	}
+
 
 	/**
 	 * Complete all closures in recipe
@@ -752,6 +1104,9 @@ class Automator_Recipe_Process_Complete {
 	public function closures( $recipe_id = null, $user_id = null, $recipe_log_id = null, $args = array() ) {
 
 		$recipe_closure_data = Automator()->get_recipe_data( 'uo-closure', $recipe_id );
+
+		$log_args = array();
+
 		foreach ( $recipe_closure_data as $closure_data ) {
 
 			$closure_code                  = $closure_data['meta']['code'];
@@ -759,10 +1114,36 @@ class Automator_Recipe_Process_Complete {
 			$closure_data['recipe_log_id'] = $recipe_log_id;
 			$closure_integration           = Automator()->get->closure_integration_from_closure_code( $closure_code );
 
+			// The log arguments.
+			$log_args = array(
+				'user_id'                 => $user_id,
+				'automator_closure_id'    => $closure_data['ID'],
+				'automator_recipe_id'     => $recipe_id,
+				'automator_recipe_log_id' => $recipe_log_id,
+				'completed'               => Automator_Status::COMPLETED,
+			);
+
+			// The log meta args.
+			$log_meta_args = array(
+				'user_id'              => $user_id,
+				'automator_closure_id' => $closure_data['ID'],
+			);
+
 			if ( 1 === Automator()->plugin_status->get( $closure_integration ) && 'publish' === $closure_status ) {
+
+				// Log the entry before doing a redirect.
+				$log_id = Automator()->db->closure->add_entry( $log_args );
 
 				// The plugin for this action is active .. execute
 				$closure_execution_function = Automator()->get->closure_execution_function_from_closure_code( $closure_code );
+
+				// Log a meta.
+				if ( false !== $log_id ) {
+					$args['closure_log_id']                    = $log_id;
+					$log_meta_args['automator_closure_log_id'] = $log_id;
+					Automator()->db->closure->add_entry_meta( $log_meta_args, 'closure_data', wp_json_encode( $closure_data ) );
+				}
+
 				call_user_func_array(
 					$closure_execution_function,
 					array(
@@ -772,10 +1153,13 @@ class Automator_Recipe_Process_Complete {
 						$args,
 					)
 				);
+
 			} else {
 
 				// The plugin for this action is NOT active
-				Automator()->error->add_error( 'complete_closures', 'ERROR: You are trying to complete ' . $closure_code . ' and the plugin ' . $closure_integration . ' is not active.', $this );
+				Automator()->wp_error->add_error( 'complete_closures', 'ERROR: You are trying to complete ' . $closure_code . ' and the plugin ' . $closure_integration . ' is not active.', $this );
+
+				// Do not log error in closures for now.
 			}
 		}
 
@@ -789,6 +1173,7 @@ class Automator_Recipe_Process_Complete {
 			'3.0',
 			'automator_closures_completed'
 		);
+
 		do_action( 'automator_closures_completed', $recipe_id, $user_id, $args );
 
 		return true;
@@ -839,5 +1224,41 @@ class Automator_Recipe_Process_Complete {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * @param $recipe_id
+	 *
+	 * @return void
+	 */
+	public function add_recipe_count( $recipe_id ) {
+
+		global $wpdb;
+
+		if ( ! empty( $wpdb->get_row( $wpdb->prepare( "SELECT recipe_id FROM {$wpdb->prefix}uap_recipe_count WHERE recipe_id = %d", $recipe_id ) ) ) ) {
+			return;
+		}
+
+		// Added NOT_COMPLETED status to avoid first in progress run.
+		// Automator()->db->recipe->update_count( $recipe_id );
+		// will automatically increase count
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT count(*) as record_count
+				FROM {$wpdb->prefix}uap_recipe_log
+					WHERE automator_recipe_id = %d
+					  AND completed != %d",
+				$recipe_id,
+				Automator_Status::NOT_COMPLETED
+			)
+		);
+
+		$wpdb->insert(
+			$wpdb->prefix . 'uap_recipe_count',
+			array(
+				'recipe_id' => $recipe_id,
+				'runs'      => $count,
+			)
+		);
 	}
 }

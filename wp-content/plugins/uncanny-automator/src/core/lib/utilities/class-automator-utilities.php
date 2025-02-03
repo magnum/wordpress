@@ -121,6 +121,9 @@ class Automator_Utilities {
 		// Create an array with a list of integrations name
 		$list_of_names = array();
 		foreach ( Automator()->integrations as $integration_id => $integration ) {
+			if ( null === $integration || ! isset( $integration['name'] ) ) {
+				continue;
+			}
 			$list_of_names[ $integration_id ] = strtolower( $integration['name'] );
 		}
 
@@ -249,38 +252,61 @@ class Automator_Utilities {
 	}
 
 	/**
+	 * Wrapper method for ajax_auth_check for convenience.
+	 *
+	 * Sends back JSON reponse if nonce is failing.
+	 *
+	 * @return void
+	 */
+	public function verify_nonce( $post = array() ) {
+		return $this->ajax_auth_check( $post );
+	}
+
+	/**
 	 * Verifies that a correct security nonce was used with time limit.
 	 *
-	 * @param array $post
+	 * @param mixed[] $post
+	 *
+	 * @return void
 	 */
 	public function ajax_auth_check( $post = array() ) {
+
 		$return = array();
+
 		// Check if nonce is available, if not just bail.
 		if ( ! isset( $_POST['nonce'] ) && ! isset( $post['nonce'] ) ) {
+
 			$return['status'] = 'auth-failed';
 			$return['error']  = esc_html__( 'Automator did not receive nonce.', 'uncanny-automator' );
-			echo wp_json_encode( $return );
-			die();
+
+			wp_send_json( $return );
+
 		}
 
 		$capability = 'manage_options';
 		$capability = apply_filters_deprecated( 'modify_recipe', array( $capability ), '3.0', 'automator_capability_required' );
 		$capability = apply_filters( 'automator_capability_required', $capability, $post );
+
 		// Check if the current user is capable of calling this auth.
 		if ( ! current_user_can( $capability ) ) {
+
 			$return['status'] = 'auth-failed';
 			$return['error']  = esc_html__( 'You do not have permission to update options.', 'uncanny-automator' );
-			echo wp_json_encode( $return );
-			die();
+
+			wp_send_json( $return );
+
 		}
 
 		// check if the nonce is verifiable.
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_rest' ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $post['nonce'] ) ), 'wp_rest' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_rest' )
+			 && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $post['nonce'] ) ), 'wp_rest' ) ) {
+
 			$return['status'] = 'auth-failed';
 			$return['error']  = esc_html__( 'nonce validation failed.', 'uncanny-automator' );
-			echo wp_json_encode( $return );
-			die();
+
+			wp_send_json( $return );
 		}
+
 	}
 
 	/**
@@ -329,32 +355,36 @@ class Automator_Utilities {
 	 */
 	public function get_recipe_type( $recipe_id = 0 ) {
 
-		if ( ! absint( $recipe_id ) ) {
+		$recipe_id = absint( $recipe_id );
+
+		if ( 0 === $recipe_id ) {
 			return false;
 		}
 
-		if ( ! empty( $this->recipe_types ) && isset( $this->recipe_types[ $recipe_id ] ) ) {
-			return $this->recipe_types[ $recipe_id ];
-		}
+		$recipe_types = $this->get_recipe_types();
 
-		$cached = Automator()->cache->get( 'get_recipe_type' );
-		if ( ! empty( $cached ) && isset( $cached[ $recipe_id ] ) ) {
-			return $cached[ $recipe_id ];
-		}
-
-		global $wpdb;
-		$recipe_types = $wpdb->get_results( $wpdb->prepare( "SELECT pm.meta_value, pm.post_id FROM $wpdb->postmeta pm JOIN $wpdb->posts p ON p.ID = pm.post_id WHERE p.post_type = %s AND pm.meta_key = %s", 'uo-recipe', 'uap_recipe_type' ) );
-
-		$data = array();
 		foreach ( $recipe_types as $r_t ) {
-			$r_id          = $r_t->post_id;
-			$r_type        = $r_t->meta_value;
-			$data[ $r_id ] = $r_type;
+			if ( absint( $r_t->post_id ) === $recipe_id ) {
+				return $r_t->meta_value;
+			}
 		}
-		Automator()->cache->set( 'get_recipe_type', $data );
-		$this->recipe_types = $data;
 
-		return ! isset( $data[ $recipe_id ] ) || empty( $data[ $recipe_id ] ) ? 'user' : $data[ $recipe_id ];
+		return 'user';
+	}
+
+	/**
+	 * get_recipe_types
+	 *
+	 * @return mixed
+	 */
+	public function get_recipe_types() {
+
+		if ( empty( $this->recipe_types ) ) {
+			global $wpdb;
+			$this->recipe_types = $wpdb->get_results( $wpdb->prepare( "SELECT pm.meta_value, pm.post_id FROM $wpdb->postmeta pm JOIN $wpdb->posts p ON p.ID = pm.post_id WHERE p.post_type = %s AND pm.meta_key = %s", 'uo-recipe', 'uap_recipe_type' ) );
+		}
+
+		return $this->recipe_types;
 	}
 
 	/**
@@ -380,43 +410,134 @@ class Automator_Utilities {
 	}
 
 	/**
-	 * @param $data
+	 * Get user walkthrough class for a user.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return Automator_User_Walkthroughs
+	 */
+	public function get_user_walkthrough_class( $user_id ) {
+		static $walkthrough_class = array();
+
+		if ( ! isset( $walkthrough_class[ $user_id ] ) ) {
+			// Include file if not already included.
+			if ( ! class_exists( 'Automator_User_Walkthroughs' ) ) {
+				require_once UA_ABSPATH . 'src/core/lib/utilities/class-automator-user-walkthroughs.php';
+			}
+			try {
+				$walkthrough                   = new Automator_User_Walkthroughs( $user_id );
+				$walkthrough_class[ $user_id ] = $walkthrough;
+			} catch ( Exception $e ) {
+				throw new Exception( 'Failed to instantiate Automator_User_Walkthroughs' );
+			}
+		}
+
+		return $walkthrough_class[ $user_id ];
+	}
+	/**
+	 * Get user walkthroughs for a user.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array
+	 */
+	public function get_user_walkthroughs( $user_id ) {
+		try {
+			return $this->get_user_walkthrough_class( $user_id )->get_user_walkthroughs();
+		} catch ( Exception $e ) {
+			return array();
+		}
+	}
+
+	/**
+	 * Set user walkthrough progress for a user.
+	 *
+	 * @param int $user_id
+	 * @param string $walkthrough_id
+	 * @param int $progress
+	 *
+	 * @return mixed false on failure, progress on success
+	 */
+	public function set_user_walkthrough_progress( $user_id, $walkthrough_id, $progress ) {
+		try {
+			$walkthrough_obj = $this->get_user_walkthrough_class( $user_id );
+			$walkthrough_obj->set_progress_by_id( $walkthrough_id, $progress );
+			return $walkthrough_obj->get_progress_by_id( $walkthrough_id );
+		} catch ( Exception $e ) {
+			return false;
+		}
+	}
+
+	/**
+	 * Restart a user walkthough.
+	 *
+	 * @param int $user_id
+	 * @param string $walkthrough_id
+	 *
+	 * @return mixed false on failure, progress on success
+	 */
+	public function restart_user_walkthrough( $user_id, $walkthrough_id ) {
+		try {
+			$walkthrough_obj = $this->get_user_walkthrough_class( $user_id );
+			$walkthrough_obj->restart_user_walkthrough( $walkthrough_id );
+			return $walkthrough_obj->get_progress_by_id( $walkthrough_id );
+		} catch ( Exception $e ) {
+			return false;
+		}
+	}
+
+	/**
+	 * Sanitizes the input base on the data type.
+	 *
+	 * @param mixed $data The input, can be array.
 	 * @param string $type
 	 * @param string $meta_key
-	 * @param array $options
+	 * @param mixed[] $options
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function automator_sanitize( $data, $type = 'text', $meta_key = '', $options = array() ) {
-		// If it's an array, handle it early and return data
+
+		// If it's an array, handle it early and return data.
 		if ( is_array( $data ) ) {
 			return $this->automator_sanitize_array( $data, $meta_key, $options );
 		}
-		$type_before = $type;
-		// Maybe identify field type
+
 		if ( empty( $type ) || 'mixed' === $type ) {
 			$type = $this->maybe_get_field_type( $meta_key, $options );
 		}
 
 		switch ( $type ) {
+			case 'html':
+			case 'repeater':
+			case 'markdown':
+			case 'select':
+				// Do nothing for these types.
+				break;
 			case 'textarea':
 				$data = sanitize_textarea_field( $data );
 				break;
-			case 'html':
-				// not sanitization
+			case 'url':
+				// Only escape the data if there are no tokens.
+				preg_match_all( '/{{\s*(.*?)\s*}}/', $data, $tokens );
+				if ( ! isset( $tokens[0] ) || empty( $tokens[0] ) ) {
+					$data = esc_url_raw( $data ); // Use esc_url_raw so ampersand won't be encoded.
+				}
 				break;
 			case 'text':
 				$data = sanitize_text_field( $data );
 				break;
 			case 'mixed':
+				// Apply default sanitization for 'mixed' type.
 			default:
 				if ( wp_strip_all_tags( $data ) === $data ) {
 					$data = sanitize_text_field( $data );
 				}
+
 				break;
 		}
 
-		return $data;
+		return apply_filters( 'automator_sanitized_data', $data, $type, $meta_key, $options );
 	}
 
 	/**
@@ -450,7 +571,7 @@ class Automator_Utilities {
 			$filtered[ $key ] = filter_var( $value, $filters[ $key ], $options[ $key ] );
 		}
 
-		return wp_slash( wp_json_encode( $filtered ) );
+		return apply_filters( 'automator_sanitized_json', wp_slash( wp_json_encode( $filtered ) ), $type, $meta_key, $options );
 	}
 
 	/**
@@ -463,6 +584,7 @@ class Automator_Utilities {
 	 * @return mixed
 	 */
 	public function automator_sanitize_array( $data, $meta_key = '', $options = array() ) {
+
 		foreach ( $data as $k => $v ) {
 			$k = esc_attr( $k );
 			if ( is_array( $v ) ) {
@@ -477,8 +599,16 @@ class Automator_Utilities {
 						$data[ $k ] = sanitize_text_field( $v );
 						break;
 					case 'EMAILBODY':
+						$data[ $k ] = $v;
+						break;
 					case 'WPCPOSTCONTENT':
-						$data[ $k ] = wp_kses_post( $v );
+						if ( apply_filters( 'automator_wpcpostcontent_should_sanitize', false, $data ) ) {
+							$v = wp_kses_post( $v );
+						}
+						if ( apply_filters( 'automator_wpcpostcontent_should_wp_slash', false, $data ) ) {
+							$v = wp_slash( $v );
+						}
+						$data[ $k ] = $v;
 						break;
 					default:
 						$field_type = $this->maybe_get_field_type( $k, $options );
@@ -501,8 +631,8 @@ class Automator_Utilities {
 		$has_pro_license  = false;
 		$has_free_license = false;
 
-		$free_license_status = get_option( 'uap_automator_free_license_status' );
-		$pro_license_status  = get_option( 'uap_automator_pro_license_status' );
+		$free_license_status = automator_get_option( 'uap_automator_free_license_status' );
+		$pro_license_status  = automator_get_option( 'uap_automator_pro_license_status' );
 
 		if ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === $pro_license_status ) {
 			$has_pro_license = true;
@@ -595,21 +725,28 @@ class Automator_Utilities {
 	public function maybe_get_field_type( $option_code, $options ) {
 		// if nothing is set, return text
 		if ( empty( $options ) || ! isset( $options['fields'] ) || ! isset( $options['fields'][ $option_code ] ) ) {
-			return 'text';
+			return apply_filters( 'automator_sanitize_get_field_type_text', 'text', $option_code, $options );
 		}
 
 		// if tinymce is set to yes, return HTML
 		if ( isset( $options['fields'][ $option_code ]['supports_tinymce'] ) && 'true' === (string) $options['fields'][ $option_code ]['supports_tinymce'] ) {
-			return 'html';
+			return apply_filters( 'automator_sanitize_get_field_type_html', 'html', $option_code, $options );
+		}
+
+		// if markdown is set to yes, return HTML
+		if ( isset( $options['fields'][ $option_code ]['supports_markdown'] ) && 'true' === (string) $options['fields'][ $option_code ]['supports_markdown'] ) {
+			return apply_filters( 'automator_sanitize_get_field_type_markdown', 'markdown', $option_code, $options );
 		}
 
 		// No type found
 		if ( ! isset( $options['fields'][ $option_code ]['type'] ) || empty( $options['fields'][ $option_code ]['type'] ) ) {
-			return 'text';
+			return apply_filters( 'automator_sanitize_get_field_type_text', 'text', $option_code, $options );
 		}
 
 		// Return type
-		return (string) $options['fields'][ $option_code ]['type'];
+		$type = (string) $options['fields'][ $option_code ]['type'];
+
+		return apply_filters( 'automator_sanitize_get_field_type_' . $type, $type, $option_code, $options );
 	}
 
 	/**
@@ -634,8 +771,179 @@ class Automator_Utilities {
 		$words   = explode( apply_filters( 'automator_get_the_excerpt_separator', ' ' ), $excerpt );
 		$len     = min( $length, count( $words ) );
 		$excerpt = array_slice( $words, 0, $len );
-		$excerpt = join( ' ', $excerpt ) . apply_filters( 'automator_get_the_excerpt_continuity', '...', $post_id );
+		$excerpt = join( ' ', $excerpt );
+		if ( ! empty( $excerpt ) ) {
+			$excerpt = $excerpt . apply_filters( 'automator_get_the_excerpt_continuity', '...', $post_id );
+		}
 
 		return apply_filters( 'automator_get_the_excerpt', $excerpt, $post_content, $post_id, $length );
+	}
+
+	/**
+	 * Determine if the given text has multiple lines or not.
+	 *
+	 * @param string $text Optional parameter defaults to empty string.
+	 *
+	 * @return boolean True if has multiple lines. Otherwise, false.
+	 */
+	public function has_multiple_lines( $text = '' ) {
+		// Bail early if empty or not a string.
+		if ( empty( $text ) || ! is_string( $text ) ) {
+			return false;
+		}
+		// Standardize newline characters to "\n".
+		$token_value = str_replace( array( "\r\n", "\r" ), "\n", $text );
+		// Remove more than two contiguous line breaks.
+		$token_value = preg_replace( "/\n\n+/", "\n\n", $token_value );
+		// Split up the contents into an array of strings, separated by double line breaks.
+		$paragraphs = preg_split( '/\n\s*\n/', $token_value, - 1, PREG_SPLIT_NO_EMPTY );
+
+		return count( $paragraphs ) > 1;
+	}
+
+	/**
+	 * @param $post
+	 * @param $post_before
+	 *
+	 * @return bool
+	 */
+	public function is_wp_post_being_published( $post, $post_before ) {
+
+		// If this is an autosave, bail
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return false;
+		}
+
+		// If this post is not published yet, bail
+		if ( 'publish' !== $post->post_status ) {
+			return false;
+		}
+
+		// If this post was published before, bail
+		if ( ! empty( $post_before->post_status ) && 'publish' === $post_before->post_status ) {
+			return false;
+		}
+
+		// Include attachment, revision etc
+		$include_non_public_posts = apply_filters(
+			'automator_wp_post_updates_include_non_public_posts',
+			false,
+			$post->ID
+		);
+
+		if ( false === $include_non_public_posts ) {
+			$__object = get_post_type_object( $post->post_type );
+			if ( isset( $__object->public ) && false === $__object->public ) {
+				return false;
+			}
+		}
+
+		// Otherwise, return true
+		return true;
+	}
+
+	/**
+	 * Fetches the live or 'publish' actions from specified integration.
+	 *
+	 * @param string $integration_code The integration code.
+	 *
+	 * @return array{}|array{array{ID:string,post_status:string}}
+	 */
+	public function fetch_live_integration_actions( $integration_code = '' ) {
+
+		global $wpdb;
+
+		if ( empty( $integration_code ) || ! is_string( $integration_code ) ) {
+			return array();
+		}
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_status FROM $wpdb->posts as post
+					INNER JOIN $wpdb->postmeta as meta
+						ON meta.post_id = post.ID
+					WHERE meta.meta_key = %s
+						AND meta.meta_value = %s
+						AND post.post_status = %s
+						AND post.post_type = %s
+				",
+				'integration',
+				$integration_code,
+				'publish',
+				'uo-action'
+			),
+			ARRAY_A
+		);
+
+		return (array) $results;
+
+	}
+
+	/**
+	 * Fetches the actions from specified integration.
+	 *
+	 * @param string $integration_code The integration code.
+	 *
+	 * @return array{}|array{array{ID:string,post_status:string}}
+	 */
+	public function fetch_integration_actions( $integration_code = '' ) {
+
+		global $wpdb;
+
+		if ( empty( $integration_code ) || ! is_string( $integration_code ) ) {
+			return array();
+		}
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_parent, post_title, ID, post_status FROM $wpdb->posts as post
+					INNER JOIN $wpdb->postmeta as meta
+						ON meta.post_id = post.ID
+					WHERE meta.meta_key = %s
+						AND meta.meta_value = %s
+						AND post.post_type = %s
+				",
+				'integration',
+				$integration_code,
+				'uo-action'
+			),
+			ARRAY_A
+		);
+
+		return (array) $results;
+
+	}
+
+
+	/**
+	 * @param $recipe_id
+	 *
+	 * @return int
+	 */
+	public function get_recipe_total_runs( $recipe_id ) {
+		global $wpdb;
+
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT `runs` as record_count
+				FROM {$wpdb->prefix}uap_recipe_count
+					WHERE recipe_id = %d",
+				$recipe_id
+			)
+		);
+
+		if ( empty( $count ) || 0 === $count ) {
+
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT count(*) as record_count
+				FROM {$wpdb->prefix}uap_recipe_log
+					WHERE automator_recipe_id = %d",
+					$recipe_id
+				)
+			);
+		}
+
+		return absint( $count );
 	}
 }

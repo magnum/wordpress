@@ -114,9 +114,17 @@ class Manager extends CSS_Manager {
 			$post->post_excerpt = $data['post_excerpt'];
 		}
 
+		if ( isset( $data['menu_order'] ) && is_post_type_hierarchical( $post->post_type ) ) {
+			$post->menu_order = $data['menu_order'];
+		}
+
 		if ( isset( $data['post_status'] ) ) {
 			$this->save_post_status( $id, $data['post_status'] );
 			unset( $post->post_status );
+		}
+
+		if ( isset( $data['comment_status'] ) && post_type_supports( $post->post_type, 'comments' ) ) {
+			$post->comment_status = $data['comment_status'];
 		}
 
 		wp_update_post( $post );
@@ -130,6 +138,11 @@ class Manager extends CSS_Manager {
 		}
 
 		if ( isset( $data['post_featured_image'] ) && post_type_supports( $post->post_type, 'thumbnail' ) ) {
+			// Check if the user is at least an Author before allowing them to modify the thumbnail
+			if ( ! current_user_can( 'publish_posts' ) ) {
+				throw new \Exception( 'You do not have permission to modify the featured image.', Exceptions::FORBIDDEN );
+			}
+
 			if ( empty( $data['post_featured_image']['id'] ) ) {
 				delete_post_thumbnail( $post->ID );
 			} else {
@@ -167,9 +180,9 @@ class Manager extends CSS_Manager {
 		<div class="elementor-panel-navigation">
 			<# _.each( tabs, function( tabTitle, tabSlug ) {
 			$e.bc.ensureTab( 'panel/page-settings', tabSlug ); #>
-			<div class="elementor-component-tab elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
-				<a href="#">{{{ tabTitle }}}</a>
-			</div>
+			<button class="elementor-component-tab elementor-panel-navigation-tab elementor-tab-control-{{ tabSlug }}" data-tab="{{ tabSlug }}">
+				<span>{{{ tabTitle }}}</span>
+			</button>
 			<# } ); #>
 		</div>
 		<# } #>
@@ -308,6 +321,8 @@ class Manager extends CSS_Manager {
 			'template',
 			'post_excerpt',
 			'post_featured_image',
+			'menu_order',
+			'comment_status',
 		];
 	}
 
@@ -332,6 +347,12 @@ class Manager extends CSS_Manager {
 
 		$allowed_post_statuses = get_post_statuses();
 
+		if ( $this->is_contributor_user() && $this->has_invalid_post_status_for_contributor( $status ) ) {
+			// If the status is not allowed, set it to 'pending' by default
+			$status = 'pending';
+			$post->post_status = $status;
+		}
+
 		if ( isset( $allowed_post_statuses[ $status ] ) ) {
 			$post_type_object = get_post_type_object( $post->post_type );
 			if ( 'publish' !== $status || current_user_can( $post_type_object->cap->publish_posts ) ) {
@@ -341,4 +362,13 @@ class Manager extends CSS_Manager {
 
 		wp_update_post( $post );
 	}
+
+	private function is_contributor_user(): bool {
+		return current_user_can( 'edit_posts' ) && ! current_user_can( 'publish_posts' );
+	}
+
+	private function has_invalid_post_status_for_contributor( $status ): bool {
+		return 'draft' !== $status && 'pending' !== $status;
+	}
+
 }

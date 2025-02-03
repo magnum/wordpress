@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogCategoryFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogCategoryCategorizationCriteriaValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,26 +39,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogCategoryCategorizatio
  * pull request for this class.
  *
  */
-class ProductCatalogCategory extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'categories';
-    }
-    /**
-     * @return ProductCatalogCategoryFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogCategoryFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['CategorizationCriteria'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogCategoryCategorizationCriteriaValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class ProductCatalogCategory extends AbstractObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'categories';
+  }
+
+  /**
+   * @return ProductCatalogCategoryFields
+   */
+  public static function getFieldsEnum() {
+    return ProductCatalogCategoryFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['CategorizationCriteria'] = ProductCatalogCategoryCategorizationCriteriaValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

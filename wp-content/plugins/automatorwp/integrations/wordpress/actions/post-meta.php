@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Post_Meta extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_post_meta';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_post_meta';
+
+        parent::__construct();
+
+    }
 
     /**
      * The post ID where meta has been applied
@@ -32,8 +43,8 @@ class AutomatorWP_WordPress_Post_Meta extends AutomatorWP_Integration_Action {
 
         automatorwp_register_action( $this->action, array(
             'integration'       => $this->integration,
-            'label'             => __( 'Set, insert, increment or decrement post meta', 'automatorwp' ),
-            'select_option'     => __( 'Set, insert, increment or decrement <strong>post meta</strong>', 'automatorwp' ),
+            'label'             => __( 'Update post meta', 'automatorwp' ),
+            'select_option'     => __( 'Update <strong>post meta</strong>', 'automatorwp' ),
             /* translators: %1$s: Operation (Set, insert, increment or decrement). %2$s: Post ID. %3$s: Meta value. %4$s: Meta key. */
             'edit_label'        => sprintf( __( '%1$s post %2$s meta value %3$s for meta key %4$s', 'automatorwp' ), '{operation}', '{post}', '{meta_value}', '{meta_key}' ),
             /* translators: %1$s: Operation (Set, insert, increment or decrement). %2$s: Post ID. %3$s: Meta value. %4$s: Meta key. */
@@ -100,6 +111,7 @@ class AutomatorWP_WordPress_Post_Meta extends AutomatorWP_Integration_Action {
                     )
                 )
             ),
+            'tags' => automatorwp_utilities_post_tags(),
         ) );
 
     }
@@ -115,8 +127,11 @@ class AutomatorWP_WordPress_Post_Meta extends AutomatorWP_Integration_Action {
         add_filter( 'automatorwp_parse_automation_item_edit_label', array( $this, 'dynamic_label' ), 10, 5 );
         add_filter( 'automatorwp_parse_automation_item_log_label', array( $this, 'dynamic_label' ), 10, 5 );
 
-        // Log meta data
+        // Log post ID
         add_filter( 'automatorwp_user_completed_action_post_id', array( $this, 'post_id' ), 10, 6 );
+
+        // Log meta data
+        add_filter( 'automatorwp_user_completed_action_log_meta', array( $this, 'log_meta' ), 10, 5 );
 
         parent::hooks();
 
@@ -260,6 +275,52 @@ class AutomatorWP_WordPress_Post_Meta extends AutomatorWP_Integration_Action {
         return $this->post_id;
     }
 
+    /**
+     * Action custom log meta
+     *
+     * @since 1.0.0
+     *
+     * @param array     $log_meta           Log meta data
+     * @param stdClass  $action             The action object
+     * @param int       $user_id            The user ID
+     * @param array     $action_options     The action's stored options (with tags already passed)
+     * @param stdClass  $automation         The action's automation object
+     *
+     * @return array
+     */
+    public function log_meta( $log_meta, $action, $user_id, $action_options, $automation ) {
+
+        // Bail if action type don't match this action
+        if( $action->type !== $this->action ) {
+            return $log_meta;
+        }
+
+        // Store post fields
+        $post_fields = array(
+            'post_title',
+            'post_name',
+            'post_type',
+            'post_status',
+            'post_date',
+            'post_author',
+            'post_content',
+            'post_excerpt',
+            'post_parent',
+            'menu_order',
+            'post_password',
+        );
+
+        foreach( $post_fields as $post_field ) {
+            $log_meta[$post_field] = $action_options[$post_field];
+        }
+
+        // Store post meta
+        $log_meta['post_meta'] = $this->post_meta;
+
+        return $log_meta;
+    }
+
 }
 
-new AutomatorWP_WordPress_Post_Meta();
+new AutomatorWP_WordPress_Post_Meta( 'wordpress' );
+new AutomatorWP_WordPress_Post_Meta( 'posts' );

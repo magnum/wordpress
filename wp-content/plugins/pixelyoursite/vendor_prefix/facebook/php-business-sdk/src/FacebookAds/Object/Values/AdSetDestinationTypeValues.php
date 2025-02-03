@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdSetDestinationTypeValues getInstance()
  */
-class AdSetDestinationTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP = 'APP';
-    const APPLINKS_AUTOMATIC = 'APPLINKS_AUTOMATIC';
-    const FACEBOOK = 'FACEBOOK';
-    const MESSENGER = 'MESSENGER';
-    const UNDEFINED = 'UNDEFINED';
-    const WEBSITE = 'WEBSITE';
+class AdSetDestinationTypeValues extends AbstractEnum {
+
+  const APP = 'APP';
+  const APPLINKS_AUTOMATIC = 'APPLINKS_AUTOMATIC';
+  const FACEBOOK = 'FACEBOOK';
+  const MESSENGER = 'MESSENGER';
+  const UNDEFINED = 'UNDEFINED';
+  const WEBSITE = 'WEBSITE';
 }

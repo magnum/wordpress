@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeLinkDataFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataAttachmentStyleValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataFormatOptionValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataFormatOptionValue
  * pull request for this class.
  *
  */
-class AdCreativeLinkData extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdCreativeLinkDataFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeLinkDataFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['AttachmentStyle'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataAttachmentStyleValues::getInstance()->getValues();
-        $ref_enums['FormatOption'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataFormatOptionValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdCreativeLinkData extends AbstractObject {
+
+  /**
+   * @return AdCreativeLinkDataFields
+   */
+  public static function getFieldsEnum() {
+    return AdCreativeLinkDataFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['AttachmentStyle'] = AdCreativeLinkDataAttachmentStyleValues::getInstance()->getValues();
+    $ref_enums['FormatOption'] = AdCreativeLinkDataFormatOptionValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

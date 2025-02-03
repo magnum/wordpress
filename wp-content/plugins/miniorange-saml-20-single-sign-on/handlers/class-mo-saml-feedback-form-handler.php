@@ -24,7 +24,6 @@ class Mo_SAML_Feedback_Form_Handler {
 
 		wp_safe_redirect( self_admin_url( 'plugins.php?deactivate=true' ) );
 		exit;
-
 	}
 
 	/**
@@ -58,7 +57,7 @@ class Mo_SAML_Feedback_Form_Handler {
 	 * @param array $post_array Contains the user input from the feedback form.
 	 * @return string
 	 */
-	public static function mo_saml_get_feedback_message( $post_array ) : string {
+	public static function mo_saml_get_feedback_message( $post_array ) {
 		$message                   = 'Plugin Deactivated';
 		$rate_value                = isset( $post_array['rate'] ) ? $post_array['rate'] : '';
 		$deactivate_reason_message = isset( $post_array['query_feedback'] ) ? sanitize_text_field( $post_array['query_feedback'] ) : false;
@@ -79,7 +78,7 @@ class Mo_SAML_Feedback_Form_Handler {
 	 * @param array $post_array Contains the user input from the feedback form.
 	 * @return string
 	 */
-	public static function mo_saml_get_user_email( $post_array ) : string {
+	public static function mo_saml_get_user_email( $post_array ) {
 		if ( isset( $post_array['query_mail'] ) && filter_var( $post_array['query_mail'], FILTER_VALIDATE_EMAIL ) ) {
 			$email = $post_array['query_mail'];
 		} else {
@@ -98,12 +97,12 @@ class Mo_SAML_Feedback_Form_Handler {
 	 * @param array $response Contains the response from the feedback API call.
 	 * @return bool
 	 */
-	public static function mo_saml_validate_response( $response ) : bool {
+	public static function mo_saml_validate_response( $response ) {
 		if ( json_last_error() === JSON_ERROR_NONE ) {
 			if ( ! empty( $response['status'] ) && Mo_Saml_Api_Status_Constants::ERROR === $response['status'] ) {
 				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, $response['message'] );
 			} elseif ( false === $response ) {
-				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::QUERY_NOT_SUBMITTED );
+				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'QUERY_NOT_SUBMITTED' ) );
 			}
 		}
 		if ( isset( $post_save ) ) {

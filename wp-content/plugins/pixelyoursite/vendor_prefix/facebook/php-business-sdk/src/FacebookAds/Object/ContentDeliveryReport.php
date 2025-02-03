@@ -22,15 +22,15 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object;
 
-use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Cursor;
-use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ContentDeliveryReportFields;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPlatformValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPositionValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Cursor;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ContentDeliveryReportFields;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPlatformValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPositionValues;
 /**
  * This class is auto-generated.
  *
@@ -39,20 +39,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPositionValues
  * pull request for this class.
  *
  */
-class ContentDeliveryReport extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
+class ContentDeliveryReport extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
 {
     /**
      * @return ContentDeliveryReportFields
      */
     public static function getFieldsEnum()
     {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ContentDeliveryReportFields::getInstance();
+        return \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ContentDeliveryReportFields::getInstance();
     }
     protected static function getReferencedEnums()
     {
         $ref_enums = array();
-        $ref_enums['Platform'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPlatformValues::getInstance()->getValues();
-        $ref_enums['Position'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPositionValues::getInstance()->getValues();
+        $ref_enums['Platform'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPlatformValues::getInstance()->getValues();
+        $ref_enums['Position'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\ContentDeliveryReportPositionValues::getInstance()->getValues();
         return $ref_enums;
     }
 }

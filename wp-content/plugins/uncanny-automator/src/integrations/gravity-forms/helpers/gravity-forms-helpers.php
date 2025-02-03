@@ -4,6 +4,8 @@ namespace Uncanny_Automator;
 
 use GFFormsModel;
 use Uncanny_Automator_Pro\Gravity_Forms_Pro_Helpers;
+use Uncanny_Automator\Integrations\Gravity_Forms\GF_SUBFORM_CODES;
+use Uncanny_Automator\Integrations\Gravity_Forms\GF_SUBFORM_GROUPS;
 
 /**
  * Class Gravity_Forms_Helpers
@@ -25,14 +27,12 @@ class Gravity_Forms_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Gravity_Forms_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->load_options = true;
 
 	}
 
@@ -327,7 +327,7 @@ class Gravity_Forms_Helpers {
 	 */
 	public function get_forms_as_option_fields() {
 
-		if ( ! class_exists( '\GFAPI' ) ) {
+		if ( ! class_exists( '\GFAPI' ) || ! is_admin() ) {
 
 			return array();
 
@@ -335,7 +335,7 @@ class Gravity_Forms_Helpers {
 
 		$forms = \GFAPI::get_forms();
 
-		$options[-1] = __( 'Any form', 'uncanny-automator' );
+		$options[- 1] = __( 'Any form', 'uncanny-automator' );
 
 		foreach ( $forms as $form ) {
 

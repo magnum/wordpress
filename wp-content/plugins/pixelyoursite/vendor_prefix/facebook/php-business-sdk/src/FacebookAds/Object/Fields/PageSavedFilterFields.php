@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PageSavedFilterFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DISPLAY_NAME = 'display_name';
-    const FILTERS = 'filters';
-    const ID = 'id';
-    const PAGE_ID = 'page_id';
-    const SECTION = 'section';
-    const TIME_CREATED = 'time_created';
-    const TIME_UPDATED = 'time_updated';
-    public function getFieldTypes()
-    {
-        return array('display_name' => 'string', 'filters' => 'list<Object>', 'id' => 'string', 'page_id' => 'string', 'section' => 'string', 'time_created' => 'int', 'time_updated' => 'int');
-    }
+
+class PageSavedFilterFields extends AbstractEnum {
+
+  const DISPLAY_NAME = 'display_name';
+  const FILTERS = 'filters';
+  const ID = 'id';
+  const PAGE_ID = 'page_id';
+  const SECTION = 'section';
+  const TIME_CREATED = 'time_created';
+  const TIME_UPDATED = 'time_updated';
+
+  public function getFieldTypes() {
+    return array(
+      'display_name' => 'string',
+      'filters' => 'list<Object>',
+      'id' => 'string',
+      'page_id' => 'string',
+      'section' => 'string',
+      'time_created' => 'int',
+      'time_updated' => 'int',
+    );
+  }
 }

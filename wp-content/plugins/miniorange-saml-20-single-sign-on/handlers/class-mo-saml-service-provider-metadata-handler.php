@@ -73,7 +73,7 @@ class Mo_SAML_Service_Provider_Metadata_Handler {
 			$save_array[ Mo_Saml_Options_Enum_Identity_Provider::SP_ENTITY_ID ] = sanitize_text_field( $post_array[ Mo_Saml_Options_Enum_Identity_Provider::SP_ENTITY_ID ] );
 			$db_handler->mo_saml_save_options( $save_array );
 
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::SETTINGS_UPDATED, 'SP_ENTITY_ID', $save_array );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::mo_saml_translate( 'SETTINGS_UPDATED' ), 'SP_ENTITY_ID', $save_array );
 			$post_save->mo_saml_post_save_action();
 		}
 	}

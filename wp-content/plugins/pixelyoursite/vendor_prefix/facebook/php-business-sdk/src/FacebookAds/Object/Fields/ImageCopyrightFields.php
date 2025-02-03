@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,25 +34,42 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ImageCopyrightFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ARTIST = 'artist';
-    const COPYRIGHT_MONITORING_STATUS = 'copyright_monitoring_status';
-    const CREATION_TIME = 'creation_time';
-    const CREATOR = 'creator';
-    const CUSTOM_ID = 'custom_id';
-    const DESCRIPTION = 'description';
-    const FILENAME = 'filename';
-    const ID = 'id';
-    const IMAGE = 'image';
-    const MATCHES_COUNT = 'matches_count';
-    const ORIGINAL_CONTENT_CREATION_DATE = 'original_content_creation_date';
-    const OWNERSHIP_COUNTRIES = 'ownership_countries';
-    const TAGS = 'tags';
-    const TITLE = 'title';
-    const UPDATE_TIME = 'update_time';
-    public function getFieldTypes()
-    {
-        return array('artist' => 'string', 'copyright_monitoring_status' => 'string', 'creation_time' => 'datetime', 'creator' => 'string', 'custom_id' => 'string', 'description' => 'string', 'filename' => 'string', 'id' => 'string', 'image' => 'Photo', 'matches_count' => 'unsigned int', 'original_content_creation_date' => 'datetime', 'ownership_countries' => 'VideoCopyrightGeoGate', 'tags' => 'list<string>', 'title' => 'string', 'update_time' => 'datetime');
-    }
+
+class ImageCopyrightFields extends AbstractEnum {
+
+  const ARTIST = 'artist';
+  const COPYRIGHT_MONITORING_STATUS = 'copyright_monitoring_status';
+  const CREATION_TIME = 'creation_time';
+  const CREATOR = 'creator';
+  const CUSTOM_ID = 'custom_id';
+  const DESCRIPTION = 'description';
+  const FILENAME = 'filename';
+  const ID = 'id';
+  const IMAGE = 'image';
+  const MATCHES_COUNT = 'matches_count';
+  const ORIGINAL_CONTENT_CREATION_DATE = 'original_content_creation_date';
+  const OWNERSHIP_COUNTRIES = 'ownership_countries';
+  const TAGS = 'tags';
+  const TITLE = 'title';
+  const UPDATE_TIME = 'update_time';
+
+  public function getFieldTypes() {
+    return array(
+      'artist' => 'string',
+      'copyright_monitoring_status' => 'string',
+      'creation_time' => 'datetime',
+      'creator' => 'string',
+      'custom_id' => 'string',
+      'description' => 'string',
+      'filename' => 'string',
+      'id' => 'string',
+      'image' => 'Photo',
+      'matches_count' => 'unsigned int',
+      'original_content_creation_date' => 'datetime',
+      'ownership_countries' => 'VideoCopyrightGeoGate',
+      'tags' => 'list<string>',
+      'title' => 'string',
+      'update_time' => 'datetime',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,25 +34,44 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class UnifiedThreadFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAN_REPLY = 'can_reply';
-    const FORMER_PARTICIPANTS = 'former_participants';
-    const ID = 'id';
-    const IS_SUBSCRIBED = 'is_subscribed';
-    const LINK = 'link';
-    const MESSAGE_COUNT = 'message_count';
-    const NAME = 'name';
-    const PARTICIPANTS = 'participants';
-    const SCOPED_THREAD_KEY = 'scoped_thread_key';
-    const SENDERS = 'senders';
-    const SNIPPET = 'snippet';
-    const SUBJECT = 'subject';
-    const UNREAD_COUNT = 'unread_count';
-    const UPDATED_TIME = 'updated_time';
-    const WALLPAPER = 'wallpaper';
-    public function getFieldTypes()
-    {
-        return array('can_reply' => 'bool', 'former_participants' => 'Object', 'id' => 'string', 'is_subscribed' => 'bool', 'link' => 'string', 'message_count' => 'int', 'name' => 'string', 'participants' => 'Object', 'scoped_thread_key' => 'string', 'senders' => 'Object', 'snippet' => 'string', 'subject' => 'string', 'unread_count' => 'int', 'updated_time' => 'datetime', 'wallpaper' => 'string');
-    }
+
+class UnifiedThreadFields extends AbstractEnum {
+
+  const CAN_REPLY = 'can_reply';
+  const FOLDER = 'folder';
+  const FORMER_PARTICIPANTS = 'former_participants';
+  const ID = 'id';
+  const IS_SUBSCRIBED = 'is_subscribed';
+  const LINK = 'link';
+  const MESSAGE_COUNT = 'message_count';
+  const NAME = 'name';
+  const PARTICIPANTS = 'participants';
+  const SCOPED_THREAD_KEY = 'scoped_thread_key';
+  const SENDERS = 'senders';
+  const SNIPPET = 'snippet';
+  const SUBJECT = 'subject';
+  const UNREAD_COUNT = 'unread_count';
+  const UPDATED_TIME = 'updated_time';
+  const WALLPAPER = 'wallpaper';
+
+  public function getFieldTypes() {
+    return array(
+      'can_reply' => 'bool',
+      'folder' => 'string',
+      'former_participants' => 'Object',
+      'id' => 'string',
+      'is_subscribed' => 'bool',
+      'link' => 'string',
+      'message_count' => 'int',
+      'name' => 'string',
+      'participants' => 'Object',
+      'scoped_thread_key' => 'string',
+      'senders' => 'Object',
+      'snippet' => 'string',
+      'subject' => 'string',
+      'unread_count' => 'int',
+      'updated_time' => 'datetime',
+      'wallpaper' => 'string',
+    );
+  }
 }

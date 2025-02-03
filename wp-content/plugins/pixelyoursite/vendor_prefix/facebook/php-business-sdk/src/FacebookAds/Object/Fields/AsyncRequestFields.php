@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AsyncRequestFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const RESULT = 'result';
-    const STATUS = 'status';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('id' => 'int', 'result' => 'string', 'status' => 'int', 'type' => 'int');
-    }
+
+class AsyncRequestFields extends AbstractEnum {
+
+  const ID = 'id';
+  const RESULT = 'result';
+  const STATUS = 'status';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'int',
+      'result' => 'string',
+      'status' => 'int',
+      'type' => 'int',
+    );
+  }
 }

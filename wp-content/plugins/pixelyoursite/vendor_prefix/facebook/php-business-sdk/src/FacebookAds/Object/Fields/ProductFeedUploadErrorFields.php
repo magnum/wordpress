@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductFeedUploadErrorFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AFFECTED_SURFACES = 'affected_surfaces';
-    const DESCRIPTION = 'description';
-    const ERROR_TYPE = 'error_type';
-    const ID = 'id';
-    const SEVERITY = 'severity';
-    const SUMMARY = 'summary';
-    const TOTAL_COUNT = 'total_count';
-    public function getFieldTypes()
-    {
-        return array('affected_surfaces' => 'list<AffectedSurfaces>', 'description' => 'string', 'error_type' => 'string', 'id' => 'string', 'severity' => 'Severity', 'summary' => 'string', 'total_count' => 'unsigned int');
-    }
+
+class ProductFeedUploadErrorFields extends AbstractEnum {
+
+  const AFFECTED_SURFACES = 'affected_surfaces';
+  const DESCRIPTION = 'description';
+  const ERROR_TYPE = 'error_type';
+  const ID = 'id';
+  const SEVERITY = 'severity';
+  const SUMMARY = 'summary';
+  const TOTAL_COUNT = 'total_count';
+
+  public function getFieldTypes() {
+    return array(
+      'affected_surfaces' => 'list<AffectedSurfaces>',
+      'description' => 'string',
+      'error_type' => 'string',
+      'id' => 'string',
+      'severity' => 'Severity',
+      'summary' => 'string',
+      'total_count' => 'unsigned int',
+    );
+  }
 }

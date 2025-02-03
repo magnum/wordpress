@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class UserPaymentMobilePricepointsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const MOBILE_COUNTRY = 'mobile_country';
-    const PHONE_NUMBER_LAST4 = 'phone_number_last4';
-    const PRICEPOINTS = 'pricepoints';
-    const USER_CURRENCY = 'user_currency';
-    public function getFieldTypes()
-    {
-        return array('mobile_country' => 'string', 'phone_number_last4' => 'string', 'pricepoints' => 'list<Object>', 'user_currency' => 'string');
-    }
+
+class UserPaymentMobilePricepointsFields extends AbstractEnum {
+
+  const MOBILE_COUNTRY = 'mobile_country';
+  const PHONE_NUMBER_LAST4 = 'phone_number_last4';
+  const PRICEPOINTS = 'pricepoints';
+  const USER_CURRENCY = 'user_currency';
+
+  public function getFieldTypes() {
+    return array(
+      'mobile_country' => 'string',
+      'phone_number_last4' => 'string',
+      'pricepoints' => 'list<Object>',
+      'user_currency' => 'string',
+    );
+  }
 }

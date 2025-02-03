@@ -107,9 +107,8 @@ class WPCF7_Stripe extends WPCF7_Service {
 				$this->reset_data();
 				$redirect_to = $this->menu_page_url( 'action=setup' );
 			} else {
-				$publishable = isset( $_POST['publishable'] ) ?
-					trim( $_POST['publishable'] ) : '';
-				$secret = isset( $_POST['secret'] ) ? trim( $_POST['secret'] ) : '';
+				$publishable = trim( $_POST['publishable'] ?? '' );
+				$secret = trim( $_POST['secret'] ?? '' );
 
 				if ( $publishable and $secret ) {
 					$this->api_keys = array(
@@ -136,18 +135,21 @@ class WPCF7_Stripe extends WPCF7_Service {
 
 
 	public function admin_notice( $message = '' ) {
-		if ( 'invalid' == $message ) {
-			echo sprintf(
-				'<div class="notice notice-error"><p><strong>%1$s</strong>: %2$s</p></div>',
-				esc_html( __( "Error", 'contact-form-7' ) ),
-				esc_html( __( "Invalid key values.", 'contact-form-7' ) )
+		if ( 'invalid' === $message ) {
+			wp_admin_notice(
+				sprintf(
+					'<strong>%1$s</strong>: %2$s',
+					esc_html( __( "Error", 'contact-form-7' ) ),
+					esc_html( __( "Invalid key values.", 'contact-form-7' ) )
+				),
+				'type=error'
 			);
 		}
 
-		if ( 'success' == $message ) {
-			echo sprintf(
-				'<div class="notice notice-success"><p>%s</p></div>',
-				esc_html( __( 'Settings saved.', 'contact-form-7' ) )
+		if ( 'success' === $message ) {
+			wp_admin_notice(
+				esc_html( __( "Settings saved.", 'contact-form-7' ) ),
+				'type=success'
 			);
 		}
 	}

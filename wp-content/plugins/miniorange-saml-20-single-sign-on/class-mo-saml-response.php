@@ -89,9 +89,13 @@ class Mo_SAML_Response {
 				continue;
 			}
 
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- $xml is the object of PHP's predefined class
-			if ( 'Assertion' === $node->localName || 'EncryptedAssertion' === $node->localName ) {
-				$this->assertions[] = new Mo_SAML_Assertion( $node );
+			try {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- $xml is the object of PHP's predefined class
+				if ( 'Assertion' === $node->localName || 'EncryptedAssertion' === $node->localName ) {
+					$this->assertions[] = new Mo_SAML_Assertion( $node );
+				}
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Missing Issuer in Assertion' );
 			}
 		}
 	}

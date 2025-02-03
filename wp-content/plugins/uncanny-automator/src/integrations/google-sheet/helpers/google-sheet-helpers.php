@@ -2,9 +2,9 @@
 
 namespace Uncanny_Automator;
 
-global $google_sheet_meeting_token_renew;
-
+use Exception;
 use Uncanny_Automator\Api_Server;
+use Uncanny_Automator\Integrations\Google_Sheet\Migrations\Migrate_58;
 use Uncanny_Automator_Pro\Google_Sheet_Pro_Helpers;
 
 /**
@@ -15,44 +15,51 @@ use Uncanny_Automator_Pro\Google_Sheet_Pro_Helpers;
 class Google_Sheet_Helpers {
 
 	/**
+	 * The scope for fetching users google drives (legacy &).
+	 *
+	 * @var string SCOPE_DRIVE The scope for drive.
+	 */
+	const LEGACY_SCOPE_DRIVE = 'https://www.googleapis.com/auth/drive';
+
+	/**
 	 * The scope for fetching users google drives.
 	 *
 	 * @var string SCOPE_DRIVE The scope for drive.
 	 */
-	const SCOPE_DRIVE = 'https://www.googleapis.com/auth/drive';
+	const SCOPE_DRIVE = 'https://www.googleapis.com/auth/drive.file';
 
 	/**
 	 * The scope for fetching users spreadsheets.
 	 *
-	 * @var SCOPE_SPREADSHEETS The scope for spreadsheets.
+	 * @var string The scope for spreadsheets.
 	 */
 	const SCOPE_SPREADSHEETS = 'https://www.googleapis.com/auth/spreadsheets';
 
 	/**
 	 * The scope for fetching profile info.
 	 *
-	 * @var SCOPE_USERINFO The scope for user info.
+	 * @var string The scope for user info.
 	 */
 	const SCOPE_USERINFO = 'https://www.googleapis.com/auth/userinfo.profile';
 
 	/**
 	 * The scope for fetching user email.
 	 *
-	 * @var SCOPE_USER_EMAIL The scope for email.
+	 * @var string The scope for email.
 	 */
 	const SCOPE_USER_EMAIL = 'https://www.googleapis.com/auth/userinfo.email';
 
 	/**
 	 * The API endpoint address.
 	 *
-	 * @var API_ENDPOINT The endpoint adress.
+	 * @var string The endpoint adress.
 	 */
 	const API_ENDPOINT = 'v2/google';
 
 	/**
 	 * Google Sheet Options.
 	 *
-	 * @var Google_Sheet_Pro_Helpers
+	 * @var Google_Sheet_Helpers
 	 */
 	public $options;
 
@@ -75,7 +82,7 @@ class Google_Sheet_Helpers {
 	 *
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Client scope.
@@ -92,6 +99,18 @@ class Google_Sheet_Helpers {
 	public static $hash_string = 'Uncanny Automator Pro Google Sheet Integration';
 
 	/**
+	 * The API endpoint.
+	 *
+	 * @var string $automator_api
+	 */
+	public $automator_api = '';
+
+	/**
+	 * The spreadsheets option key.
+	 */
+	const SPREADSHEETS_OPTIONS_KEY = 'automator_google_sheets_spreadsheets';
+
+	/**
 	 * Googlesheet_Pro_Helpers constructor.
 	 */
 	public function __construct() {
@@ -99,11 +118,15 @@ class Google_Sheet_Helpers {
 		// Try migrating the googlesheet to new version.
 		$this->maybe_migrate_googlesheets();
 
+		// Initialize the 5.8 migration.
+		$migration = new Migrate_58( $this );
+		$migration->register_hooks();
+
 		// Selectively load options.
 		if ( method_exists( '\Uncanny_Automator\Automator_Helpers_Recipe', 'maybe_load_trigger_options' ) ) {
 			$this->load_options = Automator()->helpers->recipe->maybe_load_trigger_options( __CLASS__ );
 		} else {
-			$this->load_options = true;
+
 		}
 
 		$this->setting_tab = 'premium-integrations';
@@ -122,19 +145,389 @@ class Google_Sheet_Helpers {
 
 		// Would probably be a good idea if we move 'validate_oauth_tokens' away from the 'init' hook to its own endpoint.
 		add_action( 'init', array( $this, 'validate_oauth_tokens' ), 100, 3 );
+
+		// Classic methods.
 		add_action( 'wp_ajax_select_gsspreadsheet_from_gsdrive', array( $this, 'select_gsspreadsheet_from_gsdrive' ) );
 		add_action( 'wp_ajax_select_gsworksheet_from_gsspreadsheet', array( $this, 'select_gsworksheet_from_gsspreadsheet' ) );
 		add_action( 'wp_ajax_select_gsworksheet_from_gsspreadsheet_columns', array( $this, 'select_gsworksheet_from_gsspreadsheet_columns' ) );
 		add_action( 'wp_ajax_get_worksheet_ROWS_GOOGLESHEETS', array( $this, 'get_worksheet_rows_gsspreadsheet' ) );
 		add_action( 'wp_ajax_uo_google_disconnect_user', array( $this, 'disconnect_user' ) );
 
-		add_filter( 'automator_google_api_call', array( $this, 'resend_with_current_credentials' ) );
+		// Fix the OAuth credentials.
+		add_filter( 'automator_google_api_call', array( $this, 'resend_with_current_credentials' ), 10, 1 );
 
-		// Load the settings page.
-		require_once __DIR__ . '/../settings/settings-google-sheet.php';
+		// Fix the Worksheet IDs.
+		add_filter( 'automator_google_api_call', array( $this, 'resend_with_correct_worksheet_id' ), 20, 1 );
+
+		// New wp_ajax endpoints for changes related to file picker.
+		add_action( 'wp_ajax_automator_fetch_googlesheets_spreadsheets', array( $this, 'fetch_spreadsheets' ) );
+		add_action( 'wp_ajax_automator_fetch_googlesheets_worksheets', array( $this, 'fetch_worksheets' ) );
+		add_action( 'wp_ajax_automator_fetch_googlesheets_worksheets_columns', array( $this, 'fetch_worksheets_columns' ) );
+
+		// Update action colum search field options.
+		add_action( 'wp_ajax_automator_fetch_googlesheets_worksheets_columns_search', array( $this, 'fetch_worksheets_columns_search' ) );
+		add_action( 'wp_ajax_automator_handle_file_picker', array( $this, 'handle_file_picker' ) );
+		add_action( 'wp_ajax_automator_googlesheets_file_picker_auth', array( $this, 'handle_file_picker_auth' ) );
+
+		// Delete spreadsheet handler.
+		add_action( 'wp_ajax_automator_google_sheet_remove_spreadsheet', array( $this, 'remove_spreadsheet' ) );
 
 		new Google_Sheet_Settings( $this );
 
+	}
+
+	/**
+	 * Remove spreadsheets.
+	 *
+	 * @return never
+	 */
+	public function remove_spreadsheet() {
+
+		// Verify permissions and nonce.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Insufficient permission. Only administrators can use file picker.' );
+		}
+
+		if ( ! wp_verify_nonce( automator_filter_input( 'nonce' ), 'automator_google_sheet_remove_spreadsheet' ) ) {
+			wp_die( 'Invalid nonce.' );
+		}
+
+		$spreadsheet_id = automator_filter_input( 'id' );
+
+		// Retrieve the current spreadsheets.
+		$current_spreadsheets = (array) automator_get_option( self::SPREADSHEETS_OPTIONS_KEY, array() );
+
+		// Unset the spreadsheet item that matches the requested spreadsheet id.
+		foreach ( $current_spreadsheets as $key => $spreadsheet ) {
+			if ( isset( $spreadsheet['id'] ) && $spreadsheet_id === $spreadsheet['id'] ) {
+				unset( $current_spreadsheets[ $key ] );
+			}
+		}
+
+		// Update the spreadsheet. There should be no problem when there is no unset,
+		automator_update_option( self::SPREADSHEETS_OPTIONS_KEY, $current_spreadsheets );
+
+		// Redirect back to google sheet settings.
+		wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=premium-integrations&integration=google-sheet' ) );
+
+		exit;
+
+	}
+
+	/**
+	 * Handles file picker authentication.
+	 *
+	 * @return void
+	 */
+	public function handle_file_picker_auth() {
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json(
+				array(
+					'error' => 'Insufficient permission. Only administrators can use file picker.',
+				),
+				401
+			);
+		}
+
+		$json_data = (array) json_decode( file_get_contents( 'php://input' ), true ); // We'ere using wp-ajax so wp_rest_request json method is not available.
+		$nonce     = $json_data['nonce'] ?? '';
+
+		if ( ! wp_verify_nonce( $nonce, 'automator_file_picker_create_picker' ) ) {
+			wp_send_json(
+				array(
+					'error' => 'Invalid nonce. Unauthorized',
+				),
+				403
+			);
+		}
+
+		try {
+
+			$current_client = $this->get_google_client();
+			$refresh_token  = $current_client['refresh_token'] ?? '';
+			$since          = $current_client['since'] ?? 0;
+			$expires        = $current_client['expires_in'] ?? 0;
+
+			// Current time minus the since + expiry in seconds is greater than 1 hour.
+			$timestamp_expires = intval( $since ) + intval( $expires );
+
+			// Is current time greater than expiration of access token?
+			$is_access_token_expired = time() >= $timestamp_expires;
+
+			// If the access token is still good. Just return the current credentials.
+			// Refresh the access token on first instance since we need to compare it later on.
+			if ( ! empty( $since ) && ! $is_access_token_expired ) {
+				// Invokes die statement so no need to return.
+				wp_send_json(
+					array(
+						'data' => $current_client,
+					),
+					200
+				);
+			}
+
+			// Otherwise, request new access token from the API.
+			$body = array(
+				'action' => 'refresh_access_token',
+			);
+
+			$response = $this->api_call( $body, null );
+
+			if ( 200 === $response['statusCode'] && isset( $response['data'] ) ) {
+
+				$data = $response['data'];
+
+				// Insert the refresh token manually. Once the access token is refreshed, Google wont return a new set of refresh token.
+				$data['refresh_token'] = $refresh_token;
+				$data['since']         = time();
+
+				automator_update_option( '_uncannyowl_google_sheet_settings', $data );
+
+			}
+		} catch ( Exception $e ) {
+
+			wp_send_json(
+				array(
+					'error' => 'Exception: ' . $e->getMessage(),
+				),
+				400
+			);
+		}
+
+		wp_send_json(
+			$response,
+			200
+		);
+	}
+
+	/**
+	 * Handles file picker callback.
+	 *
+	 * @return void
+	 */
+	public function handle_file_picker() {
+
+		$json_data = file_get_contents( 'php://input' ); // We'ere using wp-ajax so wp_rest_request json method is not available.
+
+		$request_data = (array) json_decode( $json_data, true );
+
+		$nonce = $request_data['nonce'] ?? '';
+
+		// Verify nonce for security (if applicable)
+		if ( ! wp_verify_nonce( $nonce, 'automator_google_file_picker' ) ) {
+			wp_send_json_error(
+				array(
+					'error' => esc_html_x( 'Invalid nonce', 'Google sheets', 'uncanny-automator' ),
+				),
+				420
+			);
+		}
+
+		$spreadsheets = $request_data['spreadsheets'] ?? array();
+
+		$current_spreadsheets = automator_get_option( self::SPREADSHEETS_OPTIONS_KEY );
+
+		$new_spreadsheets_collection = $this->merge_spreadsheets_options( $current_spreadsheets, $spreadsheets );
+
+		automator_update_option( self::SPREADSHEETS_OPTIONS_KEY, $new_spreadsheets_collection, false );
+
+		wp_send_json_success(
+			(array) automator_get_option( self::SPREADSHEETS_OPTIONS_KEY, array() )
+		);
+
+	}
+
+	/**
+	 * Remove duplicate spreadsheets by spreadsheet id.
+	 *
+	 * @param string[string[]] $documents
+	 *
+	 * @return array
+	 */
+	public static function remove_duplicate_spreadsheets_by_id( $documents ) {
+
+		$unique_documents = array();
+		$unique_ids       = array();
+
+		foreach ( (array) $documents as $key => $document ) {
+			if ( ! isset( $document['id'] ) ) {
+				continue;
+			}
+			if ( ! in_array( $document['id'], $unique_ids ) ) {
+				$unique_ids[]       = $document['id'];
+				$unique_documents[] = $document;
+			}
+		}
+
+		return $unique_documents;
+	}
+
+	/**
+	 * Merge the spreadsheets options.
+	 *
+	 * @param string[string[]] $current_spreadsheets
+	 * @param string[string[]] $spreadsheets
+	 *
+	 * @return string[string[]]
+	 */
+	public static function merge_spreadsheets_options( $current_spreadsheets, $spreadsheets ) {
+
+		$documents = array_merge( (array) $current_spreadsheets, (array) $spreadsheets );
+
+		return self::remove_duplicate_spreadsheets_by_id( $documents );
+	}
+
+	/**
+	 * Fetches all spreadsheets.
+	 *
+	 * @return mixed
+	 */
+	public function fetch_spreadsheets() {
+
+		Automator()->utilities->verify_nonce();
+
+		$spreadsheets = self::get_spreadsheets();
+
+		if ( empty( $spreadsheets ) ) {
+			wp_send_json(
+				array(
+					'success' => false,
+					'error'   => esc_html_x(
+						'Unable to find any Sheets. Please go to Automator > App integrations > Google Sheets and select files.',
+						'Google Sheets',
+						'uncanny-automator'
+					),
+				)
+			);
+		}
+
+		$options = array(
+			array(
+				'text'  => _x( 'Please select a spreadsheet', 'Google Sheets', 'uncanny-automator' ),
+				'value' => '',
+			),
+		);
+
+		foreach ( $spreadsheets as $spreadsheet ) {
+			$options[] = array(
+				'text'  => $spreadsheet['name'],
+				'value' => $spreadsheet['id'],
+			);
+		}
+
+		wp_send_json(
+			array(
+				'success' => true,
+				'options' => $options,
+			)
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function fetch_worksheets() {
+
+		Automator()->utilities->verify_nonce();
+
+		$values = automator_filter_input_array( 'values', INPUT_POST );
+
+		$spreadsheet_id = sanitize_text_field( $values['GSSPREADSHEET'] );
+
+		$worksheets = $this->api_get_worksheets_from_spreadsheet( $spreadsheet_id );
+
+		wp_send_json(
+			array(
+				'success' => true,
+				'options' => $worksheets,
+			)
+		);
+	}
+
+	/**
+	 * Retrieve worksheet columns.
+	 *
+	 * @return void
+	 */
+	public function fetch_worksheets_columns() {
+
+		Automator()->utilities->verify_nonce();
+
+		$fields = array();
+
+		$values = automator_filter_input_array( 'values', INPUT_POST );
+
+		if ( ! isset( $values['GSSPREADSHEET'] ) ) {
+			wp_send_json(
+				array(
+					'success' => false,
+					'error'   => esc_html_x( 'Error: Unable to read the selected Sheet. Please make sure that you have selected a valid Sheet.', 'Google Sheets', 'uncanny-automator' ),
+				)
+			);
+		}
+
+		$gs_spreadsheet_id = sanitize_text_field( $values['GSSPREADSHEET'] );
+
+		if ( ! isset( $values['GSWORKSHEET'] ) ) {
+			wp_send_json(
+				array(
+					'success' => false,
+					'error'   => esc_html_x( 'Error: Unable to find Worksheet ID. Please make sure that you have selected a valid Worksheet.', 'Google Sheets', 'uncanny-automator' ),
+				)
+			);
+		}
+
+		$worksheet_id = sanitize_text_field( $values['GSWORKSHEET'] );
+
+		// Backwards compatibility.
+		$worksheet_id = self::calculate_hash( $worksheet_id );
+
+		$response = $this->api_get_rows( $gs_spreadsheet_id, $worksheet_id );
+
+		if ( false === $response->success ) {
+			wp_send_json(
+				array(
+					'success' => false,
+					'error'   => $response->error,
+				)
+			);
+		}
+
+		$fields = array();
+
+		if ( ! empty( $response ) && ! empty( $response->samples ) ) {
+
+			$rows = array_shift( $response->samples );
+
+			foreach ( $rows as  $row ) {
+
+				$fields[] = array(
+					'GS_COLUMN_NAME'  => $row['key'],
+					'GS_COLUMN_VALUE' => '',
+				);
+			}
+		}
+
+		wp_send_json(
+			array(
+				'success' => true,
+				'rows'    => $fields,
+			)
+		);
+
+	}
+
+	/**
+	 * Retrieves all spreadsheets from the given options.
+	 *
+	 * @return string[]
+	 */
+	public static function get_spreadsheets() {
+
+		$options_spreadsheets = (array) automator_get_option( self::SPREADSHEETS_OPTIONS_KEY, array() );
+
+		return apply_filters( 'automator_googlesheets_options_spreadsheets', $options_spreadsheets );
 	}
 
 	/**
@@ -147,16 +540,9 @@ class Google_Sheet_Helpers {
 	}
 
 	/**
-	 * Set pro.
-	 *
-	 * @param Google_Sheet_Helpers $pro
-	 */
-	public function setPro( Google_Sheet_Pro_Helpers $pro ) { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
-		$this->pro = $pro;
-	}
-
-	/**
 	 * Get the connected Google Drives.
+	 *
+	 * @deprecated 5.7
 	 *
 	 * @param null $label
 	 * @param $option_code
@@ -211,6 +597,8 @@ class Google_Sheet_Helpers {
 	/**
 	 * The the connected Google Spreadsheets.
 	 *
+	 * @deprecated 5.7
+	 *
 	 * @param $label
 	 * @param $option_code
 	 * @param $args
@@ -257,6 +645,8 @@ class Google_Sheet_Helpers {
 	/**
 	 * Method select_gsspreadsheet_from_gsdrive
 	 *
+	 * @deprecated 5.7
+	 *
 	 * @return void
 	 */
 	public function select_gsspreadsheet_from_gsdrive() {
@@ -296,6 +686,8 @@ class Google_Sheet_Helpers {
 
 	/**
 	 * Method get_google_worksheets
+	 *
+	 * @deprecated 5.7
 	 *
 	 * @param $label $label [explicite description]
 	 * @param $option_code $option_code [explicite description]
@@ -344,18 +736,24 @@ class Google_Sheet_Helpers {
 	/**
 	 * Method select_gsworksheet_from_gsspreadsheet
 	 *
+	 * @deprecated 5.7
+	 *
 	 * @return void
 	 */
 	public function select_gsworksheet_from_gsspreadsheet() {
 
 		// Nonce and post object validation
 		Automator()->utilities->ajax_auth_check();
+
 		$fields = array();
+
 		$values = automator_filter_input_array( 'values', INPUT_POST );
+
 		if ( ! isset( $values['GSSPREADSHEET'] ) ) {
 			echo wp_json_encode( $fields );
 			die();
 		}
+
 		$gs_spreadsheet_id = sanitize_text_field( $values['GSSPREADSHEET'] );
 
 		$fields = $this->api_get_worksheets_from_spreadsheet( $gs_spreadsheet_id );
@@ -363,11 +761,13 @@ class Google_Sheet_Helpers {
 		echo wp_json_encode( $fields );
 
 		die();
-	}
 
+	}
 
 	/**
 	 * Method get_worksheet_rows_gsspreadsheet
+	 *
+	 * @deprecated 5.7
 	 *
 	 * @return void
 	 */
@@ -408,10 +808,10 @@ class Google_Sheet_Helpers {
 	 */
 	public function get_google_client() {
 
-		$access_token = get_option( '_uncannyowl_google_sheet_settings', array() );
+		$access_token = automator_get_option( '_uncannyowl_google_sheet_settings', array() );
 
 		if ( empty( $access_token ) || ! isset( $access_token['access_token'] ) ) {
-			throw new \Exception( 'Google is not connected' );
+			return false;
 		}
 
 		return $access_token;
@@ -431,48 +831,40 @@ class Google_Sheet_Helpers {
 
 		// Bailout if no message from api.
 		if ( empty( $api_message ) ) {
-
 			return;
-
 		}
 
 		$error_google_sheet_url = 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=' . $this->setting_tab . '&integration=google-sheet';
 
-		$secret = get_transient( 'automator_api_google_authorize_nonce' );
+		$secret = automator_filter_input( 'nonce' );
 
 		$tokens = Automator_Helpers_Recipe::automator_api_decode_message( $api_message, $secret );
 
 		if ( ! empty( $tokens['access_token'] ) ) {
 
 			// On success.
-			update_option( '_uncannyowl_google_sheet_settings', $tokens );
-
+			automator_update_option( '_uncannyowl_google_sheet_settings', $tokens );
 			// Set the transient.
 			set_transient( '_uncannyowl_google_sheet_settings', $tokens['access_token'] . '|' . $tokens['refresh_token'], 60 * 50 );
-
 			// Refresh the user info.
 			delete_transient( '_uncannyowl_google_user_info' );
-
 			// Delete expired settings.
-			delete_option( '_uncannyowl_google_sheet_settings_expired' );
+			automator_delete_option( '_uncannyowl_google_sheet_settings_expired' );
 
 			if ( $this->has_missing_scope() ) {
 
 				wp_safe_redirect( admin_url( $error_google_sheet_url ) . '&connect=3' );
-
 				die;
 
 			}
 
 			wp_safe_redirect( admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=' . $this->setting_tab . '&integration=google-sheet&connect=1' ) );
-
 			die;
 
 		} else {
 
 			// On Error.
 			wp_safe_redirect( admin_url( $error_google_sheet_url ) . '&connect=2' );
-
 			die;
 
 		}
@@ -504,6 +896,9 @@ class Google_Sheet_Helpers {
 		$has_missing_scope = false;
 
 		foreach ( $scopes as $scope ) {
+			if ( self::SCOPE_DRIVE === $scope || self::LEGACY_SCOPE_DRIVE === $scope ) {
+				continue; // Skip drive scope check. If there is drive already then proceed.
+			}
 			if ( false === strpos( $client['scope'], $scope ) ) {
 				$has_missing_scope = true;
 			}
@@ -515,6 +910,8 @@ class Google_Sheet_Helpers {
 
 	/**
 	 * Method api_get_google_drives
+	 *
+	 * @deprecated 5.7
 	 *
 	 * @return void|null|array
 	 */
@@ -566,6 +963,8 @@ class Google_Sheet_Helpers {
 	/**
 	 * Method api_get_spreadsheets_from_drive
 	 *
+	 * @deprecated 5.7
+	 *
 	 * @param $drive_id
 	 *
 	 * @return void|null|array
@@ -600,7 +999,7 @@ class Google_Sheet_Helpers {
 		} catch ( \Exception $e ) {
 			$options[] = array(
 				'value' => '-1',
-				'text'  => __( 'Google returned an error. Please try again in a few minutes.', 'uncanny-automator' ),
+				'text'  => 'API Exception ' . $e->getMessage(),
 			);
 		}
 
@@ -619,14 +1018,13 @@ class Google_Sheet_Helpers {
 
 		$options = array();
 
-		$options[] = array(
-			'value' => '',
-			'text'  => __( 'Select a worksheet', 'uncanny-automator' ),
-		);
-
 		if ( '-1' === $spreadsheet_id ) {
 			return $options;
 		}
+
+		$req_action_id = automator_filter_input( 'item_id', INPUT_POST );
+
+		$current_worksheet_id = get_post_meta( $req_action_id, 'GSWORKSHEET', true );
 
 		try {
 
@@ -651,8 +1049,15 @@ class Google_Sheet_Helpers {
 						continue;
 					}
 
+					$worksheet_id = $this->maybe_generate_sheet_id( $properties['sheetId'] );
+
+					// Backwards compatibility for users who migrated already and re-built the action with zero worksheet id.
+					if ( 0 === self::calculate_hash( $worksheet_id ) && '0' === $current_worksheet_id ) {
+						$worksheet_id = 0;
+					}
+
 					$options[] = array(
-						'value' => $this->maybe_generate_sheet_id( $properties['sheetId'] ),
+						'value' => $worksheet_id,
 						'text'  => $properties['title'],
 					);
 				}
@@ -660,7 +1065,7 @@ class Google_Sheet_Helpers {
 		} catch ( \Exception $e ) {
 			$options[] = array(
 				'value' => '-1',
-				'text'  => __( 'Google returned an error. Please try again in a few minutes.', 'uncanny-automator' ),
+				'text'  => 'API Exception ' . $e->getMessage(),
 			);
 		}
 
@@ -671,8 +1076,9 @@ class Google_Sheet_Helpers {
 	/**
 	 * Method maybe_generate_sheet_id
 	 *
-	 * @param  mixed $id
-	 * @return void
+	 * @param int $id
+	 *
+	 * @return string
 	 */
 	public function maybe_generate_sheet_id( $id ) {
 
@@ -690,7 +1096,7 @@ class Google_Sheet_Helpers {
 	 * @param $spreadsheet_id
 	 * @param $worksheet_id
 	 *
-	 * @return void|null|array
+	 * @return void|null|array|object
 	 */
 	public function api_get_rows( $spreadsheet_id, $worksheet_id ) {
 
@@ -733,7 +1139,7 @@ class Google_Sheet_Helpers {
 		} catch ( \Exception $e ) {
 			$response = (object) array(
 				'success' => false,
-				'error'   => 'Couldn\'t fetch rows',
+				'error'   => 'Error: Couldn\'t fetch rows. ' . $e->getMessage(),
 			);
 		}
 
@@ -812,12 +1218,8 @@ class Google_Sheet_Helpers {
 
 		if ( wp_verify_nonce( filter_input( INPUT_GET, 'nonce', FILTER_UNSAFE_RAW ), 'uo-google-user-disconnect' ) ) {
 
-			$this->api_revoke_access();
+			$this->disconnect_and_revoke_credentials();
 
-			delete_option( '_uncannyowl_google_sheet_settings' );
-			delete_option( '_uncannyowl_google_sheet_settings_expired' );
-			delete_transient( '_uncannyowl_google_sheet_settings' );
-			delete_transient( '_uncannyowl_google_user_info' );
 		}
 
 		wp_safe_redirect(
@@ -836,6 +1238,25 @@ class Google_Sheet_Helpers {
 	}
 
 	/**
+	 * Disconnect and revokes the credentials.
+	 *
+	 * @return true
+	 */
+	public function disconnect_and_revoke_credentials() {
+
+		$this->api_revoke_access();
+
+		automator_delete_option( '_uncannyowl_google_sheet_settings' );
+		automator_delete_option( '_uncannyowl_google_sheet_settings_expired' );
+		delete_transient( '_uncannyowl_google_sheet_settings' );
+		delete_transient( '_uncannyowl_google_user_info' );
+		automator_delete_option( self::SPREADSHEETS_OPTIONS_KEY );
+
+		return true;
+
+	}
+
+	/**
 	 * Revoke Access.
 	 *
 	 * @return void|null|array
@@ -850,7 +1271,7 @@ class Google_Sheet_Helpers {
 
 			$response = $this->api_call( $body );
 
-			delete_option( '_uncannyowl_google_sheet_settings' );
+			automator_delete_option( '_uncannyowl_google_sheet_settings' );
 
 		} catch ( \Exception $e ) {
 			automator_log( $e->getMessage() );
@@ -884,217 +1305,6 @@ class Google_Sheet_Helpers {
 		$response = $this->api_call( $body );
 
 		return $response;
-	}
-
-	/**
-	 * Get samples JS.
-	 *
-	 * @return false|string
-	 */
-	public static function get_samples_js() {
-		// Start output
-		ob_start();
-
-		// It's optional to add the <script> tags
-		// This must have only one anonymous function
-		?>
-
-		<script>
-
-			// Do when the user clicks on send test
-			function ($button, data, modules) {
-
-				// Create a configuration object
-				let config = {
-					// In milliseconds, the time between each call
-					timeBetweenCalls: 1 * 1000,
-					// In milliseconds, the time we're going to check for samples
-					checkingTime: 60 * 1000,
-					// Links
-					links: {
-						noResultsSupport: 'https://automatorplugin.com/knowledge-base/google-sheets/'
-					},
-					// i18n
-					i18n: {
-						checkingHooks: "<?php /* translators: Non-personal infinitive verb */ printf( esc_html__( "We're checking for columns. We'll keep trying for %s seconds.", 'uncanny-automator' ), '{{time}}' ); ?>",
-						noResultsTrouble: "<?php esc_html_e( 'We had trouble finding columns.', 'uncanny-automator' ); ?>",
-						noResultsSupport: "<?php esc_html_e( 'See more details or get help', 'uncanny-automator' ); ?>",
-						samplesModalTitle: "<?php esc_html_e( "Here is the data we've collected", 'uncanny-automator' ); ?>",
-						samplesModalWarning: "<?php /* translators: 1. Button */ printf( esc_html__( 'Clicking on \"%1$s\" will remove your current fields and will use the ones on the table above instead.', 'uncanny-automator' ), '{{confirmButton}}' ); ?>",
-						samplesTableValueType: "<?php esc_html_e( 'Value type', 'uncanny-automator' ); ?>",
-						samplesTableReceivedData: "<?php esc_html_e( 'Received data', 'uncanny-automator' ); ?>",
-						samplesModalButtonConfirm: "<?php /* translators: Non-personal infinitive verb */ esc_html_e( 'Use these fields', 'uncanny-automator' ); ?>",
-						samplesModalButtonCancel: "<?php /* translators: Non-personal infinitive verb */ esc_html_e( 'Do nothing', 'uncanny-automator' ); ?>",
-					}
-				}
-
-				// Create the variable we're going to use to know if we have to keep doing calls
-				let foundResults = false;
-
-				// Get the date when this function started
-				let startDate = new Date();
-
-				// Create array with the data we're going to send
-				let dataToBeSent = {
-					action: 'get_worksheet_ROWS_GOOGLESHEETS',
-					nonce: UncannyAutomator.nonce,
-					recipe_id: UncannyAutomator.recipe.id,
-					item_id: data.item.id,
-					drive: data.values.GSDRIVE,
-					sheet: data.values.GSSPREADSHEET,
-					worksheet: data.values.GSWORKSHEET
-				};
-
-				// Add notice to the item
-				// Create notice
-				let $notice = jQuery('<div/>', {
-					'class': 'item-options__notice item-options__notice--warning'
-				});
-
-				// Add notice message
-				$notice.html(config.i18n.checkingHooks.replace('{{time}}', parseInt(config.checkingTime / 1000)));
-
-				// Get the notices container
-				let $noticesContainer = jQuery('.item[data-id="' + data.item.id + '"] .item-options__notices');
-
-				// Add notice
-				$noticesContainer.html($notice);
-
-				// Create the function we're going to use recursively to
-				// do check for the samples
-				var getSamples = function () {
-					// Do AJAX call
-					jQuery.ajax({
-						method: 'POST',
-						dataType: 'json',
-						url: ajaxurl,
-						data: dataToBeSent,
-
-						// Set the checking time as the timeout
-						timeout: config.checkingTime,
-
-						success: function (response) {
-							// Get new date
-							let currentDate = new Date();
-
-							// Define the default value of foundResults
-							let foundResults = false;
-
-							// Check if the response was successful
-							if (response.success) {
-								// Check if we got the rows from a sample
-								if (response.samples.length > 0) {
-									// Update foundResults
-									foundResults = true;
-								}
-							}
-
-							// Check if we have to do another call
-							let shouldDoAnotherCall = false;
-
-							// First, check if we don't have results
-							if (!foundResults) {
-								// Check if we still have time left
-								if ((currentDate.getTime() - startDate.getTime()) <= config.checkingTime) {
-									// Update result
-									shouldDoAnotherCall = true;
-								}
-							}
-
-							if (shouldDoAnotherCall) {
-								// Wait and do another call
-								setTimeout(function () {
-									// Invoke this function again
-									getSamples();
-								}, config.timeBetweenCalls);
-							} else {
-								// Add loading animation to the button
-								$button.removeClass('uap-btn--loading uap-btn--disabled');
-								// Iterate samples and create an array with the rows
-								let rows = [];
-								let keys = {}
-								jQuery.each(response.samples, function (index, sample) {
-									// Iterate keys
-									jQuery.each(sample, function (index, row) {
-										// Check if the we already added this key
-										if (typeof keys[row.key] !== 'undefined') {
-											// Then just append the value
-											// rows[ keys[ row.key ] ].data = rows[ keys[ row.key ] ].data + ', ' + row.data;
-										} else {
-											// Add row and save the index
-											keys[row.key] = rows.push(row);
-										}
-									});
-								});
-								// Get the field with the fields (WEBHOOK_DATA)
-								let worksheetFields = data.item.options.GOOGLESHEETROW.fields[3];
-
-								// Remove all the current fields
-								worksheetFields.fieldRows = [];
-
-								// Add new rows. Iterate rows from the sample
-								jQuery.each(rows, function (index, row) {
-									// Add row
-									worksheetFields.addRow({
-										GS_COLUMN_NAME: row.key
-									}, false);
-								});
-
-								// Render again
-								worksheetFields.reRender();
-
-								// Check if it has results
-								if (foundResults) {
-									// Remove notice
-									$notice.remove();
-
-								} else {
-									// Change the notice type
-									$notice.removeClass('item-options__notice--warning').addClass('item-options__notice--error');
-
-									// Create a new notice message
-									let noticeMessage = config.i18n.noResultsTrouble;
-
-									// Change the notice message
-									$notice.html(noticeMessage + ' ');
-
-									// Add help link
-									let $noticeHelpLink = jQuery('<a/>', {
-										target: '_blank',
-										href: config.links.noResultsSupport
-									}).text(config.i18n.noResultsSupport);
-									$notice.append($noticeHelpLink);
-								}
-							}
-						},
-
-						statusCode: {
-							403: function () {
-								location.reload();
-							}
-						},
-
-						fail: function (response) {
-						}
-					});
-				}
-
-				// Add loading animation to the button
-				$button.addClass('uap-btn--loading uap-btn--disabled');
-
-				// Try to get samples
-				getSamples();
-			}
-
-		</script>
-
-		<?php
-
-		// Get output
-		$output = ob_get_clean();
-
-		// Return output.
-		return $output;
 	}
 
 	/**
@@ -1154,32 +1364,90 @@ class Google_Sheet_Helpers {
 		return $r;
 	}
 
+	/**
+	 * @deprecated 5.7
+	 *
+	 * @return never
+	 */
 	public function select_gsworksheet_from_gsspreadsheet_columns() {
 
-		// Nonce and post object validation
+		// Nonce and post object validation.
 		Automator()->utilities->ajax_auth_check();
-		$fields = array();
+
 		$values = automator_filter_input_array( 'values', INPUT_POST );
-		if ( ! isset( $values['GSSPREADSHEET'] ) ) {
-			echo wp_json_encode( $fields );
-			die();
-		}
-		$gs_spreadsheet_id = sanitize_text_field( $values['GSSPREADSHEET'] );
 
-		if ( empty( $values['GSWORKSHEET'] ) ) {
-			echo wp_json_encode( $fields );
-			die();
-		}
+		$spreadsheet_id = $values['GSSPREADSHEET'] ?? '';
+		$worksheet_id   = $values['GSWORKSHEET'] ?? '';
 
-		$worksheet_id = sanitize_text_field( $values['GSWORKSHEET'] );
-		$hashed       = sha1( self::$hash_string );
-		$sheet_id     = substr( $hashed, 0, 9 );
+		$fields = (array) $this->get_columns( $spreadsheet_id, $worksheet_id );
+
+		echo wp_json_encode( $fields );
+
+		die();
+
+	}
+
+	/**
+	 * Fetch worksheets columns for searching.
+	 *
+	 * @return void
+	 */
+	public function fetch_worksheets_columns_search() {
+
+		// Nonce and post object validation.
+		Automator()->utilities->ajax_auth_check();
+
+		$field_values = automator_filter_input_array( 'values', INPUT_POST );
+
+		$spreadsheet_id = $field_values['GSSPREADSHEET'] ?? '';
+		$worksheet_id   = $field_values['GSWORKSHEET'] ?? '';
+
+		// Backwards compatibility.
+		$worksheet_id = self::calculate_hash( $worksheet_id );
+
+		$fields = $this->get_columns( $spreadsheet_id, $worksheet_id );
+
+		wp_send_json(
+			array(
+				'success' => true,
+				'options' => $fields,
+			)
+		);
+
+	}
+
+	/**
+	 * Legacy backwords compatibility.
+	 *
+	 * @param string $worksheet_id
+	 *
+	 * @return string The ID of sheet.
+	 */
+	public static function calculate_hash( $worksheet_id ) {
+
+		$hashed   = sha1( self::$hash_string );
+		$sheet_id = substr( $hashed, 0, 9 );
 
 		if ( (string) $worksheet_id === (string) $sheet_id || intval( '-1' ) === intval( $worksheet_id ) ) {
 			$worksheet_id = 0;
 		}
 
-		$response = $this->api_get_rows( $gs_spreadsheet_id, $worksheet_id );
+		return $worksheet_id;
+	}
+
+	/**
+	 * Retrieve sheets columns from API.
+	 *
+	 * @since 5.8
+	 *
+	 * @param string $spreadsheet_id
+	 * @param string $worksheet_id
+	 *
+	 * @return string[]
+	 */
+	public function get_columns( $spreadsheet_id, $worksheet_id ) {
+
+		$response = $this->api_get_rows( $spreadsheet_id, $worksheet_id );
 
 		$fields = array();
 
@@ -1194,9 +1462,7 @@ class Google_Sheet_Helpers {
 			}
 		}
 
-		echo wp_json_encode( $fields );
-
-		die();
+		return $fields;
 
 	}
 
@@ -1207,7 +1473,7 @@ class Google_Sheet_Helpers {
 	 */
 	public function maybe_migrate_googlesheets() {
 
-		if ( 'yes' === get_option( 'uncanny_automator_google_sheets_migrated' ) ) {
+		if ( 'yes' === automator_get_option( 'uncanny_automator_google_sheets_migrated' ) ) {
 			return;
 		}
 
@@ -1281,7 +1547,7 @@ class Google_Sheet_Helpers {
 		}
 
 		// Update the option 'uncanny_automator_google_sheets_migrated'.
-		update_option( 'uncanny_automator_google_sheets_migrated', 'yes', false );
+		automator_update_option( 'uncanny_automator_google_sheets_migrated', 'yes', true );
 
 	}
 
@@ -1310,17 +1576,17 @@ class Google_Sheet_Helpers {
 	 * Method api_update_row
 	 *
 	 * @param  mixed $spreadsheet_id
-	 * @param  mixed $range
+	 * @param  mixed $ranges
 	 * @param  mixed $row_values
 	 * @return void
 	 */
-	public function api_update_row( $spreadsheet_id, $range, $row_values, $action = null ) {
+	public function api_update_row( $spreadsheet_id, $ranges, $row_values, $action = null ) {
 
 		$values = wp_json_encode( array( $row_values ) );
 
 		$body = array(
-			'action'         => 'update_row',
-			'range'          => $range,
+			'action'         => 'update_row_multiple',
+			'range'          => $ranges,
 			'spreadsheet_id' => $spreadsheet_id,
 			'values'         => $values,
 		);
@@ -1385,5 +1651,96 @@ class Google_Sheet_Helpers {
 		}
 
 		return $params;
+	}
+
+	/**
+	 * Resend with the correct worksheet ID.
+	 *
+	 * On version 5.8, existing worksheet ID that has hashed ID is breaking.
+	 *
+	 * @param mixed[] $params
+	 *
+	 * @return mixed[]
+	 */
+	public function resend_with_correct_worksheet_id( $params ) {
+
+		// If it is not a resend, proceed as usual.
+		if ( empty( $params['resend'] ) ) {
+			return $params;
+		}
+
+		// Proceed with no changes if `worksheet_id` is not present.
+		if ( ! isset( $params['body']['worksheet_id'] ) ) {
+			return $params;
+		}
+
+		// Figure out the correct sheet ID.
+		$worksheet_id = $this->calculate_hash( $params['body']['worksheet_id'] );
+
+		$params['body']['worksheet_id'] = $worksheet_id;
+
+		return $params;
+	}
+
+	/**
+	 * Determine if the user is connected or not.
+	 *
+	 * @param bool $mock_disconnect
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function is_connected( $mock_disconnect = false ) {
+
+		if ( is_bool( $mock_disconnect ) && false === $mock_disconnect ) {
+			return false;
+		}
+
+		try {
+			$client = $this->get_google_client();
+		} catch ( Exception $e ) {
+			return false;
+		}
+
+		if ( empty( $client ) ) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Retrieve the client scopes.
+	 *
+	 * @return false|string[]
+	 */
+	public function get_client_scopes() {
+
+		try {
+			$client = $this->get_google_client();
+		} catch ( Exception $e ) {
+			return false;
+		}
+
+		if ( empty( $client['scope'] ) ) {
+			return false;
+		}
+
+		return explode( ' ', $client['scope'] );
+
+	}
+
+	/**
+	 * Determines whether the current connected user has still generic drive scope.
+	 *
+	 * @return boolean
+	 */
+	public function has_generic_drive_scope() {
+
+		$scopes = $this->get_client_scopes();
+
+		return is_array( $scopes ) && in_array( 'https://www.googleapis.com/auth/drive', $scopes, true );
+
 	}
 }

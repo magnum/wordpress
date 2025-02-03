@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_AutomatorWP_Post_Created extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'automatorwp';
-    public $trigger = 'automatorwp_post_created';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_post_created';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -110,4 +121,5 @@ class AutomatorWP_AutomatorWP_Post_Created extends AutomatorWP_Integration_Trigg
 
 }
 
-new AutomatorWP_AutomatorWP_Post_Created();
+new AutomatorWP_AutomatorWP_Post_Created( 'automatorwp' );
+new AutomatorWP_AutomatorWP_Post_Created( 'posts' );

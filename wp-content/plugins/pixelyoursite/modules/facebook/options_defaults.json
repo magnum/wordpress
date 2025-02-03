@@ -2,7 +2,7 @@
   "enabled": true,
   "pixel_id": "",
   "advanced_matching_enabled": false,
-  "remove_metadata": false,
+  "remove_metadata": true,
 
   "general_event_enabled": true,
   "comment_event_enabled": true,
@@ -14,6 +14,8 @@
   "woo_content_id_prefix": "",
   "woo_content_id_suffix": "",
   "woo_content_id_logic": "default",
+  "woo_wpml_unified_id": false,
+
   "woo_purchase_enabled": true,
   "woo_initiate_checkout_enabled": true,
   "woo_remove_from_cart_enabled": true,
@@ -49,7 +51,6 @@
   "fdp_purchase_value" : "0",
 
   "use_server_api": false,
-  "server_event_use_ajax": true,
   "server_access_api_token": "",
   "test_api_event_code": "",
   "test_api_event_code_expiration_at": "",
@@ -72,5 +73,9 @@
   "automatic_event_comment_enabled": true,
   "automatic_event_scroll_enabled": true,
   "automatic_event_time_on_page_enabled": true,
-  "automatic_event_search_enabled": true
+  "automatic_event_search_enabled": true,
+
+  "disable_noscript": false,
+  "enabled_medical": false,
+  "do_not_track_medical_param": [ "event_url", "post_title", "page_title", "landing_page","content_name", "categories", "tags" ]
 }

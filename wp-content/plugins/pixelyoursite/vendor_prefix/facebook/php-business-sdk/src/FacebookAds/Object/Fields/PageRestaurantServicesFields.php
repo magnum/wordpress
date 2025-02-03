@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,20 +34,32 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PageRestaurantServicesFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CATERING = 'catering';
-    const DELIVERY = 'delivery';
-    const GROUPS = 'groups';
-    const KIDS = 'kids';
-    const OUTDOOR = 'outdoor';
-    const PICKUP = 'pickup';
-    const RESERVE = 'reserve';
-    const TAKEOUT = 'takeout';
-    const WAITER = 'waiter';
-    const WALKINS = 'walkins';
-    public function getFieldTypes()
-    {
-        return array('catering' => 'bool', 'delivery' => 'bool', 'groups' => 'bool', 'kids' => 'bool', 'outdoor' => 'bool', 'pickup' => 'bool', 'reserve' => 'bool', 'takeout' => 'bool', 'waiter' => 'bool', 'walkins' => 'bool');
-    }
+
+class PageRestaurantServicesFields extends AbstractEnum {
+
+  const CATERING = 'catering';
+  const DELIVERY = 'delivery';
+  const GROUPS = 'groups';
+  const KIDS = 'kids';
+  const OUTDOOR = 'outdoor';
+  const PICKUP = 'pickup';
+  const RESERVE = 'reserve';
+  const TAKEOUT = 'takeout';
+  const WAITER = 'waiter';
+  const WALKINS = 'walkins';
+
+  public function getFieldTypes() {
+    return array(
+      'catering' => 'bool',
+      'delivery' => 'bool',
+      'groups' => 'bool',
+      'kids' => 'bool',
+      'outdoor' => 'bool',
+      'pickup' => 'bool',
+      'reserve' => 'bool',
+      'takeout' => 'bool',
+      'waiter' => 'bool',
+      'walkins' => 'bool',
+    );
+  }
 }

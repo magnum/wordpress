@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdRuleTriggerOperatorValues getInstance()
  */
-class AdRuleTriggerOperatorValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ALL = 'ALL';
-    const ANY = 'ANY';
-    const CONTAIN = 'CONTAIN';
-    const EQUAL = 'EQUAL';
-    const GREATER_THAN = 'GREATER_THAN';
-    const IN = 'IN';
-    const IN_RANGE = 'IN_RANGE';
-    const LESS_THAN = 'LESS_THAN';
-    const NONE = 'NONE';
-    const NOT_CONTAIN = 'NOT_CONTAIN';
-    const NOT_EQUAL = 'NOT_EQUAL';
-    const NOT_IN = 'NOT_IN';
-    const NOT_IN_RANGE = 'NOT_IN_RANGE';
+class AdRuleTriggerOperatorValues extends AbstractEnum {
+
+  const ALL = 'ALL';
+  const ANY = 'ANY';
+  const CONTAIN = 'CONTAIN';
+  const EQUAL = 'EQUAL';
+  const GREATER_THAN = 'GREATER_THAN';
+  const IN = 'IN';
+  const IN_RANGE = 'IN_RANGE';
+  const LESS_THAN = 'LESS_THAN';
+  const NONE = 'NONE';
+  const NOT_CONTAIN = 'NOT_CONTAIN';
+  const NOT_EQUAL = 'NOT_EQUAL';
+  const NOT_IN = 'NOT_IN';
+  const NOT_IN_RANGE = 'NOT_IN_RANGE';
 }

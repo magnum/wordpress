@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class OffsitePixelFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATOR = 'creator';
-    const ID = 'id';
-    const JS_PIXEL = 'js_pixel';
-    const LAST_FIRING_TIME = 'last_firing_time';
-    const NAME = 'name';
-    const TAG = 'tag';
-    public function getFieldTypes()
-    {
-        return array('creator' => 'string', 'id' => 'string', 'js_pixel' => 'string', 'last_firing_time' => 'datetime', 'name' => 'string', 'tag' => 'string');
-    }
+
+class OffsitePixelFields extends AbstractEnum {
+
+  const CREATOR = 'creator';
+  const ID = 'id';
+  const JS_PIXEL = 'js_pixel';
+  const LAST_FIRING_TIME = 'last_firing_time';
+  const NAME = 'name';
+  const TAG = 'tag';
+
+  public function getFieldTypes() {
+    return array(
+      'creator' => 'string',
+      'id' => 'string',
+      'js_pixel' => 'string',
+      'last_firing_time' => 'datetime',
+      'name' => 'string',
+      'tag' => 'string',
+    );
+  }
 }

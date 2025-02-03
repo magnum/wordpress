@@ -219,6 +219,11 @@ function automatorwp_maybe_anonymous_completed_trigger( $trigger, $event = array
     // Get the trigger stored options
     $trigger_options = automatorwp_get_trigger_stored_options( $trigger->id );
 
+    foreach( $trigger_options as $option => $value ) {
+        // Replace all tags by their replacements
+        $trigger_options[$option] = automatorwp_parse_automation_tags( $automation->id, 0, $value );
+    }
+
     // Check if anonymous has access to the trigger
     if( ! automatorwp_anonymous_has_access_to_trigger( $trigger, $event, $trigger_options, $automation ) ) {
         return false;
@@ -601,6 +606,11 @@ function automatorwp_maybe_user_completed_trigger( $trigger, $user_id = 0, $even
     // Get the trigger stored options
     $trigger_options = automatorwp_get_trigger_stored_options( $trigger->id );
 
+    foreach( $trigger_options as $option => $value ) {
+        // Replace all tags by their replacements
+        $trigger_options[$option] = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+    }
+
     // Check if user has access to the trigger
     if( ! automatorwp_user_has_access_to_trigger( $trigger, $user_id, $event, $trigger_options, $automation ) ) {
         return false;
@@ -863,6 +873,11 @@ function automatorwp_user_deserves_trigger_filters( $trigger = null, $user_id = 
 
         // Get the trigger stored options
         $filter_options = automatorwp_get_filter_stored_options( $filter->id, 'trigger' );
+
+        foreach( $filter_options as $option => $value ) {
+            // Replace all tags by their replacements
+            $filter_options[$option] = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+        }
 
         /**
          * Filter to override the user deserves filter check.
@@ -1645,7 +1660,7 @@ function automatorwp_run_automation( $automation_id ) {
     }
 
     // Only all users and all posts automations can be run here
-    if( ! in_array( $automation->type, array( 'all-users', 'all-posts' ) ) ) {
+    if( ! in_array( $automation->type, array( 'all-users', 'all-posts', 'import-file' ) ) ) {
         $automatorwp_run_automation_error = __( 'Invalid automation type.', 'automatorwp' );
         return false;
     }
@@ -1668,6 +1683,9 @@ function automatorwp_run_automation( $automation_id ) {
     } else if( $automation->type === 'all-posts' ) {
         // All posts
         $result = automatorwp_run_all_posts_automation( $automation );
+    } else if( $automation->type === 'import-file' ) {
+        // Import file
+        $result = automatorwp_run_import_file_automation( $automation );
     }
 
     // Bail if automation has not run correctly
@@ -1768,11 +1786,19 @@ function automatorwp_run_all_users_automation( $automation ) {
     }
 
     // Set up a false event since the following functions require it
-    $automatorwp_event = array();
+    $automatorwp_event = array(
+        'user_id' => 0
+    );
 
     foreach ( $users_ids as $user_id ) {
 
         $user_id = absint( $user_id );
+        $automatorwp_event['user_id'] = $user_id;
+
+        foreach( $trigger_options as $option => $value ) {
+            // Replace all tags by their replacements
+            $trigger_options[$option] = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+        }
 
         // Check if user deserves the trigger filters
         if( ! automatorwp_user_deserves_trigger_filters( $trigger, $user_id, $automatorwp_event, $trigger_options, $automation ) ) {
@@ -1842,7 +1868,8 @@ function automatorwp_run_all_posts_automation( $automation ) {
 
     // Set up a false event since the following functions require it
     $automatorwp_event = array(
-        'post_id' => 0
+        'post_id' => 0,
+        'user_id' => 0,
     );
 
     foreach ( $posts_ids as $post_id ) {
@@ -1850,6 +1877,93 @@ function automatorwp_run_all_posts_automation( $automation ) {
         $post_id = absint( $post_id );
         $user_id = absint( get_post_field( 'post_author', $post_id ) );
         $automatorwp_event['post_id'] = $post_id;
+        $automatorwp_event['user_id'] = $user_id;
+
+        foreach( $trigger_options as $option => $value ) {
+            // Replace all tags by their replacements
+            $trigger_options[$option] = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+        }
+
+        // Check if user deserves the trigger filters
+        if( ! automatorwp_user_deserves_trigger_filters( $trigger, $user_id, $automatorwp_event, $trigger_options, $automation ) ) {
+            continue;
+        }
+
+        // Execute all automation actions
+        automatorwp_execute_all_automation_actions( $automation, $user_id, $automatorwp_event );
+
+    }
+
+    return true;
+
+}
+
+/**
+ * Run import file automation
+ *
+ * @since 2.2.2
+ *
+ * @param stdClass $automation The automation object
+ *
+ * @return bool
+ */
+function automatorwp_run_import_file_automation( $automation ) {
+
+    global $automatorwp_run_automation_error, $automatorwp_event;
+
+    if( ! is_object( $automation ) ) {
+        $automatorwp_run_automation_error = __( 'Invalid automation.', 'automatorwp' );
+        return false;
+    }
+
+    // Get the users per loop
+    $lines_per_loop = absint( automatorwp_get_automation_meta( $automation->id, 'lines_per_loop', true ) );
+
+    // Bail if users per loop not correctly configured
+    if( $lines_per_loop <= 0 ) {
+        $automatorwp_run_automation_error = __( 'Lines per loop need to be higher than 0.', 'automatorwp' );
+        return false;
+    }
+
+    // Get the all users trigger
+    $trigger = automatorwp_get_import_file_trigger( $automation );
+
+    // Bail if trigger not found
+    if( ! $trigger ) {
+        $automatorwp_run_automation_error = __( 'Trigger configuration not found.', 'automatorwp' );
+        return false;
+    }
+
+    // Get the trigger stored options
+    $trigger_options = automatorwp_get_trigger_stored_options( $trigger->id );
+
+    // Update automation status to in progress
+    if( $automation->status !== 'in-progress' ) {
+        // Call the automation run started function
+        automatorwp_run_automation_started( $automation, $trigger, $trigger_options );
+    }
+
+    // Get the users to apply the filters and run the actions
+    $users_ids = automatorwp_get_import_file_automation_users_ids( $automation );
+
+    if( $users_ids === false ) {
+        return false;
+    }
+
+    // Set up a false event since the following functions require it
+    $automatorwp_event = array(
+        'user_id' => 0
+    );
+
+    foreach ( $users_ids as $user_id ) {
+
+        $user_id = absint( $user_id );
+        $automatorwp_event['user_id'] = $user_id;
+
+        foreach( $trigger_options as $option => $value ) {
+            // Replace all tags by their replacements
+            $trigger_options[$option] = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+        }
 
         // Check if user deserves the trigger filters
         if( ! automatorwp_user_deserves_trigger_filters( $trigger, $user_id, $automatorwp_event, $trigger_options, $automation ) ) {

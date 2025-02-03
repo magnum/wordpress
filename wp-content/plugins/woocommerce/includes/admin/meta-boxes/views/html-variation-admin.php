@@ -9,6 +9,8 @@
  * @var array $variation_data array of variation data @deprecated 4.4.0.
  */
 
+use Automattic\WooCommerce\Utilities\I18nUtil;
+
 defined( 'ABSPATH' ) || exit;
 
 ?>
@@ -68,27 +70,44 @@ defined( 'ABSPATH' ) || exit;
 	</h3>
 	<div class="woocommerce_variable_attributes wc-metabox-content" style="display: none;">
 		<div class="data">
-			<p class="form-row form-row-first upload_image">
-				<a href="#" class="upload_image_button tips <?php echo $variation_object->get_image_id( 'edit' ) ? 'remove' : ''; ?>" data-tip="<?php echo $variation_object->get_image_id( 'edit' ) ? esc_attr__( 'Remove this image', 'woocommerce' ) : esc_attr__( 'Upload an image', 'woocommerce' ); ?>" rel="<?php echo esc_attr( $variation_id ); ?>">
-					<img src="<?php echo $variation_object->get_image_id( 'edit' ) ? esc_url( wp_get_attachment_thumb_url( $variation_object->get_image_id( 'edit' ) ) ) : esc_url( wc_placeholder_img_src() ); ?>" /><input type="hidden" name="upload_image_id[<?php echo esc_attr( $loop ); ?>]" class="upload_image_id" value="<?php echo esc_attr( $variation_object->get_image_id( 'edit' ) ); ?>" />
-				</a>
-			</p>
-			<?php
-			if ( wc_product_sku_enabled() ) {
+			<div class="form-flex-box">
+				<p class="form-row upload_image">
+					<a href="#" class="upload_image_button tips <?php echo $variation_object->get_image_id( 'edit' ) ? 'remove' : ''; ?>" data-tip="<?php echo $variation_object->get_image_id( 'edit' ) ? esc_attr__( 'Remove this image', 'woocommerce' ) : esc_attr__( 'Upload an image', 'woocommerce' ); ?>" rel="<?php echo esc_attr( $variation_id ); ?>">
+						<img src="<?php echo $variation_object->get_image_id( 'edit' ) ? esc_url( wp_get_attachment_thumb_url( $variation_object->get_image_id( 'edit' ) ) ) : esc_url( wc_placeholder_img_src() ); ?>" /><input type="hidden" name="upload_image_id[<?php echo esc_attr( $loop ); ?>]" class="upload_image_id" value="<?php echo esc_attr( $variation_object->get_image_id( 'edit' ) ); ?>" />
+					</a>
+				</p>
+				<div class="form-row form-row-last">
+				<?php
+				if ( wc_product_sku_enabled() ) {
+					woocommerce_wp_text_input(
+						array(
+							'id'            => "variable_sku{$loop}",
+							'name'          => "variable_sku[{$loop}]",
+							'value'         => $variation_object->get_sku( 'edit' ),
+							'placeholder'   => $variation_object->get_sku(),
+							'label'         => '<abbr title="' . esc_attr__( 'Stock Keeping Unit', 'woocommerce' ) . '">' . esc_html__( 'SKU', 'woocommerce' ) . '</abbr>',
+							'desc_tip'      => true,
+							'description'   => __( 'SKU refers to a Stock-keeping unit, a unique identifier for each distinct product and service that can be purchased.', 'woocommerce' ),
+							'wrapper_class' => 'form-row',
+						)
+					);
+				}
 				woocommerce_wp_text_input(
 					array(
-						'id'            => "variable_sku{$loop}",
-						'name'          => "variable_sku[{$loop}]",
-						'value'         => $variation_object->get_sku( 'edit' ),
-						'placeholder'   => $variation_object->get_sku(),
-						'label'         => '<abbr title="' . esc_attr__( 'Stock Keeping Unit', 'woocommerce' ) . '">' . esc_html__( 'SKU', 'woocommerce' ) . '</abbr>',
+						'id'            => "variable_global_unique_id{$loop}",
+						'name'          => "variable_global_unique_id[{$loop}]",
+						'value'         => $variation_object->get_global_unique_id( 'edit' ),
+						'placeholder'   => $variation_object->get_global_unique_id(),
+						// translators: %1$s GTIN %2$s UPC %3$s EAN %4$s ISBN.
+						'label'         => sprintf( __( '%1$s, %2$s, %3$s, or %4$s', 'woocommerce' ), '<abbr title="' . esc_attr__( 'Global Trade Item Number', 'woocommerce' ) . '">' . esc_html__( 'GTIN', 'woocommerce' ) . '</abbr>', '<abbr title="' . esc_attr__( 'Universal Product Code', 'woocommerce' ) . '">' . esc_html__( 'UPC', 'woocommerce' ) . '</abbr>', '<abbr title="' . esc_attr__( 'European Article Number', 'woocommerce' ) . '">' . esc_html__( 'EAN', 'woocommerce' ) . '</abbr>', '<abbr title="' . esc_attr__( 'International Standard Book Number', 'woocommerce' ) . '">' . esc_html__( 'ISBN', 'woocommerce' ) . '</abbr>' ),
 						'desc_tip'      => true,
-						'description'   => __( 'SKU refers to a Stock-keeping unit, a unique identifier for each distinct product and service that can be purchased.', 'woocommerce' ),
-						'wrapper_class' => 'form-row form-row-last',
+						'description'   => __( 'Enter a barcode or any other identifier unique to this product. It can help you list this product on other channels or marketplaces.', 'woocommerce' ),
+						'wrapper_class' => 'form-row',
 					)
 				);
-			}
-			?>
+				?>
+				</div>
+			</div>
 			<p class="form-row form-row-full options">
 				<label>
 					<?php esc_html_e( 'Enabled', 'woocommerce' ); ?>
@@ -279,9 +298,9 @@ defined( 'ABSPATH' ) || exit;
 
 				if ( wc_product_weight_enabled() ) {
 					$label = sprintf(
-						/* translators: %s: weight unit */
+						/* translators: %s: Weight unit */
 						__( 'Weight (%s)', 'woocommerce' ),
-						esc_html( get_option( 'woocommerce_weight_unit' ) )
+						I18nUtil::get_weight_unit_label( get_option( 'woocommerce_weight_unit', 'kg' ) )
 					);
 
 					woocommerce_wp_text_input(
@@ -310,9 +329,9 @@ defined( 'ABSPATH' ) || exit;
 						<label for="product_length">
 							<?php
 							printf(
-								/* translators: %s: dimension unit */
+								/* translators: %s dimension unit */
 								esc_html__( 'Dimensions (L&times;W&times;H) (%s)', 'woocommerce' ),
-								esc_html( get_option( 'woocommerce_dimension_unit' ) )
+								esc_html( I18nUtil::get_dimensions_unit_label( get_option( 'woocommerce_dimension_unit' ) ) )
 							);
 							?>
 						</label>

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,27 +21,29 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Search;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static TargetingSearchTypes getInstance()
  */
-class TargetingSearchTypes extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNTRY = 'adcountry';
-    const EDUCATION = 'adeducationschool';
-    const EMPLOYER = 'adworkemployer';
-    const GEOLOCATION = 'adgeolocation';
-    const GEOLOCATIONMETA = 'adgeolocationmeta';
-    const INTEREST = 'adinterest';
-    const INTEREST_SUGGESTION = 'adinterestsuggestion';
-    const INTEREST_VALIDATE = 'adinterestvalid';
-    const KEYWORD = 'adkeyword';
-    const LOCALE = 'adlocale';
-    const MAJOR = 'adeducationmajor';
-    const POSITION = 'adworkposition';
-    const RADIUS_SUGGESTION = 'adradiussuggestion';
-    const TARGETING_CATEGORY = 'adTargetingCategory';
-    const ZIPCODE = 'adzipcode';
+class TargetingSearchTypes extends AbstractEnum {
+
+  const COUNTRY = 'adcountry';
+  const EDUCATION = 'adeducationschool';
+  const EMPLOYER = 'adworkemployer';
+  const GEOLOCATION = 'adgeolocation';
+  const GEOLOCATIONMETA = 'adgeolocationmeta';
+  const INTEREST = 'adinterest';
+  const INTEREST_SUGGESTION = 'adinterestsuggestion';
+  const INTEREST_VALIDATE = 'adinterestvalid';
+  const KEYWORD = 'adkeyword';
+  const LOCALE = 'adlocale';
+  const MAJOR = 'adeducationmajor';
+  const POSITION = 'adworkposition';
+  const RADIUS_SUGGESTION = 'adradiussuggestion';
+  const TARGETING_CATEGORY = 'adTargetingCategory';
+  const ZIPCODE = 'adzipcode';
 }

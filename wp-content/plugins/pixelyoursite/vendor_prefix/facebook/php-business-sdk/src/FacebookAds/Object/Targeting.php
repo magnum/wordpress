@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\TargetingFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\TargetingDevicePlatformsValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\TargetingEffectiveDevicePlatformsValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\TargetingEffectiveDevicePlatformsVa
  * pull request for this class.
  *
  */
-class Targeting extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return TargetingFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\TargetingFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['DevicePlatforms'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\TargetingDevicePlatformsValues::getInstance()->getValues();
-        $ref_enums['EffectiveDevicePlatforms'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\TargetingEffectiveDevicePlatformsValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class Targeting extends AbstractObject {
+
+  /**
+   * @return TargetingFields
+   */
+  public static function getFieldsEnum() {
+    return TargetingFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['DevicePlatforms'] = TargetingDevicePlatformsValues::getInstance()->getValues();
+    $ref_enums['EffectiveDevicePlatforms'] = TargetingEffectiveDevicePlatformsValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

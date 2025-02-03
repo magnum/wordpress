@@ -19,6 +19,14 @@ class Automator_DB {
 	private static $instance;
 
 	/**
+	 *
+	 */
+	public function __construct() {
+		add_action( 'automator_daily_healthcheck', array( __CLASS__, 'fix_automator_db_tables' ) );
+		add_action( 'uap_options_migration', array( __CLASS__, 'uap_options_migration_func' ) );
+	}
+
+	/**
 	 * Creates singleton instance of class
 	 *
 	 * @return Automator_DB $instance
@@ -48,8 +56,10 @@ class Automator_DB {
 			self::create_tables();
 			self::create_views();
 		}
+
 		$queries        = dbDelta( self::get_schema(), false );
 		$missing_tables = array();
+
 		foreach ( $queries as $table_name => $result ) {
 			if ( "Created table $table_name" === $result ) {
 				$missing_tables[] = $table_name;
@@ -57,14 +67,14 @@ class Automator_DB {
 		}
 
 		if ( 0 < count( $missing_tables ) ) {
-			update_option( 'automator_schema_missing_tables', $missing_tables );
+			automator_update_option( 'automator_schema_missing_tables', $missing_tables );
 		} else {
-			update_option( 'uap_database_version', AUTOMATOR_DATABASE_VERSION );
-			delete_option( 'automator_schema_missing_tables' );
-			delete_option( 'automator_schema_missing_views' );
+			automator_update_option( 'uap_database_version', AUTOMATOR_DATABASE_VERSION );
+			automator_delete_option( 'automator_schema_missing_tables' );
+			automator_delete_option( 'automator_schema_missing_views' );
 		}
 
-		return $missing_tables;
+		return apply_filters( 'automator_db_missing_tables', $missing_tables );
 	}
 
 	/**
@@ -74,7 +84,7 @@ class Automator_DB {
 		$missing_views = self::all_views( true );
 
 		if ( ! empty( $missing_views ) ) {
-			update_option( 'automator_schema_missing_views', $missing_views );
+			automator_update_option( 'automator_schema_missing_views', $missing_views );
 		}
 
 		return $missing_views;
@@ -91,20 +101,30 @@ class Automator_DB {
 		$charset_collate = $wpdb->get_charset_collate();
 		// Automator Recipe log
 		$tbl_recipe_log = $wpdb->prefix . 'uap_recipe_log';
-		//Automator trigger log
+		// Automator Recipe log meta.
+		$tbl_recipe_log_meta = $wpdb->prefix . 'uap_recipe_log_meta';
+		// Automator trigger log
 		$tbl_trigger_log = $wpdb->prefix . 'uap_trigger_log';
-		//Automator trigger meta data log
+		// Automator trigger meta data log
 		$tbl_trigger_log_meta = $wpdb->prefix . 'uap_trigger_log_meta';
 		// Automator Action log
 		$tbl_action_log = $wpdb->prefix . 'uap_action_log';
-		//Automator action meta data log
+		// Automator action meta data log
 		$tbl_action_log_meta = $wpdb->prefix . 'uap_action_log_meta';
 		// Automator Closure Log
 		$tbl_closure_log = $wpdb->prefix . 'uap_closure_log';
-		//Automator closure meta data log
+		// Automator closure meta data log
 		$tbl_closure_log_meta = $wpdb->prefix . 'uap_closure_log_meta';
-
+		// Tokens log
+		$tbl_tokens_log = $wpdb->prefix . 'uap_tokens_log';
+		// API retries log
+		$tbl_api_response_log = $wpdb->prefix . 'uap_api_log_response';
+		// API logs tables.
 		$tbl_api_log = $wpdb->prefix . 'uap_api_log';
+		// Count recipe runs
+		$tbl_recipe_counts = $wpdb->prefix . 'uap_recipe_count';
+		// Automator options
+		$tbl_automator_options = $wpdb->prefix . 'uap_options';
 
 		return "CREATE TABLE {$tbl_recipe_log} (
 `ID` bigint unsigned NOT NULL auto_increment,
@@ -117,6 +137,36 @@ PRIMARY KEY  (`ID`),
 KEY completed (`completed`),
 KEY user_id (`user_id`),
 KEY automator_recipe_id (`automator_recipe_id`)
+) ENGINE=InnoDB {$charset_collate};
+CREATE TABLE {$tbl_recipe_log_meta} (
+`ID` bigint NOT NULL AUTO_INCREMENT,
+`user_id` bigint NOT NULL,
+`recipe_id` bigint NOT NULL,
+`recipe_log_id` bigint NOT NULL,
+`meta_key` varchar(255) NOT NULL,
+`meta_value` longtext NOT NULL,
+PRIMARY KEY (`ID`),
+KEY recipe_id (`recipe_id`),
+KEY user_id (`user_id`)
+) ENGINE=InnoDB {$charset_collate};
+CREATE TABLE {$tbl_tokens_log} (
+`ID` bigint NOT NULL AUTO_INCREMENT,
+`recipe_id` bigint NOT NULL,
+`recipe_log_id` bigint NOT NULL,
+`run_number` bigint NOT NULL,
+`tokens_record` longtext NOT NULL,
+`date_added` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`ID`),
+KEY recipe_id (`recipe_id`)
+) ENGINE=InnoDB {$charset_collate};
+CREATE TABLE {$tbl_api_response_log} (
+`ID` bigint NOT NULL AUTO_INCREMENT,
+`api_log_id` bigint NOT NULL,
+`item_log_id` bigint NOT NULL,
+`result` varchar(255) NOT NULL,
+`message` text NOT NULL,
+`date_added` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB {$charset_collate};
 CREATE TABLE {$tbl_trigger_log} (
 `ID` bigint unsigned NOT NULL auto_increment,
@@ -221,6 +271,22 @@ CREATE TABLE {$tbl_api_log} (
 `notes` longtext NULL,
 PRIMARY KEY  (`ID`),
 KEY item_log_id (`item_log_id`)
+) ENGINE=InnoDB {$charset_collate};
+CREATE TABLE {$tbl_recipe_counts} (
+`ID` bigint unsigned NOT NULL auto_increment,
+`recipe_id` bigint unsigned NOT NULL,
+`runs` bigint unsigned DEFAULT 0 NOT NULL,
+PRIMARY KEY  (`ID`),
+KEY recipe_id (`recipe_id`)
+) ENGINE=InnoDB {$charset_collate};
+CREATE TABLE {$tbl_automator_options} (
+`option_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+`option_name` varchar(191) NOT NULL DEFAULT '',
+`option_value` longtext NOT NULL,
+`autoload` varchar(8) NOT NULL DEFAULT 'yes',
+PRIMARY KEY (`option_id`),
+UNIQUE KEY `option_name` (`option_name`),
+KEY `autoload` (`autoload`)
 ) ENGINE=InnoDB {$charset_collate};";
 	}
 
@@ -238,9 +304,11 @@ KEY item_log_id (`item_log_id`)
 
 		do_action( 'automator_activation_before' );
 
-		update_option( 'automator_over_time', array( 'installed_date' => time() ) );
+		automator_update_option( 'automator_over_time', array( 'installed_date' => time() ) );
 
-		$db_version = get_option( 'uap_database_version', null );
+		$db_version = automator_get_option( 'uap_database_version', null );
+
+		self::async_wp_options_migration();
 
 		if ( null !== $db_version && (string) AUTOMATOR_DATABASE_VERSION === (string) $db_version ) {
 			// bail. No db upgrade needed!
@@ -262,7 +330,7 @@ KEY item_log_id (`item_log_id`)
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
-		update_option( 'uap_database_version', AUTOMATOR_DATABASE_VERSION );
+		automator_update_option( 'uap_database_version', AUTOMATOR_DATABASE_VERSION );
 	}
 
 	/**
@@ -295,12 +363,11 @@ KEY item_log_id (`item_log_id`)
 
 		do_action( 'automator_database_views_before' );
 
-		if ( AUTOMATOR_DATABASE_VIEWS_VERSION !== get_option( 'uap_database_views_version', 0 ) ) {
+		if ( AUTOMATOR_DATABASE_VIEWS_VERSION !== automator_get_option( 'uap_database_views_version', 0 ) ) {
 			self::create_views();
 		}
 
 		do_action( 'automator_activation_views_after' );
-
 	}
 
 	/**
@@ -309,6 +376,12 @@ KEY item_log_id (`item_log_id`)
 	 * @since 3.0
 	 */
 	public static function create_views() {
+
+		// Return empty if VIEWS are disabled
+		if ( ! AUTOMATOR_DATABASE_VIEWS_ENABLED ) {
+			return;
+		}
+
 		global $wpdb;
 
 		$recipe_view       = "{$wpdb->prefix}uap_recipe_logs_view";
@@ -329,7 +402,7 @@ KEY item_log_id (`item_log_id`)
 		$api_view_query = self::api_log_view_query();
 
 		$wpdb->query( "CREATE OR REPLACE VIEW $api_view AS $api_view_query" ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		update_option( 'uap_database_views_version', AUTOMATOR_DATABASE_VIEWS_VERSION );
+		automator_update_option( 'uap_database_views_version', AUTOMATOR_DATABASE_VIEWS_VERSION );
 	}
 
 	/**
@@ -547,6 +620,11 @@ FROM {$wpdb->prefix}uap_recipe_log r
 	 * @return bool
 	 */
 	public static function is_view_exists( $type = 'recipe' ) {
+
+		if ( ! AUTOMATOR_DATABASE_VIEWS_ENABLED ) {
+			return false;
+		}
+
 		global $wpdb;
 		$recipe_view = '';
 		if ( 'recipe' === $type ) {
@@ -582,6 +660,12 @@ FROM {$wpdb->prefix}uap_recipe_log r
 	 * @version 3.0
 	 */
 	public static function all_views( $return_missing = false ) {
+
+		// Return empty if VIEWS are disabled
+		if ( ! AUTOMATOR_DATABASE_VIEWS_ENABLED ) {
+			return array();
+		}
+
 		global $wpdb;
 		$db      = DB_NAME;
 		$results = $wpdb->get_results( "SHOW FULL TABLES IN `$db` WHERE TABLE_TYPE LIKE '%VIEW%'" ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -626,6 +710,23 @@ FROM {$wpdb->prefix}uap_recipe_log r
 	}
 
 	/**
+	 * Purges a specific table.
+	 *
+	 * @param string $table_name
+	 *
+	 * @return void
+	 */
+	public static function empty_table( $table_name = '' ) {
+
+		global $wpdb;
+
+		$prefixed_tb_name = $wpdb->prefix . $table_name;
+
+		return $wpdb->query( "TRUNCATE `$prefixed_tb_name`" );
+
+	}
+
+	/**
 	 * Drops the selected view.
 	 *
 	 * @param string $view_name The name of the view.
@@ -661,11 +762,15 @@ FROM {$wpdb->prefix}uap_recipe_log r
 
 	}
 
+	/**
+	 * @return true
+	 */
 	public static function purge_tables() {
 
 		global $wpdb;
 
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_recipe_log`;" );
+		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_recipe_log_meta`;" );
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_action_log`;" );
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_action_log_meta`;" );
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_closure_log`;" );
@@ -673,9 +778,143 @@ FROM {$wpdb->prefix}uap_recipe_log r
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_trigger_log`;" );
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_trigger_log_meta`;" );
 		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_api_log`;" );
+		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_api_log_response`;" );
+		$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}uap_tokens_log`;" );
+
+		do_action( 'automator_tables_purged' );
 
 		return true;
 
 	}
 
+	/**
+	 * @return void
+	 */
+	public static function fix_automator_db_tables() {
+		$missing_views = self::all_views( true );
+
+		// If nothing is missing, bail
+		if ( empty( $missing_views ) ) {
+			return;
+		}
+
+		self::verify_base_tables( true );
+	}
+
+	/**
+	 * Schedule a one time event to update the uap_options table with wp_options data
+	 * @return void
+	 */
+	public static function async_wp_options_migration() {
+		if ( '' !== get_option( 'uncanny_automator_v6_options_migrated', '' ) ) {
+			return;
+		}
+		wp_schedule_single_event( time() + 8, 'uap_options_migration' );
+	}
+
+	/**
+	 * Fetch all the uap_options that have empty values and update them with wp_options data
+	 * @return void
+	 */
+	public static function uap_options_migration_func() {
+		global $wpdb;
+
+		$like_patterns = array(
+			'automator_%',
+			'uncanny_automator_%',
+			'uap_%',
+			'_uoa_%',
+			'_uncanny_automator%',
+			'_uncanny_credits%',
+			'UO_REDIRECTURL_%',
+			'_uncannyowl_zoom_%',
+			'uoa_setup_wiz_has_connected',
+			'zoho_campaigns_%',
+			'USERROLEADDED_migrated',
+			'_uncannyowl_slack_settings',
+			'affwp_insert_referral_migrated',
+			'ua_facebook%',
+			'_uncannyowl_gtt%',
+		);
+
+		// Generate LIKE conditions dynamically
+		$like_conditions = array_map(
+			function ( $pattern ) use ( $wpdb ) {
+				return $wpdb->prepare( 'option_name LIKE %s', $pattern );
+			},
+			$like_patterns
+		);
+
+		// Combine all conditions with OR
+		$conditions_query = implode( ' OR ', $like_conditions );
+
+		// SQL query for UPSERT (Insert or Update if option_name exists)
+		$sql_query = "INSERT INTO {$wpdb->prefix}uap_options (option_name, option_value, autoload)
+SELECT option_name, option_value, autoload
+FROM {$wpdb->prefix}options
+WHERE $conditions_query
+ON DUPLICATE KEY UPDATE
+	option_value = VALUES(option_value),
+	                   autoload = VALUES(autoload)";
+
+		// Execute the query
+		$wpdb->query( $sql_query );
+
+		$async_actions = self::get_automator_async_run_with_hash();
+
+		if ( ! empty( $async_actions ) ) {
+			foreach ( $async_actions as $hash ) {
+				$action = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_name = %s", $hash['hash'] ) );
+				$wpdb->insert(
+					$wpdb->prefix . 'uap_options',
+					array(
+						'option_name'  => $action->option_name,
+						'option_value' => $action->option_value,
+						'autoload'     => $action->autoload,
+					),
+					array(
+						'%s',
+						'%s',
+						'%s',
+					)
+				);
+			}
+		}
+
+		add_option( 'uncanny_automator_v6_options_migrated', time() );
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function get_automator_async_run_with_hash() {
+		// Ensure the Action Scheduler library is available.
+		if ( ! class_exists( 'ActionScheduler' ) ) {
+			return array();
+		}
+
+		$query_args = array(
+			'hook'     => 'automator_async_run_with_hash',
+			'status'   => \ActionScheduler_Store::STATUS_PENDING, // Change if needed: 'complete', 'failed', 'canceled'
+			'per_page' => -1, // Retrieve all actions
+		);
+
+		$store   = \ActionScheduler::store();
+		$actions = $store->query_actions( $query_args );
+
+		$results = array();
+
+		if ( ! empty( $actions ) ) {
+			foreach ( $actions as $action_id ) {
+				$args      = $store->fetch_action( $action_id )->get_args();
+				$first_arg = ! empty( $args ) ? $args[0] : null; // Get the first argument
+
+				$results[] = array(
+					'hash' => $first_arg,
+				);
+			}
+		}
+
+		return $results;
+	}
 }

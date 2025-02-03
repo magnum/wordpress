@@ -2,6 +2,8 @@
 
 namespace Uncanny_Automator;
 
+use Uncanny_Automator\Services\Dashboard\Recipe_Using_Credits_Utils;
+
 /**
  * Class Automator_Get_Data
  *
@@ -82,7 +84,7 @@ class Automator_Get_Data {
 	public function trigger_actions_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'get_trigger_action_from_trigger_code', 'ERROR: You are trying to get a trigger action from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'get_trigger_action_from_trigger_code', 'ERROR: You are trying to get a trigger action from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -115,7 +117,7 @@ class Automator_Get_Data {
 	public function trigger_meta_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_meta_from_trigger_code', 'ERROR: You are trying to get a trigger meta from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_meta_from_trigger_code', 'ERROR: You are trying to get a trigger meta from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -146,7 +148,7 @@ class Automator_Get_Data {
 	public function trigger_title_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_title_from_trigger_code', 'ERROR: You are trying to get a title from trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_title_from_trigger_code', 'ERROR: You are trying to get a title from trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -178,7 +180,7 @@ class Automator_Get_Data {
 	public function action_title_from_action_code( $action_code = null ) {
 
 		if ( null === $action_code || ! is_string( $action_code ) ) {
-			Automator()->error->add_error( 'action_title_from_action_code', 'ERROR: You are trying to get a title from action code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'action_title_from_action_code', 'ERROR: You are trying to get a title from action code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -253,7 +255,7 @@ class Automator_Get_Data {
 	 */
 	public function trigger_validation_function_from_trigger_code( $trigger_code = null ) {
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'get_trigger_validation_function_from_trigger_code', 'ERROR: You are trying to get a trigger validation function from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'get_trigger_validation_function_from_trigger_code', 'ERROR: You are trying to get a trigger validation function from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -284,7 +286,7 @@ class Automator_Get_Data {
 	public function trigger_integration_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_integration_from_trigger_code', 'ERROR: You are trying to get a trigger integration code from a trigger code without providing an $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_integration_from_trigger_code', 'ERROR: You are trying to get a trigger integration code from a trigger code without providing an $trigger_code', $this );
 
 			return null;
 		}
@@ -332,7 +334,7 @@ class Automator_Get_Data {
 	public function action_integration_from_action_code( $action_code = null ) {
 
 		if ( null === $action_code || ! is_string( $action_code ) ) {
-			Automator()->error->add_error( 'action_integration_from_action_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
+			Automator()->wp_error->add_error( 'action_integration_from_action_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
 
 			return null;
 		}
@@ -380,7 +382,7 @@ class Automator_Get_Data {
 	public function closure_integration_from_closure_code( $closure_code = null ) {
 
 		if ( null === $closure_code || ! is_string( $closure_code ) ) {
-			Automator()->error->add_error( 'closure_integration_from_closure_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
+			Automator()->wp_error->add_error( 'closure_integration_from_closure_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
 
 			return null;
 		}
@@ -419,6 +421,36 @@ class Automator_Get_Data {
 	}
 
 	/**
+	 * Get loop filter integration by loop filter code
+	 *
+	 * @param string $filter_code
+	 *
+	 * @return string|null
+	 */
+	public function loop_filter_integration_from_loop_filter_code( $filter_code = null ) {
+		if ( null === $filter_code || ! is_string( $filter_code ) ) {
+			Automator()->wp_error->add_error( 'loop_filter_integration_from_loop_filter_code', 'ERROR: You are trying to get a loop filter integration code from a loop filter code without providing an $filter_code', $this );
+
+			return null;
+		}
+
+		$all_filters = Automator()->get_loop_filters();
+		if ( empty( $all_filters ) ) {
+			return null;
+		}
+
+		foreach ( $all_filters as $integration_code => $integration_filters ) {
+			foreach ( $integration_filters as $code => $filter ) {
+				if ( $code === $filter_code ) {
+					return $integration_code;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Accepts an action code(most like from trigger meta) and returns that associated action execution function
 	 *
 	 * @param null $action_code
@@ -428,7 +460,7 @@ class Automator_Get_Data {
 	public function action_execution_function_from_action_code( $action_code = null ) {
 
 		if ( null === $action_code || ! is_string( $action_code ) ) {
-			Automator()->error->add_error( 'action_execution_function_from_action_code', 'ERROR: You are trying to get an action execution function from an action code without providing a $action_code', $this );
+			Automator()->wp_error->add_error( 'action_execution_function_from_action_code', 'ERROR: You are trying to get an action execution function from an action code without providing a $action_code', $this );
 
 			return null;
 		}
@@ -460,7 +492,7 @@ class Automator_Get_Data {
 	public function closure_execution_function_from_closure_code( $closure_code = null ) {
 
 		if ( null === $closure_code || ! is_string( $closure_code ) ) {
-			Automator()->error->add_error( 'closure_execution_function_from_closure_code', 'ERROR: You are trying to get an action execution function from an action code without providing a $action_code', $this );
+			Automator()->wp_error->add_error( 'closure_execution_function_from_closure_code', 'ERROR: You are trying to get an action execution function from an action code without providing a $action_code', $this );
 
 			return null;
 		}
@@ -489,12 +521,12 @@ class Automator_Get_Data {
 	 */
 	public function value_from_trigger_meta( $trigger_code = null, $meta = null ) {
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'value_from_trigger_meta', 'ERROR: You are trying to get a meta value from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'value_from_trigger_meta', 'ERROR: You are trying to get a meta value from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
 		if ( null === $meta || ! is_string( $meta ) ) {
-			Automator()->error->add_error( 'value_from_trigger_meta', 'ERROR: You are trying to get a meta value from a trigger code without providing a $meta', $this );
+			Automator()->wp_error->add_error( 'value_from_trigger_meta', 'ERROR: You are trying to get a meta value from a trigger code without providing a $meta', $this );
 
 			return null;
 		}
@@ -525,12 +557,12 @@ class Automator_Get_Data {
 	public function value_from_action_meta( $action_code = null, $meta = null ) {
 
 		if ( null === $action_code || ! is_string( $action_code ) ) {
-			Automator()->error->add_error( 'value_from_action_meta', 'ERROR: You are trying to get a action meta from an action code without providing an $action_code', $this );
+			Automator()->wp_error->add_error( 'value_from_action_meta', 'ERROR: You are trying to get a action meta from an action code without providing an $action_code', $this );
 
 			return null;
 		}
 		if ( null === $meta || ! is_string( $meta ) ) {
-			Automator()->error->add_error( 'value_from_action_meta', 'ERROR: You are trying to get an action meta from an action code without providing a $meta', $this );
+			Automator()->wp_error->add_error( 'value_from_action_meta', 'ERROR: You are trying to get an action meta from an action code without providing a $meta', $this );
 
 			return null;
 		}
@@ -564,7 +596,7 @@ class Automator_Get_Data {
 	public function trigger_priority_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_priority_from_trigger_code', 'ERROR: You are trying to get a trigger priority from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_priority_from_trigger_code', 'ERROR: You are trying to get a trigger priority from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -598,7 +630,7 @@ class Automator_Get_Data {
 	public function trigger_tokens_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_priority_from_trigger_code', 'ERROR: You are trying to get a trigger priority from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_priority_from_trigger_code', 'ERROR: You are trying to get a trigger priority from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -631,7 +663,7 @@ class Automator_Get_Data {
 	public function trigger_accepted_args_from_trigger_code( $trigger_code = null ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_accepted_args_from_trigger_code', 'ERROR: You are trying to get a trigger validation function accepted args from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_accepted_args_from_trigger_code', 'ERROR: You are trying to get a trigger validation function accepted args from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -661,7 +693,7 @@ class Automator_Get_Data {
 	public function trigger_options_from_trigger_code( $trigger_code ) {
 
 		if ( null === $trigger_code || ! is_string( $trigger_code ) ) {
-			Automator()->error->add_error( 'trigger_options_from_trigger_code', 'ERROR: You are trying to get a trigger options from a trigger code without providing a $trigger_code', $this );
+			Automator()->wp_error->add_error( 'trigger_options_from_trigger_code', 'ERROR: You are trying to get a trigger options from a trigger code without providing a $trigger_code', $this );
 
 			return null;
 		}
@@ -684,6 +716,36 @@ class Automator_Get_Data {
 	}
 
 	/**
+	 * Accepts a an object code (e.g. Trigger code, or action code) and returns that associated object as array.
+	 *
+	 * @param null $trigger_code
+	 *
+	 * @return array
+	 */
+	public function object_field_options_from_object_code( $object_code = '', $option_type = 'options_group', $object_type = 'trigger' ) {
+
+		// Load all default trigger settings
+		if ( 'action' === $object_type ) {
+			$object = Automator()->get_action( $object_code );
+		}
+
+		if ( 'trigger' === $object_type ) {
+			$object = Automator()->get_trigger( $object_code );
+		}
+
+		if ( false !== $object && isset( $object[ $option_type ] ) ) {
+			return array(
+				'integration'  => $object['integration'],
+				'trigger_code' => $object['code'],
+				$option_type   => $object[ $option_type ],
+			);
+		}
+
+		return array();
+
+	}
+
+	/**
 	 * Get the trigger log ID for the user
 	 *
 	 * @param null $user_id
@@ -701,13 +763,13 @@ class Automator_Get_Data {
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'trigger_log_id', 'ERROR: You are trying to get a trigger log ID without providing a trigger_id', $this );
+			Automator()->wp_error->add_error( 'trigger_log_id', 'ERROR: You are trying to get a trigger log ID without providing a trigger_id', $this );
 
 			return null;
 		}
 
 		if ( null === $recipe_id || ! is_numeric( $recipe_id ) ) {
-			Automator()->error->add_error( 'trigger_log_id', 'ERROR: You are trying to get a trigger lod ID without providing a recipe_id', $this );
+			Automator()->wp_error->add_error( 'trigger_log_id', 'ERROR: You are trying to get a trigger lod ID without providing a recipe_id', $this );
 
 			return null;
 		}
@@ -748,13 +810,13 @@ class Automator_Get_Data {
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'trigger_meta', 'ERROR: You are trying to get trigger meta without providing a trigger_id', $this );
+			Automator()->wp_error->add_error( 'trigger_meta', 'ERROR: You are trying to get trigger meta without providing a trigger_id', $this );
 
 			return null;
 		}
 
 		if ( null === $meta_key || ! is_string( $meta_key ) ) {
-			Automator()->error->add_error( 'trigger_meta', 'ERROR: You are trying to get trigger meta without providing a meta_key', $this );
+			Automator()->wp_error->add_error( 'trigger_meta', 'ERROR: You are trying to get trigger meta without providing a meta_key', $this );
 
 			return null;
 		}
@@ -1397,7 +1459,7 @@ WHERE t.automator_trigger_id = %d
 	public function action_has_background_processing( $action_code = null ) {
 
 		if ( null === $action_code || ! is_string( $action_code ) ) {
-			Automator()->error->add_error( 'action_integration_from_action_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
+			Automator()->wp_error->add_error( 'action_integration_from_action_code', 'ERROR: You are trying to get a action integration code from a action code without providing an $action_code', $this );
 
 			return null;
 		}
@@ -1415,6 +1477,15 @@ WHERE t.automator_trigger_id = %d
 				return isset( $system_action['background_processing'] ) && true === $system_action['background_processing'];
 			}
 		}
+	}
+
+	/**
+	 * Retrieves all recipes that has an action that consumes a credit.
+	 *
+	 * @return mixed[]
+	 */
+	public function fetch_recipe_with_apps() {
+		return ( new Recipe_Using_Credits_Utils() )->fetch();
 	}
 
 	/**

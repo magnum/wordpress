@@ -53,12 +53,14 @@ class Automator_Email_Helpers {
 		}
 
 		// Add CC in headers.
+		$cc = array_filter( $cc );
 		if ( ! empty( $cc ) ) {
 			$cced      = join( ', ', $cc );
 			$headers[] = "Cc: $cced";
 		}
 
 		// Add BCC in headers.
+		$bcc = array_filter( $bcc );
 		if ( ! empty( $bcc ) ) {
 			$bcced     = join( ', ', $bcc );
 			$headers[] = "Bcc: $bcced";
@@ -102,7 +104,7 @@ class Automator_Email_Helpers {
 		$headers     = $mail['headers'];
 		$attachments = $mail['attachment'];
 		$is_html     = $mail['is_html'];
-		$error       = Automator()->error;
+		$error       = Automator()->wp_error;
 
 		if ( ! $error->get_message( 'wp_mail_to' ) ) {
 			if ( is_array( $to ) ) {

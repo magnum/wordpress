@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,23 +34,38 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PagePostExperimentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTO_RESOLVE_SETTINGS = 'auto_resolve_settings';
-    const CREATION_TIME = 'creation_time';
-    const CREATOR = 'creator';
-    const DECLARED_WINNING_TIME = 'declared_winning_time';
-    const DESCRIPTION = 'description';
-    const ID = 'id';
-    const INSIGHT_SNAPSHOTS = 'insight_snapshots';
-    const NAME = 'name';
-    const OPTIMIZATION_GOAL = 'optimization_goal';
-    const PUBLISH_STATUS = 'publish_status';
-    const PUBLISH_TIME = 'publish_time';
-    const SCHEDULED_EXPERIMENT_TIMESTAMP = 'scheduled_experiment_timestamp';
-    const UPDATED_TIME = 'updated_time';
-    public function getFieldTypes()
-    {
-        return array('auto_resolve_settings' => 'Object', 'creation_time' => 'datetime', 'creator' => 'User', 'declared_winning_time' => 'datetime', 'description' => 'string', 'id' => 'string', 'insight_snapshots' => 'map<datetime, map<int, Object>>', 'name' => 'string', 'optimization_goal' => 'string', 'publish_status' => 'string', 'publish_time' => 'datetime', 'scheduled_experiment_timestamp' => 'datetime', 'updated_time' => 'datetime');
-    }
+
+class PagePostExperimentFields extends AbstractEnum {
+
+  const AUTO_RESOLVE_SETTINGS = 'auto_resolve_settings';
+  const CREATION_TIME = 'creation_time';
+  const CREATOR = 'creator';
+  const DECLARED_WINNING_TIME = 'declared_winning_time';
+  const DESCRIPTION = 'description';
+  const ID = 'id';
+  const INSIGHT_SNAPSHOTS = 'insight_snapshots';
+  const NAME = 'name';
+  const OPTIMIZATION_GOAL = 'optimization_goal';
+  const PUBLISH_STATUS = 'publish_status';
+  const PUBLISH_TIME = 'publish_time';
+  const SCHEDULED_EXPERIMENT_TIMESTAMP = 'scheduled_experiment_timestamp';
+  const UPDATED_TIME = 'updated_time';
+
+  public function getFieldTypes() {
+    return array(
+      'auto_resolve_settings' => 'Object',
+      'creation_time' => 'datetime',
+      'creator' => 'User',
+      'declared_winning_time' => 'datetime',
+      'description' => 'string',
+      'id' => 'string',
+      'insight_snapshots' => 'map<datetime, map<int, Object>>',
+      'name' => 'string',
+      'optimization_goal' => 'string',
+      'publish_status' => 'string',
+      'publish_time' => 'datetime',
+      'scheduled_experiment_timestamp' => 'datetime',
+      'updated_time' => 'datetime',
+    );
+  }
 }

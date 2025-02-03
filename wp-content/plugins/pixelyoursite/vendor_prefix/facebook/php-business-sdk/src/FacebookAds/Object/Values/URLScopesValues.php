@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static URLScopesValues getInstance()
  */
-class URLScopesValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const NEWS_TAB = 'NEWS_TAB';
-    const NEWS_TAB_DEV_ENV = 'NEWS_TAB_DEV_ENV';
+class URLScopesValues extends AbstractEnum {
+
+  const NEWS_TAB = 'NEWS_TAB';
+  const NEWS_TAB_DEV_ENV = 'NEWS_TAB_DEV_ENV';
 }

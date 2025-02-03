@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,23 +35,23 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdRuleExecutionSpecExecutionTypeValues getInstance()
  */
-class AdRuleExecutionSpecExecutionTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADD_INTEREST_RELAXATION = 'ADD_INTEREST_RELAXATION';
-    const ADD_QUESTIONNAIRE_INTERESTS = 'ADD_QUESTIONNAIRE_INTERESTS';
-    const AUDIENCE_CONSOLIDATION = 'AUDIENCE_CONSOLIDATION';
-    const AUDIENCE_CONSOLIDATION_ASK_FIRST = 'AUDIENCE_CONSOLIDATION_ASK_FIRST';
-    const CHANGE_BID = 'CHANGE_BID';
-    const CHANGE_BUDGET = 'CHANGE_BUDGET';
-    const CHANGE_CAMPAIGN_BUDGET = 'CHANGE_CAMPAIGN_BUDGET';
-    const INCREASE_RADIUS = 'INCREASE_RADIUS';
-    const NOTIFICATION = 'NOTIFICATION';
-    const PAUSE = 'PAUSE';
-    const PING_ENDPOINT = 'PING_ENDPOINT';
-    const REBALANCE_BUDGET = 'REBALANCE_BUDGET';
-    const ROTATE = 'ROTATE';
-    const UNPAUSE = 'UNPAUSE';
-    const UPDATE_CREATIVE = 'UPDATE_CREATIVE';
-    const UPDATE_LAX_BUDGET = 'UPDATE_LAX_BUDGET';
-    const UPDATE_LAX_DURATION = 'UPDATE_LAX_DURATION';
+class AdRuleExecutionSpecExecutionTypeValues extends AbstractEnum {
+
+  const ADD_INTEREST_RELAXATION = 'ADD_INTEREST_RELAXATION';
+  const ADD_QUESTIONNAIRE_INTERESTS = 'ADD_QUESTIONNAIRE_INTERESTS';
+  const AUDIENCE_CONSOLIDATION = 'AUDIENCE_CONSOLIDATION';
+  const AUDIENCE_CONSOLIDATION_ASK_FIRST = 'AUDIENCE_CONSOLIDATION_ASK_FIRST';
+  const CHANGE_BID = 'CHANGE_BID';
+  const CHANGE_BUDGET = 'CHANGE_BUDGET';
+  const CHANGE_CAMPAIGN_BUDGET = 'CHANGE_CAMPAIGN_BUDGET';
+  const INCREASE_RADIUS = 'INCREASE_RADIUS';
+  const NOTIFICATION = 'NOTIFICATION';
+  const PAUSE = 'PAUSE';
+  const PING_ENDPOINT = 'PING_ENDPOINT';
+  const REBALANCE_BUDGET = 'REBALANCE_BUDGET';
+  const ROTATE = 'ROTATE';
+  const UNPAUSE = 'UNPAUSE';
+  const UPDATE_CREATIVE = 'UPDATE_CREATIVE';
+  const UPDATE_LAX_BUDGET = 'UPDATE_LAX_BUDGET';
+  const UPDATE_LAX_DURATION = 'UPDATE_LAX_DURATION';
 }

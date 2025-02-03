@@ -61,6 +61,7 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
                                 'remove_button'     => '<span class="dashicons dashicons-no-alt"></span>',
                             ),
                             'fields' => array(
+                                'operator' => automatorwp_utilities_operator_field(),
                                 'field' => array(
                                     'name' => __( 'Field:', 'automatorwp' ),
                                     'type' => 'select',
@@ -88,6 +89,7 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
                                 'remove_button'     => '<span class="dashicons dashicons-no-alt"></span>',
                             ),
                             'fields' => array(
+                                'operator' => automatorwp_utilities_operator_field(),
                                 'meta_key' => array(
                                     'name' => __( 'Meta Key:', 'automatorwp' ),
                                     'type' => 'text',
@@ -207,13 +209,26 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
 
         $joins = array();
         $where = array();
-
+        
         // Set up the user field conditions
         if( is_array( $field_conditions ) ) {
+
+            $where = array( "( 1=1" );
+            
             foreach( $field_conditions as $condition ) {
 
                 if( ! isset( $condition['field'] ) ) {
                     continue;
+                }
+
+                // Initialize operator for backward compatibility
+                if( ! isset( $condition['operator'] ) ) {
+                    $condition['operator'] = "AND";
+                }
+
+                // Ensure that operator is AND or OR, other values are not allowed
+                if( ! in_array( $condition['operator'], array( "AND", "OR" ) ) ) {
+                    $condition['operator'] = "AND";
                 }
 
                 // Sanitize
@@ -221,9 +236,10 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
                 $value = sanitize_text_field( $condition['value'] );
 
                 if( ! empty( $field ) ) {
-                    $where[] = automatorwp_utilities_parse_condition_to_sql( 'u.' . $field, $condition['condition'], $value );
+                    $where[] = $condition['operator'] . " (" . automatorwp_utilities_parse_condition_to_sql( 'u.' . $field, $condition['condition'], $value ) . ")";
                 }
             }
+            $where[] = ')';
         }
 
         // Set up the user meta conditions
@@ -232,6 +248,16 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
 
                 if( ! isset( $condition['meta_key'] ) ) {
                     continue;
+                }
+
+                // Initialize operator for backward compatibility
+                if( ! isset( $condition['operator'] ) ) {
+                    $condition['operator'] = "AND";
+                }
+
+                // Ensure that operator is AND or OR, other values are not allowed
+                if( ! in_array( $condition['operator'], array( "AND", "OR" ) ) ) {
+                    $condition['operator'] = "AND";
                 }
 
                 // Sanitize
@@ -243,14 +269,14 @@ class AutomatorWP_AutomatorWP_All_Users extends AutomatorWP_Integration_Trigger 
 
                     $joins[] = "INNER JOIN {$wpdb->usermeta} AS um{$index} ON ( um{$index}.user_id = u.ID AND um{$index}.meta_key = '{$meta_key}' )";
 
-                    $where[] = automatorwp_utilities_parse_condition_to_sql( "um{$index}.meta_value", $condition['condition'], $meta_value, false );
+                    $where[] = $condition['operator'] . " (" .automatorwp_utilities_parse_condition_to_sql( "um{$index}.meta_value", $condition['condition'], $meta_value, false ) . ")";
                 }
             }
         }
 
         // Turn arrays into strings
         $joins = implode( ' ', $joins );
-        $where = ( ! empty( $where ) ? 'WHERE ( ' . implode( ' ) AND ( ', $where ) . ' ) ' : '' );
+        $where = ( ! empty( $where ) ? 'WHERE ' . implode( ' ', $where ) : '' );
 
         if( $count ) {
             // The count SQL query

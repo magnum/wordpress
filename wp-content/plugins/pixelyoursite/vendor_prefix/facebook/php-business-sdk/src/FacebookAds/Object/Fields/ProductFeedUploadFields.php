@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,23 +34,38 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductFeedUploadFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const END_TIME = 'end_time';
-    const ERROR_COUNT = 'error_count';
-    const ERROR_REPORT = 'error_report';
-    const FILENAME = 'filename';
-    const ID = 'id';
-    const INPUT_METHOD = 'input_method';
-    const NUM_DELETED_ITEMS = 'num_deleted_items';
-    const NUM_DETECTED_ITEMS = 'num_detected_items';
-    const NUM_INVALID_ITEMS = 'num_invalid_items';
-    const NUM_PERSISTED_ITEMS = 'num_persisted_items';
-    const START_TIME = 'start_time';
-    const URL = 'url';
-    const WARNING_COUNT = 'warning_count';
-    public function getFieldTypes()
-    {
-        return array('end_time' => 'datetime', 'error_count' => 'int', 'error_report' => 'ProductFeedUploadErrorReport', 'filename' => 'string', 'id' => 'string', 'input_method' => 'InputMethod', 'num_deleted_items' => 'int', 'num_detected_items' => 'int', 'num_invalid_items' => 'int', 'num_persisted_items' => 'int', 'start_time' => 'datetime', 'url' => 'string', 'warning_count' => 'int');
-    }
+
+class ProductFeedUploadFields extends AbstractEnum {
+
+  const END_TIME = 'end_time';
+  const ERROR_COUNT = 'error_count';
+  const ERROR_REPORT = 'error_report';
+  const FILENAME = 'filename';
+  const ID = 'id';
+  const INPUT_METHOD = 'input_method';
+  const NUM_DELETED_ITEMS = 'num_deleted_items';
+  const NUM_DETECTED_ITEMS = 'num_detected_items';
+  const NUM_INVALID_ITEMS = 'num_invalid_items';
+  const NUM_PERSISTED_ITEMS = 'num_persisted_items';
+  const START_TIME = 'start_time';
+  const URL = 'url';
+  const WARNING_COUNT = 'warning_count';
+
+  public function getFieldTypes() {
+    return array(
+      'end_time' => 'datetime',
+      'error_count' => 'int',
+      'error_report' => 'ProductFeedUploadErrorReport',
+      'filename' => 'string',
+      'id' => 'string',
+      'input_method' => 'InputMethod',
+      'num_deleted_items' => 'int',
+      'num_detected_items' => 'int',
+      'num_invalid_items' => 'int',
+      'num_persisted_items' => 'int',
+      'start_time' => 'datetime',
+      'url' => 'string',
+      'warning_count' => 'int',
+    );
+  }
 }

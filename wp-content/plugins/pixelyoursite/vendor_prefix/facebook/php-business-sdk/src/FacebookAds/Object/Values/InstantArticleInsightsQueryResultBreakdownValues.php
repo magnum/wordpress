@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static InstantArticleInsightsQueryResultBreakdownValues getInstance()
  */
-class InstantArticleInsightsQueryResultBreakdownValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AGE = 'age';
-    const COUNTRY = 'country';
-    const GENDER = 'gender';
-    const GENDER_AND_AGE = 'gender_and_age';
-    const IS_ORGANIC = 'is_organic';
-    const IS_SHARED_BY_IA_OWNER = 'is_shared_by_ia_owner';
-    const NO_BREAKDOWN = 'no_breakdown';
-    const PLATFORM = 'platform';
-    const REGION = 'region';
+class InstantArticleInsightsQueryResultBreakdownValues extends AbstractEnum {
+
+  const AGE = 'age';
+  const COUNTRY = 'country';
+  const GENDER = 'gender';
+  const GENDER_AND_AGE = 'gender_and_age';
+  const IS_ORGANIC = 'is_organic';
+  const IS_SHARED_BY_IA_OWNER = 'is_shared_by_ia_owner';
+  const NO_BREAKDOWN = 'no_breakdown';
+  const PLATFORM = 'platform';
+  const REGION = 'region';
 }

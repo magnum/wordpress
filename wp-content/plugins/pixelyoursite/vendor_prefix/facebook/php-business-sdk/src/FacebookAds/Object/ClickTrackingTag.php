@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,29 +21,33 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ClickTrackingTagFields;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-class ClickTrackingTag extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     * @return string
-     */
-    protected function getEndpoint()
-    {
-        return 'trackingtag';
-    }
-    /**
-     * @return ClickTrackingTagFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ClickTrackingTagFields::getInstance();
-    }
-    public function deleteSelf(array $params = array())
-    {
-        $this->getApi()->call('/' . $this->parentId . '/' . $this->getEndpoint(), \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, $params);
-    }
+
+class ClickTrackingTag extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   * @return string
+   */
+  protected function getEndpoint() {
+    return 'trackingtag';
+  }
+
+  /**
+   * @return ClickTrackingTagFields
+   */
+  public static function getFieldsEnum() {
+    return ClickTrackingTagFields::getInstance();
+  }
+
+  public function deleteSelf(array $params = array()) {
+    $this->getApi()->call(
+      '/'.$this->parentId.'/'.$this->getEndpoint(),
+      RequestInterface::METHOD_DELETE,
+      $params);
+  }
 }

@@ -12,56 +12,56 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Comment_Details extends Ithemes_Sync_Verb {
-	public static $name = 'get-comment-details';
-	public static $description = 'Retrieve details about the site\'s comments.';
-	public static $status_element_name = 'comments';
+	public static $name                      = 'get-comment-details';
+	public static $description               = 'Retrieve details about the site\'s comments.';
+	public static $status_element_name       = 'comments';
 	public static $show_in_status_by_default = false;
 	
-	private $response = array();
+	private $response = [];
 	
-	private $default_arguments = array(
-		'args' => array(
+	private $default_arguments = [
+		'args'                   => [
 			'status' => 'hold',
-		),
+		],
 		'include-parent-details' => true,
 		'include-post-details'   => true,
 		'include-user-details'   => true,
 		'include-comment-counts' => true,
-	);
+	];
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
 		if ( ! is_callable( 'get_comments' ) ) {
-			include_once( ABSPATH . WPINC . '/wp-includes/comment.php' );
+			include_once ABSPATH . WPINC . '/wp-includes/comment.php';
 		}
 		if ( ! is_callable( 'get_comments' ) ) {
 			return new WP_Error( 'missing-function-get_comments', 'Due to an unknown issue, the wp_comments function is not available.' );
 		}
 		
-		$comments = get_comments( $arguments['args'] );
+		$comments       = get_comments( $arguments['args'] );
 		$comments_count = wp_count_comments();
 		
 		if ( is_array( $comments ) ) {
-			$this->response['comments'] = array();
+			$this->response['comments'] = [];
 			
 			foreach ( $comments as $index => $comment ) {
-				$this->response['comments'][$comment->comment_ID] = (array) $comment;
+				$this->response['comments'][ $comment->comment_ID ] = (array) $comment;
 			}
 			
-			if ( !empty( $arguments['include-parent-details'] ) ) {
+			if ( ! empty( $arguments['include-parent-details'] ) ) {
 				$this->add_parent_details();
 			}
 			
-			if ( !empty( $arguments['include-post-details'] ) ) {
+			if ( ! empty( $arguments['include-post-details'] ) ) {
 				$this->add_post_details();
 			}
 			
-			if ( !empty( $arguments['include-user-details'] ) ) {
+			if ( ! empty( $arguments['include-user-details'] ) ) {
 				$this->add_user_details();
 			}
 			
-			if ( !empty( $arguments['include-comment-counts'] ) ) {
+			if ( ! empty( $arguments['include-comment-counts'] ) ) {
 				$this->response['comment_counts'] = $comments_count;
 			}
 		} else {
@@ -73,34 +73,34 @@ class Ithemes_Sync_Verb_Get_Comment_Details extends Ithemes_Sync_Verb {
 	}
 	
 	private function add_parent_details() {
-		$parent_ids = array();
-		$parents = array();
+		$parent_ids = [];
+		$parents    = [];
 		
 		foreach ( $this->response['comments'] as $comment ) {
 			if ( ! empty( $comment['comment_parent'] ) ) {
-				$parent_ids[$comment['comment_parent']] = true;
+				$parent_ids[ $comment['comment_parent'] ] = true;
 			}
 		}
 		$parent_ids = array_keys( $parent_ids );
 		
 		foreach ( $parent_ids as $parent_id ) {
-			$parents[$parent_id] = get_comment( $parent_id, ARRAY_A );
+			$parents[ $parent_id ] = get_comment( $parent_id, ARRAY_A );
 		}
 		
 		$this->response['parents'] = $parents;
 	}
 	
 	private function add_post_details() {
-		$post_ids = array();
-		$posts = array();
+		$post_ids = [];
+		$posts    = [];
 		
 		foreach ( $this->response['comments'] as $id => $comment ) {
-			$post_ids[$comment['comment_post_ID']] = true;
+			$post_ids[ $comment['comment_post_ID'] ] = true;
 		}
 		$post_ids = array_keys( $post_ids );
 		
 		if ( ! empty( $post_ids ) ) {
-			$posts = get_posts( array( 'post__in' => $post_ids ) );
+			$posts = get_posts( [ 'post__in' => $post_ids ] );
 		}
 		
 		foreach ( $posts as $post ) {
@@ -119,12 +119,12 @@ class Ithemes_Sync_Verb_Get_Comment_Details extends Ithemes_Sync_Verb {
 			unset( $post['menu_order'] );
 			unset( $post['filter'] );
 			
-			$this->response['posts'][$id] = $post;
+			$this->response['posts'][ $id ] = $post;
 		}
 	}
 	
 	private function add_user_details() {
-		$user_ids = array();
+		$user_ids = [];
 		
 		$comments = $this->response['comments'];
 		
@@ -137,24 +137,24 @@ class Ithemes_Sync_Verb_Get_Comment_Details extends Ithemes_Sync_Verb {
 				continue;
 			}
 			
-			$user_ids[$comment['user_id']] = true;
+			$user_ids[ $comment['user_id'] ] = true;
 		}
 		
 		if ( isset( $this->response['posts'] ) ) {
 			foreach ( $this->response['posts'] as $post ) {
-				$user_ids[$post['post_author']] = true;
+				$user_ids[ $post['post_author'] ] = true;
 			}
 		}
 		
 		$user_ids = array_keys( $user_ids );
 		
 		if ( empty( $user_ids ) ) {
-			$this->response['users'] = array();
+			$this->response['users'] = [];
 			return;
 		}
 		
 		
-		$users = get_users( array( 'include' => $user_ids ) );
+		$users = get_users( [ 'include' => $user_ids ] );
 		
 		foreach ( $users as $user ) {
 			$id = $user->ID;
@@ -167,7 +167,7 @@ class Ithemes_Sync_Verb_Get_Comment_Details extends Ithemes_Sync_Verb {
 			unset( $user['user_activation_key'] );
 			unset( $user['user_status'] );
 			
-			$this->response['users'][$id] = $user;
+			$this->response['users'][ $id ] = $user;
 		}
 	}
 }

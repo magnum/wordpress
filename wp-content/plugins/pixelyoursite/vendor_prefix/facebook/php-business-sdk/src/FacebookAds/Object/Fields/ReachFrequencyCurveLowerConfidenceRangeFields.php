@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ReachFrequencyCurveLowerConfidenceRangeFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const IMPRESSION_LOWER = 'impression_lower';
-    const NUM_POINTS = 'num_points';
-    const REACH = 'reach';
-    const REACH_LOWER = 'reach_lower';
-    const UNIQ_VIDEO_VIEWS_2S_LOWER = 'uniq_video_views_2s_lower';
-    const VIDEO_VIEWS_2S_LOWER = 'video_views_2s_lower';
-    public function getFieldTypes()
-    {
-        return array('impression_lower' => 'list<int>', 'num_points' => 'unsigned int', 'reach' => 'list<int>', 'reach_lower' => 'list<int>', 'uniq_video_views_2s_lower' => 'list<int>', 'video_views_2s_lower' => 'list<int>');
-    }
+
+class ReachFrequencyCurveLowerConfidenceRangeFields extends AbstractEnum {
+
+  const IMPRESSION_LOWER = 'impression_lower';
+  const NUM_POINTS = 'num_points';
+  const REACH = 'reach';
+  const REACH_LOWER = 'reach_lower';
+  const UNIQ_VIDEO_VIEWS_2S_LOWER = 'uniq_video_views_2s_lower';
+  const VIDEO_VIEWS_2S_LOWER = 'video_views_2s_lower';
+
+  public function getFieldTypes() {
+    return array(
+      'impression_lower' => 'list<int>',
+      'num_points' => 'unsigned int',
+      'reach' => 'list<int>',
+      'reach_lower' => 'list<int>',
+      'uniq_video_views_2s_lower' => 'list<int>',
+      'video_views_2s_lower' => 'list<int>',
+    );
+  }
 }

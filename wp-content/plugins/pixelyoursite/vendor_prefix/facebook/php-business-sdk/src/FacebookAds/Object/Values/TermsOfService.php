@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,15 +21,17 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static TermsOfService getInstance()
  */
-class TermsOfService extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CUSTOM_AUDIENCE = 'custom_audience';
-    const WEBSITE_CUSTOM_AUDIENCE = 'website_custom_audience';
-    const MOBILE_APP_CUSTOM_AUDIENCE = 'mobile_app_custom_audience';
+class TermsOfService extends AbstractEnum {
+
+  const CUSTOM_AUDIENCE  = 'custom_audience';
+  const WEBSITE_CUSTOM_AUDIENCE = 'website_custom_audience';
+  const MOBILE_APP_CUSTOM_AUDIENCE = 'mobile_app_custom_audience';
 }

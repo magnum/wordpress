@@ -82,10 +82,21 @@ include "html-popovers.php";
                             case 'wcf':
                                 include "html-main-wcf.php";
                                 break;
+                            case 'hooks':
+                                include "html-hooks.php";
+                                break;
 
                             case 'head_footer':
                                 /** @noinspection PhpIncludeInspection */
-                                include PYS_FREE_PATH . '/modules/head_footer/views/html-admin-page.php';
+                                if ( current_user_can( 'manage_pys' ) && current_user_can('unfiltered_html') )
+                                {
+                                    include PYS_FREE_PATH . '/modules/head_footer/views/html-admin-page.php';
+                                }
+                                else
+                                {
+                                    include PYS_FREE_PATH . '/modules/head_footer/views/html-admin-not-permission-page.php';
+                                }
+
                                 break;
 
                             case 'facebook_settings':
@@ -93,9 +104,14 @@ include "html-popovers.php";
                                 include PYS_FREE_PATH . '/modules/facebook/views/html-settings.php';
                                 break;
 
-                            case 'ga_settings':
+                            case 'google_tags_settings':
                                 /** @noinspection PhpIncludeInspection */
                                 include PYS_FREE_PATH . '/modules/google_analytics/views/html-settings.php';
+                                break;
+
+                            case 'gtm_tags_settings':
+                                /** @noinspection PhpIncludeInspection */
+                                include PYS_FREE_PATH . '/modules/google_gtm/views/html-settings.php';
                                 break;
 
                             case 'superpack_settings':
@@ -209,8 +225,8 @@ include "html-popovers.php";
                             <div class="card card-static border-primary">
                                 <div class="card-body">
                                     <h4 class="card-title">WooCommerce Product Catalog Feeds</h4>
-                                    <p class="card-text">Generate auto-updating WooCommerce XML feeds for Facebook Product
-                                        Catalog, Google Merchant, and Google Ads (custom type).</p>
+                                    <p class="card-text">Generate auto-updating WooCommerce XML feeds for Meta Product
+                                        Catalog, Google Merchant, Google Ads (custom type), Pinterst Catalogs, or TikTok Catalogs.</p>
                                     <a href="https://www.pixelyoursite.com/product-catalog-facebook?utm_source=free&utm_medium=plugin&utm_campaign=right-column-free" target="_blank"
                                        class="btn btn-sm btn-block btn-primary">Click for details</a>
                                 </div>

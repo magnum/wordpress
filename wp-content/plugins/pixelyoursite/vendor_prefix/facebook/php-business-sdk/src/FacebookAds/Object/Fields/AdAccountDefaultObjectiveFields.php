@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAccountDefaultObjectiveFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DEFAULT_OBJECTIVE_FOR_USER = 'default_objective_for_user';
-    const OBJECTIVE_FOR_LEVEL = 'objective_for_level';
-    public function getFieldTypes()
-    {
-        return array('default_objective_for_user' => 'DefaultObjectiveForUser', 'objective_for_level' => 'ObjectiveForLevel');
-    }
+
+class AdAccountDefaultObjectiveFields extends AbstractEnum {
+
+  const DEFAULT_OBJECTIVE_FOR_USER = 'default_objective_for_user';
+  const OBJECTIVE_FOR_LEVEL = 'objective_for_level';
+
+  public function getFieldTypes() {
+    return array(
+      'default_objective_for_user' => 'DefaultObjectiveForUser',
+      'objective_for_level' => 'ObjectiveForLevel',
+    );
+  }
 }

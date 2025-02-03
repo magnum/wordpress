@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,30 +35,33 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdsInsightsBreakdownsValues getInstance()
  */
-class AdsInsightsBreakdownsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AD_FORMAT_ASSET = 'ad_format_asset';
-    const AGE = 'age';
-    const APP_ID = 'app_id';
-    const BODY_ASSET = 'body_asset';
-    const CALL_TO_ACTION_ASSET = 'call_to_action_asset';
-    const COUNTRY = 'country';
-    const DESCRIPTION_ASSET = 'description_asset';
-    const DEVICE_PLATFORM = 'device_platform';
-    const DMA = 'dma';
-    const FREQUENCY_VALUE = 'frequency_value';
-    const GENDER = 'gender';
-    const HOURLY_STATS_AGGREGATED_BY_ADVERTISER_TIME_ZONE = 'hourly_stats_aggregated_by_advertiser_time_zone';
-    const HOURLY_STATS_AGGREGATED_BY_AUDIENCE_TIME_ZONE = 'hourly_stats_aggregated_by_audience_time_zone';
-    const IMAGE_ASSET = 'image_asset';
-    const IMPRESSION_DEVICE = 'impression_device';
-    const LINK_URL_ASSET = 'link_url_asset';
-    const PLACE_PAGE_ID = 'place_page_id';
-    const PLATFORM_POSITION = 'platform_position';
-    const PRODUCT_ID = 'product_id';
-    const PUBLISHER_PLATFORM = 'publisher_platform';
-    const REGION = 'region';
-    const SKAN_CONVERSION_ID = 'skan_conversion_id';
-    const TITLE_ASSET = 'title_asset';
-    const VIDEO_ASSET = 'video_asset';
+class AdsInsightsBreakdownsValues extends AbstractEnum {
+
+  const AD_FORMAT_ASSET = 'ad_format_asset';
+  const AGE = 'age';
+  const APP_ID = 'app_id';
+  const BODY_ASSET = 'body_asset';
+  const CALL_TO_ACTION_ASSET = 'call_to_action_asset';
+  const COUNTRY = 'country';
+  const DESCRIPTION_ASSET = 'description_asset';
+  const DEVICE_PLATFORM = 'device_platform';
+  const DMA = 'dma';
+  const FREQUENCY_VALUE = 'frequency_value';
+  const GENDER = 'gender';
+  const HOURLY_STATS_AGGREGATED_BY_ADVERTISER_TIME_ZONE = 'hourly_stats_aggregated_by_advertiser_time_zone';
+  const HOURLY_STATS_AGGREGATED_BY_AUDIENCE_TIME_ZONE = 'hourly_stats_aggregated_by_audience_time_zone';
+  const IMAGE_ASSET = 'image_asset';
+  const IMPRESSION_DEVICE = 'impression_device';
+  const IS_CONVERSION_ID_MODELED = 'is_conversion_id_modeled';
+  const LINK_URL_ASSET = 'link_url_asset';
+  const MMM = 'mmm';
+  const PLACE_PAGE_ID = 'place_page_id';
+  const PLATFORM_POSITION = 'platform_position';
+  const PRODUCT_ID = 'product_id';
+  const PUBLISHER_PLATFORM = 'publisher_platform';
+  const REGION = 'region';
+  const SKAN_CAMPAIGN_ID = 'skan_campaign_id';
+  const SKAN_CONVERSION_ID = 'skan_conversion_id';
+  const TITLE_ASSET = 'title_asset';
+  const VIDEO_ASSET = 'video_asset';
 }

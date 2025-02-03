@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class MinimumBudgetFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CURRENCY = 'currency';
-    const MIN_DAILY_BUDGET_HIGH_FREQ = 'min_daily_budget_high_freq';
-    const MIN_DAILY_BUDGET_IMP = 'min_daily_budget_imp';
-    const MIN_DAILY_BUDGET_LOW_FREQ = 'min_daily_budget_low_freq';
-    const MIN_DAILY_BUDGET_VIDEO_VIEWS = 'min_daily_budget_video_views';
-    public function getFieldTypes()
-    {
-        return array('currency' => 'string', 'min_daily_budget_high_freq' => 'int', 'min_daily_budget_imp' => 'int', 'min_daily_budget_low_freq' => 'int', 'min_daily_budget_video_views' => 'int');
-    }
+
+class MinimumBudgetFields extends AbstractEnum {
+
+  const CURRENCY = 'currency';
+  const MIN_DAILY_BUDGET_HIGH_FREQ = 'min_daily_budget_high_freq';
+  const MIN_DAILY_BUDGET_IMP = 'min_daily_budget_imp';
+  const MIN_DAILY_BUDGET_LOW_FREQ = 'min_daily_budget_low_freq';
+  const MIN_DAILY_BUDGET_VIDEO_VIEWS = 'min_daily_budget_video_views';
+
+  public function getFieldTypes() {
+    return array(
+      'currency' => 'string',
+      'min_daily_budget_high_freq' => 'int',
+      'min_daily_budget_imp' => 'int',
+      'min_daily_budget_low_freq' => 'int',
+      'min_daily_budget_video_views' => 'int',
+    );
+  }
 }

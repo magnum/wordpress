@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,21 +21,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeObjectStorySpecFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Traits\FieldValidation;
+
 /**
  * @deprecated use AdCreativeObjectStorySpec instead
  */
-class ObjectStorySpec extends \PYS_PRO_GLOBAL\FacebookAds\Object\AdCreativeObjectStorySpec
-{
-    use FieldValidation;
-    /**
-     * @return AdCreativeObjectStorySpecFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeObjectStorySpecFields::getInstance();
-    }
+class ObjectStorySpec extends AdCreativeObjectStorySpec {
+  use FieldValidation;
+
+  /**
+   * @return AdCreativeObjectStorySpecFields
+   */
+  public static function getFieldsEnum() {
+    return AdCreativeObjectStorySpecFields::getInstance();
+  }
 }

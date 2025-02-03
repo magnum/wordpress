@@ -93,6 +93,9 @@ function automatorwp_fluentform_get_form_fields_values( $fields ) {
                 if( is_string( $subfield_name ) ) {
                     $form_fields[$subfield_name] = $subfield_value;
                 }
+                if( is_numeric( $subfield_name ) ) {
+                    $form_fields[$field_name . '_' . $subfield_name] = $subfield_value;
+                }
             }
 
         } else {
@@ -154,6 +157,20 @@ function automatorwp_fluentform_parse_automation_tags( $parsed_content, $replace
         // Skip if not form fields
         if( ! is_array( $form_fields ) ) {
             continue;
+        }
+
+        // Look for form field tags
+        preg_match_all( "/\{t:" . $trigger->id . ":form_field:\s*(.*?)\s*\}/", $parsed_content, $matches );
+        
+        if( is_array( $matches ) && isset( $matches[1] ) ) {
+
+            foreach( $matches[1] as $field_name ) {
+                // Replace {t:ID:form_field:NAME} by the field value
+                if( isset( $form_fields[$field_name] ) ) {
+                    $new_replacements['{t:' . $trigger->id . ':form_field:' . $field_name . '}'] = $form_fields[$field_name];
+                }
+            }
+
         }
 
         // Look for form field tags

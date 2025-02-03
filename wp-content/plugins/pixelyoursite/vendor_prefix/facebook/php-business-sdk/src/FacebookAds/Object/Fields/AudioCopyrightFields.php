@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,23 +34,38 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AudioCopyrightFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATION_TIME = 'creation_time';
-    const DISPLAYED_MATCHES_COUNT = 'displayed_matches_count';
-    const ID = 'id';
-    const IN_CONFLICT = 'in_conflict';
-    const ISRC = 'isrc';
-    const MATCH_RULE = 'match_rule';
-    const OWNERSHIP_COUNTRIES = 'ownership_countries';
-    const REFERENCE_FILE_STATUS = 'reference_file_status';
-    const RIDGE_MONITORING_STATUS = 'ridge_monitoring_status';
-    const TAGS = 'tags';
-    const UPDATE_TIME = 'update_time';
-    const WHITELISTED_FB_USERS = 'whitelisted_fb_users';
-    const WHITELISTED_IG_USERS = 'whitelisted_ig_users';
-    public function getFieldTypes()
-    {
-        return array('creation_time' => 'datetime', 'displayed_matches_count' => 'int', 'id' => 'string', 'in_conflict' => 'bool', 'isrc' => 'string', 'match_rule' => 'VideoCopyrightRule', 'ownership_countries' => 'list<string>', 'reference_file_status' => 'string', 'ridge_monitoring_status' => 'string', 'tags' => 'list<string>', 'update_time' => 'datetime', 'whitelisted_fb_users' => 'list<Object>', 'whitelisted_ig_users' => 'list<string>');
-    }
+
+class AudioCopyrightFields extends AbstractEnum {
+
+  const CREATION_TIME = 'creation_time';
+  const DISPLAYED_MATCHES_COUNT = 'displayed_matches_count';
+  const ID = 'id';
+  const IN_CONFLICT = 'in_conflict';
+  const ISRC = 'isrc';
+  const MATCH_RULE = 'match_rule';
+  const OWNERSHIP_COUNTRIES = 'ownership_countries';
+  const REFERENCE_FILE_STATUS = 'reference_file_status';
+  const RIDGE_MONITORING_STATUS = 'ridge_monitoring_status';
+  const TAGS = 'tags';
+  const UPDATE_TIME = 'update_time';
+  const WHITELISTED_FB_USERS = 'whitelisted_fb_users';
+  const WHITELISTED_IG_USERS = 'whitelisted_ig_users';
+
+  public function getFieldTypes() {
+    return array(
+      'creation_time' => 'datetime',
+      'displayed_matches_count' => 'int',
+      'id' => 'string',
+      'in_conflict' => 'bool',
+      'isrc' => 'string',
+      'match_rule' => 'VideoCopyrightRule',
+      'ownership_countries' => 'list<string>',
+      'reference_file_status' => 'string',
+      'ridge_monitoring_status' => 'string',
+      'tags' => 'list<string>',
+      'update_time' => 'datetime',
+      'whitelisted_fb_users' => 'list<Object>',
+      'whitelisted_ig_users' => 'list<string>',
+    );
+  }
 }

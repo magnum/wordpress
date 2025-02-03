@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class OfflineConversionDataSetPermissionsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAN_EDIT = 'can_edit';
-    const CAN_EDIT_OR_UPLOAD = 'can_edit_or_upload';
-    const CAN_UPLOAD = 'can_upload';
-    const SHOULD_BLOCK_VANILLA_BUSINESS_EMPLOYEE_ACCESS = 'should_block_vanilla_business_employee_access';
-    public function getFieldTypes()
-    {
-        return array('can_edit' => 'bool', 'can_edit_or_upload' => 'bool', 'can_upload' => 'bool', 'should_block_vanilla_business_employee_access' => 'bool');
-    }
+
+class OfflineConversionDataSetPermissionsFields extends AbstractEnum {
+
+  const CAN_EDIT = 'can_edit';
+  const CAN_EDIT_OR_UPLOAD = 'can_edit_or_upload';
+  const CAN_UPLOAD = 'can_upload';
+  const SHOULD_BLOCK_VANILLA_BUSINESS_EMPLOYEE_ACCESS = 'should_block_vanilla_business_employee_access';
+
+  public function getFieldTypes() {
+    return array(
+      'can_edit' => 'bool',
+      'can_edit_or_upload' => 'bool',
+      'can_upload' => 'bool',
+      'should_block_vanilla_business_employee_access' => 'bool',
+    );
+  }
 }

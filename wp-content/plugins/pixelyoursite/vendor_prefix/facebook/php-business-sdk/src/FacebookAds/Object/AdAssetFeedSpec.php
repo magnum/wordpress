@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAssetFeedSpecFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAssetFeedSpecCallToActionTypesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAssetFeedSpecCallToActionTypesVal
  * pull request for this class.
  *
  */
-class AdAssetFeedSpec extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAssetFeedSpecFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAssetFeedSpecFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['CallToActionTypes'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAssetFeedSpecCallToActionTypesValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAssetFeedSpec extends AbstractObject {
+
+  /**
+   * @return AdAssetFeedSpecFields
+   */
+  public static function getFieldsEnum() {
+    return AdAssetFeedSpecFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['CallToActionTypes'] = AdAssetFeedSpecCallToActionTypesValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdAccountContentTypeValues getInstance()
  */
-class AdAccountContentTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
-    const DESTINATION = 'DESTINATION';
-    const FLIGHT = 'FLIGHT';
-    const HOME_LISTING = 'HOME_LISTING';
-    const HOTEL = 'HOTEL';
-    const JOB = 'JOB';
-    const LOCAL_SERVICE_BUSINESS = 'LOCAL_SERVICE_BUSINESS';
-    const LOCATION_BASED_ITEM = 'LOCATION_BASED_ITEM';
-    const MEDIA_TITLE = 'MEDIA_TITLE';
-    const OFFLINE_PRODUCT = 'OFFLINE_PRODUCT';
-    const PRODUCT = 'PRODUCT';
-    const VEHICLE = 'VEHICLE';
-    const VEHICLE_OFFER = 'VEHICLE_OFFER';
+class AdAccountContentTypeValues extends AbstractEnum {
+
+  const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
+  const DESTINATION = 'DESTINATION';
+  const FLIGHT = 'FLIGHT';
+  const HOME_LISTING = 'HOME_LISTING';
+  const HOTEL = 'HOTEL';
+  const JOB = 'JOB';
+  const LOCAL_SERVICE_BUSINESS = 'LOCAL_SERVICE_BUSINESS';
+  const LOCATION_BASED_ITEM = 'LOCATION_BASED_ITEM';
+  const MEDIA_TITLE = 'MEDIA_TITLE';
+  const OFFLINE_PRODUCT = 'OFFLINE_PRODUCT';
+  const PRODUCT = 'PRODUCT';
+  const VEHICLE = 'VEHICLE';
+  const VEHICLE_OFFER = 'VEHICLE_OFFER';
 }

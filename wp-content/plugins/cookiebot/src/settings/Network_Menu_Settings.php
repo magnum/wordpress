@@ -2,6 +2,7 @@
 
 namespace cybot\cookiebot\settings;
 
+use cybot\cookiebot\lib\Cookiebot_Frame;
 use cybot\cookiebot\lib\Cookiebot_WP;
 use cybot\cookiebot\settings\pages\Support_Page;
 use InvalidArgumentException;
@@ -10,7 +11,8 @@ use function cybot\cookiebot\lib\include_view;
 
 class Network_Menu_Settings {
 
-	const ICON = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNzIgNTQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0iI0ZGRkZGRiIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNNDYuODcyNTkwMyA4Ljc3MzU4MzM0QzQxLjk0MzkwMzkgMy4zODI5NTAxMSAzNC44NDI0OTQ2IDAgMjYuOTQ4MjgxOSAwIDEyLjA2NTE1NjggMCAwIDEyLjAyNDQ3NzQgMCAyNi44NTc0MjE5YzAgMTQuODMyOTQ0NSAxMi4wNjUxNTY4IDI2Ljg1NzQyMTkgMjYuOTQ4MjgxOSAyNi44NTc0MjE5IDcuODk0MjEyNyAwIDE0Ljk5NTYyMi0zLjM4Mjk1MDIgMTkuOTI0MzA4NC04Ljc3MzU4MzQtMi44ODk2OTY3LTEuMzY4ODY2My01LjM5OTMxMS0zLjQwNTQzOS03LjMyODA4MzgtNS45MDk2MzU4LTMuMTIxNDMwNiAzLjIwOTQxMDQtNy40OTI5OTQ0IDUuMjA0MTI5MS0xMi4zMzIwMjU4IDUuMjA0MTI5MS05LjQ4NDM0NDQgMC0xNy4xNzI5MjQ3LTcuNjYyNjU3Mi0xNy4xNzI5MjQ3LTE3LjExNTAyMzhzNy42ODg1ODAzLTE3LjExNTAyMzcgMTcuMTcyOTI0Ny0xNy4xMTUwMjM3YzQuNzIzNDgyMiAwIDkuMDAxNTU1MiAxLjkwMDU5MzkgMTIuMTA2MjkyIDQuOTc2MzA5IDEuOTU2OTIzNy0yLjY0MTEzMSA0LjU1MDAyNjMtNC43ODU1MTgzIDcuNTUzODE3Ni02LjIwODQzMTg2eiIvPjxwYXRoIGQ9Ik01NS4zODAzMjgyIDQyLjY1MDE5OTFDNDYuMzMzNzIyNyA0Mi42NTAxOTkxIDM5IDM1LjM0MTIwMzEgMzkgMjYuMzI1MDk5NiAzOSAxNy4zMDg5OTYgNDYuMzMzNzIyNyAxMCA1NS4zODAzMjgyIDEwYzkuMDQ2NjA1NSAwIDE2LjM4MDMyODIgNy4zMDg5OTYgMTYuMzgwMzI4MiAxNi4zMjUwOTk2IDAgOS4wMTYxMDM1LTcuMzMzNzIyNyAxNi4zMjUwOTk1LTE2LjM4MDMyODIgMTYuMzI1MDk5NXptLjAyMTMwOTItNy43NTU2MzQyYzQuNzM3MDI3NiAwIDguNTc3MTQ3MS0zLjgyNzE3MiA4LjU3NzE0NzEtOC41NDgyMjc5IDAtNC43MjEwNTYtMy44NDAxMTk1LTguNTQ4MjI4LTguNTc3MTQ3MS04LjU0ODIyOC00LjczNzAyNzUgMC04LjU3NzE0NyAzLjgyNzE3Mi04LjU3NzE0NyA4LjU0ODIyOCAwIDQuNzIxMDU1OSAzLjg0MDExOTUgOC41NDgyMjc5IDguNTc3MTQ3IDguNTQ4MjI3OXoiLz48L2c+PC9zdmc+';
+
+	const ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzY0ODFfMzE4MTUpIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01Ljg2MTYgNS44MDUyVjE5LjgxMTRDNS44NjE2IDI3LjUzNjMgMTIuMjAzOSAzMy44MTc2IDIwLjAwMzkgMzMuODE3NkMyNy44MDM4IDMzLjgxNzYgMzQuMTQ2MiAyNy41MzYzIDM0LjE0NjIgMTkuODExNFY1LjgwNTJINS44NjE2Wk0yMCAzOS42MjI4QzguOTc2MzggMzkuNjIwNyAwIDMwLjczNzEgMCAxOS44MTE0VjBINDBWMTkuODExNEM0MCAzMC43Mjk0IDMxLjAzMTQgMzkuNjIwNyAyMCAzOS42MjI4Wk0yMi42ODk0IDI2Ljk0ODZMMjIuNjg4OCAyNi45NDk5SDE1LjkyTDE1LjkzMTIgMjYuOTI2Nkw5Ljk4OTIxIDE2LjU4MjFIMTYuNzY1N0wxOS4wMTA2IDIwLjQ5MDJMMjMuNzEyMiAxMC42NjMxSDMwLjQ4ODhMMjIuNzAzNSAyNi45MTkyTDIyLjcyMDQgMjYuOTQ4NkgyMi42ODk0WiIgZmlsbD0iYmxhY2siLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF82NDgxXzMxODE1Ij4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJ3aGl0ZSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPgo=';
 
 	public function add_menu() {
 		add_action( 'network_admin_menu', array( $this, 'add_network_menu' ), 1 );
@@ -65,13 +67,38 @@ class Network_Menu_Settings {
 	public function network_settings_save() {
 		check_admin_referer( 'cookiebot-network-settings' );
 
-		update_site_option( 'cookiebot-cbid', ! empty( $_POST['cookiebot-cbid'] ) ? $_POST['cookiebot-cbid'] : '' );
-		update_site_option( 'cookiebot-script-tag-uc-attribute', ! empty( $_POST['cookiebot-script-tag-uc-attribute'] ) ? $_POST['cookiebot-script-tag-uc-attribute'] : '' );
-		update_site_option( 'cookiebot-script-tag-cd-attribute', ! empty( $_POST['cookiebot-script-tag-cd-attribute'] ) ? $_POST['cookiebot-script-tag-cd-attribute'] : '' );
-		update_site_option( 'cookiebot-autoupdate', ! empty( $_POST['cookiebot-autoupdate'] ) ? $_POST['cookiebot-autoupdate'] : '' );
-		update_site_option( 'cookiebot-nooutput', ! empty( $_POST['cookiebot-nooutput'] ) ? $_POST['cookiebot-nooutput'] : '' );
-		update_site_option( 'cookiebot-nooutput-admin', ! empty( $_POST['cookiebot-nooutput-admin'] ) ? $_POST['cookiebot-nooutput-admin'] : '' );
-		update_site_option( 'cookiebot-cookie-blocking-mode', ! empty( $_POST['cookiebot-cookie-blocking-mode'] ) ? $_POST['cookiebot-cookie-blocking-mode'] : '' );
+		update_site_option(
+			'cookiebot-cbid',
+			! empty( $_POST['cookiebot-cbid'] ) ? $_POST['cookiebot-cbid'] : ''
+		);
+		update_site_option(
+			'cookiebot-ruleset-id',
+			! empty( $_POST['cookiebot-ruleset-id'] ) ? $_POST['cookiebot-ruleset-id'] : ''
+		);
+		update_site_option(
+			'cookiebot-script-tag-uc-attribute',
+			! empty( $_POST['cookiebot-script-tag-uc-attribute'] ) ? $_POST['cookiebot-script-tag-uc-attribute'] : ''
+		);
+		update_site_option(
+			'cookiebot-script-tag-cd-attribute',
+			! empty( $_POST['cookiebot-script-tag-cd-attribute'] ) ? $_POST['cookiebot-script-tag-cd-attribute'] : ''
+		);
+		update_site_option(
+			'cookiebot-autoupdate',
+			! empty( $_POST['cookiebot-autoupdate'] ) ? $_POST['cookiebot-autoupdate'] : ''
+		);
+		update_site_option(
+			'cookiebot-nooutput',
+			! empty( $_POST['cookiebot-nooutput'] ) ? $_POST['cookiebot-nooutput'] : ''
+		);
+		update_site_option(
+			'cookiebot-nooutput-admin',
+			! empty( $_POST['cookiebot-nooutput-admin'] ) ? $_POST['cookiebot-nooutput-admin'] : ''
+		);
+		update_site_option(
+			'cookiebot-cookie-blocking-mode',
+			! empty( $_POST['cookiebot-cookie-blocking-mode'] ) ? $_POST['cookiebot-cookie-blocking-mode'] : ''
+		);
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -117,11 +144,12 @@ class Network_Menu_Settings {
 		);
 
 		include_view(
-			'admin/settings/network-settings-page.php',
+			Cookiebot_Frame::get_view_path( true ) . 'network-settings-page.php',
 			array(
-				'cookiebot_gdpr_url' => 'https://www.cookiebot.com/goto/gdpr',
+				'cookiebot_gdpr_url' => 'https://www.cookiebot.com/' . Cookiebot_WP::get_manager_language() . '/gdpr/?utm_source=wordpress&utm_medium=referral&utm_campaign=banner',
 				'logo'               => CYBOT_COOKIEBOT_PLUGIN_URL . 'cookiebot-logo.png',
 				'cbm'                => $cbm,
+				'ruleset_id'         => ! empty( get_site_option( 'cookiebot-ruleset-id' ) ) ? get_site_option( 'cookiebot-ruleset-id' ) : 'settings',
 			)
 		);
 	}

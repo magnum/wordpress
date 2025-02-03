@@ -7,11 +7,14 @@
  * @class   Automator_Tokens
  * @since   3.0
  * @version 3.0
- * @package Uncanny_Automator
  * @author  Saad S.
+ * @package Uncanny_Automator
  */
 
 namespace Uncanny_Automator;
+
+use Exception;
+use Uncanny_Automator\Services\Recipe\Action\Token\Entity as Action_Token;
 
 /**
  * Class Automator_Tokens
@@ -24,7 +27,6 @@ class Automator_Tokens {
 	 * @var
 	 */
 	public static $instance;
-
 
 	/**
 	 * @return Automator_Tokens
@@ -97,18 +99,20 @@ class Automator_Tokens {
 			return null;
 		}
 
+		if ( defined( 'DOING_CRON' ) ) {
+			return null;
+		}
+
 		$tokens = apply_filters( 'automator_maybe_trigger_pre_tokens', array(), $triggers_meta, $recipe_id );
+
 		//Only load these when on edit recipe page or is automator ajax is happening!
 		if ( ! automator_do_identify_tokens() ) {
 			return $tokens;
 		}
-		//      if ( ! Automator()->helpers->recipe->is_edit_page() && ! Automator()->helpers->recipe->is_rest() && ! Automator()->helpers->recipe->is_ajax() ) {
-		//          return $tokens;
-		//      }
+
 		if ( empty( $triggers_meta ) ) {
 			return $tokens;
 		}
-
 		//Add custom tokens regardless of integration / trigger code
 		$filters                 = array();
 		$trigger_integration     = '';
@@ -205,7 +209,13 @@ class Automator_Tokens {
 
 		if ( $filters ) {
 			foreach ( $filters as $filter => $args ) {
-				$tokens = apply_filters( $filter, $tokens, $args );
+				try {
+					$tokens = apply_filters( $filter, $tokens, $args );
+				} catch ( \Error $e ) {
+					automator_log( $e->getMessage(), '$e->getMessage()', AUTOMATOR_DEBUG_MODE, 'trigger_tokens_errors', true );
+				} catch ( \Exception $e ) {
+					automator_log( $e->getMessage(), '$e->getMessage()', AUTOMATOR_DEBUG_MODE, 'trigger_tokens_exceptions', true );
+				}
 			}
 		}
 		if ( null === $tokens ) {
@@ -224,10 +234,25 @@ class Automator_Tokens {
 	}
 
 
-	public function get_action_tokens_renderable( $action ) {
+	/**
+	 * @param $action
+	 * @param $action_id
+	 * @param $recipe_id
+	 *
+	 * @return mixed|null
+	 */
+	public function get_action_tokens_renderable( $action, $action_id = null, $recipe_id = null ) {
 
-		return apply_filters( 'automator_action_' . $action['code'] . '_tokens_renderable', array() );
+		$default_action_tokens = array();
+
+		$status = Automator()->action_tokens()->entity();
+		$status->set_id( 'ACTION_RUN_STATUS' );
+		$status->set_name( _x( 'Completion status', 'Action token', 'uncanny-automator' ) );
+		$status->set_type( 'string' );
+
+		$default_action_tokens[] = $status->toArray();
+
+		return apply_filters( "automator_action_{$action['code']}_tokens_renderable", $default_action_tokens, $action_id, $recipe_id );
 
 	}
-
 }

@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_create_post';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_create_post';
+
+        parent::__construct();
+
+    }
 
     /**
      * The new inserted post ID
@@ -112,6 +123,12 @@ class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
                             'type' => 'text',
                             'default' => ''
                         ),
+                        'post_category' => array(
+                            'name' => __( 'Category:', 'automatorwp' ),
+                            'desc' => __( 'The post category slug.', 'automatorwp' ),
+                            'type' => 'text',
+                            'default' => ''
+                        ),
                         'post_date' => array(
                             'name' => __( 'Date:', 'automatorwp' ),
                             'desc' => __( 'The date of the post. Supports "YYYY-MM-DD HH:MM:SS" and "YYYY-MM-DD" formats. By default, the date at the moment the automation gets completed.', 'automatorwp' ),
@@ -179,6 +196,7 @@ class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
                     )
                 )
             ),
+            'tags' => automatorwp_utilities_post_tags(),
         ) );
 
     }
@@ -201,6 +219,7 @@ class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
             'post_name'     => '',
             'post_type'     => 'post',
             'post_status'   => 'draft',
+            'post_category' => array(),
             'post_date'     => '',
             'post_author'   => '',
             'post_content'  => '',
@@ -218,6 +237,11 @@ class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
         // Format post date
         if( absint( $post_data['post_author'] ) === 0 ) {
             $post_data['post_author'] = $user_id;
+        }
+
+        if( ! empty( $post_data['post_category'] ) ) {
+            $category_ID = get_cat_ID( $post_data['post_category'] );
+            $post_data['post_category'] = array( $category_ID );
         }
 
         // Insert the post
@@ -463,4 +487,5 @@ class AutomatorWP_WordPress_Create_Post extends AutomatorWP_Integration_Action {
 
 }
 
-new AutomatorWP_WordPress_Create_Post();
+new AutomatorWP_WordPress_Create_Post( 'wordpress' );
+new AutomatorWP_WordPress_Create_Post( 'posts' );

@@ -13,7 +13,7 @@
 
 
 class Ithemes_Sync_Verb_Get_Dashboard_Widgets extends Ithemes_Sync_Verb {
-	public static $name = 'get-dashboard-widgets';
+	public static $name        = 'get-dashboard-widgets';
 	public static $description = 'Retrieve list of dashboard widgets.';
 
 	public function run( $arguments ) {

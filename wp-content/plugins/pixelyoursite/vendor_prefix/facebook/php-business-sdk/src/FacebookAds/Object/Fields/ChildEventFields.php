@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ChildEventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const END_TIME = 'end_time';
-    const ID = 'id';
-    const START_TIME = 'start_time';
-    const TICKET_URI = 'ticket_uri';
-    public function getFieldTypes()
-    {
-        return array('end_time' => 'string', 'id' => 'string', 'start_time' => 'string', 'ticket_uri' => 'string');
-    }
+
+class ChildEventFields extends AbstractEnum {
+
+  const END_TIME = 'end_time';
+  const ID = 'id';
+  const START_TIME = 'start_time';
+  const TICKET_URI = 'ticket_uri';
+
+  public function getFieldTypes() {
+    return array(
+      'end_time' => 'string',
+      'id' => 'string',
+      'start_time' => 'string',
+      'ticket_uri' => 'string',
+    );
+  }
 }

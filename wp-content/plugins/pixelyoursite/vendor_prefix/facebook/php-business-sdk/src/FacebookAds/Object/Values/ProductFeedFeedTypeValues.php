@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,21 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedFeedTypeValues getInstance()
  */
-class ProductFeedFeedTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTO = 'AUTO';
-    const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
-    const DESTINATION = 'DESTINATION';
-    const FLIGHT = 'FLIGHT';
-    const HOME_LISTING = 'HOME_LISTING';
-    const HOTEL = 'HOTEL';
-    const HOTEL_ROOM = 'HOTEL_ROOM';
-    const LOCAL_INVENTORY = 'LOCAL_INVENTORY';
-    const MARKET = 'MARKET';
-    const MEDIA_TITLE = 'MEDIA_TITLE';
-    const OFFER = 'OFFER';
-    const PRODUCTS = 'PRODUCTS';
-    const TRANSACTABLE_ITEMS = 'TRANSACTABLE_ITEMS';
-    const VEHICLES = 'VEHICLES';
-    const VEHICLE_OFFER = 'VEHICLE_OFFER';
+class ProductFeedFeedTypeValues extends AbstractEnum {
+
+  const AUTOMOTIVE_MODEL = 'AUTOMOTIVE_MODEL';
+  const DESTINATION = 'DESTINATION';
+  const FLIGHT = 'FLIGHT';
+  const HOME_LISTING = 'HOME_LISTING';
+  const HOTEL = 'HOTEL';
+  const HOTEL_ROOM = 'HOTEL_ROOM';
+  const LOCAL_INVENTORY = 'LOCAL_INVENTORY';
+  const MEDIA_TITLE = 'MEDIA_TITLE';
+  const OFFER = 'OFFER';
+  const PRODUCTS = 'PRODUCTS';
+  const TRANSACTABLE_ITEMS = 'TRANSACTABLE_ITEMS';
+  const VEHICLES = 'VEHICLES';
+  const VEHICLE_OFFER = 'VEHICLE_OFFER';
 }

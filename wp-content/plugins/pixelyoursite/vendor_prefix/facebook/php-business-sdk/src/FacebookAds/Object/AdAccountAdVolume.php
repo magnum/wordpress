@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountAdVolumeFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdVolumeRecommendationTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdVolumeRecommendationType
  * pull request for this class.
  *
  */
-class AdAccountAdVolume extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAccountAdVolumeFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountAdVolumeFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['RecommendationType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdVolumeRecommendationTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountAdVolume extends AbstractObject {
+
+  /**
+   * @return AdAccountAdVolumeFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountAdVolumeFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['RecommendationType'] = AdAccountAdVolumeRecommendationTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

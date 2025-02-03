@@ -19,6 +19,43 @@ class Automator_Registration {
 	 * Automator_Registration constructor.
 	 */
 	public function __construct() {
+		add_filter(
+			'automator_register_integration',
+			array(
+				$this,
+				'set_connected_to_false_if_site_inactive',
+			),
+			99,
+			2
+		);
+	}
+
+	/**
+	 * Set `connected` for each API integration to false IF the site is no
+	 * longer connected to automatorplugin.com OR has a valid PRO license.
+	 *
+	 * @param $integration
+	 * @param $integration_code
+	 *
+	 * @return mixed
+	 */
+	public function set_connected_to_false_if_site_inactive( $integration, $integration_code ) {
+		// Not a Recipe Builder page
+		if ( ! Automator()->helpers->recipe->is_edit_page() ) {
+			return $integration;
+		}
+		// Doesn't have `connected` key
+		if ( ! isset( $integration['connected'] ) ) {
+			return $integration;
+		}
+		// Check if the site is connected
+		$is_connected = Api_Server::get_license_type();
+		// Site is no longer connected
+		if ( false === $is_connected ) {
+			$integration['connected'] = false;
+		}
+
+		return $integration;
 	}
 
 	/**
@@ -42,7 +79,7 @@ class Automator_Registration {
 	public function recipe_type( $type, $details ) {
 
 		if ( null === $type || ! is_string( $type ) ) {
-			Automator()->error->add_error( 'register_integration', 'ERROR: You are trying to register an integration without passing an integration code.', $this );
+			Automator()->wp_error->add_error( 'register_integration', 'ERROR: You are trying to register an integration without passing an integration code.', $this );
 
 			return null;
 		}
@@ -188,6 +225,21 @@ class Automator_Registration {
 			throw new Automator_Exception( 'You are trying to register a trigger without setting its trigger_validation_function', 1001 );
 		}
 
+		// Register trigger loopable tokens.
+		// @since 5.10
+		if ( isset( $trigger['loopable_tokens'] ) ) {
+
+			foreach ( (array) $trigger['loopable_tokens'] as $key => $loopable_tokens ) {
+
+				$loopable_token = new $loopable_tokens();
+
+				$loopable_token->set_trigger( $trigger );
+				$loopable_token->register_hooks( $trigger );
+
+				$trigger['loopable_tokens'][ $key ] = $loopable_token; // @todo: Create a filter and use pro to overwrite.
+			}
+		}
+
 		// Register the trigger into the system
 		Automator()->set_triggers( Automator()->utilities->keep_order_of_options( $trigger ) );
 
@@ -205,6 +257,11 @@ class Automator_Registration {
 	 */
 	public function integration( $integration_code = null, $integration = null ) {
 
+		// Only registers the integration if its not yet registered.
+		if ( ! isset( Automator()->all_integrations[ $integration_code ] ) ) {
+			Automator()->set_all_integrations( $integration_code, $integration );
+		}
+
 		if ( null === $integration_code || ! is_string( $integration_code ) ) {
 			throw new Automator_Exception( 'You are trying to register an integration without passing an integration code.', 1002 );
 		}
@@ -213,6 +270,8 @@ class Automator_Registration {
 			throw new Automator_Exception( 'You are trying to register an integration without passing an integration object.', 1002 );
 		}
 
+		$integration = apply_filters( 'automator_register_integration', $integration, $integration_code );
+
 		// Register integration if it doesn't already exist
 		if ( ! array_key_exists( $integration_code, Automator()->integrations ) ) {
 			Automator()->set_integrations( $integration_code, $integration );
@@ -220,10 +279,18 @@ class Automator_Registration {
 			Automator()->set_integrations( $integration_code, $integration );
 		}
 
+		// Fire up the loopable tokens.
+		if ( isset( $integration['loopable_tokens'] ) ) {
+			foreach ( (array) $integration['loopable_tokens'] as $id => $loopable_token_class ) {
+				( new $loopable_token_class( $integration_code ) )->register_hooks();
+			}
+		}
+
 		// Order integrations alphabetically
 		Automator()->utilities->sort_integrations_alphabetically();
 
 		return true;
+
 	}
 
 	/**
@@ -332,6 +399,20 @@ class Automator_Registration {
 		// Sanity check that execution_function isset
 		if ( ! isset( $uap_action['execution_function'] ) ) {
 			throw new Automator_Exception( 'You are trying to register an action without setting its execution_function.', 1003 );
+		}
+
+		// Register action loopable tokens.
+		// @since 6.0
+		if ( isset( $uap_action['loopable_tokens'] ) ) {
+
+			foreach ( (array) $uap_action['loopable_tokens'] as $key => $loopable_tokens ) {
+
+				$loopable_token = new $loopable_tokens();
+				$loopable_token->set_action( $uap_action );
+				$loopable_token->register_hooks( $uap_action );
+
+				$uap_action['loopable_tokens'][ $key ] = $loopable_token; // @todo: Create a filter and use pro to overwrite.
+			}
 		}
 
 		Automator()->set_actions( Automator()->utilities->keep_order_of_options( $uap_action ) );

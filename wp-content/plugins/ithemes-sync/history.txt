@@ -207,7 +207,7 @@
 	Enhancement - Updater improvements
 2.0.14 - 2019-02-12 - Glenn Ansley
 	Enhancement - Added Silent Mode hooks
-2.0.15 - 2019-02-25 - Lew Ayotte	
+2.0.15 - 2019-02-25 - Lew Ayotte
 	Bug Fix: PHP7.1/7.2's implemention of serialize precision causes
 	json_encode to float version numbers like 5.1 as 5.0999999999996, which
 	disrupts our hashing algorithm.
@@ -216,7 +216,7 @@
 2.0.17 - 2019-08-13 - Lew Ayotte
 	Bug Fix: Missing updater files from 2.0.16
 2.0.18 - 2019-10-07 - Lew Ayotte
-	Bug Fix: Adding validation to manage-site verb 
+	Bug Fix: Adding validation to manage-site verb
 2.1.0 - 2019-11-05 - Lew Ayotte, Josh Oakes, AJ Morris
     Enhancement: Update server URL for sync API
 	Enhancement: Updated Readme FAQs
@@ -254,3 +254,20 @@
 	Enhancement: Updater improvements
 	Enhancement: Add filter to disable "duplicate post" feature
 	Enhancement: Add filter to exclude post types from "duplicate post" feature
+2.1.14 - 2023-08-24 - John Hooks
+	* Fix: Add nonce to dismiss notice request
+3.0.0 - 2023-10-10 - John Hooks
+	New: iThemes Sync is now Solid Central! Learn More: https://go.solidwp.com/central-welcome-to-solidwp
+	New: Solid Central gets a restyled interface focused on improving responsiveness. It works great across mobile, tablet, and desktop devices.
+	Tweak: Update the styling of the Scheduled Reports, providing a better experience to customers. The new design is clean, and improves contrast for better visibility.
+	Tweak: Update the White Label email template to match the updated styling of Solid Central.
+	Tweak: The Daily Report and Uptime emails have also been restyled.
+	Tweak: All forms, inputs, and buttons have improvements in: functionality, responsiveness, and accessibility.
+3.0.1 - 2023-11-07 - John Hooks
+	Security: Harden SolidWP Updater against XSS attacks. Thanks to Robin Wood (digi.ninja) for disclosing this issue.
+3.1.0 - 2024-08-28 - Timothy Jacobs, Jared Hill, John Hooks, John Regan
+	New: Add support for tracking vulnerabilities reported by Solid Security in Solid Central.
+3.2.0 - 2024-09-18 - Timothy Jacobs, John Hooks, John Regan
+	New: Connecting to your WordPress site from Solid Central has gotten simpler thanks to the new Application Password based authorization flow.
+3.2.1 - 2024-09-24 - Timothy Jacobs, John Hooks
+	New: Introduce streamline connection flow to Solid Central from the settings screen.

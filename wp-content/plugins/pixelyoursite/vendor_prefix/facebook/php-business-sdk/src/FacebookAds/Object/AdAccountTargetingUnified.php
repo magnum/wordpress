@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -35,6 +35,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedModeValues
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedObjectiveValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedRegulatedCategoriesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedWhitelistedTypesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -43,24 +44,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedWhiteliste
  * pull request for this class.
  *
  */
-class AdAccountTargetingUnified extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return AdAccountTargetingUnifiedFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountTargetingUnifiedFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['LimitType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedLimitTypeValues::getInstance()->getValues();
-        $ref_enums['RegulatedCategories'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedRegulatedCategoriesValues::getInstance()->getValues();
-        $ref_enums['WhitelistedTypes'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedWhitelistedTypesValues::getInstance()->getValues();
-        $ref_enums['AppStore'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedAppStoreValues::getInstance()->getValues();
-        $ref_enums['Objective'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedObjectiveValues::getInstance()->getValues();
-        $ref_enums['Mode'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountTargetingUnifiedModeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountTargetingUnified extends AbstractCrudObject {
+
+  /**
+   * @return AdAccountTargetingUnifiedFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountTargetingUnifiedFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['LimitType'] = AdAccountTargetingUnifiedLimitTypeValues::getInstance()->getValues();
+    $ref_enums['RegulatedCategories'] = AdAccountTargetingUnifiedRegulatedCategoriesValues::getInstance()->getValues();
+    $ref_enums['WhitelistedTypes'] = AdAccountTargetingUnifiedWhitelistedTypesValues::getInstance()->getValues();
+    $ref_enums['AppStore'] = AdAccountTargetingUnifiedAppStoreValues::getInstance()->getValues();
+    $ref_enums['Objective'] = AdAccountTargetingUnifiedObjectiveValues::getInstance()->getValues();
+    $ref_enums['Mode'] = AdAccountTargetingUnifiedModeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

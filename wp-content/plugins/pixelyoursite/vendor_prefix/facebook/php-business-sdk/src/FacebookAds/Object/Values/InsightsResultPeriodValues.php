@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static InsightsResultPeriodValues getInstance()
  */
-class InsightsResultPeriodValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DAY = 'day';
-    const DAYS_28 = 'days_28';
-    const LIFETIME = 'lifetime';
-    const MONTH = 'month';
-    const WEEK = 'week';
+class InsightsResultPeriodValues extends AbstractEnum {
+
+  const DAY = 'day';
+  const DAYS_28 = 'days_28';
+  const LIFETIME = 'lifetime';
+  const MONTH = 'month';
+  const TOTAL_OVER_RANGE = 'total_over_range';
+  const WEEK = 'week';
 }

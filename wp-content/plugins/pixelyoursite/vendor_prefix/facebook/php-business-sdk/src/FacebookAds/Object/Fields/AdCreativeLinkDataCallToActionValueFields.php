@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,21 +34,34 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataCallToActionValueFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP_DESTINATION = 'app_destination';
-    const APP_LINK = 'app_link';
-    const APPLICATION = 'application';
-    const EVENT_ID = 'event_id';
-    const LEAD_GEN_FORM_ID = 'lead_gen_form_id';
-    const LINK = 'link';
-    const LINK_CAPTION = 'link_caption';
-    const LINK_FORMAT = 'link_format';
-    const PAGE = 'page';
-    const PRODUCT_LINK = 'product_link';
-    const WHATSAPP_NUMBER = 'whatsapp_number';
-    public function getFieldTypes()
-    {
-        return array('app_destination' => 'string', 'app_link' => 'string', 'application' => 'string', 'event_id' => 'string', 'lead_gen_form_id' => 'string', 'link' => 'string', 'link_caption' => 'string', 'link_format' => 'string', 'page' => 'string', 'product_link' => 'string', 'whatsapp_number' => 'string');
-    }
+
+class AdCreativeLinkDataCallToActionValueFields extends AbstractEnum {
+
+  const APP_DESTINATION = 'app_destination';
+  const APP_LINK = 'app_link';
+  const APPLICATION = 'application';
+  const EVENT_ID = 'event_id';
+  const LEAD_GEN_FORM_ID = 'lead_gen_form_id';
+  const LINK = 'link';
+  const LINK_CAPTION = 'link_caption';
+  const LINK_FORMAT = 'link_format';
+  const PAGE = 'page';
+  const PRODUCT_LINK = 'product_link';
+  const WHATSAPP_NUMBER = 'whatsapp_number';
+
+  public function getFieldTypes() {
+    return array(
+      'app_destination' => 'string',
+      'app_link' => 'string',
+      'application' => 'string',
+      'event_id' => 'string',
+      'lead_gen_form_id' => 'string',
+      'link' => 'string',
+      'link_caption' => 'string',
+      'link_format' => 'string',
+      'page' => 'string',
+      'product_link' => 'string',
+      'whatsapp_number' => 'string',
+    );
+  }
 }

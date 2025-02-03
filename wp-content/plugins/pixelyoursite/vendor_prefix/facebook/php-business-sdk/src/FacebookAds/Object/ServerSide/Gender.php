@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,19 +21,24 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * Class Gender
- * @package FacebookAds\Object\ServerSide
+ * @package PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide
  */
-class Gender extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const MALE = 'm';
-    const FEMALE = 'f';
-    public function getFieldTypes()
-    {
-        return array('m' => 'string', 'f' => 'string');
-    }
+class Gender extends AbstractEnum {
+
+  const MALE = 'm';
+  const FEMALE = 'f';
+
+  public function getFieldTypes() {
+    return array(
+      'm' => 'string',
+      'f' => 'string',
+    );
+  }
 }

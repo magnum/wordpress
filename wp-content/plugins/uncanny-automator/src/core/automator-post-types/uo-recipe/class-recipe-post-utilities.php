@@ -45,7 +45,7 @@ class Recipe_Post_Utilities {
 
 		// Change to before delete post.
 		add_action(
-			'delete_post',
+			'_DEPRECATED_delete_post',
 			array(
 				$this,
 				'delete_triggers_actions',
@@ -204,6 +204,8 @@ class Recipe_Post_Utilities {
 				'uap-codemirror-mode-javascript',
 				'uap-codemirror-mode-htmlmixed',
 				'uap-tinymce-plugin-fullpage',
+				'wp-api-fetch',
+				'wp-i18n',
 			),
 			Utilities::automator_get_version(),
 			true
@@ -213,6 +215,11 @@ class Recipe_Post_Utilities {
 			'uncanny-automator-ui',
 			'UncannyAutomator',
 			$this->assets_get_automator_main_object()
+		);
+
+		wp_set_script_translations(
+			'uncanny-automator-ui',
+			'uncanny-automator'
 		);
 
 		wp_enqueue_script( 'uncanny-automator-ui' );
@@ -229,7 +236,7 @@ class Recipe_Post_Utilities {
 
 		// Remove conflictive assets
 		// These shouldn't load in the recipe builder
-		$this->dequeue_conflictive_assets();
+		self::dequeue_conflictive_assets();
 	}
 
 	/**
@@ -371,7 +378,8 @@ class Recipe_Post_Utilities {
 	/**
 	 * Dequeues conflictive assets that shouldn't be loading in the recipe builder
 	 */
-	private function dequeue_conflictive_assets() {
+	public static function dequeue_conflictive_assets() {
+
 		// Set conflictive scripts
 		$conflictive_scripts = array(
 			// General
@@ -396,6 +404,12 @@ class Recipe_Post_Utilities {
 
 			// YouTube Embed Plus
 			'__ytprefs_admin__',
+
+			/**
+			 * Groundhogg
+			 * Creates a conflict with select2 dropdowns
+			 */
+			'groundhogg-select2',
 		);
 
 		$conflictive_styles = array(
@@ -410,6 +424,21 @@ class Recipe_Post_Utilities {
 
 			// JW Player 6 for WordPress
 			'jquerySelect2Style',
+
+			// Advanced Custom Fields Pro
+			'acf-input',
+
+			/**
+			 * Groundhogg
+			 * Creates a conflict with select2 dropdowns
+			 */
+			'groundhogg-select2',
+
+			/**
+			 * MemberPress for LearnDash
+			 * Creates a conflict with select2 dropdowns
+			 */
+			'learndash-memberpress-edit-membership',
 		);
 
 		$conflictive_assets = array(
@@ -450,15 +479,6 @@ class Recipe_Post_Utilities {
 		// $post return $post->ID as a string, Our JS expects an int... change it
 		$post_id = (int) $post->ID;
 
-		// API data
-		$completions_allowed     = get_post_meta( $post_id, 'recipe_completions_allowed', true );
-		$max_completions_allowed = get_post_meta( $post_id, 'recipe_max_completions_allowed', true );
-		$recipe_type             = get_post_meta( $post_id, 'uap_recipe_type', true );
-		$trigger_logic           = get_post_meta( $post_id, 'automator_trigger_logic', true );
-		if ( empty( $trigger_logic ) ) {
-			$trigger_logic = 'all';
-		}
-
 		// Get source
 		$source = get_post_meta( $post_id, 'source', true );
 		// Create fields array
@@ -480,51 +500,177 @@ class Recipe_Post_Utilities {
 
 		// Remove any cached extra options
 		delete_post_meta( $post_id, 'extra_options' );
-		$count = Automator()->get->recipe_completed_times( $post_id );
-		$url   = add_query_arg(
-			array(
-				'post_type' => 'uo-recipe',
-				'page'      => 'uncanny-automator-admin-logs',
-				'recipe_id' => $post_id,
-			),
-			admin_url( 'edit.php' )
-		);
 
 		Automator()->automator_load_textdomain();
 
+		// Integrations object (new).
+		try {
+			$core_integrations = new Services\Integrations\Structure( $post_id );
+			$integrations      = '';
+			if ( ! is_null( $core_integrations ) ) {
+				$integrations = json_decode( $core_integrations->toJSON(), true );
+			}
+		} catch ( \Error $e ) {
+			automator_log( $e->getMessage(), $post_id, AUTOMATOR_DEBUG_MODE, '$core_integrations' );
+		} catch ( \Exception $e ) {
+			automator_log( $e->getMessage(), $post_id, AUTOMATOR_DEBUG_MODE, '$core_integrations' );
+		}
+
+		// Add the Create first recipe walkthrough.
+		add_filter( 'automator_get_user_walkthroughs', array( $this, 'should_show_create_recipe_walkthrough' ), 10, 3 );
+		$_integrations   = Automator()->get_integrations();
+		$_pro_only_items = Utilities::get_pro_only_items();
+
 		$api_setup = array(
-			'wp'                  => false,
-			'restURL'             => esc_url_raw( rest_url() . AUTOMATOR_REST_API_END_POINT ),
-			'siteURL'             => get_site_url(),
-			'nonce'               => \wp_create_nonce( 'wp_rest' ),
-			'dev'                 => array(
-				'developerMode'  => (bool) AUTOMATOR_DEBUG_MODE,
-				'recipesUrl'     => admin_url( 'edit.php?post_type=uo-recipe' ),
-				'debuggingURL'   => 'https://automatorplugin.com/knowledge-base/troubleshooting-plugin-errors/?utm_source=uncanny_automator&utm_medium=recipe-wizard-error-modal&utm_content=learn-more-debugging',
-				'supportPage'    => 'https://automatorplugin.com/automator-support/',
-				'permalinksURL'  => esc_url( admin_url( 'options-permalink.php' ) ),
-				'automatorTools' => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-tools' ),
+			// UncannyAutomator._recipe
+			'_recipe'        => Automator()->get_recipe_object( $post_id, ARRAY_A ),
+
+			// UncannyAutomator._site
+			'_site'          => array(
+				// UncannyAutomator._site.rest
+				'rest'                => array(
+					// UncannyAutomator._site.rest.url
+					'url'   => esc_url_raw( rest_url() . AUTOMATOR_REST_API_END_POINT ),
+					// UncannyAutomator._site.rest.nonce
+					'nonce' => \wp_create_nonce( 'wp_rest' ),
+				),
+
+				// UncannyAutomator._site.in_walkthrough_mode
+				// 'in_walkthrough_mode' => $this->should_show_walkthrough(),
+
+				// UncannyAutomator._site.walkthroughs
+				'walkthroughs'        => Automator()->utilities->get_user_walkthroughs( get_current_user_id() ),
+
+				// UncannyAutomator._site.has_debug_enabled
+				'has_debug_enabled'   => (bool) AUTOMATOR_DEBUG_MODE,
+
+				// UncannyAutomator._site.is_multisite
+				'is_multisite'        => is_multisite(),
+
+				// UncannyAutomator._site.is_rtl
+				'is_rtl'              => is_rtl(),
+
+				// UncannyAutomator._site.date_format
+				'date_format'         => get_option( 'date_format' ),
+
+				// UncannyAutomator._site.time_format
+				'time_format'         => get_option( 'time_format' ),
+
+				// UncannyAutomator._site.automator
+				'automator'           => array(
+					// UncannyAutomator._site.automator.version
+					'version'               => AUTOMATOR_PLUGIN_VERSION,
+
+					// UncannyAutomator._site.automator.has_pro
+					'has_pro'               => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ),
+
+					// UncannyAutomator._site.automator.version_pro
+					'version_pro'           => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ? AUTOMATOR_PRO_PLUGIN_VERSION : '',
+
+					// UncannyAutomator._site.automator.has_account_connected
+					'has_account_connected' => ( ! Api_Server::is_automator_connected( automator_filter_has_var( 'ua_connecting_integration' ) ) ? false : true ),
+
+					// UncannyAutomator._site.automator.has_valid_pro_license
+					'has_valid_pro_license' => ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === automator_get_option( 'uap_automator_pro_license_status' ) ),
+
+					// UncannyAutomator._site.automator.marketing_referer
+					'marketing_referer'     => automator_get_option( 'uncannyautomator_source', '' ),
+
+					// UncannyAutomator._site.automator.links
+					'links'                 => array(
+						// UncannyAutomator._site.automator.links.debugging_guide
+						'debugging_guide'    => 'https://automatorplugin.com/knowledge-base/troubleshooting-plugin-errors/?utm_source=uncanny_automator&utm_medium=recipe-wizard-error-modal&utm_content=learn-more-debugging',
+
+						// UncannyAutomator._site.automator.links.contact_support
+						'contact_support'    => add_query_arg(
+							array(
+								'utm_source'  => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ? 'uncanny_automator_pro' : 'uncanny_automator',
+								'utm_medium'  => 'error_handler',
+								'utm_content' => 'get_support_link',
+								'subject'     => 'technical-support',
+								'version'     => AUTOMATOR_PLUGIN_VERSION,
+								'site_url'    => get_site_url(),
+							),
+							'https://automatorplugin.com/automator-support/'
+						),
+
+						// UncannyAutomator._site.automator.links.loops_guide
+						'loops_guide'        => array(
+							// UncannyAutomator._site.automator.links.loops_guide.users_loops
+							'users_loops' => 'https://automatorplugin.com/knowledge-base/user-loops/',
+
+							// UncannyAutomator._site.automator.links.loops_guide.posts_loops
+							'posts_loops' => 'https://automatorplugin.com/knowledge-base/post-loops/',
+
+							// UncannyAutomator._site.automator.links.loops_guide.token_loops
+							'token_loops' => 'https://automatorplugin.com/knowledge-base/token-loops/',
+						),
+
+						'all_recipes'        => admin_url( 'edit.php?post_type=uo-recipe' ),
+
+						// UncannyAutomator._site.automator.links.tools
+						'tools'              => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-tools' ),
+
+						// UncannyAutomator._site.automator.links.manage_license
+						'manage_license'     => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=general&general=license' ),
+
+						// UncannyAutomator._site.automator.links.styles_for_tinymce
+						// TinyMCE needs the Automator styles to be loaded again inside the iframe
+						// of the "Visual" tab. For that, we need to define an array with the URLs
+						// of both Automator stylesheets
+						'styles_for_tinymce' => array(
+							add_query_arg( array( 'ver' => AUTOMATOR_PLUGIN_VERSION ), Utilities::automator_get_asset( 'backend/dist/main.bundle.min.css' ) ),
+							add_query_arg( array( 'ver' => AUTOMATOR_PLUGIN_VERSION ), Utilities::automator_get_recipe_dist( 'bundle.min.css' ) ),
+						),
+					),
+				),
+
+				// UncannyAutomator._site.links
+				'links'               => array(
+					// UncannyAutomator._site.links.wp_admin
+					'wp_admin'      => admin_url( 'admin.php' ),
+
+					// UncannyAutomator._site.links.wp_permalinks
+					'wp_permalinks' => esc_url( admin_url( 'options-permalink.php' ) ),
+				),
+
+				// UncannyAutomator._site.permalink_structure
+				'permalink_structure' => get_option( 'permalink_structure' ),
 			),
-			'isMultisite'         => ( is_multisite() ) ? true : false,
-			'integrations'        => Automator()->get_integrations(),
-			'triggers'            => Automator()->get_triggers(),
-			'actions'             => Automator()->get_actions(),
-			'closures'            => Automator()->get_closures(),
-			'i18n'                => Automator()->i18n->get_all(),
-			'recipes_object'      => Automator()->get_recipes_data( true, $post_id ),
-			'version'             => Utilities::automator_get_version(),
-			'proVersion'          => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ? AUTOMATOR_PRO_PLUGIN_VERSION : '',
-			'proFeatures'         => $this->get_pro_items(),
-			'recipe'              => array(
-				'id'               => $post_id,
-				'author'           => $post->post_author,
-				'status'           => $post->post_status,
-				'type'             => empty( $recipe_type ) ? null : $recipe_type,
-				'isLive'           => 'publish' === $post->post_status,
+
+			// UncannyAutomator._integrations
+			'_integrations'  => $integrations,
+
+			// UncannyAutomator._core
+			'_core'          => array(
+				// UncannyAutomator._core.i18n
+				'i18n' => Automator()->i18n->get_all(),
+			),
+
+			// TODO Move `triggers`, `actions` and `closures` inside `UncannyAutomator._core.integrations`
+			// UncannyAutomator.triggers
+			'triggers'       => array_values( Automator()->get_triggers() ),
+			// UncannyAutomator.actions
+			'actions'        => array_values( Automator()->get_actions() ),
+			// UncannyAutomator.closures
+			'closures'       => array_values( Automator()->get_closures() ),
+			// UncannyAutomator.pro_items
+			'pro_items'      => $this->get_pro_items(),
+
+			// TODO Remove once `UncannyAutomator._core.integrations is finished
+			// UncannyAutomator.integrations
+			'integrations'   => automator_array_merge( $_integrations, $_pro_only_items ),
+
+			// TODO Remove once the JS stops using both `recipes_object` and `recipe` objects
+			'recipes_object' => Automator()->get_recipes_data( true, $post_id ),
+			'recipe'         => array(
+				// UncannyAutomator.recipe.requiresUserData
 				'requiresUserData' => Automator()->get->get_recipe_requires_user( $post_id ),
+				// UncannyAutomator.recipe.errorMode
 				'errorMode'        => false,
-				'triggersLogic'    => $trigger_logic,
+				// UncannyAutomator.recipe.isValid
 				'isValid'          => false,
+				// UncannyAutomator.recipe.userSelector
 				'userSelector'     => array(
 					'source'    => $source,
 					'data'      => $fields,
@@ -533,49 +679,26 @@ class Recipe_Post_Utilities {
 						'roles' => $roles,
 					),
 				),
+				// UncannyAutomator.recipe.hasLive
 				'hasLive'          => array(
+					// UncannyAutomator.recipe.hasLive.trigger
 					'trigger' => false,
+					// UncannyAutomator.recipe.hasLive.action
 					'action'  => false,
+					// UncannyAutomator.recipe.hasLive.closure
 					'closure' => false,
 				),
+				// UncannyAutomator.recipe.message
 				'message'          => array(
+					// UncannyAutomator.recipe.message.error
 					'error'   => '',
+					// UncannyAutomator.recipe.message.warning
 					'warning' => '',
 				),
+				// UncannyAutomator.recipe.items
 				'items'            => array(),
-				'publish'          => array(
-					'timesPerUser'           => empty( $completions_allowed ) ? 1 : $completions_allowed,
-					'timesPerRecipe'         => empty( $max_completions_allowed ) ? '-1' : $max_completions_allowed,
-					'recipeRunTimes'         => $count,
-					'recipeRunTimesUrl'      => $url,
-					'recipeRunTimesViewLogs' => __( 'View logs', 'uncanny-automator' ),
-					'createdOn'              => date_i18n( 'M j, Y @ G:i', get_the_time( 'U', $post_id ) ),
-					'moveToTrash'            => get_delete_post_link( $post_id ),
-					'copyToDraft'            => sprintf( '%s?action=%s&post=%d&return_to_recipe=yes&_wpnonce=%s', admin_url( 'edit.php' ), 'copy_recipe_parts', $post_id, wp_create_nonce( 'Aut0Mat0R' ) ),
-				),
-			),
-			'isRTL'               => is_rtl(),
-			'format'              => array(
-				'date' => get_option( 'date_format' ),
-				'time' => get_option( 'time_format' ),
-			),
-			'connectApiUrl'       => sprintf( '%s%s?redirect_url=%s', AUTOMATOR_FREE_STORE_URL, AUTOMATOR_FREE_STORE_CONNECT_URL, rawurlencode( admin_url( 'admin.php?page=uncanny-automator-dashboard' ) ) ),
-			'dashboardUrl'        => admin_url( 'admin.php?page=uncanny-automator-dashboard' ),
-			'hasAccountConnected' => ( ! Api_Server::is_automator_connected() ? false : true ),
-			'hasValidProLicense'  => ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === get_option( 'uap_automator_pro_license_status' ) ),
-			'licenseUrl'          => admin_url( 'edit.php?post_type=uo-recipe&page=uncanny-automator-config&tab=general&general=license' ),
-			'marketing'           => array(
-				'utmR' => get_option( 'uncannyautomator_source', '' ),
-			),
-			'assets'              => array(
-				'global'        => array(
-					'style'  => Utilities::automator_get_asset( 'backend/dist/bundle.min.css' ),
-					'script' => Utilities::automator_get_asset( 'backend/dist/bundle.min.js' ),
-				),
-				'recipeBuilder' => array(
-					'style'  => Utilities::automator_get_recipe_dist( 'bundle.min.css' ),
-					'script' => Utilities::automator_get_recipe_dist( 'bundle.min.js' ),
-				),
+				// UncannyAutomator.recipe.publish
+				'publish'          => array(),
 			),
 		);
 
@@ -595,9 +718,57 @@ class Recipe_Post_Utilities {
 	}
 
 	/**
+	 * Check user progress for Create first recipe walkthrough.
+	 *
+	 * @param array $walkthroughs
+	 * @param int   $user_id
+	 * @param Automator_User_Walkthroughs $walkthroughs_object
+	 *
+	 * @return array
+	 */
+	public function should_show_create_recipe_walkthrough( $walkthroughs, $user_id, $walkthroughs_object ) {
+
+		$id = 'create-recipe';
+
+		// Check if progress has been set.
+		$create_progress = $walkthroughs_object->get_progress_by_id( $id, false );
+		if ( ! empty( $create_progress ) ) {
+			// If progress has already been set, return it with defaults parsed.
+			$walkthroughs[ $id ] = $walkthroughs_object->get_progress_by_id( $id );
+			return $walkthroughs;
+		}
+
+		// Check if current user has any published recipes.
+		$user_recipes = get_posts(
+			array(
+				'post_type' => 'uo-recipe',
+				'author'    => $user_id,
+				'status'    => 'publish',
+				'fields'    => 'ids',
+			)
+		);
+
+		// Set our progress to enabled.
+		$progress = array(
+			'show' => count( $user_recipes ) > 0 ? 0 : 1,
+			'step' => '',
+		);
+
+		// Save the progress so we don't run the checks every time.
+		$walkthroughs_object->set_progress_by_id( $id, $progress );
+
+		// Return walkthrough with enabled status.
+		$walkthroughs[ $id ] = $walkthroughs_object->get_progress_by_id( $id );
+
+		return $walkthroughs;
+	}
+
+	/**
 	 * Delete all children triggers and actions of recipe
 	 *
 	 * @param $post_ID
+	 *
+	 * @deprecated 4.15.2
 	 */
 	public function delete_triggers_actions( $post_ID ) {
 
@@ -827,8 +998,10 @@ class Recipe_Post_Utilities {
 				<?php
 				break;
 			case 'runs':
-				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed = %d", $post_id, 1 ) );
-				$url   = add_query_arg(
+				//$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(run_number) FROM {$wpdb->prefix}uap_recipe_log WHERE automator_recipe_id=%d AND completed = %d", $post_id, 1 ) );
+				$count = Automator()->utilities->get_recipe_total_runs( $post_id );
+
+				$url = add_query_arg(
 					array(
 						'post_type' => 'uo-recipe',
 						'page'      => 'uncanny-automator-admin-logs',
@@ -845,7 +1018,37 @@ class Recipe_Post_Utilities {
 			case 'recipe_status':
 				$post_status = get_post_status( $post_id );
 				echo 'publish' === $post_status ? '<span class="dashicons dashicons-yes-alt recipe-ui-dash" title="Live"></span>' . esc_html__( 'Live', 'uncanny-automator' ) : '<span class="dashicons dashicons-warning recipe-ui-dash" title="Draft"></span>' . esc_html__( 'Draft', 'uncanny-automator' );
+				break;
+			case 'recipe_notes':
+				$note_meta = get_post_meta( $post_id, 'uap_recipe_notes', true );
+				$notes     = '';
+				if ( ! empty( $note_meta ) ) {
+					// Limit the text 10 words.
+					$limited_text = wp_trim_words( $note_meta, 10, '...' );
+					$show_full    = strlen( $note_meta ) > strlen( $limited_text );
+					$limited_aria = $show_full ? 'false' : 'true';
 
+					// Create a wrapper.
+					$notes = '<div class="recipe-ui-list-notes__wrapper">';
+
+					// Add a span with the limited text.
+					$notes .= sprintf(
+						'<span class="recipe-ui-list-notes__limited" aria-hidden="%s">%s</span>',
+						esc_attr( $limited_aria ),
+						esc_html( $limited_text )
+					);
+
+					// Add another span with the full text (hidden by default).
+					if ( $show_full ) {
+						$notes .= sprintf(
+							'<span class="recipe-ui-list-notes__full" aria-hidden="false">%s</span>',
+							nl2br( esc_textarea( $note_meta ) )
+						);
+					}
+
+					$notes .= '</div>';
+				}
+				echo $notes;
 				break;
 		}
 	}
@@ -871,6 +1074,7 @@ class Recipe_Post_Utilities {
 				/* translators: The number of times a recipe was completed */
 				$new_columns['runs']          = esc_attr__( 'Completed runs', 'uncanny-automator' );
 				$new_columns['recipe_status'] = esc_attr__( 'Recipe status', 'uncanny-automator' );
+				$new_columns['recipe_notes']  = esc_attr__( 'Notes', 'uncanny-automator' );
 				$new_columns[ $key ]          = $column;
 
 			} else {

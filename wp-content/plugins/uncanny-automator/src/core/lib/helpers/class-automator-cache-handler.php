@@ -10,6 +10,14 @@ namespace Uncanny_Automator;
 class Automator_Cache_Handler {
 
 	/**
+	 *
+	 */
+	const OPTION_NAME = 'uncanny_automator_advanced_automator_cache';
+	/**
+	 * @var Automator_Cache_Handler
+	 */
+	public static $instance;
+	/**
 	 * @var mixed|void
 	 */
 	public $expires;
@@ -17,38 +25,14 @@ class Automator_Cache_Handler {
 	 * @var
 	 */
 	public $long_expires;
-
 	/**
 	 * @var string
 	 */
 	public $recipes_data = 'automator_recipes_data';
-
 	/**
 	 * @var string
 	 */
 	public $recipes = 'automator_recipes';
-
-	/**
-	 * @var Automator_Cache_Handler
-	 */
-	public static $instance;
-
-	/**
-	 *
-	 */
-	const OPTION_NAME = 'uncanny_automator_advanced_automator_cache';
-
-	/**
-	 * @return Automator_Cache_Handler
-	 */
-	public static function get_instance() {
-
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
 
 	/**
 	 * Cache_Handler constructor.
@@ -202,6 +186,18 @@ class Automator_Cache_Handler {
 	}
 
 	/**
+	 * @return Automator_Cache_Handler
+	 */
+	public static function get_instance() {
+
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * @param $post_id
 	 * @param $post
 	 * @param $update
@@ -294,6 +290,7 @@ class Automator_Cache_Handler {
 		$key = 'automator_recipe_data_of_' . $post_id;
 		$this->remove( $key );
 		$this->remove( 'get_recipe_type' );
+
 		do_action( 'automator_cache_clear_automator_recipe_part_cache', $post_id );
 	}
 
@@ -364,10 +361,10 @@ class Automator_Cache_Handler {
 	 * @param null|mixed $expires
 	 */
 	public function set( $key, $data, $group = 'automator', $expires = null ) {
-		// Allow users to disable cache
-		if ( false === (bool) $this->is_cache_enabled( $key ) ) {
-			return;
-		}
+		//      // Allow users to disable cache
+		//      if ( false === (bool) $this->is_cache_enabled( $key ) ) {
+		//          return;
+		//      }
 
 		if ( null === $expires ) {
 			$expires = $this->expires;
@@ -381,9 +378,9 @@ class Automator_Cache_Handler {
 	 *
 	 * @return bool|mixed
 	 */
-	public function get( $key, $group = 'automator' ) {
+	public function get( $key, $group = 'automator', $force = false ) {
 		// Allow users to disable cache
-		if ( false === (bool) $this->is_cache_enabled( $key ) ) {
+		if ( false === $force && false === (bool) $this->is_cache_enabled( $key ) ) {
 			return array();
 		}
 
@@ -402,12 +399,15 @@ class Automator_Cache_Handler {
 	 *
 	 */
 	public function remove_all() {
-		wp_cache_flush();
+
 		$this->remove( 'automator_integration_directories_loaded' );
 		$this->remove( 'automator_get_all_integrations' );
 		$this->remove( 'automator_actionified_triggers' );
 		$this->remove( $this->recipes_data );
 		$this->remove( 'get_recipe_type' );
+
+		automator_cache_delete_group( 'automator' );
+
 		do_action( 'automator_cache_remove_all' );
 	}
 
@@ -423,7 +423,7 @@ class Automator_Cache_Handler {
 		}
 		$this->remove_all();
 		add_action(
-			'admin_notices',
+			'automator_show_internal_admin_notice',
 			function () {
 				?>
 
@@ -563,7 +563,7 @@ class Automator_Cache_Handler {
 	 * @return mixed|void
 	 */
 	public function is_cache_enabled( $key = '' ) {
-		$value = get_option( self::OPTION_NAME, '' );
+		$value = automator_get_option( self::OPTION_NAME, '' );
 
 		if ( '' === (string) $value ) {
 			// Use filter to check if user has disabled object cache previously.

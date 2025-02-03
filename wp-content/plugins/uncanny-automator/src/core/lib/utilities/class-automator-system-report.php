@@ -12,6 +12,10 @@ class Automator_System_Report {
 	 * @var
 	 */
 	public static $instance;
+	/**
+	 * @var
+	 */
+	public $available_updates;
 
 	/**
 	 * @return Automator_System_Report
@@ -29,15 +33,21 @@ class Automator_System_Report {
 	 * @return array
 	 */
 	public function get() {
-		return array(
-			'automator_stats'    => $this->get_automator_stats(),
-			'environment'        => $this->get_environment_info(),
-			'database'           => $this->get_database_info(),
-			'active_plugins'     => $this->get_active_plugins(),
-			'inactive_plugins'   => $this->get_inactive_plugins(),
-			'dropins_mu_plugins' => $this->get_dropins_mu_plugins(),
-			'theme'              => $this->get_theme_info(),
+
+		$system_status = apply_filters(
+			'automator_system_report_get',
+			array(
+				'automator_stats'    => $this->get_automator_stats(),
+				'environment'        => $this->get_environment_info(),
+				'database'           => $this->get_database_info(),
+				'active_plugins'     => $this->get_active_plugins(),
+				'inactive_plugins'   => $this->get_inactive_plugins(),
+				'dropins_mu_plugins' => $this->get_dropins_mu_plugins(),
+				'theme'              => $this->get_theme_info(),
+			)
 		);
+
+		return $system_status;
 	}
 
 	/**
@@ -119,7 +129,7 @@ class Automator_System_Report {
 		if ( function_exists( 'memory_get_usage' ) ) {
 			$wp_memory_limit = max( $wp_memory_limit, $this->automator_string_to_num( @ini_get( 'memory_limit' ) ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		}
-
+		$automator_check_url = 'https://licensing.uncannyowl.com/automator-check?version=' . AUTOMATOR_PLUGIN_VERSION;
 		// Test POST requests.
 		$post_response_successful = null;
 		$post_response_code       = null;
@@ -128,13 +138,15 @@ class Automator_System_Report {
 
 			if ( false === $post_response_code || is_wp_error( $post_response_code ) ) {
 				$response = wp_safe_remote_post(
-					'https://automatorplugin.com/',
+					$automator_check_url,
 					array(
-						'timeout'     => 10,
-						'user-agent'  => 'Automator/' . AUTOMATOR_PLUGIN_VERSION,
-						'httpversion' => '1.1',
-						'body'        => array(
+						'timeout'    => 5,
+						'user-agent' => 'Automator/' . AUTOMATOR_PLUGIN_VERSION,
+						'body'       => array(
 							'cmd' => '_notify-validate',
+						),
+						'headers'    => array(
+							'X-UO-Destination' => 'ap',
 						),
 					)
 				);
@@ -154,7 +166,7 @@ class Automator_System_Report {
 			$get_response_code = get_transient( 'automator_test_remote_get' );
 
 			if ( false === $get_response_code || is_wp_error( $get_response_code ) ) {
-				$response = wp_safe_remote_get( 'https://automatorplugin.com/' );
+				$response = wp_safe_remote_get( $automator_check_url );
 				if ( ! is_wp_error( $response ) ) {
 					$get_response_code = $response['response']['code'];
 				}
@@ -165,12 +177,17 @@ class Automator_System_Report {
 		}
 
 		$database_version = $this->get_server_database_version();
+		$last_updated     = automator_get_option( 'automator_last_updated' );
+
+		if ( ! empty( $last_updated ) ) {
+			$last_updated = sprintf( '(Updated: %s)', $last_updated );
+		}
 
 		// Return all environment info. Described by JSON Schema.
 		return array(
 			'home_url'                => get_option( 'home' ),
 			'site_url'                => get_option( 'siteurl' ),
-			'version'                 => AUTOMATOR_PLUGIN_VERSION,
+			'version'                 => sprintf( '%s %s', AUTOMATOR_PLUGIN_VERSION, $last_updated ),
 			'pro_version'             => defined( 'AUTOMATOR_PRO_PLUGIN_VERSION' ) ? AUTOMATOR_PRO_PLUGIN_VERSION : null,
 			'log_directory'           => UA_DEBUG_LOGS_DIR,
 			'log_directory_writable'  => is_writable( dirname( UA_DEBUG_LOGS_DIR . 'test.log' ) ),
@@ -197,7 +214,8 @@ class Automator_System_Report {
 			'remote_get_successful'   => $get_response_successful,
 			'remote_get_response'     => is_wp_error( $get_response_code ) ? $get_response_code->get_error_message() : $get_response_code,
 			'automator_cache'         => Automator()->cache->is_cache_enabled(),
-			'automator_bg_processing' => '1' === get_option( Background_Actions::OPTION_NAME, '1' ) ? true : false,
+			'automator_bg_processing' => '1' === automator_get_option( Background_Actions::OPTION_NAME, '1' ) ? true : false,
+			'permalink_structure'     => get_option( 'permalink_structure' ),
 		);
 	}
 
@@ -215,10 +233,9 @@ class Automator_System_Report {
 		}
 
 		// phpcs:disable WordPress.DB.RestrictedFunctions, PHPCompatibility.Extensions.RemovedExtensions.mysql_DeprecatedRemoved
-		if ( $wpdb->use_mysqli ) {
+		$server_info = '"mysqli_get_server_info" does not exist.';
+		if ( \function_exists( 'mysqli_get_server_info' ) ) {
 			$server_info = mysqli_get_server_info( $wpdb->dbh );
-		} else {
-			$server_info = mysql_get_server_info( $wpdb->dbh );
 		}
 
 		// phpcs:enable WordPress.DB.RestrictedFunctions, PHPCompatibility.Extensions.RemovedExtensions.mysql_DeprecatedRemoved
@@ -294,15 +311,16 @@ class Automator_System_Report {
 		// It is not possible to get the database name from some classes that replace wpdb (e.g., HyperDB)
 		// and that is why this if condition is needed.
 		if ( defined( 'DB_NAME' ) ) {
+
 			$database_table_information = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT
-					    table_name AS 'name',
-						engine AS 'engine',
+					    TABLE_NAME AS 'name',
+						ENGINE AS 'engine',
 					    round( ( data_length / 1024 / 1024 ), 2 ) 'data',
 					    round( ( index_length / 1024 / 1024 ), 2 ) 'index'
 					FROM information_schema.TABLES
-					WHERE table_schema = %s
+					WHERE TABLE_SCHEMA = %s
 					ORDER BY name ASC;",
 					DB_NAME
 				)
@@ -312,18 +330,23 @@ class Automator_System_Report {
 			$core_tables = (object) apply_filters(
 				'automator_database_tables',
 				(object) array(
-					'recipe'       => 'uap_recipe_log',
-					'trigger'      => 'uap_trigger_log',
-					'trigger_meta' => 'uap_trigger_log_meta',
-					'action'       => 'uap_action_log',
-					'action_meta'  => 'uap_action_log_meta',
-					'closure'      => 'uap_closure_log',
-					'closure_meta' => 'uap_closure_log_meta',
-					'api'          => 'uap_api_log',
-					'recipe_logs'  => 'uap_recipe_logs_view',
-					'trigger_logs' => 'uap_trigger_logs_view',
-					'action_logs'  => 'uap_action_logs_view',
-					'api_logs'     => 'uap_api_logs_view',
+					'recipe_logs'       => 'uap_recipe_logs_view',
+					'trigger_logs'      => 'uap_trigger_logs_view',
+					'action_logs'       => 'uap_action_logs_view',
+					'api_logs'          => 'uap_api_logs_view',
+					'recipe'            => 'uap_recipe_log',
+					'recipe_meta'       => 'uap_recipe_log_meta',
+					'trigger'           => 'uap_trigger_log',
+					'trigger_meta'      => 'uap_trigger_log_meta',
+					'action'            => 'uap_action_log',
+					'action_meta'       => 'uap_action_log_meta',
+					'closure'           => 'uap_closure_log',
+					'closure_meta'      => 'uap_closure_log_meta',
+					'api'               => 'uap_api_log',
+					'api_response_logs' => 'uap_api_log_response',
+					'tokens_logs'       => 'uap_tokens_log',
+					'recipe_count'      => 'uap_recipe_count',
+					'automator_options' => 'uap_options',
 				)
 			);
 
@@ -350,35 +373,46 @@ class Automator_System_Report {
 			);
 
 			$site_tables_prefix = $wpdb->get_blog_prefix( get_current_blog_id() );
-			$global_tables      = $wpdb->tables( 'global', true );
-			foreach ( $database_table_information as $table ) {
-				// Only include tables matching the prefix of the current site, this is to prevent displaying all tables on a MS install not relating to the current.
-				if ( is_multisite() && 0 !== strpos( $table->name, $site_tables_prefix ) && ! in_array( $table->name, $global_tables, true ) ) {
-					continue;
-				}
-				$table_type = in_array( $table->name, $core_tables, true ) ? 'automator' : 'other';
 
-				$tables[ $table_type ][ $table->name ] = array(
-					'data'   => $table->data,
-					'index'  => $table->index,
-					'engine' => $table->engine,
+			$global_tables = $wpdb->tables( 'global', true );
+
+			foreach ( $database_table_information as $table ) {
+
+				$table_name   = isset( $table->name ) ? $table->name : null;
+				$table_index  = isset( $table->index ) ? $table->index : null;
+				$table_engine = isset( $table->engine ) ? $table->engine : null;
+				$table_data   = isset( $table->data ) ? $table->data : null;
+
+				// Only include tables matching the prefix of the current site, this is to prevent displaying all tables on a MS install not relating to the current.
+				if ( is_multisite() && 0 !== strpos( $table_name, $site_tables_prefix ) && ! in_array( $table_name, $global_tables, true ) ) {
+					continue; // skip
+				}
+
+				$table_type = in_array( $table_name, $core_tables, true ) ? 'automator' : 'other';
+
+				$tables[ $table_type ][ $table_name ] = array(
+					'data'   => $table_data,
+					'index'  => $table_index,
+					'engine' => $table_engine,
 				);
 
-				$database_size['data']  += $table->data;
-				$database_size['index'] += $table->index;
+				$database_size['data']  += $table_data;
+				$database_size['index'] += $table_index;
+
 			}
 		}
 
 		// Return all database info. Described by JSON Schema.
 		return array(
-			'automator_database_version'                => get_option( 'uap_database_version' ),
+			'automator_database_version'                => automator_get_option( 'uap_database_version' ),
 			'automator_database_available_version'      => AUTOMATOR_DATABASE_VERSION,
-			'automator_database_views_version'          => get_option( 'uap_database_views_version' ),
+			'automator_database_views_version'          => automator_get_option( 'uap_database_views_version' ),
 			'automator_database_available_view_version' => AUTOMATOR_DATABASE_VIEWS_VERSION,
 			'database_prefix'                           => $wpdb->prefix,
 			'database_tables'                           => $tables,
 			'database_size'                             => $database_size,
 		);
+
 	}
 
 	/**
@@ -407,6 +441,38 @@ class Automator_System_Report {
 		}
 
 		return $active_plugins_data;
+	}
+
+	/**
+	 * Get the total sizes of the table.
+	 *
+	 * @return float
+	 */
+	public static function get_tables_total_size() {
+
+		global $wpdb;
+
+		$sum = 0;
+
+		$tables = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS `size_mb`
+					FROM information_schema.TABLES
+				WHERE TABLE_SCHEMA = %s
+				AND TABLE_NAME like '%uap%' AND TABLE_NAME NOT LIKE '%_view'
+				ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC;
+				",
+				DB_NAME
+			),
+			ARRAY_A
+		);
+
+		foreach ( $tables as $table ) {
+			$sum += floatval( $table['size_mb'] );
+		}
+
+		return round( $sum, 2 );
+
 	}
 
 	/**
@@ -586,6 +652,14 @@ class Automator_System_Report {
 	 * @return array
 	 */
 	public function get_automator_stats() {
+
+		if (
+			// Disable in Status > Tools page.
+			'uncanny-automator-admin-tools' === filter_input( INPUT_GET, 'page' )
+			&& 'tools' === filter_input( INPUT_GET, 'tab' ) ) {
+			return;
+		}
+
 		if ( ! class_exists( '\Uncanny_Automator\Admin_Menu' ) ) {
 			include_once UA_ABSPATH . 'src/core/admin/class-admin-menu.php';
 		}

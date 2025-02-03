@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogDataSourceFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDataSourceIngestionSourceTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDataSourceIngestionSo
  * pull request for this class.
  *
  */
-class ProductCatalogDataSource extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return ProductCatalogDataSourceFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogDataSourceFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['IngestionSourceType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDataSourceIngestionSourceTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class ProductCatalogDataSource extends AbstractCrudObject {
+
+  /**
+   * @return ProductCatalogDataSourceFields
+   */
+  public static function getFieldsEnum() {
+    return ProductCatalogDataSourceFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['IngestionSourceType'] = ProductCatalogDataSourceIngestionSourceTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

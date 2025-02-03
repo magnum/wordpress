@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductCatalogDataSourceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP_ID = 'app_id';
-    const ID = 'id';
-    const INGESTION_SOURCE_TYPE = 'ingestion_source_type';
-    const NAME = 'name';
-    const UPLOAD_TYPE = 'upload_type';
-    public function getFieldTypes()
-    {
-        return array('app_id' => 'string', 'id' => 'string', 'ingestion_source_type' => 'string', 'name' => 'string', 'upload_type' => 'string');
-    }
+
+class ProductCatalogDataSourceFields extends AbstractEnum {
+
+  const APP_ID = 'app_id';
+  const ID = 'id';
+  const INGESTION_SOURCE_TYPE = 'ingestion_source_type';
+  const NAME = 'name';
+  const UPLOAD_TYPE = 'upload_type';
+
+  public function getFieldTypes() {
+    return array(
+      'app_id' => 'string',
+      'id' => 'string',
+      'ingestion_source_type' => 'string',
+      'name' => 'string',
+      'upload_type' => 'string',
+    );
+  }
 }

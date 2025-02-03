@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PageCategoryFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const API_ENUM = 'api_enum';
-    const FB_PAGE_CATEGORIES = 'fb_page_categories';
-    const ID = 'id';
-    const NAME = 'name';
-    public function getFieldTypes()
-    {
-        return array('api_enum' => 'string', 'fb_page_categories' => 'list<PageCategory>', 'id' => 'string', 'name' => 'string');
-    }
+
+class PageCategoryFields extends AbstractEnum {
+
+  const API_ENUM = 'api_enum';
+  const FB_PAGE_CATEGORIES = 'fb_page_categories';
+  const ID = 'id';
+  const NAME = 'name';
+
+  public function getFieldTypes() {
+    return array(
+      'api_enum' => 'string',
+      'fb_page_categories' => 'list<PageCategory>',
+      'id' => 'string',
+      'name' => 'string',
+    );
+  }
 }

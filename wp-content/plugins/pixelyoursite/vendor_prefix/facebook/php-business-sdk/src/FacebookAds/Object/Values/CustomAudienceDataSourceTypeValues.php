@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CustomAudienceDataSourceTypeValues getInstance()
  */
-class CustomAudienceDataSourceTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONTACT_IMPORTER = 'CONTACT_IMPORTER';
-    const COPY_PASTE = 'COPY_PASTE';
-    const EVENT_BASED = 'EVENT_BASED';
-    const FILE_IMPORTED = 'FILE_IMPORTED';
-    const HOUSEHOLD_AUDIENCE = 'HOUSEHOLD_AUDIENCE';
-    const SEED_BASED = 'SEED_BASED';
-    const THIRD_PARTY_IMPORTED = 'THIRD_PARTY_IMPORTED';
-    const UNKNOWN = 'UNKNOWN';
+class CustomAudienceDataSourceTypeValues extends AbstractEnum {
+
+  const CONTACT_IMPORTER = 'CONTACT_IMPORTER';
+  const COPY_PASTE = 'COPY_PASTE';
+  const EVENT_BASED = 'EVENT_BASED';
+  const FILE_IMPORTED = 'FILE_IMPORTED';
+  const HOUSEHOLD_AUDIENCE = 'HOUSEHOLD_AUDIENCE';
+  const SEED_BASED = 'SEED_BASED';
+  const THIRD_PARTY_IMPORTED = 'THIRD_PARTY_IMPORTED';
+  const UNKNOWN = 'UNKNOWN';
 }

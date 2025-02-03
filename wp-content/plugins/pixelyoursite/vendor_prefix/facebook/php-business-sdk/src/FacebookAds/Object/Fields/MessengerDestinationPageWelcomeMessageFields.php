@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class MessengerDestinationPageWelcomeMessageFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const PAGE_WELCOME_MESSAGE_BODY = 'page_welcome_message_body';
-    const PAGE_WELCOME_MESSAGE_TYPE = 'page_welcome_message_type';
-    const TEMPLATE_NAME = 'template_name';
-    const TIME_CREATED = 'time_created';
-    const TIME_LAST_USED = 'time_last_used';
-    public function getFieldTypes()
-    {
-        return array('id' => 'string', 'page_welcome_message_body' => 'string', 'page_welcome_message_type' => 'string', 'template_name' => 'string', 'time_created' => 'datetime', 'time_last_used' => 'datetime');
-    }
+
+class MessengerDestinationPageWelcomeMessageFields extends AbstractEnum {
+
+  const ID = 'id';
+  const PAGE_WELCOME_MESSAGE_BODY = 'page_welcome_message_body';
+  const PAGE_WELCOME_MESSAGE_TYPE = 'page_welcome_message_type';
+  const TEMPLATE_NAME = 'template_name';
+  const TIME_CREATED = 'time_created';
+  const TIME_LAST_USED = 'time_last_used';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'string',
+      'page_welcome_message_body' => 'string',
+      'page_welcome_message_type' => 'string',
+      'template_name' => 'string',
+      'time_created' => 'datetime',
+      'time_last_used' => 'datetime',
+    );
+  }
 }

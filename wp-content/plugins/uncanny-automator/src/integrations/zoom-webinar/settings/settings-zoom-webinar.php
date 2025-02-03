@@ -32,10 +32,6 @@ class Zoom_Webinar_Settings extends Settings\Premium_Integration_Settings {
 
 		$this->set_name( 'Zoom Webinars' );
 
-		$this->register_option( 'uap_automator_zoom_webinar_api_consumer_key' );
-		$this->register_option( 'uap_automator_zoom_webinar_api_consumer_secret' );
-		$this->register_option( 'uap_automator_zoom_webinar_api_settings_timestamp' );
-
 		$this->register_option( 'uap_automator_zoom_webinar_api_account_id' );
 		$this->register_option( 'uap_automator_zoom_webinar_api_client_id' );
 		$this->register_option( 'uap_automator_zoom_webinar_api_client_secret' );
@@ -46,7 +42,11 @@ class Zoom_Webinar_Settings extends Settings\Premium_Integration_Settings {
 
 	public function get_status() {
 
-		$user = get_option( 'uap_zoom_webinar_api_connected_user', array() );
+		if ( $this->helpers->legacy_client_connected() ) {
+			$this->helpers->delete_options();
+		}
+
+		$user = automator_get_option( 'uap_zoom_webinar_api_connected_user', array() );
 
 		return ! empty( $user['email'] ) ? 'success' : '';
 	}
@@ -58,20 +58,14 @@ class Zoom_Webinar_Settings extends Settings\Premium_Integration_Settings {
 	 */
 	public function output() {
 
-		$this->api_key    = trim( get_option( 'uap_automator_zoom_webinar_api_consumer_key', '' ) );
-		$this->api_secret = trim( get_option( 'uap_automator_zoom_webinar_api_consumer_secret', '' ) );
-		$this->account_id = '';
-
-		if ( '3' === get_option( 'uap_automator_zoom_webinar_api_settings_version', false ) ) {
-			$this->account_id = trim( get_option( 'uap_automator_zoom_webinar_api_account_id', '' ) );
-			$this->api_key    = trim( get_option( 'uap_automator_zoom_webinar_api_client_id', '' ) );
-			$this->api_secret = trim( get_option( 'uap_automator_zoom_webinar_api_client_secret', '' ) );
-		}
+		$this->account_id = trim( automator_get_option( 'uap_automator_zoom_webinar_api_account_id', '' ) );
+		$this->api_key    = trim( automator_get_option( 'uap_automator_zoom_webinar_api_client_id', '' ) );
+		$this->api_secret = trim( automator_get_option( 'uap_automator_zoom_webinar_api_client_secret', '' ) );
 
 		$this->user = false;
 
 		if ( ! empty( $this->api_key ) && ! empty( $this->api_secret ) ) {
-			$this->user = get_option( 'uap_zoom_webinar_api_connected_user', array() );
+			$this->user = automator_get_option( 'uap_zoom_webinar_api_connected_user', array() );
 		}
 
 		$this->is_connected = false;
@@ -82,17 +76,6 @@ class Zoom_Webinar_Settings extends Settings\Premium_Integration_Settings {
 
 		$disconnect_url = $this->helpers->disconnect_url();
 
-		if ( automator_filter_input( 'automator_zoom_webinar_jwt' ) ) {
-			include_once 'view-zoom-webinar-v2.php';
-			return;
-		}
-
-		// If old JWT app is connected, show old settings
-		if ( $this->helpers->jwt_mode() && $this->is_connected ) {
-			include_once 'view-zoom-webinar-v2.php';
-			return;
-		}
-
 		include_once 'view-zoom-webinar-v3.php';
 
 	}
@@ -101,8 +84,8 @@ class Zoom_Webinar_Settings extends Settings\Premium_Integration_Settings {
 
 		try {
 
-			delete_option( 'uap_zoom_webinar_api_connected_user' );
-			delete_option( '_uncannyowl_zoom_webinar_settings' );
+			automator_delete_option( 'uap_zoom_webinar_api_connected_user' );
+			automator_delete_option( '_uncannyowl_zoom_webinar_settings' );
 
 			$this->user = $this->helpers->api_get_user_info();
 

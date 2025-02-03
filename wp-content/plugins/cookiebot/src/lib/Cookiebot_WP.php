@@ -3,15 +3,18 @@
 namespace cybot\cookiebot\lib;
 
 use cybot\cookiebot\addons\Cookiebot_Addons;
-use cybot\cookiebot\admin_notices\Cookiebot_Recommendation_Notice;
+use cybot\cookiebot\admin_notices\Cookiebot_Notices;
 use cybot\cookiebot\gutenberg\Cookiebot_Gutenberg_Declaration_Block;
 use cybot\cookiebot\settings\Menu_Settings;
 use cybot\cookiebot\settings\Network_Menu_Settings;
+use cybot\cookiebot\shortcode\Cookiebot_Embedding_Shortcode;
 use cybot\cookiebot\widgets\Dashboard_Widget_Cookiebot_Status;
+use DomainException;
 use RuntimeException;
 
 class Cookiebot_WP {
-	const COOKIEBOT_PLUGIN_VERSION  = '4.2.4';
+
+	const COOKIEBOT_PLUGIN_VERSION  = '4.4.1';
 	const COOKIEBOT_MIN_PHP_VERSION = '5.6.0';
 
 	/**
@@ -49,8 +52,7 @@ class Cookiebot_WP {
 	 */
 	public function __construct() {
 		$this->throw_exception_if_php_version_is_incompatible();
-
-		add_action( 'after_setup_theme', array( $this, 'cookiebot_init' ), 5 );
+		$this->cookiebot_init();
 		register_activation_hook( __FILE__, array( new Cookiebot_Activated(), 'run' ) );
 		register_deactivation_hook( __FILE__, array( new Cookiebot_Deactivated(), 'run' ) );
 	}
@@ -65,36 +67,34 @@ class Cookiebot_WP {
 				__( 'The Cookiebot plugin requires PHP version %s or greater.', 'cookiebot' ),
 				self::COOKIEBOT_MIN_PHP_VERSION
 			);
-			throw new RuntimeException( $message );
+			throw new DomainException( $message );
 		}
 	}
 
 	public function cookiebot_init() {
 		Cookiebot_Addons::instance();
-		load_textdomain(
-			'cookiebot',
-			CYBOT_COOKIEBOT_PLUGIN_DIR . 'langs/cookiebot-' . get_locale() . '.mo'
-		);
-		load_plugin_textdomain( 'cookiebot', false, dirname( plugin_basename( __FILE__ ) ) . '/langs' );
+		add_action( 'init', array( $this, 'cookiebot_load_textdomain' ) );
 
 		if ( is_admin() ) {
 			( new Menu_Settings() )->add_menu();
-			if ( is_multisite() ) {
+			if ( is_multisite() && is_plugin_active_for_network( 'cookiebot/cookiebot.php' ) ) {
 				( new Network_Menu_Settings() )->add_menu();
 			}
 			( new Dashboard_Widget_Cookiebot_Status() )->register_hooks();
-			( new Cookiebot_Recommendation_Notice() )->register_hooks();
+			( new Cookiebot_Notices() )->register_hooks();
+			( new Cookiebot_Review() )->register_hooks();
 		}
 
 		( new Consent_API_Helper() )->register_hooks();
 		( new Cookiebot_Javascript_Helper() )->register_hooks();
+		( new Cookiebot_Embedding_Shortcode() )->register_hooks();
 		( new Cookiebot_Automatic_Updates() )->register_hooks();
 		( new Widgets() )->register_hooks();
 		( new Cookiebot_Gutenberg_Declaration_Block() )->register_hooks();
 		( new WP_Rocket_Helper() )->register_hooks();
 
-		$this->set_consent_mode_default();
-		add_filter( 'plugin_action_links_cookiebot/cookiebot.php', array( $this, 'set_settings_action_link' ) );
+		$this->set_default_options();
+		( new Cookiebot_Admin_Links() )->register_hooks();
 	}
 
 	/**
@@ -106,21 +106,30 @@ class Cookiebot_WP {
 	 * @version 3.4.1
 	 */
 	public static function can_current_user_edit_theme() {
-		if ( is_user_logged_in() ) {
-			if ( current_user_can( 'edit_themes' ) ) {
-				return true;
-			}
-
-			if ( current_user_can( 'edit_pages' ) ) {
-				return true;
-			}
-
-			if ( current_user_can( 'edit_posts' ) ) {
-				return true;
-			}
+		if ( is_user_logged_in() &&
+			(
+				current_user_can( 'edit_themes' ) ||
+				current_user_can( 'edit_pages' ) ||
+				current_user_can( 'edit_posts' )
+			)
+		) {
+			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Loads translations textdomain
+	 *
+	 * @return void
+	 */
+	public function cookiebot_load_textdomain() {
+		load_textdomain(
+			'cookiebot',
+			CYBOT_COOKIEBOT_PLUGIN_DIR . 'langs/cookiebot-' . get_locale() . '.mo'
+		);
+		load_plugin_textdomain( 'cookiebot', false, dirname( plugin_basename( __FILE__ ) ) . '/langs' );
 	}
 
 	/**
@@ -136,46 +145,122 @@ class Cookiebot_WP {
 	/**
 	 * @return string
 	 */
+	public static function get_network_cbid() {
+		return get_site_option( 'cookiebot-cbid', '' );
+	}
+
+	/**
+	 * @return string
+	 */
 	public static function get_cookie_blocking_mode() {
 		$allowed_modes   = array( 'auto', 'manual' );
 		$network_setting = (string) get_site_option( 'cookiebot-cookie-blocking-mode', 'manual' );
-		$setting         = (string) get_option( 'cookiebot-cookie-blocking-mode', $network_setting );
+		$setting         = $network_setting === 'manual' ?
+			(string) get_option( 'cookiebot-cookie-blocking-mode', $network_setting ) :
+			$network_setting;
 
 		return in_array( $setting, $allowed_modes, true ) ? $setting : 'manual';
 	}
 
 	/**
+	 * @return bool
+	 */
+	public static function check_network_auto_blocking_mode() {
+		$network_setting = (string) get_site_option( 'cookiebot-cookie-blocking-mode' );
+
+		return $network_setting === 'auto' ? true : false;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_cookie_categories_status() {
+		return self::get_cookie_blocking_mode() === 'auto' ? 'disabled' : '';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function is_cookie_category_selected( $option, $category ) {
+		$categories = get_option( $option );
+		if ( ! $categories || ! is_array( $categories ) ) {
+			return false;
+		}
+
+		return in_array( $category, $categories, true );
+	}
+
+	/**
 	 * Cookiebot_WP Check if Cookiebot is active in admin
 	 *
-	 * @version 3.1.0
+	 * @version 4.2.8
 	 * @since       3.1.0
 	 */
 	public static function cookiebot_disabled_in_admin() {
-		if ( is_multisite() && get_site_option( 'cookiebot-nooutput-admin', false ) ) {
-			return true;
-		} elseif ( get_option( 'cookiebot-nooutput-admin', false ) ) {
+		if ( ( is_network_admin() && get_site_option( 'cookiebot-nooutput-admin', false ) ) ||
+			( ! is_network_admin() && get_site_option( 'cookiebot-nooutput-admin', false ) ) ||
+			( ! is_network_admin() && get_option( 'cookiebot-nooutput-admin', false ) ) ) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private function set_consent_mode_default() {
-		if ( ! get_option( 'cookiebot-gcm' ) && ! get_option( 'cookiebot-gcm-first-run' ) ) {
-			update_option( 'cookiebot-gcm', '1' );
+	/**
+	 * Cookiebot_WP Set default options
+	 *
+	 * @version 4.2.5
+	 * @since       4.2.5
+	 */
+	private function set_default_options() {
+		$options = array(
+			'cookiebot-nooutput-admin' => '1',
+			'cookiebot-gcm'            => '1',
+		);
+
+		foreach ( $options as $option => $default ) {
+			if ( get_option( $option ) === false && ! get_option( $option . self::OPTION_FIRST_RUN_SUFFIX ) ) {
+				update_option( $option, $default );
+			}
+
+			if ( ( get_option( $option ) || get_option( $option ) !== false ) && ! get_option( $option . self::OPTION_FIRST_RUN_SUFFIX ) ) {
+				update_option( $option . self::OPTION_FIRST_RUN_SUFFIX, '1' );
+			}
 		}
 
-		if ( get_option( 'cookiebot-gcm' ) && ! get_option( 'cookiebot-gcm-first-run' ) ) {
-			update_option( 'cookiebot-gcm', '1' );
-			update_option( 'cookiebot-gcm-first-run', '1' );
+		self::set_tcf_version();
+	}
+
+	private static function set_tcf_version() {
+		$iab_version = get_option( 'cookiebot-tcf-version' );
+		if ( empty( $iab_version ) || $iab_version === 'IAB' ) {
+			update_option( 'cookiebot-tcf-version', 'TCFv2.2' );
 		}
 	}
 
 	public function set_settings_action_link( $actions ) {
 		$cblinks = array(
-			'<a href="' . admin_url( 'admin.php?page=cookiebot' ) . '">' . esc_html__( 'Dashboard', 'cookiebot' ) . '</a>',
+			'<a href="' . esc_url( add_query_arg( 'page', 'cookiebot', admin_url( 'admin.php' ) ) ) . '">' . esc_html__( 'Dashboard', 'cookiebot' ) . '</a>',
 		);
 		$actions = array_merge( $actions, $cblinks );
 		return $actions;
 	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_manager_language() {
+		$locale          = get_locale();
+		$supported_langs = array(
+			'de_DE' => 'de',
+			'da_DK' => 'da',
+			'fr_FR' => 'fr',
+			'it_IT' => 'it',
+			'es_ES' => 'es',
+		);
+
+		return array_key_exists( $locale, $supported_langs ) ? $supported_langs[ $locale ] : esc_html( 'en' );
+	}
+
+	const OPTION_FIRST_RUN_SUFFIX = '-first-run';
 }

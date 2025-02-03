@@ -174,22 +174,38 @@ class MAILPOET_ADDSUBSCRIBERTOLIST_A {
 			'schedule_welcome_email'  => true,
 		);
 
+		$existing_subscriber = false;
+
 		try {
 			// try to find if user is already a subscriber
-			$existing_subscriber = \MailPoet\Models\Subscriber::findOne( $subscriber['email'] );
+			$existing_subscriber = $mailpoet->getSubscriber( $subscriber['email'] );
+		} catch ( \MailPoet\API\MP\v1\APIException $e ) {
+			 // Complete with error if the Exception is not that the subscriber does not exist.
+			if ( $e->getCode() !== \MailPoet\API\MP\v1\APIException::SUBSCRIBER_NOT_EXISTS ) {
+				$error_message                       = $e->getMessage();
+				$action_data['complete_with_errors'] = true;
+				Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
+				return;
+			}
+		}
+
+		try {
+			// If the subscriber does not exist, add them.
 			if ( ! $existing_subscriber ) {
 				$new_subscriber = $mailpoet->addSubscriber( $subscriber );
 				$subscriber_id  = $new_subscriber['id'];
 			} else {
-				$subscriber_id = $existing_subscriber->id;
+				$subscriber_id = $existing_subscriber['id'];
 			}
 			if ( false === $disable_confirmation_email ) {
 				$this->update_status_manually( $subscriber['status'], $subscriber_id );
 			}
+
 			/**
 			 * Adding a cron here so that the
 			 * status 'subscribed' is properly delegated.
 			 * Else Welcome Emails linked to the list aren't sent.
+			 *
 			 * @since 4.7
 			 */
 			$rr = wp_schedule_single_event(
@@ -205,13 +221,16 @@ class MAILPOET_ADDSUBSCRIBERTOLIST_A {
 				),
 				true
 			);
+
+			// Complete the action with notice while Cron is processing it.
+			$action_data['complete_with_notice'] = true;
+			Automator()->complete->action( $user_id, $action_data, $recipe_id, _x( 'Waiting for the action to be completed', 'MailPoet action status', 'uncanny-automator' ) );
+
 		} catch ( \MailPoet\API\MP\v1\APIException $e ) {
 			$error_message                       = $e->getMessage();
-			$action_data['do-nothing']           = true;
 			$action_data['complete_with_errors'] = true;
 			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
 		}
-
 	}
 
 	/**
@@ -248,7 +267,6 @@ class MAILPOET_ADDSUBSCRIBERTOLIST_A {
 			Automator()->complete->action( $user_id, $action_data, $recipe_id );
 		} catch ( \MailPoet\API\MP\v1\APIException $e ) {
 			$error_message                       = $e->getMessage();
-			$action_data['do-nothing']           = true;
 			$action_data['complete_with_errors'] = true;
 			Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
 		}

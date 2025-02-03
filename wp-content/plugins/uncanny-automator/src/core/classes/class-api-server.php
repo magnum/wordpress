@@ -2,6 +2,8 @@
 
 namespace Uncanny_Automator;
 
+use Exception;
+
 /**
  * Class Api.
  *
@@ -9,13 +11,40 @@ namespace Uncanny_Automator;
  */
 class Api_Server {
 
+	/**
+	 * @var string The key used for marking the failed license.
+	 */
+	const TRANSIENT_LICENSE_CHECK_FAILED = 'automator_license_check_failed';
+
+	/**
+	 * @var int The frequency of license check.
+	 */
+	private static $transient_api_license_expires = 60; // 1 minute by default.
+
+	/**
+	 * @var mixed|null
+	 */
 	public static $url;
 
+	/**
+	 * @var null
+	 */
 	public static $mock_response = null;
 
+	/**
+	 * @var null
+	 */
 	private static $instance = null;
 
+	/**
+	 * @var null
+	 */
 	private static $license = null;
+
+	/**
+	 * @var mixed
+	 */
+	public static $last_response = array();
 
 	/**
 	 * __construct
@@ -26,11 +55,24 @@ class Api_Server {
 
 		self::$url = apply_filters( 'automator_api_url', AUTOMATOR_API_URL );
 
+		/**
+		 * Set the cache expiry to 12 hours. The nightly check is 24 hours. This is a
+		 * safe number so the license check is atleast performed twice a day. One when actively
+		 * editing the recipe page, and two, when nightly checks are made.
+		 */
+		self::$transient_api_license_expires = HOUR_IN_SECONDS * 12;
+
 		add_filter( 'http_request_args', array( $this, 'add_api_headers' ), 10, 2 );
+		add_filter( 'http_request_timeout', array( $this, 'default_api_timeout' ), 10, 2 );
 		add_filter( 'automator_trigger_should_complete', array( $this, 'maybe_log_trigger' ), 10, 3 );
 
 	}
 
+	/**
+	 * @param $instance
+	 *
+	 * @return void
+	 */
 	public static function set_instance( $instance ) {
 		self::$instance = $instance;
 	}
@@ -60,20 +102,50 @@ class Api_Server {
 	 */
 	public function add_api_headers( $args, $request_url ) {
 
+		// If the request URL starts with the Automator API url
+		if ( ! $this->is_api_url( $request_url ) ) {
+			return $args;
+		}
+
 		$license_key = self::get_license_key();
 
 		if ( ! $license_key ) {
 			return $args;
 		}
 
-		// If the request URL starts with the Automator API url
-		if ( substr( $request_url, 0, strlen( self::$url ) ) === self::$url ) {
-			$args['headers']['license-key'] = $license_key;
-			$args['headers']['site-name']   = self::get_site_name();
-			$args['headers']['item-name']   = self::get_item_name();
-		}
+		$args['headers']['license-key'] = $license_key;
+		$args['headers']['site-name']   = self::get_site_name();
+		$args['headers']['item-name']   = self::get_item_name();
 
 		return $args;
+	}
+
+	/**
+	 * is_api_url
+	 *
+	 * @param mixed $url
+	 *
+	 * @return bool
+	 */
+	public function is_api_url( $url ) {
+		return substr( $url, 0, strlen( self::$url ) ) === self::$url;
+	}
+
+	/**
+	 * default_api_timeout
+	 *
+	 * @param mixed $timeout
+	 * @param mixed $request_url
+	 *
+	 * @return int
+	 */
+	public function default_api_timeout( $timeout, $request_url ) {
+
+		if ( ! $this->is_api_url( $request_url ) ) {
+			return $timeout;
+		}
+
+		return apply_filters( 'automator_api_timeout', 30, $request_url );
 	}
 
 	/**
@@ -82,9 +154,9 @@ class Api_Server {
 	 * @return string
 	 */
 	public static function get_license_type() {
-		if ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === get_option( 'uap_automator_pro_license_status' ) ) {
+		if ( defined( 'AUTOMATOR_PRO_FILE' ) && 'valid' === automator_get_option( 'uap_automator_pro_license_status' ) ) {
 			return 'pro';
-		} elseif ( 'valid' === get_option( 'uap_automator_free_license_status' ) ) {
+		} elseif ( 'valid' === automator_get_option( 'uap_automator_free_license_status' ) ) {
 			return 'free';
 		}
 
@@ -99,7 +171,7 @@ class Api_Server {
 	public static function get_license_key() {
 		$license_type = self::get_license_type();
 
-		return get_option( 'uap_automator_' . $license_type . '_license_key' );
+		return automator_get_option( 'uap_automator_' . $license_type . '_license_key' );
 	}
 
 	/**
@@ -183,9 +255,13 @@ class Api_Server {
 	 * @param string $endpoint
 	 * @param array $body
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public static function api_call( $params ) {
+
+		if ( true === AUTOMATOR_DISABLE_APP_INTEGRATION_REQUESTS ) {
+			throw new Exception( 'App integrations have been disabled in wp-config.php.', 500 );
+		}
 
 		$api = self::get_instance();
 
@@ -205,7 +281,7 @@ class Api_Server {
 
 		$params['method']             = 'POST';
 		$params['url']                = self::$url . $params['endpoint'];
-		$params['body']['plugin_ver'] = InitializePlugin::PLUGIN_VERSION;
+		$params['body']['plugin_ver'] = AUTOMATOR_PLUGIN_VERSION;
 
 		$params = $api->filter_params( $params );
 
@@ -220,13 +296,7 @@ class Api_Server {
 			throw new \Exception( 'Unrecognized API response', 500 );
 		}
 
-		if ( array_key_exists( 'data', $response_body ) ) {
-			return $response_body;
-		}
-
-		automator_log( var_export( $response_body, true ), 'Empty API response: ' ); //phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
-
-		throw new \Exception( 'API returned an empty response with error code ' . $response_body['statusCode'], $response_body['statusCode'] );
+		return $response_body;
 	}
 
 	/**
@@ -294,31 +364,36 @@ class Api_Server {
 
 		$time_before = microtime( true );
 
-		$response = wp_remote_request(
+		self::$last_response = wp_remote_request(
 			$params['url'],
 			$request
 		);
+
+		self::$last_response = apply_filters( 'automator_api_last_response', self::$last_response, $request, $params );
+
+		do_action( 'automator_api_response', self::$last_response, $request, $params );
 
 		$time_spent = round( ( microtime( true ) - $time_before ) * 1000 );
 
 		$params['time_spent'] = $time_spent;
 
-		$api->maybe_log_action( $params, $request, $response );
+		$api_log_id = $api->maybe_log_action( $params, $request, self::$last_response );
 
-		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'WordPress was not able to make a request: ' . $response->get_error_message(), 500 );
+		if ( is_wp_error( self::$last_response ) ) {
+			throw new \Exception( 'WordPress was not able to make a request: ' . self::$last_response->get_error_message(), 500 );
 		}
 
-		return $response;
+		self::$last_response['api_log_id'] = $api_log_id;
+
+		return self::$last_response;
 	}
 
+
 	/**
-	 * maybe_add_optional_params
+	 * @param $request
+	 * @param $params
 	 *
-	 * @param mixed $request
-	 * @param mixed $params
-	 *
-	 * @return void
+	 * @return mixed
 	 */
 	public function maybe_add_optional_params( $request, $params ) {
 
@@ -360,6 +435,14 @@ class Api_Server {
 
 		$cached_license = get_transient( 'automator_api_license' );
 
+		$has_failed = false !== get_transient( self::TRANSIENT_LICENSE_CHECK_FAILED );
+
+		// Early bail if failing.
+		if ( true === $has_failed ) {
+			return false;
+		}
+
+		// Serve the cached license if its there.
 		if ( false !== $cached_license ) {
 			return $cached_license;
 		}
@@ -372,14 +455,29 @@ class Api_Server {
 		);
 
 		try {
-			$response      = self::api_call( $params );
-			$license       = $response['data'];
+
+			$response = self::api_call( $params );
+
+			$license = $response['data'];
+
 			self::$license = $license;
-			set_transient( 'automator_api_license', $license, MINUTE_IN_SECONDS );
+
+			// Save the license.
+			set_transient( 'automator_api_license', $license, self::$transient_api_license_expires );
+
+			// Removes any failed license checks.
+			delete_transient( self::TRANSIENT_LICENSE_CHECK_FAILED );
 
 			return $license;
+
 		} catch ( \Exception $e ) {
-			throw new \Exception( __( 'Unable to fetch the license: ', 'uncanny-automator' ) . $e->getMessage() );
+
+			$error_message = 'Unable to fetch the license: ' . $e->getMessage();
+
+			set_transient( self::TRANSIENT_LICENSE_CHECK_FAILED, $error_message );
+
+			throw new \Exception( $error_message );
+
 		}
 	}
 
@@ -439,7 +537,7 @@ class Api_Server {
 
 		$license = self::api_call( $params );
 
-		set_transient( 'automator_api_license', $license['data'], MINUTE_IN_SECONDS );
+		set_transient( 'automator_api_license', $license['data'], self::$transient_api_license_expires );
 
 		return $license;
 
@@ -481,11 +579,11 @@ class Api_Server {
 		$log = array(
 			'type'          => 'action',
 			'recipe_log_id' => $params['action']['recipe_log_id'],
-			'item_log_id'   => $params['action']['action_log_id'],
+			'item_log_id'   => isset( $params['action']['action_log_id'] ) ? $params['action']['action_log_id'] : '',
 			'endpoint'      => $params['endpoint'],
 			'params'        => maybe_serialize( $params ),
 			'request'       => maybe_serialize( $request ),
-			'response'      => maybe_serialize( $response ),
+			'response'      => maybe_serialize( apply_filters( 'automator_log_api_responses', false, $response ) ),
 			'balance'       => isset( $credits['balance'] ) ? $credits['balance'] : null,
 			'price'         => isset( $credits['price'] ) ? $credits['price'] : null,
 			'status'        => $this->get_response_code( $response ),
@@ -495,10 +593,20 @@ class Api_Server {
 		return $this->add_log( $log );
 	}
 
+	/**
+	 * @param $log
+	 *
+	 * @return bool|int
+	 */
 	public function add_log( $log ) {
 		return Automator()->db->api->add( $log );
 	}
 
+	/**
+	 * @param $response
+	 *
+	 * @return mixed|null
+	 */
 	public function get_response_credits( $response ) {
 
 		if ( is_wp_error( $response ) ) {
@@ -515,6 +623,11 @@ class Api_Server {
 
 	}
 
+	/**
+	 * @param $response
+	 *
+	 * @return int|mixed|string
+	 */
 	public function get_response_code( $response ) {
 		if ( is_wp_error( $response ) ) {
 			return $response->get_error_code();
@@ -543,18 +656,26 @@ class Api_Server {
 		return $response_body;
 	}
 
+	/**
+	 * @param $process_further
+	 * @param $args
+	 * @param $trigger
+	 *
+	 * @return false|mixed
+	 */
 	public function maybe_log_trigger( $process_further, $args, $trigger ) {
 
 		if ( ! $trigger->get_uses_api() ) {
 			return $process_further;
 		}
 
-		$log_entry = $args['trigger_entry'];
+		$recipe_log_id  = $args['entry_args']['recipe_log_id'] ?? null;
+		$trigger_log_id = $args['entry_args']['trigger_log_id'] ?? null;
 
 		$log = array(
 			'type'          => 'trigger',
-			'recipe_log_id' => $log_entry['recipe_log_id'],
-			'item_log_id'   => $log_entry['trigger_log_id'],
+			'recipe_log_id' => $recipe_log_id,
+			'item_log_id'   => $trigger_log_id,
 			'params'        => $args['trigger_args'],
 		);
 
@@ -614,11 +735,14 @@ class Api_Server {
 
 		if ( $force_refresh ) {
 			delete_transient( 'automator_api_license' );
+			delete_transient( self::TRANSIENT_LICENSE_CHECK_FAILED );
 		}
 
 		$license_key = self::get_license_key();
 
 		if ( false === $license_key ) {
+			self::set_connection_error_message( 'Unable to fetch the license key.' );
+
 			return false;
 		}
 
@@ -626,9 +750,27 @@ class Api_Server {
 			return self::get_license();
 		} catch ( \Exception $e ) {
 			automator_log( $e->getMessage() );
+			self::set_connection_error_message( 'API error exception: ' . $e->getCode() . ' ' . $e->getMessage() );
+
+			return false;
 		}
 
+		self::set_connection_error_message( 'An error has occured while connecting. Please try again later.' );
+
 		return false;
+	}
+
+	/**
+	 * Sets an error message for one minute that can be shown in the front-end.
+	 *
+	 * @param string $error_message
+	 *
+	 * @return void
+	 */
+	public static function set_connection_error_message( $error_message ) {
+
+		set_transient( 'automator_setup_wizard_error', $error_message, MINUTE_IN_SECONDS );
+
 	}
 }
 

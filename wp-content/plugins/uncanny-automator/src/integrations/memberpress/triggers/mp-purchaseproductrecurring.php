@@ -64,7 +64,17 @@ class MP_PURCHASEPRODUCTRECURRING {
 		return Automator()->utilities->keep_order_of_options(
 			array(
 				'options' => array(
-					Automator()->helpers->recipe->memberpress->options->all_memberpress_products_recurring( null, $this->trigger_meta, array( 'uo_include_any' => true ) ),
+					Automator()->helpers->recipe->memberpress->options->all_memberpress_products_recurring(
+						null,
+						$this->trigger_meta,
+						array(
+							'uo_include_any'  => true,
+							'relevant_tokens' => array(
+								$this->trigger_meta . '_TXN_ID'        => esc_attr__( 'Transaction ID', 'uncanny-automator' ),
+								$this->trigger_meta . '_TXN_AMOUNT'        => esc_attr__( 'Transaction amount', 'uncanny-automator' ),
+							),
+						)
+					),
 				),
 			)
 		);
@@ -83,6 +93,19 @@ class MP_PURCHASEPRODUCTRECURRING {
 		$user_id    = absint( $transaction->user()->ID );
 		if ( 'lifetime' === (string) $product->period_type ) {
 			return;
+		}
+
+		// Flexibility to prevent running the trigger.
+		if ( ! apply_filters( 'automator_mepr_recurring_subscriptions_trigger_switch', true, $event ) ) {
+			return;
+		}
+
+		if ( apply_filters( 'automator_mepr_check_first_real_payment', false, $event ) ) {
+			$subscription          = $transaction->subscription();
+			$is_first_real_payment = Automator()->helpers->recipe->memberpress->check_if_is_renewal_or_first_payment( $subscription );
+			if ( $is_first_real_payment === false && \MeprTransaction::$free_gateway_str !== $pm->id ) {
+				return;
+			}
 		}
 
 		$recipes = Automator()->get->recipes_from_trigger_code( $this->trigger_code );
@@ -132,6 +155,14 @@ class MP_PURCHASEPRODUCTRECURRING {
 
 					$trigger_meta['meta_key']   = $this->trigger_meta;
 					$trigger_meta['meta_value'] = $product_id;
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'mp_txn_id';
+					$trigger_meta['meta_value'] = $transaction->id;
+					Automator()->insert_trigger_meta( $trigger_meta );
+
+					$trigger_meta['meta_key']   = 'mp_txn_amount';
+					$trigger_meta['meta_value'] = $transaction->amount;
 					Automator()->insert_trigger_meta( $trigger_meta );
 
 					Automator()->maybe_trigger_complete( $result['args'] );

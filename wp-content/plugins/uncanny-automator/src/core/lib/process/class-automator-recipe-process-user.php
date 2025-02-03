@@ -1,4 +1,5 @@
 <?php
+
 namespace Uncanny_Automator;
 
 /**
@@ -25,6 +26,7 @@ class Automator_Recipe_Process_User {
 	 * @return array|null
 	 */
 	public function maybe_add_trigger_entry( $args, $mark_trigger_complete = true, $trigger_args = array() ) {
+
 		$original_args      = $args;
 		$is_signed_in       = Automator()->is_user_signed_in( $args );
 		$check_trigger_code = key_exists( 'code', $args ) ? $args['code'] : null;
@@ -146,7 +148,7 @@ class Automator_Recipe_Process_User {
 					if ( 0 !== absint( $post_id ) ) {
 						$meta_results = $this->maybe_trigger_add_any_option_meta( $meta_arg, $trigger_meta );
 						if ( isset( $meta_results['result'] ) && false === $meta_results['result'] ) {
-							Automator()->error->add_error( 'uap_maybe_add_meta_entry', 'ERROR: You are trying to add entry ' . $trigger['meta'][ $trigger_meta ] . ' and post_id = ' . $post_id . '.', $this );
+							Automator()->wp_error->add_error( 'uap_maybe_add_meta_entry', 'ERROR: You are trying to add entry ' . $trigger['meta'][ $trigger_meta ] . ' and post_id = ' . $post_id . '.', $this );
 						}
 					}
 				}
@@ -166,8 +168,8 @@ class Automator_Recipe_Process_User {
 
 				if ( true === $trigger_steps_completed['result'] ) {
 					/**
-					 * @deprecated  $args['trigger_log_id'] Use $args['trigger_log_id'].
 					 * @version 3.0
+					 * @deprecated  $args['trigger_log_id'] Use $args['trigger_log_id'].
 					 */
 					$args['get_trigger_id'] = $get_trigger_log_id;
 					$args['trigger_log_id'] = $get_trigger_log_id;
@@ -217,26 +219,43 @@ class Automator_Recipe_Process_User {
 	 *
 	 */
 	public function maybe_create_recipe_log_entry( $recipe_id, $user_id, $create_recipe = true, $args = array(), $maybe_simulate = false, $maybe_add_log_id = null ) {
+
 		global $wpdb;
 
-		$recipe_log_id = $this->wpdb_get_var(
-			$wpdb->prepare(
-				"SELECT ID
-				FROM {$wpdb->prefix}uap_recipe_log
-				WHERE completed NOT IN (1,2,5,9,10,11)
-				AND automator_recipe_id = %d
-				AND user_id = %d",
-				$recipe_id,
-				$user_id
-			)
+		$statuses = array(
+			Automator_Status::COMPLETED,
+			Automator_Status::COMPLETED_WITH_ERRORS,
+			Automator_Status::IN_PROGRESS,
+			Automator_Status::IN_PROGRESS_WITH_ERROR,
+			Automator_Status::DID_NOTHING,
+			Automator_Status::COMPLETED_AWAITING,
+			Automator_Status::COMPLETED_WITH_NOTICE,
+			Automator_Status::FAILED,
 		);
+
+		$stmt = $wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			"SELECT ID FROM {$wpdb->prefix}uap_recipe_log WHERE completed NOT IN (" . join( ',', $statuses ) . ') AND automator_recipe_id = %d AND user_id = %d', // Ok to proceed as $statuses hold a constant internal values.
+			$recipe_id,
+			$user_id
+		);
+
+		// Retrieve the recipe log from recipes.
+		$recipe_log_id = $this->wpdb_get_var( $stmt );
+
+		// If a recipe log ID was created and there is a user that has ran the recipe.
 		if ( $recipe_log_id && 0 !== absint( $user_id ) ) {
+
+			// Return existing user as true with the recipe log id.
 			return array(
 				'existing'      => true,
 				'recipe_log_id' => $recipe_log_id,
 			);
+
 		} elseif ( true === $maybe_simulate ) {
 			/*
+			 * Otherwise, simulate the recipe completion by inserting a recipe log if `$maybe_simulate` is true.
+			 *
 			 * @since 2.0
 			 * @author Saad S.
 			 */
@@ -393,7 +412,7 @@ class Automator_Recipe_Process_User {
 		// Skip completion if the plugin is not active
 		if ( 0 === $this->get_plugin_status( $trigger_integration ) ) {
 			// The plugin for this trigger is NOT active
-			Automator()->error->add_error( 'uap_do_trigger_log', 'ERROR: You are trying to complete ' . $trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. ', $this );
+			Automator()->wp_error->add_error( 'uap_do_trigger_log', 'ERROR: You are trying to complete ' . $trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. ', $this );
 
 			return array(
 				'result' => false,
@@ -437,7 +456,9 @@ class Automator_Recipe_Process_User {
 			 * @version 2.1.6
 			 * @author  Saad
 			 */
-			if ( ! isset( $trigger['meta'][ $trigger_meta ] ) && ! isset( $trigger['meta'][ $args['code'] ] ) ) {
+			$is_trigger_meta_and_trigger_meta_code_empty = ! isset( $trigger['meta'][ $trigger_meta ] ) && ! isset( $trigger['meta'][ $args['code'] ] );
+
+			if ( $is_trigger_meta_and_trigger_meta_code_empty || $trigger['meta']['code'] !== $args['code'] ) {
 				return array(
 					'result' => false,
 					'error'  => esc_html__( 'Trigger meta not found.', 'uncanny-automator' ),
@@ -446,6 +467,7 @@ class Automator_Recipe_Process_User {
 		}
 
 		return $this->maybe_get_trigger_id( $user_id, $trigger_id, $recipe_id, $recipe_log_id );
+
 	}
 
 	/**
@@ -553,7 +575,7 @@ class Automator_Recipe_Process_User {
 		// Skip completion if the plugin is not active
 		if ( 0 === $this->get_plugin_status( $trigger_integration ) ) {
 			// The plugin for this trigger is NOT active
-			Automator()->error->add_error( 'uap_do_trigger_log', 'ERROR: You are trying to complete ' . $trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. ', $this );
+			Automator()->wp_error->add_error( 'uap_do_trigger_log', 'ERROR: You are trying to complete ' . $trigger['meta']['code'] . ' and the plugin ' . $trigger_integration . ' is not active. ', $this );
 
 			return array(
 				'result' => false,
@@ -593,7 +615,7 @@ class Automator_Recipe_Process_User {
 					'result' => false,
 					'error'  => esc_html__( 'Trigger not matched.', 'uncanny-automator' ),
 				);
-			} elseif ( (string) $trigger_post_id != (string) $post_id ) {
+			} elseif ( (string) $trigger_post_id !== (string) $post_id ) {
 				return array(
 					'result' => false,
 					'error'  => esc_html__( 'Trigger not matched.', 'uncanny-automator' ),
@@ -612,6 +634,8 @@ class Automator_Recipe_Process_User {
 	 * @return array
 	 */
 	public function maybe_trigger_num_times_completed( $times_args ) {
+
+		do_action( 'automator_before_maybe_trigger_num_times_completed', $times_args );
 
 		$recipe_id      = key_exists( 'recipe_id', $times_args ) ? $times_args['recipe_id'] : null;
 		$trigger_id     = key_exists( 'trigger_id', $times_args ) ? $times_args['trigger_id'] : null;
@@ -651,7 +675,7 @@ class Automator_Recipe_Process_User {
 		} else {
 
 			$user_num_times ++;
-			$run_number         = $run_number + 1;
+			$run_number         = $run_number + 1; //phpcs:ignore Squiz.Operators.IncrementDecrementUsage.Found
 			$args['run_number'] = $run_number;
 			$args['meta_value'] = 1;
 		}
@@ -669,31 +693,60 @@ class Automator_Recipe_Process_User {
 		 *
 		 */
 		$trigger_data = Automator()->get->trigger_sentence( $trigger_id, 'trigger_detail' );
+
 		do_action( 'automator_complete_trigger_detail', $trigger_data, $args );
 
 		$sentence_human_readable = $this->get_trigger_sentence( $trigger_id );
 
 		// Store trigger sentence details for the completion
+		// @Todo: Remove this process if not in used.
 		if ( ! empty( $sentence_human_readable ) ) {
-			$save_meta = array(
+
+			// Inserting `sentence_human_readable` with each run
+			$this->insert_trigger_meta(
+				array(
+					'user_id'        => $user_id,
+					'trigger_id'     => $trigger_id,
+					'trigger_log_id' => $trigger_log_id,
+					'run_number'     => $run_number,
+					'meta_key'       => 'sentence_human_readable',
+					'meta_value'     => $sentence_human_readable,
+				)
+			);
+
+		}
+
+		// Store the trigger object.
+		$this->insert_trigger_meta(
+			array(
 				'user_id'        => $user_id,
 				'trigger_id'     => $trigger_id,
 				'trigger_log_id' => $trigger_log_id,
 				'run_number'     => $run_number,
-				'meta_key'       => 'sentence_human_readable',
-				'meta_value'     => $sentence_human_readable,
-			);
-
-			$this->insert_trigger_meta( $save_meta );
-
-		}
-		/**  */
+				'meta_key'       => 'trigger_object',
+				'meta_value'     => maybe_serialize( $trigger ),
+			)
+		);
 
 		//change completed from -1 to 0
 		$this->maybe_change_recipe_log_to_zero( $recipe_id, $user_id, $recipe_log_id, true );
 
 		// Move on if the user didn't trigger the trigger enough times
 		if ( $user_num_times < $num_times ) {
+
+			// Used by fields logger.
+			do_action(
+				'automator_recipe_process_user_trigger_num_times_insufficient',
+				array(
+					'trigger_id'     => $trigger_id,
+					'recipe_id'      => isset( $times_args['recipe_id'] ) ? $times_args['recipe_id'] : null,
+					'trigger_log_id' => $trigger_log_id,
+					'recipe_log_id'  => $recipe_log_id,
+					'run_number'     => $run_number,
+					'user_id'        => $user_id,
+				)
+			);
+
 			return array(
 				'result' => false,
 				'error'  => 'Number of times condition is not completed.',
@@ -826,19 +879,19 @@ class Automator_Recipe_Process_User {
 
 		// No user id is aviable.
 		if ( 0 === $user_id ) {
-			Automator()->error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta when a there is no logged in user.', $this );
+			Automator()->wp_error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta when a there is no logged in user.', $this );
 
 			return null;
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta without providing a trigger_id', $this );
+			Automator()->wp_error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta without providing a trigger_id', $this );
 
 			return null;
 		}
 
 		if ( null === $meta_key || ! is_string( $meta_key ) ) {
-			Automator()->error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta without providing a meta_key', $this );
+			Automator()->wp_error->add_error( 'update_trigger_meta', 'ERROR: You are trying to update trigger meta without providing a meta_key', $this );
 
 			return null;
 		}
@@ -918,19 +971,19 @@ class Automator_Recipe_Process_User {
 
 		// No user id is available.
 		if ( 0 === $user_id ) {
-			Automator()->error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID when a there is no logged in user.', $this );
+			Automator()->wp_error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID when a there is no logged in user.', $this );
 
 			return null;
 		}
 
 		if ( null === $trigger_id || ! is_numeric( $trigger_id ) ) {
-			Automator()->error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID without providing a trigger_id', $this );
+			Automator()->wp_error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID without providing a trigger_id', $this );
 
 			return null;
 		}
 
 		if ( null === $meta_key || ! is_string( $meta_key ) ) {
-			Automator()->error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID without providing a meta_key', $this );
+			Automator()->wp_error->add_error( 'get_trigger_meta_id', 'ERROR: You are trying to get trigger meta ID without providing a meta_key', $this );
 
 			return null;
 		}
@@ -949,7 +1002,8 @@ class Automator_Recipe_Process_User {
 	/**
 	 * wpdb_get_var
 	 *
-	 * @param  string $query
+	 * @param string $query
+	 *
 	 * @return mixed
 	 */
 	public function wpdb_get_var( $query ) {
@@ -962,7 +1016,8 @@ class Automator_Recipe_Process_User {
 	/**
 	 * get_plugin_status
 	 *
-	 * @param  string $integration
+	 * @param string $integration
+	 *
 	 * @return bool
 	 */
 	public function get_plugin_status( $integration ) {
@@ -972,8 +1027,9 @@ class Automator_Recipe_Process_User {
 	/**
 	 * recipe_number_times_completed
 	 *
-	 * @param  mixed $recipe_id
-	 * @param  mixed $results
+	 * @param mixed $recipe_id
+	 * @param mixed $results
+	 *
 	 * @return mixed
 	 */
 	public function recipe_number_times_completed( $recipe_id, $results ) {
@@ -983,8 +1039,9 @@ class Automator_Recipe_Process_User {
 	/**
 	 * is_recipe_completed
 	 *
-	 * @param  mixed $recipe_id
-	 * @param  mixed $user_id
+	 * @param mixed $recipe_id
+	 * @param mixed $user_id
+	 *
 	 * @return mixed
 	 */
 	public function is_recipe_completed( $recipe_id, $user_id ) {
@@ -994,8 +1051,9 @@ class Automator_Recipe_Process_User {
 	/**
 	 * recipes_from_trigger_code
 	 *
-	 * @param  mixed $check_trigger_code
-	 * @param  mixed $webhook_recipe
+	 * @param mixed $check_trigger_code
+	 * @param mixed $webhook_recipe
+	 *
 	 * @return mixed
 	 */
 	public function recipes_from_trigger_code( $check_trigger_code, $webhook_recipe = null ) {
@@ -1005,10 +1063,11 @@ class Automator_Recipe_Process_User {
 	/**
 	 * get_trigger_meta
 	 *
-	 * @param  mixed $user_id
-	 * @param  mixed $trigger_id
-	 * @param  mixed $meta_key
-	 * @param  mixed $trigger_log_id
+	 * @param mixed $user_id
+	 * @param mixed $trigger_id
+	 * @param mixed $meta_key
+	 * @param mixed $trigger_log_id
+	 *
 	 * @return mixed
 	 */
 	public function get_trigger_meta( $user_id, $trigger_id, $meta_key, $trigger_log_id ) {
@@ -1018,7 +1077,8 @@ class Automator_Recipe_Process_User {
 	/**
 	 * get_trigger_sentence
 	 *
-	 * @param  mixed $trigger_id
+	 * @param mixed $trigger_id
+	 *
 	 * @return mixed
 	 */
 	public function get_trigger_sentence( $trigger_id ) {
@@ -1028,11 +1088,12 @@ class Automator_Recipe_Process_User {
 	/**
 	 * maybe_get_meta_id_from_trigger_log
 	 *
-	 * @param  mixed $run_number
-	 * @param  mixed $trigger_id
-	 * @param  mixed $trigger_log_id
-	 * @param  mixed $trigger_meta
-	 * @param  mixed $user_id
+	 * @param mixed $run_number
+	 * @param mixed $trigger_id
+	 * @param mixed $trigger_log_id
+	 * @param mixed $trigger_meta
+	 * @param mixed $user_id
+	 *
 	 * @return mixed
 	 */
 	public function maybe_get_meta_id_from_trigger_log( $run_number, $trigger_id, $trigger_log_id, $trigger_meta, $user_id ) {

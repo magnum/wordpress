@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class FundingSourceDetailsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUPON = 'coupon';
-    const DISPLAY_STRING = 'display_string';
-    const ID = 'id';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('coupon' => 'FundingSourceDetailsCoupon', 'display_string' => 'string', 'id' => 'string', 'type' => 'int');
-    }
+
+class FundingSourceDetailsFields extends AbstractEnum {
+
+  const COUPON = 'coupon';
+  const DISPLAY_STRING = 'display_string';
+  const ID = 'id';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'coupon' => 'FundingSourceDetailsCoupon',
+      'display_string' => 'string',
+      'id' => 'string',
+      'type' => 'int',
+    );
+  }
 }

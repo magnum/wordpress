@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Update_Post extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_update_post';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_update_post';
+
+        parent::__construct();
+
+    }
 
     /**
      * The new inserted post ID
@@ -182,6 +193,7 @@ class AutomatorWP_WordPress_Update_Post extends AutomatorWP_Integration_Action {
                     )
                 )
             ),
+            'tags' => automatorwp_utilities_post_tags(),
         ) );
 
     }
@@ -478,4 +490,5 @@ class AutomatorWP_WordPress_Update_Post extends AutomatorWP_Integration_Action {
 
 }
 
-new AutomatorWP_WordPress_Update_Post();
+new AutomatorWP_WordPress_Update_Post( 'wordpress' );
+new AutomatorWP_WordPress_Update_Post( 'posts' );

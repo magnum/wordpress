@@ -134,8 +134,23 @@ class Fr_Tokens {
 			);
 			$value          = Automator()->db->trigger->get_token_meta( $match, $parse_tokens );
 			$value          = maybe_unserialize( $value );
+
 			if ( is_array( $value ) ) {
-				$value = join( ' ', $value );
+				// Check for file uploads
+				if ( key_exists( 'file', $value ) ) {
+					$url   = key_exists( 'file_url', $value['file'] ) ? $value['file']['file_url'] : '';
+					$value = is_array( $url ) ? join( ', ', $url ) : $url;
+					// Check for raw and formatted values.
+				} elseif ( key_exists( 'result', $value ) && key_exists( 'formatting_result', $value ) ) {
+					// Return formatted value.
+					$value = $value['formatting_result'];
+					// Check for datefield with text input or dropdown settings.
+				} elseif ( key_exists( 'year', $value ) && key_exists( 'month', $value ) && key_exists( 'day', $value ) && key_exists( 'format', $value ) ) {
+					$value = date( $value['format'], strtotime( $value['year'] . '-' . $value['month'] . '-' . $value['day'] ) );
+					// Default join array values.
+				} else {
+					$value = join( ' ', $value );
+				}
 			}
 		}
 

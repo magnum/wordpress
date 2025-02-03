@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductCatalogImageSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAROUSEL_AD = 'carousel_ad';
-    const SINGLE_AD = 'single_ad';
-    public function getFieldTypes()
-    {
-        return array('carousel_ad' => 'ProductCatalogImageSettingsOperation', 'single_ad' => 'ProductCatalogImageSettingsOperation');
-    }
+
+class ProductCatalogImageSettingsFields extends AbstractEnum {
+
+  const CAROUSEL_AD = 'carousel_ad';
+  const SINGLE_AD = 'single_ad';
+
+  public function getFieldTypes() {
+    return array(
+      'carousel_ad' => 'ProductCatalogImageSettingsOperation',
+      'single_ad' => 'ProductCatalogImageSettingsOperation',
+    );
+  }
 }

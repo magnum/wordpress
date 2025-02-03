@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static VehicleFuelTypeValues getInstance()
  */
-class VehicleFuelTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DIESEL = 'DIESEL';
-    const ELECTRIC = 'ELECTRIC';
-    const FLEX = 'FLEX';
-    const GASOLINE = 'GASOLINE';
-    const HYBRID = 'HYBRID';
-    const NONE = 'NONE';
-    const OTHER = 'OTHER';
-    const PETROL = 'PETROL';
-    const PLUGIN_HYBRID = 'PLUGIN_HYBRID';
+class VehicleFuelTypeValues extends AbstractEnum {
+
+  const DIESEL = 'DIESEL';
+  const ELECTRIC = 'ELECTRIC';
+  const FLEX = 'FLEX';
+  const GASOLINE = 'GASOLINE';
+  const HYBRID = 'HYBRID';
+  const NONE = 'NONE';
+  const OTHER = 'OTHER';
+  const PETROL = 'PETROL';
+  const PLUGIN_HYBRID = 'PLUGIN_HYBRID';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,22 +34,36 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LinkFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAPTION = 'caption';
-    const CREATED_TIME = 'created_time';
-    const DESCRIPTION = 'description';
-    const FROM = 'from';
-    const ICON = 'icon';
-    const ID = 'id';
-    const LINK = 'link';
-    const MESSAGE = 'message';
-    const MULTI_SHARE_OPTIMIZED = 'multi_share_optimized';
-    const NAME = 'name';
-    const PRIVACY = 'privacy';
-    const VIA = 'via';
-    public function getFieldTypes()
-    {
-        return array('caption' => 'string', 'created_time' => 'datetime', 'description' => 'string', 'from' => 'Object', 'icon' => 'string', 'id' => 'string', 'link' => 'string', 'message' => 'string', 'multi_share_optimized' => 'bool', 'name' => 'string', 'privacy' => 'Privacy', 'via' => 'Object');
-    }
+
+class LinkFields extends AbstractEnum {
+
+  const CAPTION = 'caption';
+  const CREATED_TIME = 'created_time';
+  const DESCRIPTION = 'description';
+  const FROM = 'from';
+  const ICON = 'icon';
+  const ID = 'id';
+  const LINK = 'link';
+  const MESSAGE = 'message';
+  const MULTI_SHARE_OPTIMIZED = 'multi_share_optimized';
+  const NAME = 'name';
+  const PRIVACY = 'privacy';
+  const VIA = 'via';
+
+  public function getFieldTypes() {
+    return array(
+      'caption' => 'string',
+      'created_time' => 'datetime',
+      'description' => 'string',
+      'from' => 'Object',
+      'icon' => 'string',
+      'id' => 'string',
+      'link' => 'string',
+      'message' => 'string',
+      'multi_share_optimized' => 'bool',
+      'name' => 'string',
+      'privacy' => 'Privacy',
+      'via' => 'Object',
+    );
+  }
 }

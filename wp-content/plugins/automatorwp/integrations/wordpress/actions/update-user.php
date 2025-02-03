@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Update_User extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_update_user';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_update_user';
+
+        parent::__construct();
+
+    }
 
     /**
      * The new inserted user ID
@@ -47,14 +58,6 @@ class AutomatorWP_WordPress_Update_User extends AutomatorWP_Integration_Action {
      * @since 1.0.0
      */
     public function register() {
-
-        $role_options = array();
-        $editable_roles = apply_filters( 'editable_roles', wp_roles()->roles );
-
-        foreach( $editable_roles as $role => $details ) {
-            /* translators: %1$s: Role key (subscriber, editor). %2$s: Role name (Subscriber, Editor). */
-            $role_options[] = sprintf( __( '<code>%1$s</code> for %2$s', 'automatorwp' ), $role, translate_user_role( $details['name'] ) );
-        }
 
         automatorwp_register_action( $this->action, array(
             'integration'       => $this->integration,
@@ -124,14 +127,14 @@ class AutomatorWP_WordPress_Update_User extends AutomatorWP_Integration_Action {
                             'type' => 'text',
                             'default' => ''
                         ),
-                        'role' => array(
-                            'name' => __( 'Role:', 'automatorwp' ),
-                            'desc' => __( 'The user\'s role.', 'automatorwp' )
-                                . ' ' . __( 'Leave empty to no update this field.', 'automatorwp' )
-                                . ' ' . automatorwp_toggleable_options_list( $role_options ),
-                            'type' => 'text',
-                            'default' => ''
-                        ),
+                        'role' => automatorwp_utilities_role_field( array(
+                            'option_custom' => true,
+                            'desc' => __( 'The user\'s role. By default, "subscriber".', 'automatorwp' )
+                                . ' ' . __( 'Leave empty to no update this field.', 'automatorwp' ),
+                        ) ),
+                        'role_custom' => automatorwp_utilities_custom_field( array(
+                            'option_custom_desc' => __( 'Role name.', 'automatorwp' )
+                        ) ),
                         'user_meta' => array(
                             'name' => __( 'User Meta:', 'automatorwp' ),
                             'desc' => __( 'The user meta values keyed by their user meta key.', 'automatorwp' ),
@@ -157,6 +160,9 @@ class AutomatorWP_WordPress_Update_User extends AutomatorWP_Integration_Action {
                     )
                 )
             ),
+            'tags' => array_merge(
+                automatorwp_utilities_user_tags()
+            )
         ) );
 
     }
@@ -444,4 +450,5 @@ class AutomatorWP_WordPress_Update_User extends AutomatorWP_Integration_Action {
 
 }
 
-new AutomatorWP_WordPress_Update_User();
+new AutomatorWP_WordPress_Update_User( 'wordpress' );
+new AutomatorWP_WordPress_Update_User( 'users' );

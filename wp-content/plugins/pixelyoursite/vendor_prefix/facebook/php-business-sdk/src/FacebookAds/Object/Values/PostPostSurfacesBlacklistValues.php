@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PostPostSurfacesBlacklistValues getInstance()
  */
-class PostPostSurfacesBlacklistValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const VALUE_1 = '1';
-    const VALUE_2 = '2';
-    const VALUE_3 = '3';
-    const VALUE_4 = '4';
-    const VALUE_5 = '5';
+class PostPostSurfacesBlacklistValues extends AbstractEnum {
+
+  const VALUE_1 = '1';
+  const VALUE_2 = '2';
+  const VALUE_3 = '3';
+  const VALUE_4 = '4';
+  const VALUE_5 = '5';
 }

@@ -65,7 +65,7 @@ class AutomatorWP_GamiPress_User_Points extends AutomatorWP_Integration_Action {
                         'user' => array(
                             'name' => __( 'User ID:', 'automatorwp' ),
                             'desc' => __( 'User ID that will receive this points. Leave blank to award the points to the user that completes the automation.', 'automatorwp' ),
-                            'type' => 'input',
+                            'type' => 'text',
                             'default' => ''
                         ),
                     )

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PageEntryPointIconValues getInstance()
  */
-class PageEntryPointIconValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CHAT_ANGULAR_ICON = 'CHAT_ANGULAR_ICON';
-    const CHAT_ROUND_ICON = 'CHAT_ROUND_ICON';
-    const MESSENGER_ICON = 'MESSENGER_ICON';
-    const NONE = 'NONE';
+class PageEntryPointIconValues extends AbstractEnum {
+
+  const CHAT_ANGULAR_ICON = 'CHAT_ANGULAR_ICON';
+  const CHAT_ROUND_ICON = 'CHAT_ROUND_ICON';
+  const MESSENGER_ICON = 'MESSENGER_ICON';
+  const NONE = 'NONE';
 }

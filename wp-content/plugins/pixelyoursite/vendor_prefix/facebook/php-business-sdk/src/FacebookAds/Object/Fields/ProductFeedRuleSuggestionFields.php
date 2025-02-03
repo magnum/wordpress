@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductFeedRuleSuggestionFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ATTRIBUTE = 'attribute';
-    const PARAMS = 'params';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('attribute' => 'string', 'params' => 'map<string, string>', 'type' => 'string');
-    }
+
+class ProductFeedRuleSuggestionFields extends AbstractEnum {
+
+  const ATTRIBUTE = 'attribute';
+  const PARAMS = 'params';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'attribute' => 'string',
+      'params' => 'map<string, string>',
+      'type' => 'string',
+    );
+  }
 }

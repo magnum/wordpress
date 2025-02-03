@@ -1,6 +1,8 @@
 <?php
 namespace Elementor;
 
+use Elementor\Container\Container;
+use ElementorDeps\DI\Container as DIContainer;
 use Elementor\Core\Admin\Menu\Admin_Menu_Manager;
 use Elementor\Core\Wp_Api;
 use Elementor\Core\Admin\Admin;
@@ -14,10 +16,8 @@ use Elementor\Core\Editor\Editor;
 use Elementor\Core\Files\Manager as Files_Manager;
 use Elementor\Core\Files\Assets\Manager as Assets_Manager;
 use Elementor\Core\Modules_Manager;
-use Elementor\Core\Schemes\Manager as Schemes_Manager;
 use Elementor\Core\Settings\Manager as Settings_Manager;
 use Elementor\Core\Settings\Page\Manager as Page_Settings_Manager;
-use Elementor\Core\Upgrade\Elementor_3_Re_Migrate_Globals;
 use Elementor\Modules\History\Revisions_Manager;
 use Elementor\Core\DynamicTags\Manager as Dynamic_Tags_Manager;
 use Elementor\Core\Logger\Manager as Log_Manager;
@@ -101,6 +101,7 @@ class Plugin {
 	 *
 	 * @since 1.0.0
 	 * @access public
+	 * @deprecated 3.0.0
 	 *
 	 * @var Schemes_Manager
 	 */
@@ -570,6 +571,14 @@ class Plugin {
 	public $assets_loader;
 
 	/**
+	 * Container instance for managing dependencies.
+	 *
+	 * @since 3.24.0
+	 * @var DIContainer
+	 */
+	private $container;
+
+	/**
 	 * Clone.
 	 *
 	 * Disable class cloning and throw an error on object clone.
@@ -581,8 +590,11 @@ class Plugin {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'elementor' ), '1.0.0' );
+		_doing_it_wrong(
+			__FUNCTION__,
+			sprintf( 'Cloning instances of the singleton "%s" class is forbidden.', get_class( $this ) ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'1.0.0'
+		);
 	}
 
 	/**
@@ -594,8 +606,11 @@ class Plugin {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'elementor' ), '1.0.0' );
+		_doing_it_wrong(
+			__FUNCTION__,
+			sprintf( 'Unserializing instances of the singleton "%s" class is forbidden.', get_class( $this ) ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'1.0.0'
+		);
 	}
 
 	/**
@@ -624,6 +639,23 @@ class Plugin {
 		}
 
 		return self::$instance;
+	}
+
+	public function initialize_container() {
+		Container::initialize_instance();
+
+		$this->container = Container::get_instance();
+	}
+
+	/**
+	 * Get the Elementor container or resolve a dependency.
+	 */
+	public function elementor_container( $abstract = null ) {
+		if ( is_null( $abstract ) ) {
+			return $this->container;
+		}
+
+		return $this->container->make( $abstract );
 	}
 
 	/**
@@ -707,7 +739,6 @@ class Plugin {
 		$this->controls_manager = new Controls_Manager();
 		$this->documents = new Documents_Manager();
 		$this->kits_manager = new Kits_Manager();
-		$this->schemes_manager = new Schemes_Manager();
 		$this->elements_manager = new Elements_Manager();
 		$this->widgets_manager = new Widgets_Manager();
 		$this->skins_manager = new Skins_Manager();
@@ -748,7 +779,6 @@ class Plugin {
 			$this->wordpress_widgets_manager = new WordPress_Widgets_Manager();
 			$this->admin = new Admin();
 			$this->beta_testers = new Beta_Testers();
-			new Elementor_3_Re_Migrate_Globals();
 		}
 	}
 
@@ -760,36 +790,6 @@ class Plugin {
 		$this->common = new CommonApp();
 
 		$this->common->init_components();
-	}
-
-	/**
-	 * Get Legacy Mode
-	 *
-	 * @since 3.0.0
-	 * @deprecated 3.1.0 Use `Plugin::$instance->experiments->is_feature_active()` instead
-	 *
-	 * @param string $mode_name Optional. Default is null
-	 *
-	 * @return bool|bool[]
-	 */
-	public function get_legacy_mode( $mode_name = null ) {
-		self::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation
-			->deprecated_function( __METHOD__, '3.1.0', 'Plugin::$instance->experiments->is_feature_active()' );
-
-		$legacy_mode = [
-			'elementWrappers' => ! self::$instance->experiments->is_feature_active( 'e_dom_optimization' ),
-		];
-
-		if ( ! $mode_name ) {
-			return $legacy_mode;
-		}
-
-		if ( isset( $legacy_mode[ $mode_name ] ) ) {
-			return $legacy_mode[ $mode_name ];
-		}
-
-		// If there is no legacy mode with the given mode name;
-		return false;
 	}
 
 	/**
@@ -883,5 +883,7 @@ class Plugin {
 
 if ( ! defined( 'ELEMENTOR_TESTS' ) ) {
 	// In tests we run the instance manually.
-	Plugin::instance();
+	$plugin_instance = Plugin::instance();
+
+	$plugin_instance->initialize_container();
 }

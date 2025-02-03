@@ -51,7 +51,7 @@ use DOMElement;
 use DOMNode;
 use DOMXPath;
 use Exception;
-use RobRichards\XMLSecLibs\Utils\Mo_SAML_XPath as Mo_SAML_XPath;
+use RobRichards\XMLSecLibs\Utils\Mo_SAML_XPath;
 /**
  * Encrypt the XML data.
  */
@@ -479,76 +479,81 @@ class Mo_SAML_XML_Sec_Enc {
 		}
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attrbutes.
 		foreach ( $encmeth->childNodes as $child ) {
+			try {
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
-			switch ( $child->localName ) {
-				case 'KeyName':
-					if ( ! empty( $obj_base_key ) ) {
-						// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
-						$obj_base_key->name = $child->nodeValue;
-					}
-					break;
-				case 'KeyValue':
-					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
-					foreach ( $child->childNodes as $keyval ) {
-						// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
-						switch ( $keyval->localName ) {
-							case 'DSAKeyValue':
-								throw new Exception( 'DSAKeyValue currently not supported' );
-							case 'RSAKeyValue':
-								$modulus      = null;
-								$exponent     = null;
-								$modulus_node = $keyval->getElementsByTagName( 'Modulus' )->item( 0 );
-								if ( $modulus_node ) {
-									// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Working with PHP DOMElement Attributes.
-									$modulus = base64_decode( $modulus_node->nodeValue );
-								}
-								$exponent_node = $keyval->getElementsByTagName( 'Exponent' )->item( 0 );
-								if ( $exponent_node ) {
-									// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Working with PHP DOMElement Attributes.
-									$exponent = base64_decode( $exponent_node->nodeValue );
-								}
-								if ( empty( $modulus ) || empty( $exponent ) ) {
-									throw new Exception( 'Missing Modulus or Exponent' );
-								}
-								$public_key = Mo_SAML_XML_Security_Key::mo_saml_convert_rsa( $modulus, $exponent );
-								$obj_base_key->mo_saml_load_key( $public_key );
-								break;
+				switch ( $child->localName ) {
+					case 'KeyName':
+						if ( ! empty( $obj_base_key ) ) {
+							// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
+							$obj_base_key->name = $child->nodeValue;
 						}
-					}
-					break;
-				case 'RetrievalMethod':
-					$type = $child->getAttribute( 'Type' );
-					if ( 'http://www.w3.org/2001/04/xmlenc#EncryptedKey' !== $type ) {
-						/* Unsupported key type. */
 						break;
-					}
-					$uri = $child->getAttribute( 'URI' );
-					if ( '#' !== $uri[0] ) {
-						/* URI not a reference - unsupported. */
-						break;
-					}
-					$id = substr( $uri, 1 );
-
-					$query       = '//xmlsecenc:EncryptedKey[@Id="' . Mo_SAML_XPath::mo_saml_filter_attr_value( $id, Mo_SAML_XPath::DOUBLE_QUOTE ) . '"]';
-					$key_element = $xpath->query( $query )->item( 0 );
-					if ( ! $key_element ) {
-						throw new Exception( "Unable to locate EncryptedKey with @Id='$id'." );
-					}
-
-					return Mo_SAML_XML_Security_Key::mo_saml_from_encrypted_key_element( $key_element );
-				case 'EncryptedKey':
-					return Mo_SAML_XML_Security_Key::mo_saml_from_encrypted_key_element( $child );
-				case 'X509Data':
-					$x509cert_nodes = $child->getElementsByTagName( 'X509Certificate' );
-					if ( $x509cert_nodes ) {
-						if ( $x509cert_nodes->length > 0 ) {
-							$x509cert = $x509cert_nodes->item( 0 )->textContent;
-							$x509cert = str_replace( array( "\r", "\n", ' ' ), '', $x509cert );
-							$x509cert = "-----BEGIN CERTIFICATE-----\n" . chunk_split( $x509cert, 64, "\n" ) . "-----END CERTIFICATE-----\n";
-							$obj_base_key->mo_saml_load_key( $x509cert, false, true );
+					case 'KeyValue':
+						// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
+						foreach ( $child->childNodes as $keyval ) {
+							// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Working with PHP DOMElement Attributes.
+							switch ( $keyval->localName ) {
+								case 'DSAKeyValue':
+									throw new Exception( 'DSAKeyValue currently not supported' );
+								case 'RSAKeyValue':
+									$modulus      = null;
+									$exponent     = null;
+									$modulus_node = $keyval->getElementsByTagName( 'Modulus' )->item( 0 );
+									if ( $modulus_node ) {
+										// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Working with PHP DOMElement Attributes.
+										$modulus = base64_decode( $modulus_node->nodeValue );
+									}
+									$exponent_node = $keyval->getElementsByTagName( 'Exponent' )->item( 0 );
+									if ( $exponent_node ) {
+										// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Working with PHP DOMElement Attributes.
+										$exponent = base64_decode( $exponent_node->nodeValue );
+									}
+									if ( empty( $modulus ) || empty( $exponent ) ) {
+										throw new Exception( 'Missing Modulus or Exponent' );
+									}
+									$public_key = Mo_SAML_XML_Security_Key::mo_saml_convert_rsa( $modulus, $exponent );
+									$obj_base_key->mo_saml_load_key( $public_key );
+									break;
+							}
 						}
-					}
-					break;
+						break;
+					case 'RetrievalMethod':
+						$type = $child->getAttribute( 'Type' );
+						if ( 'http://www.w3.org/2001/04/xmlenc#EncryptedKey' !== $type ) {
+							/* Unsupported key type. */
+							break;
+						}
+						$uri = $child->getAttribute( 'URI' );
+						if ( '#' !== $uri[0] ) {
+							/* URI not a reference - unsupported. */
+							break;
+						}
+						$id = substr( $uri, 1 );
+
+						$query       = '//xmlsecenc:EncryptedKey[@Id="' . Mo_SAML_XPath::mo_saml_filter_attr_value( $id, Mo_SAML_XPath::DOUBLE_QUOTE ) . '"]';
+						$key_element = $xpath->query( $query )->item( 0 );
+						if ( ! $key_element ) {
+							throw new Exception( "Unable to locate EncryptedKey with @Id='$id'." );
+						}
+
+						return Mo_SAML_XML_Security_Key::mo_saml_from_encrypted_key_element( $key_element );
+					// phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.TerminatingComment -- Show error instead of return.
+					case 'EncryptedKey':
+						return Mo_SAML_XML_Security_Key::mo_saml_from_encrypted_key_element( $child );
+					case 'X509Data':
+						$x509cert_nodes = $child->getElementsByTagName( 'X509Certificate' );
+						if ( $x509cert_nodes ) {
+							if ( $x509cert_nodes->length > 0 ) {
+								$x509cert = $x509cert_nodes->item( 0 )->textContent;
+								$x509cert = str_replace( array( "\r", "\n", ' ' ), '', $x509cert );
+								$x509cert = "-----BEGIN CERTIFICATE-----\n" . chunk_split( $x509cert, 64, "\n" ) . "-----END CERTIFICATE-----\n";
+								$obj_base_key->mo_saml_load_key( $x509cert, false, true );
+							}
+						}
+						break;
+				}
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Key' );
 			}
 		}
 		return $obj_base_key;

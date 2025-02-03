@@ -9,7 +9,49 @@ namespace Uncanny_Automator;
  */
 class Calculation_Token {
 
+	/**
+	 * @var \ChrisKonnertz\StringCalc\StringCalc
+	 */
 	public $string_calc;
+
+	/**
+	 * @var
+	 */
+	public $recipe_id;
+	/**
+	 * @var
+	 */
+	public $user_id;
+	/**
+	 * @var
+	 */
+	public $replace_args;
+
+	/**
+	 * @var
+	 */
+	public $parsed_formula;
+	/**
+	 * @var
+	 */
+	public $result;
+
+	/**
+	 * @var
+	 */
+	public $return;
+	/**
+	 * @var
+	 */
+	public $pieces;
+	/**
+	 * @var
+	 */
+	public $trigger_data;
+	/**
+	 * @var
+	 */
+	public $formula;
 
 	/**
 	 * __construct
@@ -17,7 +59,9 @@ class Calculation_Token {
 	 * @return void
 	 */
 	public function __construct() {
-
+		if ( ! class_exists( '\ChrisKonnertz\StringCalc\StringCalc' ) ) {
+			return;
+		}
 		$this->string_calc = new \ChrisKonnertz\StringCalc\StringCalc();
 
 		add_filter( 'automator_maybe_parse_token', array( $this, 'parse_token' ), 999, 6 );
@@ -27,12 +71,13 @@ class Calculation_Token {
 	/**
 	 * parse_token
 	 *
-	 * @param  mixed $return
-	 * @param  mixed $pieces
-	 * @param  mixed $recipe_id
-	 * @param  mixed $trigger_data
-	 * @param  mixed $user_id
-	 * @param  mixed $replace_args
+	 * @param mixed $return
+	 * @param mixed $pieces
+	 * @param mixed $recipe_id
+	 * @param mixed $trigger_data
+	 * @param mixed $user_id
+	 * @param mixed $replace_args
+	 *
 	 * @return string
 	 */
 	public function parse_token( $return, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
@@ -44,7 +89,7 @@ class Calculation_Token {
 		try {
 
 			$this->hydrate( $return, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args )
-			->calculate();
+				 ->calculate();
 
 			$return = $this->get_result();
 
@@ -59,7 +104,8 @@ class Calculation_Token {
 	/**
 	 * is_calculation_token
 	 *
-	 * @param  mixed $replace_args
+	 * @param mixed $replace_args
+	 *
 	 * @return void
 	 */
 	public function is_calculation_token( $replace_args ) {
@@ -74,12 +120,13 @@ class Calculation_Token {
 	/**
 	 * hydrate
 	 *
-	 * @param  mixed $return
-	 * @param  mixed $pieces
-	 * @param  mixed $recipe_id
-	 * @param  mixed $trigger_data
-	 * @param  mixed $user_id
-	 * @param  mixed $replace_args
+	 * @param mixed $return
+	 * @param mixed $pieces
+	 * @param mixed $recipe_id
+	 * @param mixed $trigger_data
+	 * @param mixed $user_id
+	 * @param mixed $replace_args
+	 *
 	 * @return $this
 	 */
 	public function hydrate( $return, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
@@ -131,7 +178,7 @@ class Calculation_Token {
 
 		// Walk through each token separately so we can check if it is numeric or not
 		foreach ( $matches[0] as $order => $token ) {
-			$matches[1][ $order ] = $this->parse_inner_token( $token, $this->recipe_id, $this->user_id, $this->replace_args );
+			$matches[1][ $order ] = $this->parse_inner_token( $token );
 		}
 
 		// Replace the parsed tokens and return
@@ -141,7 +188,8 @@ class Calculation_Token {
 	/**
 	 * parse_inner_token
 	 *
-	 * @param  mixed $token
+	 * @param mixed $token
+	 *
 	 * @return void
 	 */
 	public function parse_inner_token( $token ) {
@@ -159,7 +207,8 @@ class Calculation_Token {
 	/**
 	 * replace_brackets
 	 *
-	 * @param  mixed $string
+	 * @param mixed $string
+	 *
 	 * @return string
 	 */
 	public function replace_brackets( $string ) {

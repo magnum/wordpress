@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,24 +34,40 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class TargetingGeoLocationCustomLocationFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADDRESS_STRING = 'address_string';
-    const COUNTRY = 'country';
-    const COUNTRY_GROUP = 'country_group';
-    const CUSTOM_TYPE = 'custom_type';
-    const DISTANCE_UNIT = 'distance_unit';
-    const KEY = 'key';
-    const LATITUDE = 'latitude';
-    const LONGITUDE = 'longitude';
-    const MAX_POPULATION = 'max_population';
-    const MIN_POPULATION = 'min_population';
-    const NAME = 'name';
-    const PRIMARY_CITY_ID = 'primary_city_id';
-    const RADIUS = 'radius';
-    const REGION_ID = 'region_id';
-    public function getFieldTypes()
-    {
-        return array('address_string' => 'string', 'country' => 'string', 'country_group' => 'string', 'custom_type' => 'string', 'distance_unit' => 'string', 'key' => 'string', 'latitude' => 'float', 'longitude' => 'float', 'max_population' => 'int', 'min_population' => 'int', 'name' => 'string', 'primary_city_id' => 'int', 'radius' => 'float', 'region_id' => 'int');
-    }
+
+class TargetingGeoLocationCustomLocationFields extends AbstractEnum {
+
+  const ADDRESS_STRING = 'address_string';
+  const COUNTRY = 'country';
+  const COUNTRY_GROUP = 'country_group';
+  const CUSTOM_TYPE = 'custom_type';
+  const DISTANCE_UNIT = 'distance_unit';
+  const KEY = 'key';
+  const LATITUDE = 'latitude';
+  const LONGITUDE = 'longitude';
+  const MAX_POPULATION = 'max_population';
+  const MIN_POPULATION = 'min_population';
+  const NAME = 'name';
+  const PRIMARY_CITY_ID = 'primary_city_id';
+  const RADIUS = 'radius';
+  const REGION_ID = 'region_id';
+
+  public function getFieldTypes() {
+    return array(
+      'address_string' => 'string',
+      'country' => 'string',
+      'country_group' => 'string',
+      'custom_type' => 'string',
+      'distance_unit' => 'string',
+      'key' => 'string',
+      'latitude' => 'float',
+      'longitude' => 'float',
+      'max_population' => 'int',
+      'min_population' => 'int',
+      'name' => 'string',
+      'primary_city_id' => 'int',
+      'radius' => 'float',
+      'region_id' => 'int',
+    );
+  }
 }

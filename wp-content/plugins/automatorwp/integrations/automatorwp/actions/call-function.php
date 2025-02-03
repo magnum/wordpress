@@ -11,17 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Call_Function extends AutomatorWP_Integration_Action {
 
-    public $integration = 'automatorwp';
-    public $action = 'automatorwp_call_function';
-
     /**
-     * The action result
+     * Initialize the trigger
      *
      * @since 1.0.0
-     *
-     * @var string $result
      */
-    public $result = '';
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_call_function';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -201,4 +203,5 @@ class AutomatorWP_WordPress_Call_Function extends AutomatorWP_Integration_Action
 
 }
 
-new AutomatorWP_WordPress_Call_Function();
+new AutomatorWP_WordPress_Call_Function( 'automatorwp' );
+new AutomatorWP_WordPress_Call_Function( 'code' );

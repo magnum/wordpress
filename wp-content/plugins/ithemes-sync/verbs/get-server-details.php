@@ -14,12 +14,12 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Server_Details extends Ithemes_Sync_Verb {
-	public static $name = 'get-server-details';
-	public static $description = 'Retrieve details about the server.';
-	public static $status_element_name = 'server';
+	public static $name                      = 'get-server-details';
+	public static $description               = 'Retrieve details about the server.';
+	public static $status_element_name       = 'server';
 	public static $show_in_status_by_default = true;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {

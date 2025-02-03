@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdAsyncRequestStatusesValues getInstance()
  */
-class AdAsyncRequestStatusesValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CANCELED = 'CANCELED';
-    const CANCELED_DEPENDENCY = 'CANCELED_DEPENDENCY';
-    const ERROR = 'ERROR';
-    const ERROR_CONFLICTS = 'ERROR_CONFLICTS';
-    const ERROR_DEPENDENCY = 'ERROR_DEPENDENCY';
-    const INITIAL = 'INITIAL';
-    const IN_PROGRESS = 'IN_PROGRESS';
-    const PENDING_DEPENDENCY = 'PENDING_DEPENDENCY';
-    const PROCESS_BY_AD_ASYNC_ENGINE = 'PROCESS_BY_AD_ASYNC_ENGINE';
-    const PROCESS_BY_EVENT_PROCESSOR = 'PROCESS_BY_EVENT_PROCESSOR';
-    const SUCCESS = 'SUCCESS';
-    const USER_CANCELED = 'USER_CANCELED';
-    const USER_CANCELED_DEPENDENCY = 'USER_CANCELED_DEPENDENCY';
+class AdAsyncRequestStatusesValues extends AbstractEnum {
+
+  const CANCELED = 'CANCELED';
+  const CANCELED_DEPENDENCY = 'CANCELED_DEPENDENCY';
+  const ERROR = 'ERROR';
+  const ERROR_CONFLICTS = 'ERROR_CONFLICTS';
+  const ERROR_DEPENDENCY = 'ERROR_DEPENDENCY';
+  const INITIAL = 'INITIAL';
+  const IN_PROGRESS = 'IN_PROGRESS';
+  const PENDING_DEPENDENCY = 'PENDING_DEPENDENCY';
+  const PROCESS_BY_AD_ASYNC_ENGINE = 'PROCESS_BY_AD_ASYNC_ENGINE';
+  const PROCESS_BY_EVENT_PROCESSOR = 'PROCESS_BY_EVENT_PROCESSOR';
+  const SUCCESS = 'SUCCESS';
+  const USER_CANCELED = 'USER_CANCELED';
+  const USER_CANCELED_DEPENDENCY = 'USER_CANCELED_DEPENDENCY';
 }

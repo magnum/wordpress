@@ -43,6 +43,15 @@ class Compatibility {
 		}
 
 		add_action( 'elementor/maintenance_mode/mode_changed', [ __CLASS__, 'clear_3rd_party_cache' ] );
+
+		// Enable floating buttons and link in bio experiment for all.
+		// TODO Remove in version 3.26
+		add_filter( 'pre_option_elementor_experiment-floating-buttons', [ __CLASS__, 'return_active' ] );
+		add_filter( 'pre_option_elementor_experiment-link-in-bio', [ __CLASS__, 'return_active' ] );
+	}
+
+	public static function return_active() {
+		return 'active';
 	}
 
 	public static function clear_3rd_party_cache() {
@@ -90,7 +99,7 @@ class Compatibility {
 		}
 
 		?>
-		<script type="text/javascript">
+		<script>
 			document.addEventListener( 'DOMContentLoaded', function() {
 				var dropdown = document.querySelector( '#split-page-title-action .dropdown' );
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemARDataSurfacesValues getInstance()
  */
-class ProductItemARDataSurfacesValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const B2C_MARKETPLACE = 'B2C_MARKETPLACE';
-    const C2C_MARKETPLACE = 'C2C_MARKETPLACE';
-    const DA = 'DA';
-    const DAILY_DEALS = 'DAILY_DEALS';
-    const DAILY_DEALS_LEGACY = 'DAILY_DEALS_LEGACY';
-    const IG_PRODUCT_TAGGING = 'IG_PRODUCT_TAGGING';
-    const MARKETPLACE = 'MARKETPLACE';
-    const MARKETPLACE_ADS_DEPRECATED = 'MARKETPLACE_ADS_DEPRECATED';
-    const MARKETPLACE_SHOPS = 'MARKETPLACE_SHOPS';
-    const OFFLINE_CONVERSIONS = 'OFFLINE_CONVERSIONS';
-    const SHOPS = 'SHOPS';
-    const UNIVERSAL_CHECKOUT = 'UNIVERSAL_CHECKOUT';
-    const WHATSAPP = 'WHATSAPP';
+class ProductItemARDataSurfacesValues extends AbstractEnum {
+
+  const B2C_MARKETPLACE = 'B2C_MARKETPLACE';
+  const C2C_MARKETPLACE = 'C2C_MARKETPLACE';
+  const DA = 'DA';
+  const DAILY_DEALS = 'DAILY_DEALS';
+  const DAILY_DEALS_LEGACY = 'DAILY_DEALS_LEGACY';
+  const IG_PRODUCT_TAGGING = 'IG_PRODUCT_TAGGING';
+  const MARKETPLACE = 'MARKETPLACE';
+  const MARKETPLACE_ADS_DEPRECATED = 'MARKETPLACE_ADS_DEPRECATED';
+  const MARKETPLACE_SHOPS = 'MARKETPLACE_SHOPS';
+  const MINI_SHOPS = 'MINI_SHOPS';
+  const OFFLINE_CONVERSIONS = 'OFFLINE_CONVERSIONS';
+  const SHOPS = 'SHOPS';
+  const UNIVERSAL_CHECKOUT = 'UNIVERSAL_CHECKOUT';
+  const WHATSAPP = 'WHATSAPP';
 }

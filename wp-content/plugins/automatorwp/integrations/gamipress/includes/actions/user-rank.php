@@ -45,7 +45,7 @@ class AutomatorWP_GamiPress_User_Rank extends AutomatorWP_Integration_Action {
                         'user' => array(
                             'name' => __( 'User ID:', 'automatorwp' ),
                             'desc' => __( 'User ID that will receive this rank. Leave blank to award the rank to the user that completes the automation.', 'automatorwp' ),
-                            'type' => 'input',
+                            'type' => 'text',
                             'default' => ''
                         ),
                     )

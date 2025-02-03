@@ -591,7 +591,7 @@ function automatorwp_options_cb_automation_statuses( $field ) {
 
     $object = ct_get_object( $object_id );
 
-    if( ! in_array( $object->type, array( 'all-users' , 'all-posts' ) ) ) {
+    if( ! in_array( $object->type, array( 'all-users' , 'all-posts', 'import-file' ) ) ) {
         unset( $options['in-progress'] );
     }
 

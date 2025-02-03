@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AsyncRequestFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AsyncRequestStatusValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AsyncRequestTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AsyncRequestTypeValues;
  * pull request for this class.
  *
  */
-class AsyncRequest extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return AsyncRequestFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AsyncRequestFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Status'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AsyncRequestStatusValues::getInstance()->getValues();
-        $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AsyncRequestTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AsyncRequest extends AbstractCrudObject {
+
+  /**
+   * @return AsyncRequestFields
+   */
+  public static function getFieldsEnum() {
+    return AsyncRequestFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Status'] = AsyncRequestStatusValues::getInstance()->getValues();
+    $ref_enums['Type'] = AsyncRequestTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

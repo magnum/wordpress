@@ -2,12 +2,75 @@
 
 namespace Uncanny_Automator\Recipe;
 
+use Exception;
 use Uncanny_Automator\Automator_Send_Webhook;
+use Uncanny_Automator\Webhooks\Response_Validator;
 
 /**
  * Trait Webhook
  */
 trait Webhooks {
+
+	use Action_Tokens;
+
+	use Log_Properties;
+
+	/**
+	 * The elapsed time in milliseconds for webhook to complete its request.
+	 *
+	 * @var int
+	 */
+	private $elapsed_time_ms = 0;
+
+	/**
+	 * Filter function to inject "Send test" response values as Action tokens.
+	 * Each Webhook calls this parent method.
+	 *
+	 * @param $tokens
+	 * @param $action_id
+	 * @param $recipe_id
+	 *
+	 * @return array|mixed
+	 */
+	public function inject_webhooks_response_tokens( $tokens = array(), $action_id = null, $recipe_id = null ) {
+
+		$tokens[] = array(
+			'tokenId'   => 'WEBHOOK_RESPONSE_CODE',
+			'tokenName' => esc_html_x( 'Response - Status code', 'webhook', 'uncanny-automator' ),
+			'tokenType' => 'int',
+		);
+
+		$response_exists = get_post_meta( $action_id, 'webhook_response_tokens', true );
+
+		if ( empty( $response_exists ) ) {
+			return $tokens;
+		}
+
+		// Make sure data is array. The func json_decode can return boolean or null.
+		$response_exists = (array) json_decode( $response_exists, true );
+
+		$new_tokens = array();
+
+		foreach ( $response_exists as $action_token ) {
+			$tag          = strtoupper( $action_token['key'] );
+			$new_tokens[] = array(
+				'tokenId'     => $tag,
+				'tokenParent' => get_post_meta( $action_id, 'code', true ),
+				'tokenName'   => sprintf( '%s - %s', __( 'Response', 'uncanny-automator' ), $action_token['key'] ),
+				'tokenType'   => $action_token['type'],
+			);
+		}
+
+		$new_tokens[] = array(
+			'tokenId'     => 'WEBHOOK_RESPONSE_BODY',
+			'tokenParent' => get_post_meta( $action_id, 'code', true ),
+			'tokenName'   => _x( 'Response - Body (raw)', 'Webhook', 'uncanny-automator' ),
+			'tokenType'   => 'text',
+		);
+
+		return array_merge( $new_tokens, $tokens );
+
+	}
 
 	/**
 	 * Common function to run action on all outgoing webhooks
@@ -23,6 +86,14 @@ trait Webhooks {
 	 */
 	protected function process_action( $user_id, $action_data, $recipe_id, $args, $parsed ) {
 
+		if ( true === AUTOMATOR_DISABLE_APP_INTEGRATION_REQUESTS ) {
+			$action_data['complete_with_errors'] = true;
+
+			return Automator()->complete->action( $user_id, $action_data, $recipe_id, 'Webhooks have been disabled in wp-config.php.' );
+		}
+		// Start the timer.
+		$start_time = microtime( true );
+
 		$legacy = isset( $action_data['meta']['WEBHOOKURL'] ) ? true : false;
 
 		$parsing_args = array(
@@ -33,31 +104,15 @@ trait Webhooks {
 
 		$data         = $action_data['meta'];
 		$data_type    = Automator()->send_webhook->get_data_type( $data );
-		$headers      = Automator()->send_webhook->get_headers( $data, $parsing_args );
 		$webhook_url  = Automator()->send_webhook->get_url( $data, $legacy, $parsing_args );
 		$fields       = Automator()->send_webhook->get_fields( $data, $legacy, $data_type, $parsing_args );
 		$request_type = Automator()->send_webhook->request_type( $data );
-		$headers      = Automator()->send_webhook->get_content_type( $data_type, $headers );
-
-		// Fix required boundary for multipart/* content-type.
-		if ( false !== strpos( $headers['Content-Type'], 'multipart/' ) ) {
-			$headers['Content-Type'] .= ';boundary=' . sha1( time() );
-		}
+		$headers      = Automator()->send_webhook->get_headers( $data, $data_type, $action_data['ID'], $parsing_args );
 
 		if ( empty( $webhook_url ) ) {
 
 			/* translators: 1. Webhook URL */
 			$error_message = esc_attr__( 'Webhook URL is empty.', 'uncanny-automator' );
-
-			$action_data['complete_with_errors'] = true;
-
-			return Automator()->complete->action( $user_id, $action_data, $recipe_id, $error_message );
-
-		}
-
-		if ( empty( $fields ) ) {
-
-			$error_message = esc_attr__( 'Webhook payload is empty.', 'uncanny-automator' );
 
 			$action_data['complete_with_errors'] = true;
 
@@ -82,11 +137,63 @@ trait Webhooks {
 
 		try {
 
+			// Get response header
 			$response = Automator_Send_Webhook::call_webhook( $webhook_url, $args, $request_type );
+
+			// Send some properties to the log.
+			$response_headers = wp_remote_retrieve_headers( $response );
+
+			$encoded_response_headers = $response_headers instanceof \WpOrg\Requests\Utility\CaseInsensitiveDictionary ? $response_headers->getAll() : array();
+
+			$this->set_log_properties(
+				array(
+					'type'       => 'code',
+					'label'      => _x( 'Response headers', 'Send webhook action response headers property', 'uncanny-automator' ),
+					'value'      => wp_json_encode( $encoded_response_headers ),
+					'attributes' => array(
+						'code_language' => 'json',
+					),
+				),
+				// Webhook response
+				array(
+					'type'       => 'code',
+					'label'      => _x( 'Response body', 'Send webhook action log response body property', 'uncanny-automator' ),
+					'value'      => wp_remote_retrieve_body( $response ),
+					'attributes' => array(
+						'code_language' => 'json',
+					),
+				)
+			);
+
+			$header_response = wp_remote_retrieve_headers( $response );
+
+			$header_leafs = Automator_Send_Webhook::parse_headers( $header_response );
+
+			// Get response body.
+			$response_body = Automator_Send_Webhook::get_leafs( json_decode( wp_remote_retrieve_body( $response ), true ), true );
+
+			// Combine header and body tokens.
+			$all_tokens = array_merge( $header_leafs, $response_body );
+
+			// If tokens are not previously saved OR set to true, override previously saved tokens.
+			if (
+				empty( get_post_meta( $action_data['ID'], 'webhook_response_tokens', true ) ) ||
+				true === apply_filters( 'automator_outgoing_webhook_live_response_tokens', false, $response )
+			) {
+				$save_tokens = Automator_Send_Webhook::clean_tokens_before_save( $all_tokens );
+				update_post_meta( $action_data['ID'], 'webhook_response_tokens', wp_json_encode( $save_tokens ) );
+				unset( $save_tokens );
+			}
+
+			// Parse response into leafs.
+			$hydration_data = Automator_Send_Webhook::before_hydrate_tokens( $all_tokens, $response );
+
+			// Pass to hydrate tokens.
+			$this->hydrate_tokens( $hydration_data );
 
 			$validated = $this->validate_response( $response );
 
-			if ( $validated ) {
+			if ( ! empty( $validated ) ) {
 
 				/**
 				 * Send some do_action args to `automator_webhook_action_completed` action hook.
@@ -106,10 +213,13 @@ trait Webhooks {
 
 				if ( is_array( $validated ) && ! empty( $validated['error_message'] ) ) {
 
+					// Marks the action as completed with notice.
 					$action_data['complete_with_notice'] = true;
-
+					// Complete the action.
 					Automator()->complete->action( $user_id, $action_data, $recipe_id, $validated['error_message'] );
-
+					// Log the webhook request.
+					$this->log_webhook_request( $args, $webhook_url, $response, $action_data );
+					// Invoke the action hook.
 					do_action( 'automator_webhook_action_completed', $body, $response, $user_id, $do_action_args, $this );
 
 					return;
@@ -124,241 +234,113 @@ trait Webhooks {
 		} catch ( \Exception $e ) {
 
 			$action_data['complete_with_errors'] = true;
-
 			// Something bad happened. Complete with error.
 			Automator()->complete->action( $user_id, $action_data, $recipe_id, $e->getMessage() );
 
 		}
 
+		// End the timer.
+		$end_time = microtime( true );
+
+		$this->elapsed_time_ms = ( $end_time - $start_time ) * 1000;
+
+		$this->log_webhook_request( $args, $webhook_url, $response, $action_data );
+
 	}
 
 	/**
-	 * Validates the response and throws an \Exception if response has errors.
+	 * Log the webhook request.
 	 *
-	 * @param $response
+	 * @param mixed[] $args
+	 * @param string $webhook_url
+	 * @param WP_REST_Response $response
+	 * @param mixed[] $action_data
 	 *
-	 * @return boolean True if no exception has occured.
+	 * @return void
+	 */
+	private function log_webhook_request( $args, $webhook_url, $response, $action_data ) {
+
+		// Log the request in the API for replay.
+		$log_parameters = $this->make_log_parameters( $args, $webhook_url, wp_remote_retrieve_response_code( $response ) );
+
+		$log_parameters['elapsed'] = $this->elapsed_time_ms;
+
+		$action_log_id = $action_data['action_log_id'] ?? null;
+		$recipe_log_id = $action_data['recipe_log_id'] ?? null;
+
+		$this->log_request_as_api(
+			$recipe_log_id,
+			$action_log_id,
+			$log_parameters
+		);
+
+	}
+
+	/**
+	 * Generates request log parameters.
+	 *
+	 * @param mixed[] $args
+	 * @param string $url
+	 * @param int $response_code
+	 *
+	 * @return array
+	 */
+	public function make_log_parameters( $args, $url, $response_code ) {
+
+		return array(
+			'endpoint' => 'internal:webhook',
+			'params'   => $args,
+			'request'  => array(
+				'http_url' => $url,
+			),
+			'response' => array(
+				'code' => $response_code,
+			),
+		);
+
+	}
+
+	/**
+	 * Log the webhook request as api.
+	 *
+	 * @param int $recipe_log_id
+	 * @param int $action_log_id
+	 * @param mixed[] $logger_params
+	 *
+	 * @return void
+	 */
+	public function log_request_as_api( $recipe_log_id, $action_log_id, $logger_params ) {
+
+		$log = array(
+			'type'          => 'action',
+			'recipe_log_id' => $recipe_log_id,
+			'item_log_id'   => $action_log_id,
+			'endpoint'      => $logger_params['endpoint'],
+			'params'        => maybe_serialize( $logger_params['params'] ),
+			'request'       => maybe_serialize( $logger_params['request'] ),
+			'response'      => maybe_serialize( $logger_params['response'] ),
+			'balance'       => null,
+			'price'         => null,
+			'status'        => $logger_params['response']['code'],
+			'time_spent'    => $logger_params['elapsed'],
+		);
+
+		Automator()->db->api->add( $log );
+
+	}
+
+	/**
+	 * Validates the response object (WP_Rest_Response). Throws an Exception if the response has errors.
+	 *
+	 * @param WP_Rest_Response $response
+	 *
+	 * @return array{error_message:string,response_code:int}|null Returns array for ok response. Returns null for error but throws Exceptions.
+	 *
 	 * @throws \Exception
 	 */
 	protected function validate_response( $response ) {
 
-		// The client did not receive a valid response while sending data to webhook URL server (e.g. timeout, server not found, etc).
-		if ( is_wp_error( $response ) ) {
-
-			$error_message = sprintf(
-			/* translators: 1. Webhook URL */
-				esc_attr__( 'An error was found in the webhook (%1$s) response.', 'uncanny-automator' ),
-				$response->get_error_message()
-			);
-
-			if ( ! empty( $response->get_error_message() ) ) {
-				$error_message = $response->get_error_message();
-			}
-
-			throw new \Exception( $error_message, absint( $response->get_error_code() ) ); // Converts blank error code to 0.
-
-		}
-
-		return $this->validate_from_status_code( $response );
-
-	}
-
-	/**
-	 * Validates the response from status code.
-	 *
-	 * @param mixed $response The response from the server.
-	 *
-	 * @return mixed True if response status code in range(200, 299).
-	 *
-	 * @throws \Exception
-	 */
-	protected function validate_from_status_code( $response = null ) {
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		// Handle successful responses.
-		if ( in_array( $response_code, range( 200, 299 ), true ) ) {
-			return $this->handle_response_successful( $response, $response_code, '' );
-		}
-
-		// Handle redirection messages.
-		if ( in_array( $response_code, range( 300, 399 ), true ) ) {
-			return $this->handle_response_redirected( $response, $response_code, __( 'Request redirected to another URL.', 'uncanny-automator' ) );
-		}
-
-		// Handle client error response.
-		if ( in_array( $response_code, range( 400, 499 ), true ) ) {
-			/* translators: Response code */
-			return $this->handle_response_client_error( $response, $response_code, sprintf( __( 'Client error, request responded with %d error.', 'uncanny-automator' ), $response_code ) );
-		}
-
-		// Handle server error responses .
-		if ( in_array( $response_code, range( 500, 599 ), true ) ) {
-			/* translators: Response code */
-			return $this->handle_response_server_error( $response, $response_code, sprintf( __( 'Server error, request responded with %d error.', 'uncanny-automator' ), $response_code ) );
-		}
-
-		throw new \Exception(
-			'Server has responded with invalid status code: ' . $response_code,
-			$response_code
-		);
-
-	}
-
-	/**
-	 * Handles 20x successful responses from server.
-	 *
-	 * @param mixed $response The response body object.
-	 *
-	 * @return boolean True if no \Exception has occured.
-	 */
-	protected function handle_response_successful( $response = null, $response_code = 0, $error_message = '' ) {
-
-		if ( $this->response_has_errors( $response ) ) {
-
-			throw new \Exception(
-				'A response containing an error object in the data was received.
-				The server response in JSON format: ' . wp_json_encode( $response ),
-				400 // Send 400 status code.
-			);
-
-		}
-
-		// Otherwise, return true.
-		return array(
-			'error_message' => null,
-			'response_code' => $response_code,
-		);
-
-	}
-
-	/**
-	 * Handles 30x redirected response.
-	 *
-	 * @param mixed $response The response body object.
-	 */
-	protected function handle_response_redirected( $response = null, $response_code = 0, $error_message = '' ) {
-
-		// Overwrite error message if response has message.
-		if ( $this->response_has_errors( $response ) ) {
-			$error_message = sprintf( 'Request %d redirected to another URL - %s', $response_code, $this->format_response_body( $response ) );
-		}
-
-		return array(
-			'error_message' => $error_message,
-			'response_code' => $response_code,
-		);
-
-	}
-
-	/**
-	 * Handles 40x client response.
-	 *
-	 * @param mixed $response The response body object.
-	 *
-	 * @return string
-	 *
-	 * @throws \Exception
-	 */
-	protected function handle_response_client_error( $response = null, $response_code = 0, $error_message = '' ) {
-
-		// Overwrite error message if response has message.
-		if ( $this->response_has_errors( $response ) ) {
-
-			$error_message = sprintf( 'Client error with %d error - %s', $response_code, $this->format_response_body( $response ) );
-
-			throw new \Exception( $error_message, $response_code );
-
-		}
-
-		throw new \Exception( $error_message, $response_code );
-
-	}
-
-	/**
-	 * Handles 50x server response.
-	 *
-	 * @param mixed $response The response body object.
-	 *
-	 * @return string
-	 */
-	public function handle_response_server_error( $response = null, $response_code = 0, $error_message = '' ) {
-
-		// Overwrite error message if response has message.
-		if ( $this->response_has_errors( $response ) ) {
-
-			$error_message = sprintf( 'Server error: %d error - %s', $response_code, $this->format_response_body( $response ) );
-
-			throw new \Exception( $error_message, $response_code );
-
-		}
-
-		throw new \Exception( $error_message, $response_code );
-
-	}
-
-	/**
-	 * Formats the response body from error message.
-	 *
-	 * @param mixed $response The response body object.
-	 *
-	 * @return string The error message.
-	 */
-	private function format_response_body( $response = null ) {
-
-		$encoded_json_response = wp_json_encode( $response, 0, 5 );
-
-		// Bail early if server has responded with non-json format.
-		// If server was redirected without any content in the body,
-		// wp_json_encode response is `string` null.
-		if ( 'null' === $encoded_json_response || empty( $encoded_json_response ) ) {
-			return null;
-		}
-
-		// Apply generic error message in JSON format.
-		$error_message = substr( $encoded_json_response, 0, 2000 ); // Max 2000 characters.
-
-		// Try to detect actual errors.
-		if ( ! empty( $response->error ) ) {
-			$error_message = $response->error;
-		}
-
-		if ( ! empty( $response->data->error ) ) {
-			$error_message = $response->data->error;
-		}
-
-		if ( ! empty( $response->data->message->error ) ) {
-			$error_message = $response->data->message->error;
-		}
-
-		// Handle in case the server has responded with an object or an array.
-		if ( is_array( $error_message ) || is_object( $error_message ) ) {
-			$error_message = wp_json_encode( $error_message );
-		}
-
-		if ( empty( $error_message ) ) {
-			$error_message = 'Empty response body.';
-		}
-
-		// Only return up to 5th level with 2000 max characters.
-		return apply_filters( 'automator_trait_webhooks_format_error_message', $error_message, $this );
-
-	}
-
-
-	/**
-	 * Checks whether the given response contains error.
-	 *
-	 * @return boolean True if there are any error(s). Otherwise, false.
-	 */
-	private function response_has_errors( $response = null ) {
-
-		return ! empty( $response->data->errors ) ||
-			   ! empty( $response->data->error ) ||
-			   ! empty( $response->error ) ||
-			   ! empty( $response->errors );
+		return Response_Validator::validate_webhook_response( $response );
 
 	}
 

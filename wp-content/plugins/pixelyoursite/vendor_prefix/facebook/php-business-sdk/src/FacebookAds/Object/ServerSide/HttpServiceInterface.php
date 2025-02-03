@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,17 +21,17 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
-interface HttpServiceInterface
-{
-    /**
-     * @param string $url The graph API endpoint that will be requested
-     * @param FacebookAds\Object\ServerSide\HttpMethod $method The HTTP request method
-     * @param array $curl_options Contains curl options
-     * @param array $headers Contains HTTP request headers including User-Agent and Accept-Encoding
-     * @param array $params Contains request parameters including access_token, data, test_event_code, etc.
-     * @return FacebookAds\Object\ServerSide\EventResponse
-     */
-    public function executeRequest($url, $method, array $curl_options, array $headers, array $params);
+interface HttpServiceInterface {
+  /**
+   * @param string $url The graph API endpoint that will be requested
+   * @param PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\HttpMethod $method The HTTP request method
+   * @param array $curl_options Contains curl options
+   * @param array $headers Contains HTTP request headers including User-Agent and Accept-Encoding
+   * @param array $params Contains request parameters including access_token, data, test_event_code, etc.
+   * @return PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\EventResponse
+   */
+  public function executeRequest($url, $method, array $curl_options, array $headers, array $params);
 }

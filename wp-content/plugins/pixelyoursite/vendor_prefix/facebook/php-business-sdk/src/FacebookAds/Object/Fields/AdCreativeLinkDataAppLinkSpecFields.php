@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataAppLinkSpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ANDROID = 'android';
-    const IOS = 'ios';
-    const IPAD = 'ipad';
-    const IPHONE = 'iphone';
-    public function getFieldTypes()
-    {
-        return array('android' => 'list<AndroidAppLink>', 'ios' => 'list<IosAppLink>', 'ipad' => 'list<IosAppLink>', 'iphone' => 'list<IosAppLink>');
-    }
+
+class AdCreativeLinkDataAppLinkSpecFields extends AbstractEnum {
+
+  const ANDROID = 'android';
+  const IOS = 'ios';
+  const IPAD = 'ipad';
+  const IPHONE = 'iphone';
+
+  public function getFieldTypes() {
+    return array(
+      'android' => 'list<AndroidAppLink>',
+      'ios' => 'list<IosAppLink>',
+      'ipad' => 'list<IosAppLink>',
+      'iphone' => 'list<IosAppLink>',
+    );
+  }
 }

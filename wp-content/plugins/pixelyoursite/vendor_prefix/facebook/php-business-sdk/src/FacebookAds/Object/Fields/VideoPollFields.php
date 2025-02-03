@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoPollFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CLOSE_AFTER_VOTING = 'close_after_voting';
-    const DEFAULT_OPEN = 'default_open';
-    const ID = 'id';
-    const QUESTION = 'question';
-    const SHOW_GRADIENT = 'show_gradient';
-    const SHOW_RESULTS = 'show_results';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('close_after_voting' => 'bool', 'default_open' => 'bool', 'id' => 'string', 'question' => 'string', 'show_gradient' => 'bool', 'show_results' => 'bool', 'status' => 'Status');
-    }
+
+class VideoPollFields extends AbstractEnum {
+
+  const CLOSE_AFTER_VOTING = 'close_after_voting';
+  const DEFAULT_OPEN = 'default_open';
+  const ID = 'id';
+  const QUESTION = 'question';
+  const SHOW_GRADIENT = 'show_gradient';
+  const SHOW_RESULTS = 'show_results';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'close_after_voting' => 'bool',
+      'default_open' => 'bool',
+      'id' => 'string',
+      'question' => 'string',
+      'show_gradient' => 'bool',
+      'show_results' => 'bool',
+      'status' => 'Status',
+    );
+  }
 }

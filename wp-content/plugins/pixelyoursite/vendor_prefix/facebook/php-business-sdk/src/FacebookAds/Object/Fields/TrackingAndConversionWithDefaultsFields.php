@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class TrackingAndConversionWithDefaultsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CUSTOM_CONVERSION = 'custom_conversion';
-    const CUSTOM_TRACKING = 'custom_tracking';
-    const DEFAULT_CONVERSION = 'default_conversion';
-    const DEFAULT_TRACKING = 'default_tracking';
-    public function getFieldTypes()
-    {
-        return array('custom_conversion' => 'list<Object>', 'custom_tracking' => 'list<Object>', 'default_conversion' => 'list<Object>', 'default_tracking' => 'list<Object>');
-    }
+
+class TrackingAndConversionWithDefaultsFields extends AbstractEnum {
+
+  const CUSTOM_CONVERSION = 'custom_conversion';
+  const CUSTOM_TRACKING = 'custom_tracking';
+  const DEFAULT_CONVERSION = 'default_conversion';
+  const DEFAULT_TRACKING = 'default_tracking';
+
+  public function getFieldTypes() {
+    return array(
+      'custom_conversion' => 'list<Object>',
+      'custom_tracking' => 'list<Object>',
+      'default_conversion' => 'list<Object>',
+      'default_tracking' => 'list<Object>',
+    );
+  }
 }

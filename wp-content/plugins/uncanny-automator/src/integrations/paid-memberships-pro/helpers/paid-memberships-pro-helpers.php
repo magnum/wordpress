@@ -25,14 +25,13 @@ class Paid_Memberships_Pro_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Paid_Memberships_Pro_Helpers constructor.
 	 */
 	public function __construct() {
 
-		$this->load_options = true;
 	}
 
 	/**
@@ -88,6 +87,7 @@ class Paid_Memberships_Pro_Helpers {
 				$option_code . '_USER_ID'             => esc_attr__( 'User ID', 'uncanny-automator' ),
 				$option_code . '_DISCOUNT_CODE'       => esc_attr__( 'Discount code', 'uncanny-automator' ),
 				$option_code . '_DISCOUNT_CODE_ID'    => esc_attr__( 'Discount code ID', 'uncanny-automator' ),
+				$option_code . '_INITIAL_AMOUNT'      => esc_attr__( 'Initial amount', 'uncanny-automator' ),
 				$option_code . '_SUBSCRIPTION_ID'     => esc_attr__( 'Subscription ID', 'uncanny-automator' ),
 				$option_code . '_SUBSCRIPTION_AMOUNT' => esc_attr__( 'Subscription amount', 'uncanny-automator' ),
 				$option_code . '_SUBSCRIPTION_PERIOD' => esc_attr__( 'Subscription period', 'uncanny-automator' ),

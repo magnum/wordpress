@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,16 +35,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdsInsightsActionAttributionWindowsValues getInstance()
  */
-class AdsInsightsActionAttributionWindowsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const VALUE_1D_CLICK = '1d_click';
-    const VALUE_1D_VIEW = '1d_view';
-    const VALUE_28D_CLICK = '28d_click';
-    const VALUE_28D_VIEW = '28d_view';
-    const VALUE_7D_CLICK = '7d_click';
-    const VALUE_7D_VIEW = '7d_view';
-    const DDA = 'dda';
-    const VALUE_DEFAULT = 'default';
-    const SKAN_CLICK = 'skan_click';
-    const SKAN_VIEW = 'skan_view';
+class AdsInsightsActionAttributionWindowsValues extends AbstractEnum {
+
+  const VALUE_1D_CLICK = '1d_click';
+  const VALUE_1D_VIEW = '1d_view';
+  const VALUE_28D_CLICK = '28d_click';
+  const VALUE_28D_VIEW = '28d_view';
+  const VALUE_7D_CLICK = '7d_click';
+  const VALUE_7D_VIEW = '7d_view';
+  const DDA = 'dda';
+  const VALUE_DEFAULT = 'default';
+  const SKAN_CLICK = 'skan_click';
+  const SKAN_VIEW = 'skan_view';
 }

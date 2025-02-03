@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,110 +21,121 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\BusinessDataAPI;
 
 use PYS_PRO_GLOBAL\FacebookAds\Api;
 use PYS_PRO_GLOBAL\FacebookAds\ApiConfig;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Page;
+
 /**
  * Business Data API Event Request
  *
  * @category    Class
  */
-class EventRequest
-{
-    /**
-     * Associative array for storing property values
-     * @var mixed[]
-     */
-    protected $container = array();
-    /**
-     * Constructor
-     * @param string $page_id page id
-     * @param mixed[] $data Associated array of property value initializing the model
-     */
-    public function __construct(string $page_id, array $data = null)
-    {
-        $this->container['page_id'] = $page_id;
-        $this->container['events'] = isset($data['events']) ? $data['events'] : null;
+class EventRequest {
+
+  /**
+   * Associative array for storing property values
+   * @var mixed[]
+   */
+  protected $container = array();
+
+  /**
+   * Constructor
+   * @param string $page_id page id
+   * @param mixed[] $data Associated array of property value initializing the model
+   */
+  public function __construct(string $page_id, array $data = null) {
+    $this->container['page_id'] = $page_id;
+    $this->container['events'] = isset($data['events']) ? $data['events'] : null;
+  }
+
+  /**
+   * Sets an array of Business Data Event objects
+   * @param PYS_PRO_GLOBAL\FacebookAds\Object\BusinessDataAPI\Event[] $events An array of Business Data Event objects
+   * @return $this
+   */
+  public function setEvents($events) {
+    $this->container['events'] = $events;
+    return $this;
+  }
+
+  /**
+   * Sets Partner Agent, which specifies who is sending the event.
+   * @param string $partner_agent The partner agent who is sending the event
+   * @return $this
+   */
+  public function setPartnerAgent($partner_agent) {
+    $this->container['partner_agent'] = $partner_agent;
+
+    return $this;
+  }
+
+  /**
+   * Execute the request
+   * @return EventResponse
+   */
+  public function execute() {
+    $fields = array();
+    $params = $this->toJson();
+    $page = new Page($this->container['page_id']);
+    $response = $page->createBusinessDatum(
+      $fields,
+      $params,
+    );
+    $event_response = new EventResponse($response->exportAllData());
+    return $event_response;
+  }
+
+  /**
+   * convert to JSON
+   * @return array
+   */
+  public function toJson() {
+    $data = array();
+    $events = $this->getEvents();
+    if (!is_null($events)) {
+      foreach ($events as $event) {
+        $event_data = $event->toJson();
+        array_push($data, $event_data);
+      }
     }
-    /**
-     * Sets an array of Business Data Event objects
-     * @param FacebookAds\Object\BusinessDataAPI\Event[] $events An array of Business Data Event objects
-     * @return $this
-     */
-    public function setEvents($events)
-    {
-        $this->container['events'] = $events;
-        return $this;
+
+    $payload = array(
+      'data' => $data,
+      'partner_agent' => $this->container['partner_agent'],
+    );
+    $payload = array_filter($payload);
+
+    return $payload;
+  }
+
+  /**
+   * Gets an array of Event objects
+   * @return PYS_PRO_GLOBAL\FacebookAds\Object\BusinessDataAPI\Event[]
+   */
+  public function getEvents() {
+    return $this->container['events'];
+  }
+
+  /**
+   * Gets Partner Agent, which specifies who is sending the event.
+   * @return string
+   */
+  public function getPartnerAgent() {
+    return $this->container['partner_agent'];
+  }
+
+ /**
+   * Gets the string presentation of the object
+   * @return string
+   */
+  public function __toString() {
+    if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
+      return json_encode($this, JSON_PRETTY_PRINT);
     }
-    /**
-     * Sets Partner Agent, which specifies who is sending the event.
-     * @param string $partner_agent The partner agent who is sending the event
-     * @return $this
-     */
-    public function setPartnerAgent($partner_agent)
-    {
-        $this->container['partner_agent'] = $partner_agent;
-        return $this;
-    }
-    /**
-     * Execute the request
-     * @return EventResponse
-     */
-    public function execute()
-    {
-        $fields = array();
-        $params = $this->toJson();
-        $page = new \PYS_PRO_GLOBAL\FacebookAds\Object\Page($this->container['page_id']);
-        $response = $page->createBusinessDatum($fields, $params);
-        $event_response = new \PYS_PRO_GLOBAL\FacebookAds\Object\BusinessDataAPI\EventResponse($response->exportAllData());
-        return $event_response;
-    }
-    /**
-     * convert to JSON
-     * @return array
-     */
-    public function toJson()
-    {
-        $data = array();
-        $events = $this->getEvents();
-        if (!\is_null($events)) {
-            foreach ($events as $event) {
-                $event_data = $event->toJson();
-                \array_push($data, $event_data);
-            }
-        }
-        $payload = array('data' => $data, 'partner_agent' => $this->container['partner_agent']);
-        $payload = \array_filter($payload);
-        return $payload;
-    }
-    /**
-     * Gets an array of Event objects
-     * @return FacebookAds\Object\BusinessDataAPI\Event[]
-     */
-    public function getEvents()
-    {
-        return $this->container['events'];
-    }
-    /**
-     * Gets Partner Agent, which specifies who is sending the event.
-     * @return string
-     */
-    public function getPartnerAgent()
-    {
-        return $this->container['partner_agent'];
-    }
-    /**
-     * Gets the string presentation of the object
-     * @return string
-     */
-    public function __toString()
-    {
-        if (\defined('JSON_PRETTY_PRINT')) {
-            // use JSON pretty print
-            return \json_encode($this, \JSON_PRETTY_PRINT);
-        }
-        return \json_encode($this);
-    }
+
+    return json_encode($this);
+  }
 }

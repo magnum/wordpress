@@ -88,6 +88,7 @@ class Documents_Manager {
 		add_filter( 'page_row_actions', [ $this, 'filter_post_row_actions' ], 11, 2 );
 		add_filter( 'user_has_cap', [ $this, 'remove_user_edit_cap' ], 10, 3 );
 		add_filter( 'elementor/editor/localize_settings', [ $this, 'localize_settings' ] );
+		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 	}
 
 	/**
@@ -206,6 +207,41 @@ class Documents_Manager {
 	}
 
 	/**
+	 * Retrieve a document after checking it exist and allowed to edit.
+	 *
+	 * @since 3.13.0
+	 *
+	 * @param int $post_id The post ID of the document.
+	 *
+	 * @return Document
+	 * @throws \Exception
+	 */
+	public function get_with_permissions( $id ): Document {
+		$document = $this->get( $id );
+
+		if ( ! $document ) {
+			throw new \Exception( 'Not found.' );
+		}
+
+		if ( ! $document->is_editable_by_current_user() ) {
+			throw new \Exception( 'Access denied.' );
+		}
+
+		return $document;
+	}
+
+	/**
+	 * A `void` version for `get_with_permissions`.
+	 *
+	 * @param $id
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function check_permissions( $id ) {
+		$this->get_with_permissions( $id );
+	}
+
+	/**
 	 * Get document or autosave.
 	 *
 	 * Retrieve either the document or the autosave.
@@ -240,7 +276,11 @@ class Documents_Manager {
 	 * @return false|Document The document if it exist, False otherwise.
 	 */
 	public function get_doc_for_frontend( $post_id ) {
-		if ( is_preview() || Plugin::$instance->preview->is_preview_mode() ) {
+		$preview_id = (int) Utils::get_super_global_value( $_GET, 'preview_id' );
+		$is_preview = is_preview() && $post_id === $preview_id;
+		$is_nonce_verify = wp_verify_nonce( Utils::get_super_global_value( $_GET, 'preview_nonce' ), 'post_preview_' . $preview_id );
+
+		if ( ( $is_preview && $is_nonce_verify ) || Plugin::$instance->preview->is_preview_mode() ) {
 			$document = $this->get_doc_or_auto_save( $post_id, get_current_user_id() );
 		} else {
 			$document = $this->get( $post_id );
@@ -509,11 +549,14 @@ class Documents_Manager {
 
 		$document->save( $data );
 
+		$post = $document->get_post();
+		$main_post = $document->get_main_post();
+
 		// Refresh after save.
-		$document = $this->get( $document->get_post()->ID, false );
+		$document = $this->get( $post->ID, false );
 
 		$return_data = [
-			'status' => $document->get_post()->post_status,
+			'status' => $post->post_status,
 			'config' => [
 				'document' => [
 					'last_edited' => $document->get_last_edited(),
@@ -523,6 +566,15 @@ class Documents_Manager {
 				],
 			],
 		];
+
+		$post_status_object = get_post_status_object( $main_post->post_status );
+
+		if ( $post_status_object ) {
+			$return_data['config']['document']['status'] = [
+				'value' => $post_status_object->name,
+				'label' => $post_status_object->label,
+			];
+		}
 
 		/**
 		 * Returned documents ajax saved data.
@@ -544,15 +596,17 @@ class Documents_Manager {
 	 *
 	 * Load the document data from an autosave, deleting unsaved changes.
 	 *
-	 * @since 2.0.0
-	 * @access public
-	 *
 	 * @param $request
 	 *
 	 * @return bool True if changes discarded, False otherwise.
+	 * @throws \Exception
+	 *
+	 * @since 2.0.0
+	 * @access public
+	 *
 	 */
 	public function ajax_discard_changes( $request ) {
-		$document = $this->get( $request['editor_post_id'] );
+		$document = $this->get_with_permissions( $request['editor_post_id'] );
 
 		$autosave = $document->get_autosave();
 
@@ -720,5 +774,51 @@ class Documents_Manager {
 		$post_type = get_post_type( $post_id );
 
 		return $this->cpt[ $post_type ] ?? 'post';
+	}
+
+	public function register_rest_routes() {
+		register_rest_route('elementor/v1/documents', '/(?P<id>\d+)/media/import', [
+			'methods' => \WP_REST_Server::CREATABLE,
+			'callback' => function( $request ) {
+				$post_id = $request->get_param( 'id' );
+
+				try {
+					$document = $this->get_with_permissions( $post_id );
+
+					$elements_data = $document->get_elements_data();
+
+					$import_data = $document->get_import_data( [
+						'content' => $elements_data,
+					] );
+
+					$document->save( [
+						'elements' => $import_data['content'],
+					] );
+
+					return new \WP_REST_Response( [
+						'success' => true,
+						'document_saved' => true,
+					], 200 );
+
+				} catch ( \Exception $e ) {
+					return new \WP_Error(
+						'elementor_import_error',
+						$e->getMessage(),
+						[ 'status' => 500 ]
+					);
+				}
+			},
+			'permission_callback' => function() {
+				return current_user_can( 'manage_options' );
+			},
+			'args' => [
+				'id' => [
+					'required' => true,
+					'validate_callback' => function( $param ) {
+						return is_numeric( $param );
+					},
+				],
+			],
+		]);
 	}
 }

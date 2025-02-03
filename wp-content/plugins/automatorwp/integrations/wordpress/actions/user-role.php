@@ -11,23 +11,26 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_user_role';
+    /**
+     * Initialize the action
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_user_role';
+
+        parent::__construct();
+
+    }
 
     /**
-     * Register the trigger
+     * Register the action
      *
      * @since 1.0.0
      */
     public function register() {
-
-        $role_options = array();
-        $editable_roles = apply_filters( 'editable_roles', wp_roles()->roles );
-
-        foreach( $editable_roles as $role => $details ) {
-            /* translators: %1$s: Role key (subscriber, editor). %2$s: Role name (Subscriber, Editor). */
-            $role_options[] = sprintf( __( '<code>%1$s</code> for %2$s', 'automatorwp' ), $role, translate_user_role( $details['name'] ) );
-        }
 
         automatorwp_register_action( $this->action, array(
             'integration'       => $this->integration,
@@ -53,14 +56,18 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
                         ),
                     )
                 ),
-                'role' => automatorwp_utilities_role_option( array(
-                    'option_none_value' => '',
-                    'option_none_label' => __( 'another role', 'automatorwp' ),
-                    'option_custom'     => true,
-                    'option_custom_desc'    => __( 'Role name.', 'automatorwp' )
-                        . ' ' . automatorwp_toggleable_options_list( $role_options ),
-                    'default'           => ''
-                ) ),
+                'role' => array(
+                    'from' => 'role',
+                    'default' => '',
+                    'fields' => array(
+                        'role' => automatorwp_utilities_role_field( array(
+                            'option_custom' => true,
+                        ) ),
+                        'role_custom' => automatorwp_utilities_custom_field( array(
+                            'option_custom_desc' => __( 'Role name.', 'automatorwp' )
+                        ) ),
+                    )
+                ),
                 'user' => array(
                     'default' => __ ( 'user', 'automatorwp' ),
                     'fields' => array(
@@ -73,6 +80,9 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
                     ),
                 ),
             ),
+            'tags' => array_merge(
+                automatorwp_utilities_user_tags()
+            )
         ) );
 
     }
@@ -93,9 +103,34 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
         $operation = $action_options['operation'];
         $role = $action_options['role'];
         $user_id_target = absint( $action_options['user_id'] );
+        $this->user_data = array();
 
         if( $user_id_target === 0 ) {
             $user_id_target = $user_id;
+        }
+
+        $user = get_userdata( $user_id_target );
+
+        $this->user_id = $user_id_target;
+
+        // The user fields
+        $user_fields = array(
+            'user_login',
+            'user_email',
+            'first_name',
+            'last_name',
+            'user_url',
+            'user_pass',
+            'display_name',
+        );
+
+        foreach( $user_fields as $user_field ) {
+                $this->user_data[$user_field] = $user->$user_field;
+        }
+
+        // Bail if user does not exists
+        if( ! $user ) {
+            return;
         }
 
         // Ensure operation default value
@@ -104,7 +139,7 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
         }
 
         // Bail if empty role to assign
-        if( empty( $role ) ) {
+        if( $role === 'any' || empty( $role ) ) {
             return;
         }
 
@@ -112,13 +147,6 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
 
         // Bail if empty role to assign
         if( ! isset( $roles[$role] ) ) {
-            return;
-        }
-
-        $user = get_userdata( $user_id_target );
-
-        // Bail if user does not exists
-        if( ! $user ) {
             return;
         }
 
@@ -149,6 +177,61 @@ class AutomatorWP_WordPress_User_Role extends AutomatorWP_Integration_Action {
 
     }
 
+    /**
+     * Register required hooks
+     *
+     * @since 1.0.0
+     */
+    public function hooks() {
+
+        // Log meta data
+        add_filter( 'automatorwp_user_completed_action_log_meta', array( $this, 'log_meta' ), 10, 5 );
+
+        parent::hooks();
+    }
+
+    /**
+     * Action custom log meta
+     *
+     * @since 1.0.0
+     *
+     * @param array     $log_meta           Log meta data
+     * @param stdClass  $action             The action object
+     * @param int       $user_id            The user ID
+     * @param array     $action_options     The action's stored options (with tags already passed)
+     * @param stdClass  $automation         The action's automation object
+     *
+     * @return array
+     */
+    public function log_meta( $log_meta, $action, $user_id, $action_options, $automation ) {
+
+        // Bail if action type don't match this action
+        if( $action->type !== $this->action ) {
+            return $log_meta;
+        }
+
+        // Store user fields
+        $user_fields = array(
+            'user_login',
+            'user_email',
+            'first_name',
+            'last_name',
+            'user_url',
+            'user_pass',
+            'display_name',
+        );
+
+        foreach( $user_fields as $user_field ) {
+            $log_meta[$user_field] = $this->user_data[$user_field];
+        }
+
+        // Store user ID
+        $log_meta['user_id'] = $this->user_id;
+
+        return $log_meta;
+    }
+
 }
 
-new AutomatorWP_WordPress_User_Role();
+new AutomatorWP_WordPress_User_Role( 'wordpress' );
+new AutomatorWP_WordPress_User_Role( 'users' );

@@ -340,7 +340,7 @@ function automatorwp_get_all_users_automation_users_ids( $automation ) {
     if( ! $sql ) {
         return false;
     }
-
+   
     return $wpdb->get_col( $sql );
 
 }
@@ -377,7 +377,7 @@ function automatorwp_get_all_users_automation_users_count( $automation ) {
     if( ! $sql ) {
         return false;
     }
-
+    
     return absint( $wpdb->get_var( $sql ) );
 
 }
@@ -649,6 +649,9 @@ function automatorwp_get_automation_run_details( $automation ) {
     } else if( $automation->type === 'all-posts' ) {
         $items_per_loop = absint( automatorwp_get_automation_meta( $automation->id, 'posts_per_loop', true ) );
         $count = automatorwp_get_all_posts_automation_posts_count( $automation );
+    } else if( $automation->type === 'import-file' ) {
+        $items_per_loop = absint( automatorwp_get_automation_meta( $automation->id, 'lines_per_loop', true ) );
+        $count = automatorwp_get_import_file_automation_lines_count( $automation );
     }
 
     $loop = absint( automatorwp_get_automation_meta( $automation->id, 'current_loop', true ) );

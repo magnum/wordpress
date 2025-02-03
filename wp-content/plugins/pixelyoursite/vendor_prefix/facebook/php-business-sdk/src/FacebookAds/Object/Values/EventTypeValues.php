@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static EventTypeValues getInstance()
  */
-class EventTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COMMUNITY = 'community';
-    const FRIENDS = 'friends';
-    const GROUP = 'group';
-    const VALUE_PRIVATE = 'private';
-    const VALUE_PUBLIC = 'public';
-    const WORK_COMPANY = 'work_company';
+class EventTypeValues extends AbstractEnum {
+
+  const COMMUNITY = 'community';
+  const FRIENDS = 'friends';
+  const GROUP = 'group';
+  const VALUE_PRIVATE = 'private';
+  const VALUE_PUBLIC = 'public';
+  const WORK_COMPANY = 'work_company';
 }

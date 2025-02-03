@@ -31,6 +31,16 @@ function videopress_is_valid_guid( $guid ) {
 }
 
 /**
+ * Validates user-supplied video preload setting.
+ *
+ * @param mixed $value the preload value to validate.
+ * @return bool
+ */
+function videopress_is_valid_preload( $value ) {
+	return in_array( strtolower( $value ), array( 'auto', 'metadata', 'none' ), true );
+}
+
+/**
  * Get details about a specific video by GUID:
  *
  * @param string $guid Video GUID.
@@ -763,10 +773,6 @@ if ( ! function_exists( 'wp_startswith' ) ) :
 		$haystack = (string) $haystack;
 		$needle   = (string) $needle;
 
-		if ( function_exists( 'str_starts_with' ) ) { // remove when PHP 8.0 is the minimum supported.
-			return str_starts_with( $haystack, $needle ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions
-		}
-
-		return 0 === strpos( $haystack, $needle );
+		return str_starts_with( $haystack, $needle );
 	}
 endif;

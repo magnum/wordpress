@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdActivityFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityCategoryValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityDataSourceValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityEventTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,21 +41,23 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityEventTypeValues;
  * pull request for this class.
  *
  */
-class AdActivity extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdActivityFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdActivityFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['EventType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityEventTypeValues::getInstance()->getValues();
-        $ref_enums['Category'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityCategoryValues::getInstance()->getValues();
-        $ref_enums['DataSource'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdActivityDataSourceValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdActivity extends AbstractObject {
+
+  /**
+   * @return AdActivityFields
+   */
+  public static function getFieldsEnum() {
+    return AdActivityFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['EventType'] = AdActivityEventTypeValues::getInstance()->getValues();
+    $ref_enums['Category'] = AdActivityCategoryValues::getInstance()->getValues();
+    $ref_enums['DataSource'] = AdActivityDataSourceValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

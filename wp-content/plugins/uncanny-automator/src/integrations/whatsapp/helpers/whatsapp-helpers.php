@@ -17,6 +17,8 @@ class WhatsApp_Helpers {
 
 	const WEBHOOK_KEY = 'uap_active_campaign_webhook_key';
 
+	protected $whatsapp_settings = '';
+
 	/**
 	 * The options.
 	 *
@@ -131,6 +133,16 @@ class WhatsApp_Helpers {
 
 		$wp_current_datetime_object = new \DateTime( $wp_current_datetime, new \DateTimeZone( Automator()->get_timezone_string() ) );
 
+		automator_log(
+			array(
+				'$wp_current_time'            => $wp_current_datetime,
+				'$wp_current_datetime_object' => $wp_current_datetime_object,
+			),
+			'WhatsApp: Method is_timestamp_acceptable params',
+			AUTOMATOR_DEBUG_MODE,
+			'whatsapp-params'
+		);
+
 		if ( false === $wp_current_datetime_object ) {
 
 			return false;
@@ -140,6 +152,16 @@ class WhatsApp_Helpers {
 		$wp_current_datetime_object->setTimezone( new \DateTimeZone( 'UTC' ) );
 		// Get the timestamp.
 		$wp_current_datetime_utc = strtotime( $wp_current_datetime_object->format( 'Y-m-d H:i:s' ) );
+
+		automator_log(
+			array(
+				'calculated'           => absint( $wp_current_datetime_utc - $wa_timestamp ),
+				'$acceptable_interval' => $acceptable_interval,
+			),
+			'WhatsApp: Method is_timestamp_acceptable params',
+			AUTOMATOR_DEBUG_MODE,
+			'whatsapp-processed'
+		);
 		// Compare if it was recently accepted.
 		return absint( $wp_current_datetime_utc - $wa_timestamp ) <= $acceptable_interval;
 
@@ -183,11 +205,31 @@ class WhatsApp_Helpers {
 
 		$timestamp = $response['entry'][0]['changes'][0]['value']['messages'][0]['timestamp'];
 
-		// Prevent spammy WhatsApp webhook.
-		if ( ! $this->is_timestamp_acceptable( $timestamp, 3 ) ) {
+		/**
+		 * Prevent spammy WhatsApp webhook. This is an old issue where WhatsApp repeatedly sends the webhook payload to the URL.
+		 * We have to do this to safe guard the users and not let WhatsApp spam their logs with incoming webhooks.
+		 * By default, its enabled.
+		 *
+		 * When the Trigger is erratically firing,
+		 * try increasing the acceptable interval first via 'automator_whatsapp_acceptable_interval'
+		 *
+		 * @default int 5 - Five seconds.
+		 * @filter automator_whatsapp_acceptable_interval
+		 **/
+		$acceptable_interval = apply_filters( 'automator_whatsapp_acceptable_interval', 5, $response, $this );
 
+		/**
+		 * Disable timestamp validation.
+		 *
+		 * Otherwise, you may completely disable the timestamp validation.
+		 *
+		 * @default true
+		 * @filter automator_whatsapp_timestamp_validation_enabled
+		 */
+		$timestamp_validation = apply_filters( 'automator_whatsapp_timestamp_validation_enabled', true, $response, $this );
+
+		if ( true === $timestamp_validation && ! $this->is_timestamp_acceptable( $timestamp, $acceptable_interval ) ) {
 			throw new \Exception( 'Stale data: WhatsApp Bug. Do not process.' );
-
 		}
 
 		$default = array(
@@ -199,18 +241,51 @@ class WhatsApp_Helpers {
 
 		$message = $response['entry'][0]['changes'][0]['value']['messages'][0];
 
-		$text_body = isset( $message['text']['body'] ) ? $message['text']['body'] : '';
+		$text_body = $this->extract_message( $message );
 
 		$args = array(
 			'from'      => $message['from'],
 			'wamid'     => $message['id'],
 			'body'      => $text_body,
 			'timestamp' => $timestamp,
+			'_response' => $response, // Send the whole response to the Trigger.
 		);
 
 		do_action( 'automator_whatsapp_webhook_message_received', $args );
 
 		return wp_parse_args( $args, $default );
+
+	}
+
+	/**
+	 * @param mixed[] $message;
+	 *
+	 * @return string Returns the message json string.
+	 */
+	protected function extract_message( $message ) {
+
+		$type = isset( $message['type'] ) ? $message['type'] : 'text';
+
+		switch ( $type ) {
+
+			case 'text':
+				// Return the text body.
+				return isset( $message['text']['body'] ) ? $message['text']['body'] : '';
+			case 'image':
+				$caption          = isset( $message['image']['caption'] ) ? $message['image']['caption'] : '';
+				$image_id         = isset( $message['image']['id'] ) ? $message['image']['id'] : '';
+				$image_id_caption = sprintf( '(%1$s) %2$s', $image_id, $caption );
+				// Return the image id + caption.
+				return apply_filters( 'automator_whatsapp_image_caption', $image_id_caption, $message );
+			case 'button':
+				$button_text = isset( $message['button']['text'] ) ? $message['button']['text'] : '';
+				// Return the button text.
+				return apply_filters( 'automator_whatsapp_button_text', $button_text, $message );
+			default:
+				// Otherwise, just return the type and message ID for now.
+				$default = sprintf( '(%s) %s', $type, $message['id'] );
+				return apply_filters( 'automator_whatsapp_default_type_message_return', $default, $message );
+		}
 
 	}
 
@@ -320,7 +395,6 @@ class WhatsApp_Helpers {
 
 		// e.g. `automator_whatsapp_message_delivery_failed`.
 		do_action( 'automator_whatsapp_message_delivery_' . $incoming_data['status'], $incoming_data );
-
 		do_action( 'automator_whatsapp_message_status', $incoming_data, $incoming_data['status'] );
 
 	}
@@ -342,6 +416,7 @@ class WhatsApp_Helpers {
 
 			// Bail out if meta is empty.
 			if ( empty( $action_data['meta'] ) ) {
+				automator_log( $action_data, 'WhatsApp: Bailed out. The $action_data["meta"] was empty.', AUTOMATOR_DEBUG_MODE, 'whatsapp' );
 				return;
 			}
 
@@ -349,6 +424,8 @@ class WhatsApp_Helpers {
 
 		} catch ( \Exception $e ) { //phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// Do nothing for now.
+			automator_log( $e->getMessage(), 'WhatsApp: An Exception has occured', AUTOMATOR_DEBUG_MODE, 'whatsapp' );
+
 		}
 
 	}
@@ -415,11 +492,13 @@ class WhatsApp_Helpers {
 	 */
 	public function validate_webhook( $request ) {
 
-		$user_agent = $request->get_header( 'user_agent' ); //
+		$user_agent = $request->get_header( 'user_agent' );
 
 		$allowed_user_agents = array(
 			'facebookexternalua',
 			'facebookplatform/1.0 (+http://developers.facebook.com)',
+			'facebookexternalua X-Middleton/1',
+			'facebookplatform/1.0 (+http://developers.facebook.com) X-Middleton/1',
 		);
 
 		// Fail if user agent is not from Facebook.
@@ -427,9 +506,11 @@ class WhatsApp_Helpers {
 			return false;
 		}
 
-		$secret = get_option( 'automator_whatsapp_secret', null );
+		$secret = automator_get_option( 'automator_whatsapp_secret', null );
 
 		$x_hub_signature = $request->get_header( 'x-hub-signature' );
+
+		$is_payload_geniune = false;
 
 		if ( ! empty( $x_hub_signature ) ) {
 			$is_payload_geniune = hash_equals(
@@ -448,9 +529,7 @@ class WhatsApp_Helpers {
 		$actual_key = $this->get_webhook_key();
 
 		if ( $actual_key !== $query_params['key'] ) {
-
 			return false;
-
 		}
 
 		return true;
@@ -469,7 +548,7 @@ class WhatsApp_Helpers {
 		// Hub challenge verification.
 		if ( ! empty( $request->get_param( 'hub_challenge' ) ) ) {
 
-			if ( $request->get_param( 'hub_verify_token' ) !== get_option( self::WEBHOOK_KEY, false ) ) {
+			if ( $request->get_param( 'hub_verify_token' ) !== automator_get_option( self::WEBHOOK_KEY, false ) ) {
 
 				wp_send_json_error( null, 403 );
 
@@ -516,7 +595,7 @@ class WhatsApp_Helpers {
 
 		$new_key = md5( uniqid( wp_rand(), true ) );
 
-		update_option( self::WEBHOOK_KEY, $new_key );
+		automator_update_option( self::WEBHOOK_KEY, $new_key );
 
 		return $new_key;
 
@@ -529,7 +608,7 @@ class WhatsApp_Helpers {
 	 */
 	public function get_webhook_key() {
 
-		$webhook_key = get_option( self::WEBHOOK_KEY, false );
+		$webhook_key = automator_get_option( self::WEBHOOK_KEY, false );
 
 		if ( false === $webhook_key ) {
 
@@ -576,16 +655,16 @@ class WhatsApp_Helpers {
 		delete_transient( $this->get_dropdown_transient_key() );
 
 		// Remove the client.
-		delete_option( self::CLIENT );
+		automator_delete_option( self::CLIENT );
 
 		// Remove phone id value.
-		delete_option( WhatsApp_Settings::PHONE_ID );
+		automator_delete_option( WhatsApp_Settings::PHONE_ID );
 
 		// Remove access token value.
-		delete_option( WhatsApp_Settings::ACCESS_TOKEN );
+		automator_delete_option( WhatsApp_Settings::ACCESS_TOKEN );
 
 		// Remove business account ID
-		delete_option( WhatsApp_Settings::BUSINESS_ID );
+		automator_delete_option( WhatsApp_Settings::BUSINESS_ID );
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -641,7 +720,7 @@ class WhatsApp_Helpers {
 
 	public function get_client() {
 
-		$option = get_option( self::CLIENT, array() );
+		$option = automator_get_option( self::CLIENT, array() );
 
 		return ! empty( $option['data']['data'] ) ? $option['data']['data'] : array();
 
@@ -665,13 +744,13 @@ class WhatsApp_Helpers {
 
 	public function get_phone_number_id() {
 
-		return absint( get_option( WhatsApp_Settings::PHONE_ID, 0 ) );
+		return absint( automator_get_option( WhatsApp_Settings::PHONE_ID, 0 ) );
 
 	}
 
 	public function get_access_token() {
 
-		return trim( get_option( WhatsApp_Settings::ACCESS_TOKEN, '' ) );
+		return trim( automator_get_option( WhatsApp_Settings::ACCESS_TOKEN, '' ) );
 
 	}
 
@@ -697,7 +776,7 @@ class WhatsApp_Helpers {
 
 			$body = array(
 				'action'       => 'list_template',
-				'business_id'  => get_option( WhatsApp_Settings::BUSINESS_ID ),
+				'business_id'  => automator_get_option( WhatsApp_Settings::BUSINESS_ID ),
 				'access_token' => $this->get_access_token(),
 			);
 
@@ -723,7 +802,7 @@ class WhatsApp_Helpers {
 	}
 
 	public function get_dropdown_transient_key() {
-		return 'automator_whatsapp_message_templates_dropdown_' . get_option( WhatsApp_Settings::BUSINESS_ID, '' );
+		return 'automator_whatsapp_message_templates_dropdown_' . automator_get_option( WhatsApp_Settings::BUSINESS_ID, '' );
 	}
 
 	public function retrieve_template() {
@@ -736,7 +815,7 @@ class WhatsApp_Helpers {
 
 			$body = array(
 				'action'       => 'list_template',
-				'business_id'  => get_option( WhatsApp_Settings::BUSINESS_ID ),
+				'business_id'  => automator_get_option( WhatsApp_Settings::BUSINESS_ID ),
 				'access_token' => $this->get_access_token(),
 			);
 
@@ -755,7 +834,7 @@ class WhatsApp_Helpers {
 
 			wp_send_json_error(
 				array(
-					'message' => __( 'Cannot find the structure for the selected template. Please refresh the page and try again later.', 'uncanny_automator' ),
+					'message' => __( 'Cannot find the structure for the selected template. Please refresh the page and try again later.', 'uncanny-automator' ),
 				),
 				400
 			);
@@ -765,7 +844,7 @@ class WhatsApp_Helpers {
 			wp_send_json_error(
 				array(
 					'message' => strtr(
-						__( 'An unexpected error has with status code [{{status_code}}] has occured. Message: {{error_message}}', 'uncanny_automator' ),
+						__( 'An unexpected error has with status code [{{status_code}}] has occured. Message: {{error_message}}', 'uncanny-automator' ),
 						array(
 							'{{status_code}}'   => $e->getCode(),
 							'{{error_message}}' => $e->getMessage(),

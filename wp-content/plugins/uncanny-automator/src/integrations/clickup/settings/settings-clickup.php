@@ -66,17 +66,14 @@ class ClickUp_Settings extends Settings\Premium_Integration_Settings {
 			'oauth_response' => json_decode( urldecode( automator_filter_input( 'response' ) ), true ),
 		);
 
-		// Triggers.
-		$vars['triggers'] = array(
-			__( 'A comment is added to a task', 'uncanny-automator' ),
-			__( 'A task is created in a list with a status', 'uncanny-automator' ),
-		);
-
 		// Actions.
 		$vars['actions'] = array(
 			__( 'Add a comment to a task', 'uncanny-automator' ),
-			__( 'Create a task in a specific list', 'uncanny-automator' ),
-			__( 'Delete a specific task', 'uncanny-automator' ),
+			__( 'Add a tag to a task', 'uncanny-automator' ),
+			__( 'Create a list', 'uncanny-automator' ),
+			__( 'Create a task', 'uncanny-automator' ),
+			__( 'Delete a task', 'uncanny-automator' ),
+			__( 'Remove a tag from a task', 'uncanny-automator' ),
 			__( 'Update a task', 'uncanny-automator' ),
 		);
 

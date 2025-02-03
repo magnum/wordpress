@@ -45,7 +45,7 @@ class AutomatorWP_GamiPress_User_Achievement extends AutomatorWP_Integration_Act
                         'user' => array(
                             'name' => __( 'User ID:', 'automatorwp' ),
                             'desc' => __( 'User ID that will receive this achievement. Leave blank to award the achievement to the user that completes the automation.', 'automatorwp' ),
-                            'type' => 'input',
+                            'type' => 'text',
                             'default' => ''
                         ),
                     )

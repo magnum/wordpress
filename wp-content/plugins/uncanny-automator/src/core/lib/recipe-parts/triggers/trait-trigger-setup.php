@@ -15,6 +15,7 @@
 namespace Uncanny_Automator\Recipe;
 
 use Uncanny_Automator\Automator_Exception;
+use Uncanny_Automator\Services\Loopable\Trigger_Loopable_Token;
 
 /**
  * Trait Trigger_Setup
@@ -42,6 +43,11 @@ trait Trigger_Setup {
 	 * @var bool
 	 */
 	protected $is_pro = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $is_elite = false;
 
 	/**
 	 * @var bool
@@ -136,6 +142,26 @@ trait Trigger_Setup {
 	protected $uses_api = false;
 
 	/**
+	 * @var Trigger_Loopable_Token[]
+	 */
+	protected $loopable_tokens = array();
+
+	/**
+	 * @var array
+	 */
+	protected $buttons = array();
+
+	/**
+	 * @var array
+	 */
+	protected $inline_css = array();
+
+	/**
+	 * @var bool
+	 */
+	protected $can_log_in_new_user = false;
+
+	/**
 	 * Set up Automator trigger constructor.
 	 */
 	public function __construct() {
@@ -154,6 +180,24 @@ trait Trigger_Setup {
 	 */
 	public function set_is_anonymous( $is_anonymous ) {
 		$this->is_anonymous = $is_anonymous;
+	}
+
+	/**
+	 * Sets the loopable tokens.
+	 *
+	 * @param Trigger_Loopable_Token[] $loopable_tokens
+	 *
+	 * @return void
+	 */
+	public function set_loopable_tokens( array $loopable_tokens ) {
+		$this->loopable_tokens = $loopable_tokens;
+	}
+
+	/**
+	 * @return \Uncanny_Automator\Services\Loopable\Trigger_Loopable_Token[]
+	 */
+	public function get_loopable_tokens() {
+		return $this->loopable_tokens;
 	}
 
 	/**
@@ -232,6 +276,22 @@ trait Trigger_Setup {
 	 */
 	public function set_is_pro( $is_pro ) {
 		$this->is_pro = $is_pro;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function get_is_elite() {
+		return $this->is_elite;
+	}
+
+	/**
+	 * @param bool $is_elite
+	 *
+	 * @return void
+	 */
+	public function set_is_elite( bool $is_elite ) {
+		$this->is_elite = $is_elite;
 	}
 
 	/**
@@ -416,20 +476,6 @@ trait Trigger_Setup {
 	/**
 	 * @return mixed
 	 */
-	//  public function get_trigger_tokens() {
-	//      return $this->trigger_tokens;
-	//  }
-
-	/**
-	 * @param mixed $trigger_tokens
-	 */
-	//  public function set_trigger_tokens( $trigger_tokens ) {
-	//      $this->trigger_tokens = $trigger_tokens;
-	//  }
-
-	/**
-	 * @return mixed
-	 */
 	public function get_token_parser() {
 		return $this->token_parser;
 	}
@@ -494,6 +540,55 @@ trait Trigger_Setup {
 	public function set_tokens_class( $tokens_class ) {
 		$this->tokens_class = $tokens_class;
 	}
+
+	/**
+	 * @return array
+	 */
+	public function get_buttons() {
+		return $this->buttons;
+	}
+
+	/**
+	 * @param array $buttons
+	 *
+	 * @return void
+	 */
+	public function set_buttons( array $buttons ) {
+		$this->buttons = $buttons;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_inline_css() {
+		return $this->inline_css;
+	}
+
+	/**
+	 * @param array $inline_css
+	 *
+	 * @return void
+	 */
+	public function set_inline_css( $inline_css ) {
+		$this->inline_css = $inline_css;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function get_can_log_in_new_user() {
+		return $this->can_log_in_new_user;
+	}
+
+	/**
+	 * @param bool $can_log_in_new_user
+	 *
+	 * @return void
+	 */
+	public function set_can_log_in_new_user( $can_log_in_new_user ) {
+		$this->can_log_in_new_user = $can_log_in_new_user;
+	}
+
 	/**
 	 * Define and register the trigger by pushing it into the Automator object
 	 * @throws Automator_Exception|\Exception
@@ -505,6 +600,7 @@ trait Trigger_Setup {
 			'support_link'        => $this->get_support_link(), // hyperlink to support page.
 			'type'                => $this->get_trigger_type(), // user|anonymous. user by default.
 			'is_pro'              => $this->get_is_pro(), // free or pro trigger.
+			'is_elite'            => $this->get_is_elite(), // elite trigger.
 			'is_deprecated'       => $this->get_is_deprecated(), // whether trigger is deprecated.
 			'integration'         => $this->get_integration(), // trigger the integration belongs to.
 			'code'                => $this->get_code(), // unique trigger code.
@@ -517,6 +613,7 @@ trait Trigger_Setup {
 			'token_parser'        => $this->get_token_parser(), // v3.0, Pass a function to parse tokens.
 			'validation_function' => array( $this, 'validate' ), // function to call for add_action().
 			'uses_api'            => $this->get_uses_api(),
+			'loopable_tokens'     => $this->get_loopable_tokens(), //@since 5.10
 		);
 
 		if ( ! empty( $this->get_options() ) ) {
@@ -529,6 +626,18 @@ trait Trigger_Setup {
 
 		if ( ! empty( $this->get_options_callback() ) ) {
 			$trigger['options_callback'] = $this->get_options_callback();
+		}
+
+		if ( ! empty( $this->get_buttons() ) ) {
+			$trigger['buttons'] = $this->get_buttons();
+		}
+
+		if ( ! empty( $this->get_inline_css() ) ) {
+			$trigger['inline_css'] = $this->get_inline_css();
+		}
+
+		if ( null !== $this->get_can_log_in_new_user() ) {
+			$trigger['can_log_in_new_user'] = $this->get_can_log_in_new_user();
 		}
 
 		$trigger = apply_filters( 'automator_register_trigger', $trigger );

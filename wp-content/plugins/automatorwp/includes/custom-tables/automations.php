@@ -35,6 +35,9 @@ function automatorwp_automations_query_where( $where, $ct_query ) {
     // Status
     $where .= automatorwp_custom_table_where( $qv, 'status', 'status', 'string' );
 
+    // Type
+    $where .= automatorwp_custom_table_where( $qv, 'type', 'type', 'string' );
+
     // User ID
     $where .= automatorwp_custom_table_where( $qv, 'user_id', 'user_id', 'integer' );
 
@@ -228,6 +231,10 @@ function automatorwp_manage_automations_custom_column(  $column_name, $object_id
 
                     if( $trigger->type === 'automatorwp_all_users' ) {
                         $integration['icon'] = AUTOMATORWP_URL . 'assets/img/automatorwp-all-users.svg';
+                    }
+
+                    if( $trigger->type === 'automatorwp_import_file' ) {
+                        $integration['icon'] = AUTOMATORWP_URL . 'assets/img/automatorwp-import-file.svg';
                     }
 
                     if( $integration ) : ?>
@@ -522,6 +529,7 @@ function automatorwp_automations_default_data( $default_data = array() ) {
     $default_data['times']          = 0;
     $default_data['status']         = 'inactive';
     $default_data['date']           = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
+    $default_data['title']          = '';
 
     return $default_data;
 }
@@ -569,7 +577,7 @@ add_filter( 'ct_insert_object_data', 'automatorwp_automations_insert_automation_
  * @param bool      $update       Whether this is an existing object being updated or not.
  */
 function automatorwp_automations_on_insert_automation( $object_id, $object, $update ) {
-
+    
     global $ct_table;
 
     // If not is our custom table, return
@@ -618,6 +626,23 @@ function automatorwp_automations_on_insert_automation( $object_id, $object, $upd
         ct_update_object_meta( $object_id, 'posts_per_loop', $posts_per_loop );
     }
 
+    // Check if is an import file automation
+    if( $object->type === 'import-file' ) {
+        /**
+         * Filter available to define the default users per loop option
+         *
+         * @since 1.0.0
+         *
+         * @param int $lines_per_loop
+         *
+         * @return int
+         */
+        $lines_per_loop = apply_filters( 'automatorwp_default_lines_per_loop', 200 );
+
+        // Update the users per loop meta
+        ct_update_object_meta( $object_id, 'lines_per_loop', $lines_per_loop );
+    }
+
 }
 add_action( 'ct_insert_object', 'automatorwp_automations_on_insert_automation', 10, 3 );
 
@@ -645,7 +670,7 @@ function automatorwp_automations_on_update_automation( $object_id, $object, $upd
     }
 
     // Check if is an all users automation
-    if( in_array( $object->type, array( 'all-users', 'all-posts' ) ) ) {
+    if( in_array( $object->type, array( 'all-users', 'all-posts', 'import-file' ) ) ) {
 
         // Calculate the next run date based on settings submitted
         automatorwp_update_automation_next_run_date( $object_id, true );
@@ -712,6 +737,26 @@ function automatorwp_automations_meta_boxes( ) {
             'posts_per_loop' => array(
                 'name' 	=> __( 'Posts per loop', 'automatorwp' ),
                 'desc' 	=> __( 'Number of posts on which run the automation per loop. Adjust this option depending of your server resources.', 'automatorwp' ),
+                'type' 	=> 'input',
+                'default' 	=> '200',
+                'attributes' => array(
+                    'type' => 'number',
+                    'min' => '1',
+                ),
+                'classes' => 'automatorwp-has-tooltip',
+                'after_field' => 'automatorwp_tooltip_cb',
+                'js_controls' => array(
+                    'icon' => 'dashicons-filter',
+                    'save_button'   => __( 'Save', 'automatorwp' ),
+                    'save_button_classes' => 'button button-primary',
+                    'cancel_button_classes' => 'button automatorwp-button-danger',
+                ),
+                'before_row' => 'js_controls_before',
+                'after_row' => 'js_controls_after',
+            ),
+            'lines_per_loop' => array(
+                'name' 	=> __( 'Lines per loop', 'automatorwp' ),
+                'desc' 	=> __( 'Number of lines on which run the automation per loop. Adjust this option depending of your server resources.', 'automatorwp' ),
                 'type' 	=> 'input',
                 'default' 	=> '200',
                 'attributes' => array(
@@ -1036,7 +1081,7 @@ function automatorwp_automations_execution_options_box_show_cb( $cmb ) {
 
     $object = ct_get_object( $object_id );
 
-    return ( in_array( $object->type, array( 'all-users', 'all-posts' ) ) );
+    return ( in_array( $object->type, array( 'all-users', 'all-posts', 'import-file' ) ) );
 }
 
 /**

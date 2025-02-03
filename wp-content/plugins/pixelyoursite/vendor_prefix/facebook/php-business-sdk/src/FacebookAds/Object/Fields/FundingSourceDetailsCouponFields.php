@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class FundingSourceDetailsCouponFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMOUNT = 'amount';
-    const CURRENCY = 'currency';
-    const DISPLAY_AMOUNT = 'display_amount';
-    const EXPIRATION = 'expiration';
-    public function getFieldTypes()
-    {
-        return array('amount' => 'int', 'currency' => 'string', 'display_amount' => 'string', 'expiration' => 'datetime');
-    }
+
+class FundingSourceDetailsCouponFields extends AbstractEnum {
+
+  const AMOUNT = 'amount';
+  const CURRENCY = 'currency';
+  const DISPLAY_AMOUNT = 'display_amount';
+  const EXPIRATION = 'expiration';
+
+  public function getFieldTypes() {
+    return array(
+      'amount' => 'int',
+      'currency' => 'string',
+      'display_amount' => 'string',
+      'expiration' => 'datetime',
+    );
+  }
 }

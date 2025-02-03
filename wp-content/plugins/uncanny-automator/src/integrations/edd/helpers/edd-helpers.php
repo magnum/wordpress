@@ -1,4 +1,5 @@
 <?php
+
 namespace Uncanny_Automator;
 
 use Uncanny_Automator_Pro\Edd_Pro_Helpers;
@@ -29,11 +30,9 @@ class Edd_Helpers {
 	 *
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	public function __construct() {
-
-		$this->load_options = true;
 
 	}
 
@@ -63,14 +62,14 @@ class Edd_Helpers {
 	 *
 	 * @return mixed
 	 */
-	public function all_edd_downloads( $label = null, $option_code = 'EDDPRODUCTS', $any_option = true ) {
+	public function all_edd_downloads( $label = null, $option_code = 'EDDPRODUCTS', $any_option = true, $is_relevant_tokens = true, $is_recurring = false ) {
 		if ( ! $this->load_options ) {
 
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
 		}
 
 		if ( ! $label ) {
-			$label = esc_attr__( 'Product', 'uncanny-automator' );
+			$label = esc_attr__( 'Download', 'uncanny-automator' );
 		}
 
 		$args = array(
@@ -81,7 +80,51 @@ class Edd_Helpers {
 			'post_status'    => 'publish',
 		);
 
-		$options = Automator()->helpers->recipe->options->wp_query( $args, $any_option, esc_attr__( 'Any download', 'uncanny-automator' ) );
+		$downloads = get_posts( $args );
+
+		$all_downloads = array();
+
+		if ( $downloads ) {
+			foreach ( $downloads as $download ) {
+
+				$download_id = $download->ID;
+
+				// Just list everything
+				if ( ! $is_recurring ) {
+					$all_downloads[ $download_id ] = $download->post_title;
+					continue;
+				}
+
+				// Check if the product has a recurring option
+				if ( edd_recurring()->is_recurring( $download_id ) ) {
+					$all_downloads[ $download_id ] = $download->post_title;
+					continue;
+				}
+
+				if ( ! edd_has_variable_prices( $download_id ) ) {
+					continue;
+				}
+
+				$variable_prices = edd_get_variable_prices( $download_id );
+
+				if ( $variable_prices ) {
+					foreach ( $variable_prices as $price ) {
+						if ( ! isset( $price['recurring'] ) || 'yes' !== $price['recurring'] ) {
+							continue;
+						}
+						$all_downloads[ $download_id ] = $download->post_title;
+					}
+				}
+			}
+		}
+
+		$any = array();
+
+		if ( $any_option ) {
+			$any = array( '-1' => esc_attr__( 'Any download', 'uncanny-automator' ) );
+		}
+
+		$options = $any + $all_downloads;
 
 		$relevant_tokens = array(
 			$option_code . '_DISCOUNT_CODES'  => esc_attr__( 'Discount codes used', 'uncanny-automator' ),
@@ -112,7 +155,7 @@ class Edd_Helpers {
 			'current_value'   => false,
 			'validation_type' => 'text',
 			'options'         => $options,
-			'relevant_tokens' => $relevant_tokens,
+			'relevant_tokens' => ( false === $is_relevant_tokens ) ? array() : $relevant_tokens,
 		);
 
 		return apply_filters( 'uap_option_all_edd_downloads', $option );
@@ -122,6 +165,7 @@ class Edd_Helpers {
 	 * Get the licenses of the order.
 	 *
 	 * @param int $order_id The payment ID.
+	 *
 	 * @return string The licenses.
 	 */
 	public function get_licenses( $order_id = 0 ) {

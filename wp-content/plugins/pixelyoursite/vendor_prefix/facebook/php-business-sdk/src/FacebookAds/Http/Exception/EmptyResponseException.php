@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,18 +21,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http\Exception;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\ResponseInterface;
-class EmptyResponseException extends \PYS_PRO_GLOBAL\FacebookAds\Http\Exception\RequestException
-{
-    /**
-     * @param ResponseInterface $response
-     */
-    public function __construct(\PYS_PRO_GLOBAL\FacebookAds\Http\ResponseInterface $response)
-    {
-        $content = array('error' => array('message' => 'Empty Response'));
-        $response->setBody(\json_encode($content));
-        parent::__construct($response);
-    }
+
+class EmptyResponseException extends RequestException {
+
+  /**
+   * @param ResponseInterface $response
+   */
+  public function __construct(ResponseInterface $response) {
+    $content = array(
+      'error' => array(
+        'message' => 'Empty Response',
+      ));
+    $response->setBody(json_encode($content));
+    parent::__construct($response);
+  }
 }

@@ -63,8 +63,7 @@
     });
 
        // On change audience
-       $('body').on('change', '.automatorwp-action-mailchimp-user-add-tag .cmb2-id-audience select, '
-           + '.automatorwp-action-mailchimp-create-send-campaign .cmb2-id-audience select', function(e) {
+       $('body').on('change', '.automatorwp-action-mailchimp-user-add-tag .cmb2-id-audience select', function(e) {
         var list = $(this).closest('.cmb-row');
         var tag_list = list.next('.cmb2-id-tags');
 

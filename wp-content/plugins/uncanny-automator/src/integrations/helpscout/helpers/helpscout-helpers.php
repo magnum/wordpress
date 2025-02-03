@@ -24,6 +24,13 @@ class Helpscout_Helpers {
 
 	const TRANSIENT_EXPIRES_TIME = 3600; // 1 hour in seconds.
 
+	/**
+	 * The setting's ID.
+	 *
+	 * @var string $setting_tab
+	 */
+	public $setting_tab = 'helpscout';
+
 	protected $webhook_endpoint = null;
 
 	public function __construct( $load_hooks = true ) {
@@ -57,13 +64,14 @@ class Helpscout_Helpers {
 			// Fetch mailbox users.
 			add_action( 'wp_ajax_automator_helpscout_fetch_mailbox_users', array( $this, 'fetch_mailbox_users' ) );
 
+			// Fetch properties' fields.
+			add_action( 'wp_ajax_automator_helpscout_fetch_properties', array( $this, 'fetch_properties' ) );
+
 			add_action( 'rest_api_init', array( $this, 'init_webhook' ) );
 
 			$this->webhook_endpoint = apply_filters( 'automator_helpscout_webhook_endpoint', '/helpscout', $this );
 
 		}
-
-		$this->setting_tab = 'helpscout';
 
 		// Load the settings page.
 		require_once __DIR__ . '/../settings/settings-helpscout.php';
@@ -113,6 +121,64 @@ class Helpscout_Helpers {
 
 	}
 
+	/**
+	 * Fetches properties.
+	 *
+	 * @return void
+	 */
+	public function fetch_properties() {
+
+		$rows = array();
+
+		try {
+
+			$response = $this->api_request(
+				array(
+					'action' => 'get_properties',
+				),
+				null
+			);
+
+			if ( ! empty( $response['data']['_embedded']['customer-properties'] ) ) {
+				foreach ( $response['data']['_embedded']['customer-properties'] as $prop ) {
+					$rows[] = array(
+						'PROPERTY_SLUG'  => $prop['slug'],
+						'PROPERTY_NAME'  => $prop['name'],
+						'PROPERTY_VALUE' => '',
+					);
+				}
+			}
+		} catch ( \Exception $e ) {
+
+			$error_message = json_decode( $e->getMessage(), true );
+
+			if ( isset( $error_message['data']['_embedded']['errors'] ) ) {
+				$error_message = implode( '. ', array_column( $error_message['data']['_embedded']['errors'], 'message' ) );
+			}
+
+			$data = array(
+				'success' => false,
+				'message' => $error_message,
+			);
+
+			wp_send_json( $data );
+
+		}
+
+		$data = array(
+			'success' => true,
+			'rows'    => $rows,
+		);
+
+		wp_send_json( $data );
+
+	}
+
+	/**
+	 * Fetches mailbox users.
+	 *
+	 * @return void
+	 */
 	public function fetch_mailbox_users() {
 
 		$selected_mailbox = filter_input( INPUT_POST, 'value' );
@@ -348,7 +414,7 @@ class Helpscout_Helpers {
 		// Manually set the access token and refresh token expiration date.
 		$tokens['expires_on'] = strtotime( current_time( 'mysql' ) ) + $tokens['expires_in'];
 
-		update_option( self::CLIENT, $tokens, false );
+		automator_update_option( self::CLIENT, $tokens, true );
 
 		try {
 
@@ -358,7 +424,7 @@ class Helpscout_Helpers {
 
 			$client['user'] = $response['data'];
 
-			update_option( self::CLIENT, $client, false );
+			automator_update_option( self::CLIENT, $client, true );
 
 		} catch ( \Exception $e ) {
 
@@ -396,9 +462,9 @@ class Helpscout_Helpers {
 
 		$this->verify_access( $nonce );
 
-		delete_option( 'automator_helpscout_client' );
-		delete_option( 'uap_helpscout_enable_webhook' );
-		delete_option( 'uap_helpscout_webhook_key' );
+		automator_delete_option( 'automator_helpscout_client' );
+		automator_delete_option( 'uap_helpscout_enable_webhook' );
+		automator_delete_option( 'uap_helpscout_webhook_key' );
 
 		delete_transient( self::TRANSIENT_MAILBOXES );
 
@@ -491,7 +557,7 @@ class Helpscout_Helpers {
 
 	public function get_client() {
 
-		return get_option( self::CLIENT, false );
+		return automator_get_option( self::CLIENT, false );
 
 	}
 
@@ -501,18 +567,44 @@ class Helpscout_Helpers {
 
 	}
 
-	private function get_access_token() {
+	/**
+	 * Retrieves the access token for the client.
+	 *
+	 * Checks if the token has expired and refreshes it if necessary.
+	 * Includes an allowance of 2 hours (7200 seconds) to account for token expiration timing.
+	 *
+	 * @return string|null The access token if available, otherwise null.
+	 */
+	public function get_access_token() {
 
-		$client = get_option( self::CLIENT, array() );
+		// Retrieve client data from options and ensure it's cast as an array.
+		$client = (array) automator_get_option( self::CLIENT, array() );
 
-		// If date today exceeded the expires on, it means the token has expired already.
-		// Allowance of 2 hours (7200s) to account for token expiration timing.
-		if ( time() >= absint( $client['expires_on'] ) - 7200 ) {
-			// Refresh the token.
+		// Verify that the required 'expires_on' field exists and is a valid integer.
+		if ( empty( $client['expires_on'] ) || ! is_numeric( $client['expires_on'] ) ) {
+			automator_log( 'Client "expires_on" is missing or invalid. Unable to retrieve access token', self::class, true, 'help-scout' );
+			return null;
+		}
+
+		// Parse the expiration time.
+		$expires_on = absint( $client['expires_on'] );
+
+		// Determine if the token is near or past expiration.
+		$is_token_expired = ( time() >= $expires_on - 7200 );
+
+		// Refresh the token if it's expired or near expiration.
+		if ( $is_token_expired ) {
 			$this->refresh_token( $client );
 		}
 
-		return $this->get_client()['access_token'];
+		// Retrieve the client instance and verify that the access token exists.
+		$client_instance = $this->get_client();
+		if ( empty( $client_instance['access_token'] ) ) {
+			automator_log( 'Access token is missing from the client instance', self::class, true, 'help-scout' );
+			return null;
+		}
+
+		return $client_instance['access_token'];
 
 	}
 
@@ -541,7 +633,7 @@ class Helpscout_Helpers {
 					$response['expires_on'] = strtotime( current_time( 'mysql' ) ) + $response['expires_in'];
 					$response['user']       = $client['user'];
 
-					update_option( self::CLIENT, $response, false );
+					automator_update_option( self::CLIENT, $response, true );
 
 				}
 			}
@@ -608,7 +700,7 @@ class Helpscout_Helpers {
 	 */
 	public function is_webhook_enabled() {
 
-		$webhook_enabled_option = get_option( 'uap_helpscout_enable_webhook', false );
+		$webhook_enabled_option = automator_get_option( 'uap_helpscout_enable_webhook', false );
 
 		// The get_option can return string or boolean sometimes.
 		if ( 'on' === $webhook_enabled_option || 1 == $webhook_enabled_option ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
@@ -627,7 +719,7 @@ class Helpscout_Helpers {
 
 		$new_key = md5( uniqid( wp_rand(), true ) );
 
-		update_option( 'uap_helpscout_webhook_key', $new_key );
+		automator_update_option( 'uap_helpscout_webhook_key', $new_key );
 
 		return $new_key;
 
@@ -646,7 +738,7 @@ class Helpscout_Helpers {
 	 */
 	public function get_webhook_key() {
 
-		$webhook_key = get_option( 'uap_helpscout_webhook_key', false );
+		$webhook_key = automator_get_option( 'uap_helpscout_webhook_key', false );
 
 		if ( false === $webhook_key ) {
 			$webhook_key = $this->regenerate_webhook_key();

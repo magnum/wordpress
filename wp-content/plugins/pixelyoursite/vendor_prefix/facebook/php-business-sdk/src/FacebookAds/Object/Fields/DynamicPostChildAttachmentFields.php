@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class DynamicPostChildAttachmentFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const IMAGE_URL = 'image_url';
-    const LINK = 'link';
-    const PLACE_ID = 'place_id';
-    const PRODUCT_ID = 'product_id';
-    const TITLE = 'title';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'image_url' => 'string', 'link' => 'string', 'place_id' => 'string', 'product_id' => 'string', 'title' => 'string');
-    }
+
+class DynamicPostChildAttachmentFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const IMAGE_URL = 'image_url';
+  const LINK = 'link';
+  const PLACE_ID = 'place_id';
+  const PRODUCT_ID = 'product_id';
+  const TITLE = 'title';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'image_url' => 'string',
+      'link' => 'string',
+      'place_id' => 'string',
+      'product_id' => 'string',
+      'title' => 'string',
+    );
+  }
 }

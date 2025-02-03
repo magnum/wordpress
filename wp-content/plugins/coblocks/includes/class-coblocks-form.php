@@ -69,8 +69,6 @@ class CoBlocks_Form {
 	public function __construct() {
 
 		add_action( 'init', array( $this, 'register_settings' ) );
-		add_action( 'init', array( $this, 'register_form_blocks' ) );
-
 		add_action( 'wp_enqueue_scripts', array( $this, 'form_recaptcha_assets' ) );
 
 	}
@@ -145,52 +143,6 @@ class CoBlocks_Form {
 	}
 
 	/**
-	 * Register the form blocks.
-	 */
-	public function register_form_blocks() {
-
-		register_block_type(
-			'coblocks/form',
-			array(
-				'render_callback' => array( $this, 'render_form' ),
-			)
-		);
-
-		$form_blocks = array(
-			'name',
-			'email',
-			'textarea',
-			'text',
-			'date',
-			'phone',
-			'radio',
-			'select',
-			'submit-button',
-			'checkbox',
-			'website',
-			'hidden',
-		);
-
-		foreach ( $form_blocks as $form_block ) {
-
-			register_block_type(
-				"coblocks/field-${form_block}",
-				array(
-					'parent'          => array( 'coblocks/form' ),
-					'render_callback' => array( $this, sprintf( 'render_field_%s', str_replace( '-', '_', $form_block ) ) ),
-				)
-			);
-
-		}
-
-		/**
-		 * Fires when the coblocks/form block and sub-blocks are registered
-		 */
-		do_action( 'coblocks_register_form_blocks' );
-
-	}
-
-	/**
 	 * Render the form
 	 *
 	 * @param array $atts    Block attributes.
@@ -198,10 +150,10 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Form markup or success message when form submits successfully.
 	 */
-	public function render_form( $atts, $content ) {
+	public function coblocks_render_coblocks_form_block( $atts, $content ) {
 
 		$this->form_hash = sha1( $content );
-		$submitted_hash  = filter_input( INPUT_POST, 'form-hash', FILTER_SANITIZE_STRING );
+		$submitted_hash  = filter_input( INPUT_POST, 'form-hash' );
 
 		ob_start();
 		?>
@@ -209,7 +161,7 @@ class CoBlocks_Form {
 		<div class="coblocks-form" id="<?php echo esc_attr( $this->form_hash ); ?>">
 
 			<?php
-			if ( $submitted_hash === $this->form_hash ) {
+			if ( $submitted_hash && htmlspecialchars( $submitted_hash ) === $this->form_hash ) {
 
 				$submit_form = $this->process_form_submission( $atts );
 
@@ -232,7 +184,7 @@ class CoBlocks_Form {
 				<?php
 				// Output a submit button if it's not found in the block content.
 				if ( false === strpos( $content, 'coblocks-form__submit' ) ) :
-					echo $this->render_field_submit_button( $atts );
+					echo $this->coblocks_render_coblocks_field_submit_button_block( $atts );
 				endif;
 				?>
 			</form>
@@ -251,7 +203,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the name field.
 	 */
-	public function render_field_name( $atts ) {
+	public function coblocks_render_coblocks_field_name_block( $atts ) {
 
 		static $name_count = 1;
 
@@ -316,7 +268,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the email field.
 	 */
-	public function render_field_email( $atts ) {
+	public function coblocks_render_coblocks_field_email_block( $atts ) {
 
 		$label         = isset( $atts['label'] ) ? $atts['label'] : __( 'Email', 'coblocks' );
 		$label_slug    = sanitize_title( $label );
@@ -344,7 +296,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the textarea field.
 	 */
-	public function render_field_textarea( $atts ) {
+	public function coblocks_render_coblocks_field_textarea_block( $atts ) {
 
 		static $textarea_count = 1;
 
@@ -375,7 +327,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the text field.
 	 */
-	public function render_field_text( $atts ) {
+	public function coblocks_render_coblocks_field_text_block( $atts ) {
 
 		static $text_count = 1;
 
@@ -406,7 +358,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the date field.
 	 */
-	public function render_field_date( $atts ) {
+	public function coblocks_render_coblocks_field_date_block( $atts ) {
 
 		static $date_count = 1;
 
@@ -437,7 +389,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the phone field.
 	 */
-	public function render_field_phone( $atts ) {
+	public function coblocks_render_coblocks_field_phone_block( $atts ) {
 
 		static $phone_count = 1;
 
@@ -468,7 +420,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the radio field.
 	 */
-	public function render_field_radio( $atts ) {
+	public function coblocks_render_coblocks_field_radio_block( $atts ) {
 
 		if ( empty( $atts['options'] ) ) {
 
@@ -488,6 +440,8 @@ class CoBlocks_Form {
 		$classes       = implode( ' ', (array) apply_filters( 'coblocks_render_label_color_wrapper_class', array( 'coblocks-label' ), $atts ) );
 
 		ob_start();
+
+		$this->render_field_label( array_merge( $atts, array( 'hidden' => true ) ), $label, $radio_count );
 
 		print( '<div class="coblocks-field"><fieldset>' );
 
@@ -539,7 +493,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the select field.
 	 */
-	public function render_field_select( $atts ) {
+	public function coblocks_render_coblocks_field_select_block( $atts ) {
 
 		if ( empty( $atts['options'] ) ) {
 
@@ -588,7 +542,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the checkbox field.
 	 */
-	public function render_field_checkbox( $atts ) {
+	public function coblocks_render_coblocks_field_checkbox_block( $atts ) {
 
 		if ( empty( $atts['options'] ) ) {
 
@@ -678,7 +632,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the website field.
 	 */
-	public function render_field_website( $atts ) {
+	public function coblocks_render_coblocks_field_website_block( $atts ) {
 
 		static $website_count = 1;
 
@@ -709,7 +663,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Markup for the hidden field.
 	 */
-	public function render_field_hidden( $atts ) {
+	public function coblocks_render_coblocks_field_hidden_block( $atts ) {
 
 		static $hidden_count = 1;
 
@@ -794,7 +748,7 @@ class CoBlocks_Form {
 	 *
 	 * @return mixed Form submit button markup.
 	 */
-	public function render_field_submit_button( $atts ) {
+	public function coblocks_render_coblocks_field_submit_button_block( $atts ) {
 
 		$btn_text             = isset( $atts['submitButtonText'] ) ? $atts['submitButtonText'] : __( 'Submit', 'coblocks' );
 		$btn_class            = isset( $atts['className'] ) ? " {$atts['className']}" : '';
@@ -851,17 +805,29 @@ class CoBlocks_Form {
 	 */
 	public function process_form_submission( $atts ) {
 
-		$form_submission = filter_input( INPUT_POST, 'action', FILTER_SANITIZE_STRING );
+		$form_submission = filter_input( INPUT_POST, 'action' );
 
-		if ( ! $form_submission || 'coblocks-form-submit' !== $form_submission ) {
+		if ( ! $form_submission ) {
 
 			return;
 
 		}
 
-		$nonce = filter_input( INPUT_POST, 'form-submit', FILTER_SANITIZE_STRING );
+		if ( 'coblocks-form-submit' !== htmlspecialchars( $form_submission ) ) {
 
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'coblocks-form-submit' ) ) {
+			return;
+
+		}
+
+		$nonce = filter_input( INPUT_POST, 'form-submit' );
+
+		if ( ! $nonce ) {
+
+			return;
+
+		}
+
+		if ( ! wp_verify_nonce( htmlspecialchars( $nonce ), 'coblocks-form-submit' ) ) {
 
 			return;
 
@@ -870,9 +836,9 @@ class CoBlocks_Form {
 		/**
 		 * Check if the honeypot field was filled out and if so, bail.
 		 */
-		$honeypot_check = filter_input( INPUT_POST, 'coblocks-verify-email', FILTER_SANITIZE_STRING );
+		$honeypot_check = filter_input( INPUT_POST, 'coblocks-verify-email' );
 
-		if ( ! empty( $honeypot_check ) ) {
+		if ( ! empty( htmlspecialchars( $honeypot_check ) ) ) {
 
 			$this->remove_url_form_hash();
 
@@ -929,9 +895,15 @@ class CoBlocks_Form {
 
 		foreach ( $_POST as $key => $data ) {
 
+			if ( ! is_array( $data ) ) {
+
+				continue;
+
+			}
+
 			if ( is_array( $data['value'] ) ) {
 
-				$data['value'] = implode( ', ', $data['value'] );
+				$data['value'] = ( array_key_exists( 'first-name', $data['value'] ) && array_key_exists( 'last-name', $data['value'] ) ) ? $data['value']['last-name'] . ', ' . $data['value']['first-name'] : implode( ', ', $data['value'] );
 
 			}
 

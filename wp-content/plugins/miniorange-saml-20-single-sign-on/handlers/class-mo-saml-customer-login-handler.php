@@ -47,10 +47,6 @@ class Mo_SAML_Customer_Login_Handler {
 		} else {
 			$response = self::mo_saml_get_current_customer( $customer, $db_handler, $new_registration );
 		}
-		if ( ! empty( $response['status'] ) && 'success' === $response['status'] ) {
-			wp_safe_redirect( admin_url( '/admin.php?page=mo_saml_settings&tab=licensing' ), 301 );
-			exit;
-		}
 	}
 
 	/**
@@ -100,18 +96,18 @@ class Mo_SAML_Customer_Login_Handler {
 
 		if ( $new_registration ) {
 			if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( array( $post_array[ Mo_Saml_Account_Setup_Constants::CONFIRM_PASSWORD ] ) ) ) {
-				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::FIELDS_EMPTY );
+				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'FIELDS_EMPTY' ) );
 			} elseif ( strcmp( $post_array[ Mo_Saml_Account_Setup_Constants::CUSTOMER_PASSWORD ], $post_array[ Mo_Saml_Account_Setup_Constants::CONFIRM_PASSWORD ] ) !== 0 ) {
-				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::PASSWORD_MISMATCH );
+				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'PASSWORD_MISMATCH' ) );
 			} elseif ( ! filter_var( $post_array[ Mo_Saml_Account_Setup_Constants::REGISTER_EMAIL ], FILTER_VALIDATE_EMAIL ) ) {
-				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::CONTACT_EMAIL_INVALID );
+				$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'CONTACT_EMAIL_INVALID' ) );
 			}
 		}
 
 		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( array( $post_array[ Mo_Saml_Account_Setup_Constants::CUSTOMER_PASSWORD ] ) ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::FIELDS_EMPTY );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'FIELDS_EMPTY' ) );
 		} elseif ( self::mo_saml_check_password_pattern( sanitize_text_field( $post_array[ Mo_Saml_Account_Setup_Constants::CUSTOMER_PASSWORD ] ) ) ) {
-			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::PASSWORD_PATTERN_INVALID );
+			$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'PASSWORD_PATTERN_INVALID' ) );
 
 		}
 
@@ -172,7 +168,7 @@ class Mo_SAML_Customer_Login_Handler {
 			$customer_key = json_decode( $content, true );
 
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				$error_message = $new_registration ? Mo_Saml_Messages::ACCOUNT_EXISTS : Mo_Saml_Messages::INVALID_CREDENTIALS;
+				$error_message = $new_registration ? Mo_Saml_Messages::mo_saml_translate( 'ACCOUNT_EXISTS' ) : Mo_Saml_Messages::mo_saml_translate( 'INVALID_CREDENTIALS' );
 				$post_save     = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, $error_message );
 				$post_save->mo_saml_post_save_action();
 
@@ -206,9 +202,8 @@ class Mo_SAML_Customer_Login_Handler {
 
 		$db_handler->mo_saml_save_options( $save_array );
 
-		$save_message = $new_registration ? Mo_Saml_Messages::REGISTER_SUCCESS : Mo_Saml_Messages::CUSTOMER_FOUND;
+		$save_message = $new_registration ? Mo_Saml_Messages::mo_saml_translate( 'REGISTER_SUCCESS' ) : Mo_Saml_Messages::mo_saml_translate( 'CUSTOMER_FOUND' );
 		$post_save    = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, $save_message );
 		$post_save->mo_saml_post_save_action();
 	}
-
 }

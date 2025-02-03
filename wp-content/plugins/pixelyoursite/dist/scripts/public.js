@@ -53,10 +53,38 @@ if (!Array.prototype.includes) {
     });
 }
 
-!function ($, options) {
+if (!String.prototype.startsWith) {
+    Object.defineProperty(String.prototype, 'startsWith', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: function (searchString, position) {
+            position = position || 0;
+            return this.indexOf(searchString, position) === position;
+        }
+    });
+}
 
+if (!String.prototype.trim) {
+    (function () {
+        String.prototype.trim = function () {
+            return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+        };
+    })();
+}
+
+! function ($, options) {
     if (options.debug) {
         console.log('PYS:', options);
+    }
+    var uniqueId = {};
+
+    let gtm_variables = {};
+    let gtm_datalayername = "dynamicVariable";
+
+    var domain = '';
+    if(options.hasOwnProperty("track_cookie_for_subdomains") && options.track_cookie_for_subdomains) {
+        domain = getRootDomain(true);
     }
 
     var dummyPinterest = function () {
@@ -65,47 +93,22 @@ if (!Array.prototype.includes) {
          * Public API
          */
         return {
-
-            isEnabled: function () {
-            },
-
-            disable: function () {
-            },
-
-            loadPixel: function () {
-            },
-
+            isEnabled: function () {},
+            disable: function () {},
+            loadPixel: function () {},
             fireEvent: function (name, data) {
                 return false;
             },
-
-            onCommentEvent: function () {
-            },
-
-            onDownloadEvent: function (params) {
-            },
-
-            onFormEvent: function (params) {
-            },
-
-            onWooAddToCartOnButtonEvent: function (product_id) {
-            },
-
-            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {
-            },
-
-            onWooRemoveFromCartEvent: function (cart_item_hash) {
-            },
-
-            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {
-            },
-
-            onEddRemoveFromCartEvent: function (item) {
-            },
+            onCommentEvent: function () {},
+            onDownloadEvent: function (params) {},
+            onFormEvent: function (params) {},
+            onWooAddToCartOnButtonEvent: function (product_id) {},
+            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {},
+            onWooRemoveFromCartEvent: function (cart_item_hash) {},
+            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {},
+            onEddRemoveFromCartEvent: function (item) {},
             onPageScroll: function (event) {},
-            onTime: function (event) {
-
-            },
+            onTime: function (event) {},
 
         }
 
@@ -117,65 +120,27 @@ if (!Array.prototype.includes) {
          * Public API
          */
         return {
-
-            isEnabled: function () {
-            },
-
-            disable: function () {
-            },
-
-            loadPixel: function () {
-            },
-
+            isEnabled: function () {},
+            disable: function () {},
+            loadPixel: function () {},
             fireEvent: function (name, data) {
                 return false;
             },
-
-            onAdSenseEvent: function () {
-            },
-
-            onClickEvent: function (params) {
-            },
-
-            onWatchVideo: function (params) {
-            },
-
-            onCommentEvent: function () {
-            },
-
-            onFormEvent: function (params) {
-            },
-
-            onDownloadEvent: function (params) {
-            },
-
-            onWooAddToCartOnButtonEvent: function (product_id) {
-            },
-
-            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {
-            },
-
-            onWooRemoveFromCartEvent: function (cart_item_hash) {
-            },
-
-            onWooAffiliateEvent: function (product_id) {
-            },
-
-            onWooPayPalEvent: function () {
-            },
-
-            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {
-            },
-
-            onEddRemoveFromCartEvent: function (item) {
-            },
-
-            onPageScroll: function (event) {
-            },
-
-            onTime: function (event) {
-            },
-
+            onAdSenseEvent: function () {},
+            onClickEvent: function (params) {},
+            onWatchVideo: function (params) {},
+            onCommentEvent: function () {},
+            onFormEvent: function (params) {},
+            onDownloadEvent: function (params) {},
+            onWooAddToCartOnButtonEvent: function (product_id) {},
+            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {},
+            onWooRemoveFromCartEvent: function (cart_item_hash) {},
+            onWooAffiliateEvent: function (product_id) {},
+            onWooPayPalEvent: function () {},
+            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {},
+            onEddRemoveFromCartEvent: function (item) {},
+            onPageScroll: function (event) {},
+            onTime: function (event) {},
         }
 
     }();
@@ -188,11 +153,17 @@ if (!Array.prototype.includes) {
 
         var gtag_loaded = false;
 
+        var gtm_loaded = false;
+
         let isNewSession = checkSession();
 
-        let utmTerms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+        var utmTerms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
-        let utmId = ['fbadid', 'gadid', 'padid', 'bingid'];
+        var utmId = ['fbadid', 'gadid', 'padid', 'bingid'];
+
+        let dataLayerName = 'dataLayerPYS';
+
+        let GTMdataLayerName = 'dataLayer';
 
         function validateEmail(email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -220,6 +191,10 @@ if (!Array.prototype.includes) {
                     Analytics.loadPixel();
                 }
 
+                if (!options.gdpr.analytics_disabled_by_api) {
+                    GTM.loadPixel();
+                }
+
                 if (!options.gdpr.pinterest_disabled_by_api) {
                     Pinterest.loadPixel();
                 }
@@ -237,13 +212,9 @@ if (!Array.prototype.includes) {
         }
 
         function checkSession() {
-            let duration = options.last_visit_duration * 60000
             if( Cookies.get('pys_start_session') === undefined ||
                 Cookies.get('pys_session_limit') === undefined) {
-                var now = new Date();
-                now.setTime(now.getTime() + duration);
-                Cookies.set('pys_session_limit', true,{ expires: now })
-                Cookies.set('pys_start_session', true)
+                firstVisit = true;
                 return true
             }
             return false
@@ -315,6 +286,35 @@ if (!Array.prototype.includes) {
         }
 
 
+        function getLandingPageValue() {
+            let name = "pys_landing_page"
+            if(options.visit_data_model === "last_visit") {
+                name = "last_pys_landing_page"
+            }
+            if(Cookies.get(name) && Cookies.get(name) !== "undefined") {
+                return Cookies.get(name);
+            }
+            else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficLanding){
+                return options.tracking_analytics.TrafficLanding;
+            } else{
+                return "";
+            }
+        }
+        function getTrafficSourceValue() {
+            let name = "pysTrafficSource"
+            if(options.visit_data_model === "last_visit") {
+                name = "last_pysTrafficSource"
+            }
+            if(Cookies.get(name) && Cookies.get(name) !== "undefined") {
+                return Cookies.get(name);
+            }
+            else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficSource){
+                return options.tracking_analytics.TrafficSource;
+            } else{
+                return "";
+            }
+        }
+
         function getUTMId(useLast = false) {
             try {
                 let cookiePrefix = 'pys_'
@@ -325,6 +325,9 @@ if (!Array.prototype.includes) {
                 $.each(utmId, function (index, name) {
                     if (Cookies.get(cookiePrefix + name)) {
                         terms[name] = Cookies.get(cookiePrefix + name)
+                    }
+                    else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficUtmsId[name]) {
+                        terms[name] = filterEmails(options.tracking_analytics.TrafficUtmsId[name])
                     }
                 });
                 return terms;
@@ -348,6 +351,9 @@ if (!Array.prototype.includes) {
                     if (Cookies.get(cookiePrefix + name)) {
                         let value = Cookies.get(cookiePrefix + name);
                         terms[name] = filterEmails(value); // do not allow email in request params (Issue #70)
+                    }
+                    else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficUtms[name]) {
+                        terms[name] = filterEmails(options.tracking_analytics.TrafficUtms[name])
                     }
                 });
 
@@ -389,7 +395,8 @@ if (!Array.prototype.includes) {
             PRODUCT_VARIABLE : 1,
             PRODUCT_BUNDLE : 2,
             PRODUCT_GROUPED : 3,
-
+            utmTerms : utmTerms,
+            utmId : utmId,
             fireEventForAllPixel:function(functionName,events){
                 if (events.hasOwnProperty(Facebook.tag()))
                     Facebook[functionName](events[Facebook.tag()]);
@@ -399,6 +406,9 @@ if (!Array.prototype.includes) {
                     Pinterest[functionName](events[Pinterest.tag()]);
                 if (events.hasOwnProperty(Bing.tag()))
                     Bing[functionName](events[Bing.tag()]);
+
+                if (events.hasOwnProperty(GTM.tag()))
+                    GTM[functionName](events[GTM.tag()]);
             },
 
             setupPinterestObject: function () {
@@ -423,53 +433,261 @@ if (!Array.prototype.includes) {
             },
 
             manageCookies: function () {
+
+                if (options.gdpr.cookiebot_integration_enabled && typeof Cookiebot !== 'undefined') {
+                    if (Cookiebot.consented === false && !Cookiebot.consent['marketing'] && !Cookiebot.consent['statistics']) {
+                        return;
+                    }
+                }
+                let cm_consent_not_expressed = false;
+                if ( options.gdpr.consent_magic_integration_enabled && window.CS_Data !== undefined && window.CS_Data.cs_refresh_after_consent == 1 ) {
+                    if ( Cookies.get( 'cs_viewed_cookie_policy' ) === undefined ) {
+                        cm_consent_not_expressed = true;
+                    }
+                }
+
+                if( !cm_consent_not_expressed && isNewSession && !options.cookie.disabled_all_cookie && !options.cookie.disabled_start_session_cookie) {
+                    let duration = options.last_visit_duration * 60000
+                    var now = new Date();
+                    now.setTime(now.getTime() + duration);
+                    Cookies.set('pys_session_limit', true,{ expires: now, path: '/',domain: domain })
+                    Cookies.set('pys_start_session', true,{path: '/',domain: domain});
+                }
+                if (options.gdpr.ajax_enabled && !options.gdpr.consent_magic_integration_enabled) {
+
+                    // retrieves actual PYS GDPR filters values which allow to avoid cache issues
+                    $.get({
+                        url: options.ajaxUrl,
+                        dataType: 'json',
+                        data: {
+                            action: 'pys_get_gdpr_filters_values'
+                        },
+                        success: function (res) {
+
+                            if (res.success) {
+
+                                options.gdpr.all_disabled_by_api = res.data.all_disabled_by_api;
+                                options.gdpr.facebook_disabled_by_api = res.data.facebook_disabled_by_api;
+                                options.gdpr.tiktok_disabled_by_api = res.data.tiktok_disabled_by_api;
+                                options.gdpr.analytics_disabled_by_api = res.data.analytics_disabled_by_api;
+                                options.gdpr.google_ads_disabled_by_api = res.data.google_ads_disabled_by_api;
+                                options.gdpr.pinterest_disabled_by_api = res.data.pinterest_disabled_by_api;
+                                options.gdpr.bing_disabled_by_api = res.data.bing_disabled_by_api;
+
+                                options.cookie.externalID_disabled_by_api = res.data.externalID_disabled_by_api;
+                                options.cookie.disabled_all_cookie = res.data.disabled_all_cookie;
+                                options.cookie.disabled_advanced_form_data_cookie = res.data.disabled_advanced_form_data_cookie;
+                                options.cookie.disabled_landing_page_cookie = res.data.disabled_landing_page_cookie;
+                                options.cookie.disabled_first_visit_cookie = res.data.disabled_first_visit_cookie;
+                                options.cookie.disabled_trafficsource_cookie = res.data.disabled_trafficsource_cookie;
+                                options.cookie.disabled_utmTerms_cookie = res.data.disabled_utmTerms_cookie;
+                                options.cookie.disabled_utmId_cookie = res.data.disabled_utmId_cookie;
+
+                            }
+                        }
+                    });
+                }
+                if (options.ajaxForServerEvent && !Cookies.get('pbid') && Facebook.isEnabled()) {
+                     jQuery.ajax({
+                        url: options.ajaxUrl,
+                        dataType: 'json',
+                        data: {
+                            action: 'pys_get_pbid'
+                        },
+                        success: function (res) {
+                            if (res.data && res.data.pbid != false && options.send_external_id) {
+                                if(!(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
+                                    var expires = parseInt(options.external_id_expire || 180);
+                                    Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/',domain: domain });
+                                }
+
+                                if(options.hasOwnProperty('facebook')) {
+                                    options.facebook.advancedMatching = {
+                                        ...options.facebook.advancedMatching,  // распыляем текущие значения advancedMatching
+                                        external_id: res.data.pbid
+                                    };
+                                }
+                            }
+                        }
+                    });
+                } else if (Cookies.get('pbid') && Facebook.isEnabled()){
+                    if(Facebook.advancedMatching() && Facebook.advancedMatching().external_id && !(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
+                        let expires = parseInt(options.external_id_expire || 180);
+                        Cookies.set('pbid', Facebook.advancedMatching().external_id, { expires: expires, path: '/',domain: domain });
+                    }
+                }
+
                 let expires = parseInt(options.cookie_duration); //  days
                 let queryVars = getQueryVars();
                 let landing = window.location.href.split('?')[0];
                 try {
                     // save data for first visit
-                    if(Cookies.get('pys_first_visit') === undefined) {
-                        Cookies.set('pys_first_visit', true, { expires: expires });
-                        Cookies.set('pysTrafficSource', getTrafficSource(), { expires: expires });
-                        Cookies.set('pys_landing_page',landing,{ expires: expires });
-                        $.each(utmTerms, function (index, name) {
-                            if (queryVars.hasOwnProperty(name)) {
-                                Cookies.set('pys_' + name, queryVars[name], { expires: expires });
-                            } else {
+                    if(Cookies.get('pys_first_visit') === undefined && (!options.cookie.disabled_all_cookie)) {
+
+                        if(!options.cookie.disabled_first_visit_cookie)
+                        {
+                            Cookies.set('pys_first_visit', true, { expires: expires, path: '/',domain: domain });
+                        }
+                        else {
+                            Cookies.remove('pys_first_visit')
+                        }
+
+                        if(!options.cookie.disabled_trafficsource_cookie)
+                        {
+                            Cookies.set('pysTrafficSource', getTrafficSource(), { expires: expires,path: '/',domain: domain });
+                        }
+                        else {
+                            Cookies.remove('pysTrafficSource')
+                        }
+
+                        if(!options.cookie.disabled_landing_page_cookie)
+                        {
+                            Cookies.set('pys_landing_page',landing,{ expires: expires,path: '/',domain: domain });
+                        }
+                        else {
+                            Cookies.remove('pys_landing_page')
+                        }
+
+                        if(!options.cookie.disabled_utmTerms_cookie)
+                        {
+                            $.each(utmTerms, function (index, name) {
+                                if (queryVars.hasOwnProperty(name)) {
+                                    Cookies.set('pys_' + name, queryVars[name], { expires: expires,path: '/',domain: domain });
+                                } else {
+                                    Cookies.remove('pys_' + name)
+                                }
+                            });
+                        }
+                        else {
+                            $.each(utmTerms, function (index, name) {
                                 Cookies.remove('pys_' + name)
-                            }
-                        });
-                        $.each(utmId,function(index,name) {
-                            if (queryVars.hasOwnProperty(name)) {
-                                Cookies.set('pys_' + name, queryVars[name], { expires: expires });
-                            } else {
+                            });
+                        }
+
+                        if(!options.cookie.disabled_utmId_cookie)
+                        {
+                            $.each(utmId,function(index,name) {
+                                if (queryVars.hasOwnProperty(name)) {
+                                    Cookies.set('pys_' + name, queryVars[name], { expires: expires,path: '/',domain: domain });
+                                } else {
+                                    Cookies.remove('pys_' + name)
+                                }
+                            })
+                        }
+                        else {
+                            $.each(utmId, function (index, name) {
                                 Cookies.remove('pys_' + name)
-                            }
-                        })
+                            });
+                        }
                     }
 
                     // save data for last visit if it new session
-                    if(isNewSession) {
-                        Cookies.set('last_pysTrafficSource', getTrafficSource(), { expires: expires });
-                        $.each(utmTerms, function (index, name) {
-                            if (queryVars.hasOwnProperty(name)) {
-                                Cookies.set('last_pys_' + name, queryVars[name], { expires: expires });
-                            } else {
+                    if(isNewSession && (!options.cookie.disabled_all_cookie)) {
+                        if(!options.cookie.disabled_trafficsource_cookie)
+                        {
+                            Cookies.set('last_pysTrafficSource', getTrafficSource(), { expires: expires,path: '/',domain: domain });
+                        }
+                        else {
+                            Cookies.remove('last_pysTrafficSource')
+                        }
+
+                        if(!options.cookie.disabled_landing_page_cookie)
+                        {
+                            Cookies.set('last_pys_landing_page',landing,{ expires: expires,path: '/',domain: domain });
+                        }
+                        else {
+                            Cookies.remove('last_pys_landing_page')
+                        }
+
+                        if(!options.cookie.disabled_utmTerms_cookie)
+                        {
+                            $.each(utmTerms, function (index, name) {
+                                if (queryVars.hasOwnProperty(name)) {
+                                    Cookies.set('last_pys_' + name, queryVars[name], { expires: expires,path: '/',domain: domain });
+                                } else {
+                                    Cookies.remove('last_pys_' + name)
+                                }
+                            });
+                        }
+                        else {
+                            $.each(utmTerms, function (index, name) {
                                 Cookies.remove('last_pys_' + name)
-                            }
+                            });
+                        }
+
+                        if(!options.cookie.disabled_utmId_cookie)
+                        {
+                            $.each(utmId,function(index,name) {
+                                if (queryVars.hasOwnProperty(name)) {
+                                    Cookies.set('last_pys_' + name, queryVars[name], { expires: expires,path: '/',domain: domain });
+                                } else {
+                                    Cookies.remove('last_pys_' + name)
+                                }
+                            })
+                        }
+                        else {
+                            $.each(utmId, function (index, name) {
+                                Cookies.remove('last_pys_' + name)
+                            });
+                        }
+
+                    }
+                    if(options.cookie.disabled_start_session_cookie) {
+                        Cookies.remove('pys_start_session')
+                        Cookies.remove('pys_session_limit')
+                    }
+                    if(options.cookie.disabled_all_cookie)
+                    {
+                        Cookies.remove('pys_first_visit')
+                        Cookies.remove('pysTrafficSource')
+                        Cookies.remove('pys_landing_page')
+                        Cookies.remove('last_pys_landing_page')
+                        Cookies.remove('last_pysTrafficSource')
+                        Cookies.remove('pys_start_session')
+                        Cookies.remove('pys_session_limit')
+                        $.each(Utils.utmTerms, function (index, name) {
+                            Cookies.remove('pys_' + name)
                         });
-                        $.each(utmId,function(index,name) {
-                            if (queryVars.hasOwnProperty(name)) {
-                                Cookies.set('last_pys_' + name, queryVars[name], { expires: expires });
-                            } else {
-                                Cookies.remove('last_pys_' + name)
-                            }
+                        $.each(Utils.utmId,function(index,name) {
+                            Cookies.remove('pys_' + name)
                         })
-                        Cookies.set('last_pys_landing_page',landing,{ expires: expires });
+                        $.each(Utils.utmTerms, function (index, name) {
+                            Cookies.remove('last_pys_' + name)
+                        });
+                        $.each(Utils.utmId,function(index,name) {
+                            Cookies.remove('last_pys_' + name)
+                        });
                     }
                 } catch (e) {
                     console.error(e);
                 }
+            },
+            /**
+             * Generate unique ID
+             */
+            generateUniqueId : function (event) {
+                if(event.eventID.length == 0 || (event.type == "static" && options.ajaxForServerStaticEvent) || (event.type !== "static" && options.ajaxForServerEvent)) {
+                    let idKey = event.hasOwnProperty('custom_event_post_id') ? event.custom_event_post_id : event.e_id;
+                    if (!uniqueId.hasOwnProperty(idKey)) {
+                        uniqueId[idKey] = pys_generate_token();
+                    }
+                    return uniqueId[idKey];
+                }
+                else if(event.eventID.length !== 0)
+                {
+                    return event.eventID;
+                }
+            },
+            sendServerAjaxRequest : function(url, data) {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: data,
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    },
+                    success: function () {},
+                });
             },
             // clone object
             clone: function(obj) {
@@ -531,32 +749,42 @@ if (!Array.prototype.includes) {
 
                 // Non-default binding used to avoid situations when some code in external js
                 // stopping events propagation, eg. returns false, and our handler will never called
-                $(document).onFirst('mouseover', triggers.join(','), function () {
+                document.addEventListener('mouseover', function(event) {
+                    var matchedElements = Array.from(document.querySelectorAll(triggers));
+                    var clickedElement = event.target;
+                    var closestMatch = clickedElement.closest(triggers);
+                    if (matchedElements.includes(clickedElement) || closestMatch){
+                        if (event.target.classList.contains('pys-mouse-over-' + eventId)) {
+                            return true;
+                        } else {
+                            event.target.classList.add('pys-mouse-over-' + eventId);
+                        }
 
-                    // do not fire event multiple times
-                    if ($(this).hasClass('pys-mouse-over-' + eventId)) {
-                        return true;
-                    } else {
-                        $(this).addClass('pys-mouse-over-' + eventId);
+                        Utils.fireTriggerEvent(eventId);
                     }
-
-                    Utils.fireDynamicEvent(eventId);
-
                 });
 
             },
 
             setupCSSClickEvents: function (eventId, triggers) {
-
                 // Non-default binding used to avoid situations when some code in external js
                 // stopping events propagation, eg. returns false, and our handler will never called
-                $(document).onFirst('click', triggers.join(','), function () {
-                    Utils.fireTriggerEvent(eventId);
-                });
+                document.addEventListener('click', function(event) {
+                    let matchedElements = Array.from(document.querySelectorAll(triggers)),
+                        clickedElement = event.target,
+                        closestMatch = clickedElement.closest(triggers);
+
+                    if (matchedElements.includes(clickedElement) || closestMatch){
+                        Utils.fireTriggerEvent(eventId);
+                    }
+                }, true);
             },
 
             setupURLClickEvents: function () {
 
+                if( !options.triggerEventTypes.hasOwnProperty('url_click') ) {
+                    return;
+                }
                 // Non-default binding used to avoid situations when some code in external js
                 // stopping events propagation, eg. returns false, and our handler will never called
                 $('a[data-pys-event-id]').onFirst('click', function (evt) {
@@ -656,6 +884,11 @@ if (!Array.prototype.includes) {
                     event = events.bing;
                     Bing.fireEvent(event.name, event);
                 }
+
+                if (events.hasOwnProperty('gtm')) {
+                    event = events.gtm;
+                    GTM.fireEvent(event.name, event);
+                }
             },
 
             fireStaticEvents: function (pixel) {
@@ -680,6 +913,8 @@ if (!Array.prototype.includes) {
                                     fired = Pinterest.fireEvent(eventData.name, eventData);
                                 } else if ('bing' === pixel) {
                                     fired = Bing.fireEvent(eventData.name, eventData);
+                                } else if ('gtm' === pixel) {
+                                    fired = GTM.fireEvent(eventData.name, eventData);
                                 }
 
                                 // prevent event double event firing
@@ -703,26 +938,95 @@ if (!Array.prototype.includes) {
             loadGoogleTag: function (id) {
 
                 if (!gtag_loaded) {
-
+                    let dataLayerName = this.dataLayerName;
+                    if(options.hasOwnProperty('GATags')){
+                        switch (options.GATags.ga_datalayer_type) {
+                            case 'default':
+                                dataLayerName = 'dataLayerPYS';
+                                break;
+                            case 'custom':
+                                dataLayerName = options.GATags.ga_datalayer_name;
+                                break;
+                            default:
+                                dataLayerName = 'dataLayer';
+                        }
+                    }
+                    this.dataLayerName = dataLayerName;
                     (function (window, document, src) {
                         var a = document.createElement('script'),
                             m = document.getElementsByTagName('script')[0];
                         a.async = 1;
                         a.src = src;
                         m.parentNode.insertBefore(a, m);
-                    })(window, document, '//www.googletagmanager.com/gtag/js?id=' + id);
+                    })(window, document, '//www.googletagmanager.com/gtag/js?id=' + id+'&l='+this.dataLayerName);
 
-                    window.dataLayer = window.dataLayer || [];
+                    window[dataLayerName] = window[dataLayerName] || [];
                     window.gtag = window.gtag || function gtag() {
-                        dataLayer.push(arguments);
+                        window[dataLayerName].push(arguments);
                     };
 
-                    gtag('js', new Date());
+                    if ( options.google_consent_mode ) {
+                        let data = {};
+                        data[ 'analytics_storage' ] = options.gdpr.analytics_storage.enabled ? options.gdpr.analytics_storage.value : 'granted';
+                        data[ 'ad_storage' ] = options.gdpr.ad_storage.enabled ? options.gdpr.ad_storage.value : 'granted';
+                        data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
+                        data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
 
+                        this.loadDefaultConsent( 'consent', 'default', data );
+                    }
+
+                    gtag('js', new Date());
                     gtag_loaded = true;
 
                 }
 
+            },
+
+            loadDefaultConsent: function() {
+                window[ this.dataLayerName ].push( arguments );
+            },
+
+            loadGTMScript: function (id) {
+                const domain = options.gtm.gtm_container_domain ?? 'www.googletagmanager.com';
+                const loader = options.gtm.gtm_container_identifier ?? 'gtm';
+                const gtm_auth = options.gtm.gtm_auth ?? ''; // Set this if needed
+                const gtm_preview = options.gtm.gtm_preview ?? ''; // Set this if needed
+                const datalayer_name = options.gtm.gtm_dataLayer_name ?? 'dataLayer';
+
+                window[ datalayer_name ] = window[ datalayer_name ] || [];
+                window.gtag = window.gtag || function gtag() {
+                    window[ datalayer_name ].push( arguments );
+                };
+
+                if ( options.google_consent_mode ) {
+                    let data = {};
+                    data[ 'analytics_storage' ] = options.gdpr.analytics_storage.enabled ? options.gdpr.analytics_storage.value : 'granted';
+                    data[ 'ad_storage' ] = options.gdpr.ad_storage.enabled ? options.gdpr.ad_storage.value : 'granted';
+                    data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
+                    data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
+
+                    this.GTMdataLayerName = datalayer_name;
+                    this.loadDefaultGTMConsent( 'consent', 'default', data );
+                }
+
+                (function(w, d, s, l, i) {
+                    w[l] = w[l] || [];
+                    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+                    const f = d.getElementsByTagName(s)[0];
+                    const j = d.createElement(s);
+                    const dl = l !== 'dataLayer' ? '&l=' + l : '';
+                    j.async = true;
+                    j.src = 'https://' + domain + '/' + loader + '.js?id=' + i + dl;
+                    if (gtm_auth && gtm_preview) {
+                        j.src += '&gtm_auth=' + gtm_auth + '&gtm_preview=' + gtm_preview + '&gtm_cookies_win=x';
+                    }
+                    f.parentNode.insertBefore(j, f);
+                })(window, document, 'script', datalayer_name, id);
+
+            },
+
+            loadDefaultGTMConsent: function() {
+                window[ this.GTMdataLayerName ].push( arguments );
             },
 
             /**
@@ -751,6 +1055,14 @@ if (!Array.prototype.includes) {
                                 options.gdpr.pinterest_disabled_by_api = res.data.pinterest_disabled_by_api;
                                 options.gdpr.bing_disabled_by_api = res.data.bing_disabled_by_api;
 
+                                options.cookie.externalID_disabled_by_api = res.data.externalID_disabled_by_api;
+                                options.cookie.disabled_all_cookie = res.data.disabled_all_cookie;
+                                options.cookie.disabled_advanced_form_data_cookie = res.data.disabled_advanced_form_data_cookie;
+                                options.cookie.disabled_landing_page_cookie = res.data.disabled_landing_page_cookie;
+                                options.cookie.disabled_first_visit_cookie = res.data.disabled_first_visit_cookie;
+                                options.cookie.disabled_trafficsource_cookie = res.data.disabled_trafficsource_cookie;
+                                options.cookie.disabled_utmTerms_cookie = res.data.disabled_utmTerms_cookie;
+                                options.cookie.disabled_utmId_cookie = res.data.disabled_utmId_cookie;
                             }
 
                             loadPixels();
@@ -769,30 +1081,57 @@ if (!Array.prototype.includes) {
                 /**
                  * ConsentMagic
                  */
-                if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
+                if ( options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined" ) {
 
-                    var cs_cookie = Cookies.get('cs_viewed_cookie_policy'+test_prefix);
-
-                    if (options.gdpr[pixel + '_prior_consent_enabled']) {
-                        if (typeof cs_cookie === 'undefined' || cs_cookie === 'yes') {
+                    var test_prefix = CS_Data.test_prefix;
+                    if ( ( typeof CS_Data.cs_google_consent_mode_enabled !== "undefined" && CS_Data.cs_google_consent_mode_enabled == 1 ) && ( pixel == 'analytics' || pixel == 'google_ads' ) ) {
+                        if ( CS_Data.cs_cache_enabled == 0 || ( CS_Data.cs_cache_enabled == 1 && window.CS_Cache && window.CS_Cache.check_status ) ) {
                             return true;
-                        }
-                    } else {
-                        if (typeof cs_cookie === 'undefined' || cs_cookie === 'yes') {
-                            return true;
+                        } else {
+                            return false;
                         }
                     }
-                    if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
-                        if ((typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1) && pixel == 'analytics') {
-                            return true;
-                        }
 
-                        if ((typeof CS_Data.cs_google_ads_consent_mode !== "undefined" && CS_Data.cs_google_ads_consent_mode == 1) && pixel == 'google_ads') {
-                            return true;
+                    if( pixel == 'facebook' && ( CS_Data.cs_script_cat.facebook == 0 || CS_Data.cs_script_cat.facebook == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    } else if( pixel == 'bing' && ( CS_Data.cs_script_cat.bing == 0 || CS_Data.cs_script_cat.bing == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    } else if( pixel == 'analytics' && ( CS_Data.cs_script_cat.analytics == 0 || CS_Data.cs_script_cat.analytics == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    } else if( pixel == 'google_ads' && ( CS_Data.cs_script_cat.gads == 0 || CS_Data.cs_script_cat.gads == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    } else if( pixel == 'pinterest' && ( CS_Data.cs_script_cat.pinterest == 0 || CS_Data.cs_script_cat.pinterest == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    } else if( pixel == 'tiktok' && ( CS_Data.cs_script_cat.tiktok == 0 || CS_Data.cs_script_cat.tiktok == CS_Data.cs_necessary_cat_id ) ) {
+                        return true;
+                    }
+
+                    var substring = "cs_enabled_cookie_term";
+                    var theCookies = document.cookie.split( ';' );
+
+                    for ( var i = 1; i <= theCookies.length; i++ ) {
+                        if ( theCookies[ i - 1 ].indexOf( substring ) !== -1 ) {
+                            var categoryCookie = theCookies[ i - 1 ].replace( 'cs_enabled_cookie_term' + test_prefix + '_', '' );
+                            categoryCookie = Number( categoryCookie.replace( /\D+/g, "" ) );
+                            var cs_cookie_val = Cookies.get( 'cs_enabled_cookie_term' + test_prefix + '_' + categoryCookie );
+
+                            if ( categoryCookie === CS_Data.cs_script_cat.facebook && pixel == 'facebook' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.bing && pixel == 'bing' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.analytics && pixel == 'analytics' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.gads && pixel == 'google_ads' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.pinterest && pixel == 'pinterest' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.tiktok && pixel == 'tiktok' ) {
+                                return cs_cookie_val == 'yes';
+                            }
                         }
                     }
+
                     return false;
-
                 }
 
                 /**
@@ -822,7 +1161,7 @@ if (!Array.prototype.includes) {
                     var cookiebot_consent_category = options.gdpr['cookiebot_' + pixel + '_consent_category'];
 
                     if (options.gdpr[pixel + '_prior_consent_enabled']) {
-                        if (Cookiebot.consented === false || Cookiebot.consent[cookiebot_consent_category]) {
+                        if (Cookiebot.consented === true || Cookiebot.consent[cookiebot_consent_category]) {
                             return true;
                         }
                     } else {
@@ -860,21 +1199,30 @@ if (!Array.prototype.includes) {
                  * Cookie Law Info
                  */
                 if (options.gdpr.cookie_law_info_integration_enabled) {
-
-                    var cli_cookie = Cookies.get('viewed_cookie_policy');
-
+                    var cli_cookie = Cookies.get('cookieyes-consent') ?? Cookies.get('viewed_cookie_policy');
                     if (options.gdpr[pixel + '_prior_consent_enabled']) {
-                        if (typeof cli_cookie === 'undefined' || cli_cookie === 'yes') {
-                            return true;
+                        if (typeof cli_cookie === 'undefined') return true;
+                        if (cli_cookie && cli_cookie === Cookies.get('cookieyes-consent')) {
+                            if (getCookieYes('analytics') === 'yes') {
+                                return true;
+                            }
+                        } else if (cli_cookie && cli_cookie === Cookies.get('viewed_cookie_policy')) {
+                            if (Cookies.get('viewed_cookie_policy') === 'yes') {
+                                return true;
+                            }
                         }
                     } else {
-                        if (cli_cookie === 'yes') {
-                            return true;
+                        if (cli_cookie && cli_cookie === Cookies.get('cookieyes-consent')) {
+                            if (getCookieYes('analytics') === 'yes') {
+                                return true;
+                            }
+                        } else if (cli_cookie && cli_cookie === Cookies.get('viewed_cookie_policy')) {
+                            if (Cookies.get('viewed_cookie_policy') === 'yes') {
+                                return true;
+                            }
                         }
                     }
-
                     return false;
-
                 }
 
                 return true;
@@ -904,8 +1252,8 @@ if (!Array.prototype.includes) {
                                 if(cs_cookie_val == 'yes') {
                                     if (categoryCookie === CS_Data.cs_script_cat.facebook) {
                                         Facebook.loadPixel();
-                                    } 
-                                    
+                                    }
+
                                     if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.loadPixel();
                                     }
@@ -914,23 +1262,23 @@ if (!Array.prototype.includes) {
 
                                         Analytics.loadPixel();
                                     }
-                                    
-                                     if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
+
+                                    if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.loadPixel();
                                     }
                                 } else {
                                     if (categoryCookie === CS_Data.cs_script_cat.facebook) {
                                         Facebook.disable();
-                                    } 
-                                    
-                                     if (categoryCookie === CS_Data.cs_script_cat.bing) {
+                                    }
+
+                                    if (categoryCookie === CS_Data.cs_script_cat.bing) {
                                         Bing.disable();
                                     }
                                     if (categoryCookie === CS_Data.cs_script_cat.analytics && (typeof CS_Data.cs_google_analytics_consent_mode == "undefined" || CS_Data.cs_google_analytics_consent_mode == 0)) {
                                         Analytics.disable();
                                     }
-                                    
-                                     if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
+
+                                    if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.disable();
                                     }
                                 }
@@ -974,6 +1322,8 @@ if (!Array.prototype.includes) {
                             .then(Facebook.loadPixel.bind(Facebook), Facebook.disable.bind(Facebook));
                         consentApi.consent("http", "_pinterest_sess", ".pinterest.com")
                             .then(Pinterest.loadPixel.bind(Pinterest), Pinterest.disable.bind(Pinterest));
+                        consentApi.consent("http", "_uetsid", "*")
+                            .then(Bing.loadPixel.bind(Bing), Bing.disable.bind(Bing));
                     }
                 }
                 /**
@@ -982,6 +1332,7 @@ if (!Array.prototype.includes) {
                 if (options.gdpr.cookiebot_integration_enabled && typeof Cookiebot !== 'undefined') {
 
                     window.addEventListener("CookiebotOnConsentReady", function() {
+                        Utils.manageCookies();
                         if (Cookiebot.consent.marketing) {
                             Facebook.loadPixel();
                             Bing.loadPixel();
@@ -1038,14 +1389,24 @@ if (!Array.prototype.includes) {
                  */
                 if (options.gdpr.cookie_law_info_integration_enabled) {
 
-                    $(document).onFirst('click', '#cookie_action_close_header', function () {
+                    $(document).onFirst('click', '#wt-cli-accept-all-btn,#cookie_action_close_header, .cky-btn-accept', function () {
+                        setTimeout(function (){
+                            var cli_cookie = Cookies.get('cookieyes-consent') ?? Cookies.get('viewed_cookie_policy');
+                            if (typeof cli_cookie !== 'undefined') {
+                                if (cli_cookie === Cookies.get('cookieyes-consent') && getCookieYes('analytics') == 'yes') {
+                                    Utils.manageCookies();
+                                } else if (cli_cookie === Cookies.get('viewed_cookie_policy') && cli_cookie == 'yes') {
+                                    Utils.manageCookies();
+                                }
+                            }
+                        },1000)
                         Facebook.loadPixel();
                         Analytics.loadPixel();
                         Pinterest.loadPixel();
                         Bing.loadPixel();
                     });
 
-                    $(document).onFirst('click', '#cookie_action_close_header_reject', function () {
+                    $(document).onFirst('click', '#cookie_action_close_header_reject, .cky-btn-reject', function () {
                         Facebook.disable();
                         Analytics.disable();
                         Pinterest.disable();
@@ -1094,7 +1455,7 @@ if (!Array.prototype.includes) {
              * Enrich
              */
             isCheckoutPage: function () {
-                return $('body').hasClass('woocommerce-checkout') ||
+                return $('body').hasClass('woocommerce-checkout') || document.querySelector('.woocommerce-checkout') ||
                     $('body').hasClass('edd-checkout');
             },
             addCheckoutFields : function() {
@@ -1135,10 +1496,10 @@ if (!Array.prototype.includes) {
                 });
 
                 var dateTime = getDateTime();
-                var landing = Cookies.get('pys_landing_page');
-                var lastLanding = Cookies.get('last_pys_landing_page');
-                var trafic = Cookies.get('pysTrafficSource');
-                var lastTrafic = Cookies.get('last_pysTrafficSource');
+                var landing = getLandingPageValue();
+                var lastLanding = getLandingPageValue();
+                var trafic = getTrafficSourceValue();
+                var lastTrafic = getTrafficSourceValue();
 
                 var $form = null;
                 if($('body').hasClass('woocommerce-checkout')) {
@@ -1164,6 +1525,14 @@ if (!Array.prototype.includes) {
                 });
 
 
+            },
+            getAdvancedFormData: function () {
+                let dataStr = Cookies.get("pys_advanced_form_data");
+                if(dataStr === undefined) {
+                    return {'first_name':"",'last_name':"",'email':"",'phone':""};
+                } else {
+                    return JSON.parse(dataStr);
+                }
             }
         };
 
@@ -1194,7 +1563,12 @@ if (!Array.prototype.includes) {
         ];
 
         var initialized = false;
-
+        var genereateFbp = function (){
+            return !Cookies.get('_fbp') ? 'fb.1.'+Date.now()+'.'+Math.floor(1000000000 + Math.random() * 9000000000) : Cookies.get('_fbp');
+        };
+        var genereateFbc = function (){
+            return getUrlParameter('fbclid') ? 'fb.1.'+Date.now()+'.'+getUrlParameter('fbclid') : ''
+        };
         // fire server side event gdpr plugin installed
         var isApiDisabled = options.gdpr.all_disabled_by_api ||
             options.gdpr.facebook_disabled_by_api ||
@@ -1213,24 +1587,21 @@ if (!Array.prototype.includes) {
             let eventId = null;
             if(options.facebook.serverApiEnabled) {
 
-                if(allData.e_id === "woo_remove_from_cart" || allData.e_id === "woo_add_to_cart_on_button_click") {// server event will sended from hook
-                    let isAddToCartFromJs =  options.woo.hasOwnProperty("addToCartCatchMethod")
-                        && options.woo.addToCartCatchMethod === "add_cart_js";
-
-                    if(isAddToCartFromJs || allData.e_id !== "woo_add_to_cart_on_button_click") {
-                        Facebook.updateEventId(allData.name);
-                        allData.eventID = Facebook.getEventId(allData.name);
-                    } else {
-                        // not update eventID for woo_add_to_cart_on_button_click,
-                        // web event created by ajax from server
-                    }
+                if(allData.e_id === "woo_remove_from_cart") {// server event will sended from hook
+                    Facebook.updateEventId(allData.name);
+                    allData.eventID = Facebook.getEventId(allData.name);
                 } else {
-                    if(  options.facebook.ajaxForServerEvent
-                        || isApiDisabled
-                        || allData.delay > 0
-                        || allData.type !== "static")
-                    { // send event from server if they was bloc by gdpr or need send with delay
-                        allData.eventID = pys_generate_token(36);
+                    // send event from server if they was bloc by gdpr or need send with delay
+                    allData.eventID = Utils.generateUniqueId(allData);
+
+                    if(Cookies.get('_fbp')){
+                        params._fbp = Cookies.get('_fbp');
+                    }
+                    if(Cookies.get('_fbc')){
+                        params._fbc = Cookies.get('_fbc');
+                    }
+
+                    if( options.ajaxForServerEvent || isApiDisabled ){
                         var json = {
                             action: 'pys_api_event',
                             pixel: 'facebook',
@@ -1248,60 +1619,21 @@ if (!Array.prototype.includes) {
                             json['edd_order'] = allData.edd_order;
                         }
 
-                        if(name == 'PageView') {
-                            let expires = parseInt(options.cookie_duration);
-                            var currentTimeInSeconds=Date.now();
-                            var randomNum = Math.floor(1000000000 + Math.random() * 9000000000);
-                            timeoutDelay = 0;
-                            if(allData.delay > 0)
-                            {
-                                timeoutDelay = allData.delay;
-                            }
-                            if(!Cookies.get('_fbp'))
-                            {
-                                timeoutDelay = 100;
-                            }
-                            if(getUrlParameter('fbclid') && !Cookies.get('_fbc'))
-                            {
-                                timeoutDelay = 100;
-                            }
-                            setTimeout(function(){
-                                if(!Cookies.get('_fbp'))
-                                {
-                                    Cookies.set('_fbp','fb.1.'+currentTimeInSeconds+'.'+randomNum,  { expires: expires })
-                                }
-                                if(getUrlParameter('fbclid') && !Cookies.get('_fbc'))
-                                {
-                                    Cookies.set('_fbc', 'fb.1.'+currentTimeInSeconds+'.'+getUrlParameter('fbclid'),  { expires: expires })
-                                }
-                                jQuery.ajax( {
-                                    type: 'POST',
-                                    url: options.ajaxUrl,
-                                    data: json,
-                                    headers: {
-                                        'Cache-Control': 'no-cache'
-                                    },
-                                    success: function(){},
-                                });
-                            },timeoutDelay)
+                        if (allData.e_id === "automatic_event_internal_link" || allData.e_id === "automatic_event_outbound_link") {
+                            setTimeout(() => Utils.sendServerAjaxRequest(options.ajaxUrl, json), 500);
+                        } else if (allData.type != 'static') {
+                            Utils.sendServerAjaxRequest(options.ajaxUrl, json);
                         }
-                        else
-                        {
-                            jQuery.ajax( {
-                                type: 'POST',
-                                url: options.ajaxUrl,
-                                data: json,
-                                headers: {
-                                    'Cache-Control': 'no-cache'
-                                },
-                                success: function(){},
-                            });
+
+                        if(allData.type == 'static' && options.ajaxForServerStaticEvent) {
+                            Utils.sendServerAjaxRequest(options.ajaxUrl, json);
                         }
                     }
                 }
+                delete params._fbp;
+                delete params._fbc;
                 eventId = allData.eventID
             }
-
             return eventId;
         }
 
@@ -1316,7 +1648,6 @@ if (!Array.prototype.includes) {
             var params = {};
             var arg = {};
             Utils.copyProperties(data, params);
-
             let eventId = sendFbServerEvent(allData,name,params)
 
 
@@ -1332,7 +1663,8 @@ if (!Array.prototype.includes) {
                 arg.eventID = eventId;
             }
 
-            fbq(actionType, name, params,arg);
+            fbq(actionType, name, params, arg);
+
         }
 
         /**
@@ -1349,7 +1681,45 @@ if (!Array.prototype.includes) {
             disable: function () {
                 initialized = false;
             },
+            advancedMatching: function () {
+                if(options.facebook.advancedMatchingEnabled) {
+                    let advancedMatchingForm = Utils.getAdvancedFormData();
+                    let advancedMatching = {};
+                    if(Object.keys(options.facebook.advancedMatching).length > 0) {
+                        advancedMatching = options.facebook.advancedMatching;
+                    }
 
+                    if(!advancedMatching.hasOwnProperty("em")
+                        && advancedMatchingForm.hasOwnProperty("email") && advancedMatchingForm["email"].length > 0) {
+                        advancedMatching["em"] = advancedMatchingForm["email"];
+                    }
+                    if(!advancedMatching.hasOwnProperty("ph")
+                        && advancedMatchingForm.hasOwnProperty("phone") && advancedMatchingForm["phone"].length > 0) {
+                        advancedMatching["ph"] = advancedMatchingForm["phone"];
+                    }
+                    if(!advancedMatching.hasOwnProperty("fn")
+                        && advancedMatchingForm.hasOwnProperty("first_name") && advancedMatchingForm["first_name"].length > 0) {
+                        advancedMatching["fn"] = advancedMatchingForm["first_name"];
+                    }
+                    if(!advancedMatching.hasOwnProperty("ln")
+                        && advancedMatchingForm.hasOwnProperty("last_name") && advancedMatchingForm["last_name"].length > 0) {
+                        advancedMatching["ln"] = advancedMatchingForm["last_name"];
+                    }
+                    if(!advancedMatching.hasOwnProperty("external_id")){
+                        if (Cookies.get('pbid') || (options.hasOwnProperty('pbid') && options.pbid)) {
+                            advancedMatching["external_id"] = Cookies.get('pbid') ? Cookies.get('pbid') : options.pbid;
+                        }
+                    }
+                    else if(advancedMatching.external_id != Cookies.get('pbid'))
+                    {
+                        advancedMatching["external_id"] = Cookies.get('pbid') ? Cookies.get('pbid') : advancedMatching.external_id;
+                    }
+                    if(Object.keys(advancedMatching).length > 0) {
+                        return advancedMatching;
+                    }
+                }
+                return false
+            },
             /**
              * Load pixel's JS
              */
@@ -1379,32 +1749,41 @@ if (!Array.prototype.includes) {
                 }(window,
                     document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
 
+                let expires = parseInt(options.cookie_duration);
+                if(!Cookies.get('_fbp')) {
+                    Cookies.set('_fbp',genereateFbp(),  { expires: expires,path: '/',domain: domain });
+                }
+
+                if(getUrlParameter('fbclid')) {
+                    Cookies.set('_fbc',genereateFbc(),  { expires: expires,path: '/',domain: domain });
+                }
                 // initialize pixel
                 options.facebook.pixelIds.forEach(function (pixelId) {
-
                     if (options.facebook.removeMetadata) {
                         fbq('set', 'autoConfig', false, pixelId);
                     }
+                    let advancedMatching = Facebook.advancedMatching();
                     if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
-                        if(options.facebook.advancedMatching.length === 0) {
+                        if(!advancedMatching) {
                             fbq('init', pixelId);
                         } else {
+                            var test_prefix = CS_Data.test_prefix;
                             var cs_advanced_matching = Cookies.get('cs_enabled_advanced_matching'+test_prefix);
                             if (jQuery('#cs_enabled_advanced_matching'+test_prefix).length > 0) {
                                 if (cs_advanced_matching == 'yes') {
-                                    fbq('init', pixelId, options.facebook.advancedMatching);
+                                    fbq('init', pixelId, advancedMatching);
                                 } else {
                                     fbq('init', pixelId);
                                 }
                             } else {
-                                fbq('init', pixelId, options.facebook.advancedMatching);
+                                fbq('init', pixelId, advancedMatching);
                             }
                         }
                     } else {
-                        if (options.facebook.advancedMatching.length === 0) {
+                        if(!advancedMatching) {
                             fbq('init', pixelId);
-                        } else {
-                            fbq('init', pixelId, options.facebook.advancedMatching);
+                        }  else {
+                            fbq('init', pixelId, advancedMatching);
                         }
                     }
                 });
@@ -1459,7 +1838,7 @@ if (!Array.prototype.includes) {
                 if(!options.dynamicEvents.woo_add_to_cart_on_button_click.hasOwnProperty(this.tag()))
                     return;
                 var event = options.dynamicEvents.woo_add_to_cart_on_button_click[this.tag()];
-
+                window.pysWooProductData = window.pysWooProductData || [];
                 if (window.pysWooProductData.hasOwnProperty(product_id)) {
                     if (window.pysWooProductData[product_id].hasOwnProperty('facebook')) {
                         event = Utils.copyProperties(event, {})
@@ -1653,7 +2032,6 @@ if (!Array.prototype.includes) {
             }
 
             var eventParams = Utils.copyProperties(data, {});
-
             var _fireEvent = function (tracking_id,name,params) {
 
                 params['send_to'] = tracking_id;
@@ -1665,7 +2043,6 @@ if (!Array.prototype.includes) {
                 gtag('event', name, params);
 
             };
-
             options.ga.trackingIds.forEach(function (tracking_id) {
                 var copyParams = Utils.copyProperties(eventParams, {}); // copy params because mapParamsTov4 can modify it
                 var params = mapParamsTov4(tracking_id,name,copyParams)
@@ -1675,8 +2052,6 @@ if (!Array.prototype.includes) {
         }
         function mapParamsTov4(tag,name,param) {
             //GA4 automatically collects a number of parameters for all events
-            delete param.page_title;
-            delete param.event_url;
             delete param.landing_page;
             // end
             if(isv4(tag)) {
@@ -1689,78 +2064,10 @@ if (!Array.prototype.includes) {
                 if(name === 'search') {
                     param['search'] = param.search_term;
                     delete param.search_term;
-                    delete param.non_interaction;
                     delete param.dynx_itemid;
                     delete param.dynx_pagetype;
                     delete param.dynx_totalvalue;
                 }
-            } else {
-
-                switch (name) {
-
-                    case 'Comment' :
-                    case 'login' :
-                    case 'sign_up' :
-                    case 'EmailClick' :
-                    case 'TelClick' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                             non_interaction: param.non_interaction,
-                        }
-                        return params;
-                    }
-                    case 'Form' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            non_interaction: param.non_interaction,
-                        }
-                        var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
-                        if(formClass != "") {
-                            params["event_label"] = formClass;
-                        }
-                        return params;
-                    }
-                    case 'Download' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: param.download_name,
-                              non_interaction: param.non_interaction,
-                        }
-                        return params;
-                    }
-                    case 'TimeOnPage' :
-                    case 'PageScroll' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: document.title,
-                              non_interaction: param.non_interaction,
-                        }
-                        return params;
-                    }
-                    case 'search' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: param.search_term,
-                              non_interaction: param.non_interaction,
-                        }
-                        return params;
-                    }
-                }
-
-                //delete standard params
-
-                delete param.post_type;
-                delete param.post_id;
-                delete param.plugin;
-                delete param.user_role;
-                delete param.cartlows;
-                delete param.cartflows_flow;
-                delete param.cartflows_step;
             }
             return param;
         }
@@ -1791,12 +2098,7 @@ if (!Array.prototype.includes) {
                 }
 
                 Utils.loadGoogleTag(options.ga.trackingIds[0]);
-
-                var config = {
-                    'link_attribution': options.ga.enhanceLinkAttr,
-                    'anonymize_ip': options.ga.anonimizeIP
-                };
-
+                var config = {};
                 // Cross-Domain tracking
                 if (options.ga.crossDomainEnabled) {
                     config.linker = {
@@ -1804,18 +2106,46 @@ if (!Array.prototype.includes) {
                         domains: options.ga.crossDomainDomains
                     };
                 }
-
-
-
+                var ids = options.ga.trackingIds;
                 // configure tracking ids
-                options.ga.trackingIds.forEach(function (trackingId,index) {
-                    config.debug_mode = options.ga.isDebugEnabled.includes("index_" + index);
+                ids.forEach(function (trackingId,index) {
+                    var obj = options.ga.isDebugEnabled;
+                    var searchValue = "index_"+index;
+                    var config_for_tag = Object.assign({}, options.config);
+                    config_for_tag.debug_mode = false;
+                    config_for_tag.send_page_view = !options.ga.custom_page_view_event;
+                    for (var key in obj) {
+                        if (obj.hasOwnProperty(key) && obj[key] === searchValue) {
+                            config_for_tag.debug_mode = true;
+                            break;
+                        }
+                    }
+                    if(!config_for_tag.debug_mode)
+                    {
+                        delete config_for_tag.debug_mode;
+                    }
                     if(isv4(trackingId)) {
                         if(options.ga.disableAdvertisingFeatures) {
-                            config.allow_google_signals = false
+                            config_for_tag.allow_google_signals = false
                         }
                         if(options.ga.disableAdvertisingPersonalization) {
-                            config.allow_ad_personalization_signals = false
+                            config_for_tag.allow_ad_personalization_signals = false
+                        }
+                    }
+                    if(options.ga.hasOwnProperty('additionalConfig')){
+                        if(options.ga.additionalConfig.hasOwnProperty(trackingId) && options.ga.additionalConfig[trackingId]){
+                            config_for_tag.first_party_collection = options.ga.additionalConfig[trackingId].first_party_collection;
+                        }
+
+                    }
+                    if(options.ga.hasOwnProperty('serverContainerUrls')){
+                        if(options.ga.serverContainerUrls.hasOwnProperty(trackingId) && options.ga.serverContainerUrls[trackingId].enable_server_container != false){
+                            if(options.ga.serverContainerUrls[trackingId].server_container_url != ''){
+                                config_for_tag.server_container_url = options.ga.serverContainerUrls[trackingId].server_container_url;
+                            }
+                            if(options.ga.serverContainerUrls[trackingId].transport_url != ''){
+                                config_for_tag.transport_url = options.ga.serverContainerUrls[trackingId].transport_url;
+                            }
                         }
                     }
                     if (options.gdpr.cookiebot_integration_enabled && typeof Cookiebot !== 'undefined') {
@@ -1823,18 +2153,17 @@ if (!Array.prototype.includes) {
                         var cookiebot_consent_category = options.gdpr['cookiebot_analytics_consent_category'];
                         if (options.gdpr['analytics_prior_consent_enabled']) {
                             if (Cookiebot.consented === true && Cookiebot.consent[cookiebot_consent_category]) {
-                                gtag('config', trackingId, config);
+                                gtag('config', trackingId, config_for_tag);
                             }
                         } else {
                             if (Cookiebot.consent[cookiebot_consent_category]) {
-                                gtag('config', trackingId, config);
+                                gtag('config', trackingId, config_for_tag);
                             }
                         }
-
                     }
                     else
                     {
-                        gtag('config', trackingId, config);
+                        gtag('config', trackingId, config_for_tag);
                     }
                 });
 
@@ -1852,7 +2181,7 @@ if (!Array.prototype.includes) {
 
                 data.delay = data.delay || 0;
                 data.params = data.params || {};
-
+                data.params.eventID = Utils.generateUniqueId(data);
                 if (data.delay === 0) {
 
                     fireEvent(name, data.params);
@@ -2018,9 +2347,383 @@ if (!Array.prototype.includes) {
 
     }(options);
 
+    var GTM = function (options) {
+        var initialized = false;
+
+        var datalayer_name = 'dataLayer';
+        /*
+         * @param name
+         * @param data
+         */
+        function fireEvent(name, event) {
+            if(typeof window.pys_event_data_filter === "function" && window.pys_disable_event_filter(name,'gtm')) {
+                return;
+            }
+
+
+            var eventParams = event.params;
+            var data = event.params;
+            var valuesArray = Object.values(event.trackingIds);
+            var ids = valuesArray;
+            Utils.copyProperties(Utils.getRequestParams(), eventParams);
+            var _fireEvent = function (tracking_id,name,params, event=null) {
+                var eventData = {};
+                var ContainerCodeHasTag = !options.gtm.gtm_just_data_layer && tracking_id.length > 0;
+                if(ContainerCodeHasTag) {
+                    params['send_to'] = tracking_id;
+                }
+                else if(!options.gtm.gtm_just_data_layer){
+                    return
+                }
+
+                if (params.hasOwnProperty('ecommerce')) {
+                    eventData.ecommerce = params.ecommerce;
+                    delete params.ecommerce;
+                }
+
+                var automatedParams = { ...params };
+                [params['manualName'], 'manualName', 'triggerType'].forEach(key => delete automatedParams[key]);
+                if(event && (!event.hasOwnProperty('hasAutoParam') || (event.hasOwnProperty('hasAutoParam') && event.hasAutoParam))) {
+                    eventData.automatedParameters = automatedParams;
+                }
+
+// Move custom parameters to eventData
+
+                if (params.hasOwnProperty(params['manualName'])) {
+                    eventData[params['manualName']] = params[params['manualName']];
+                    delete params[params['manualName']];
+                }
+
+                ['manualName','triggerType'].forEach(key => {
+                    if (params.hasOwnProperty(key)) {
+                        eventData[key] = params[key];
+                        delete params[key];
+                    }
+                });
+
+                eventData.manualDataLayer = options.gtm.gtm_dataLayer_name ?? 'dataLayer';
+
+                eventData.event = name;
+
+                if (options.debug) {
+                    if (ContainerCodeHasTag){
+                        console.log('[Google GTM #' + tracking_id + '] ' + name, eventData);
+                    }
+                    else {
+                        console.log('[Google GTM push to "'+datalayer_name+'"] ' + name, eventData);
+                    }
+                }
+                window[datalayer_name].push(eventData);
+
+            };
+
+            var copyParams = Utils.copyProperties(eventParams, {}); // copy params because mapParamsToGTM can modify it
+
+            var params = mapParamsToGTM(ids,name,copyParams)
+
+            params.event_id = Utils.generateUniqueId(event);
+
+            _fireEvent(ids, name, params, event);
+        }
+
+        function normalizeEventName(eventName) {
+
+            var matches = {
+                ViewContent: 'view_item',
+                AddToCart: 'add_to_cart',
+                AddToWishList: 'add_to_wishlist',
+                InitiateCheckout: 'begin_checkout',
+                Purchase: 'purchase',
+                Lead: 'generate_lead',
+                CompleteRegistration: 'sign_up',
+                AddPaymentInfo: 'set_checkout_option'
+            };
+
+            return matches.hasOwnProperty(eventName) ? matches[eventName] : eventName;
+
+        }
+
+        function mapParamsToGTM(tag,name,param) {
+            //GA4 automatically collects a number of parameters for all events
+            var hasGTM = false;
+
+            // end
+            if (Array.isArray(tag)) {
+                hasGTM = tag.some(function (element) {
+                    return isGTM(element);
+                });
+            } else if(isGTM(tag)) {
+                // tag является строкой и соответствует GTM
+                hasGTM = true;
+            }
+            if(hasGTM) {
+                delete param.event_category;
+                delete param.event_label;
+
+                delete param.analytics_storage;
+                delete param.ad_storage;
+                delete param.ad_user_data;
+                delete param.ad_personalization;
+
+                if(name === 'search') {
+                    param['search'] = param.search_term;
+                    delete param.search_term;
+                    delete param.dynx_itemid;
+                    delete param.dynx_pagetype;
+                    delete param.dynx_totalvalue;
+                }
+            }
+            return param;
+        }
+
+        function isGTM(tag) {
+            return tag.indexOf('GTM') === 0;
+        }
+        /**
+         * Public API
+         */
+        return {
+            tag: function() {
+                return "gtm";
+            },
+            isEnabled: function () {
+                return options.hasOwnProperty('gtm');
+            },
+            disable: function () {
+                initialized = false;
+            },
+            updateEnhancedConversionData : function () {
+                if (!initialized || !this.isEnabled()) {
+                    return;
+                }
+                if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.hasOwnProperty("userDataEnable") && options.tracking_analytics.userDataEnable) {
+                    var advanced = Utils.getAdvancedFormData();
+                    if (Object.keys(advanced).length > 0) {
+                        window[datalayer_name].push({'user_data' : advanced});
+                    }
+                }
+            },
+            loadPixel: function () {
+
+                if (initialized || !this.isEnabled() || !Utils.consentGiven('analytics')) {
+                    return;
+                }
+                datalayer_name = options.gtm.gtm_dataLayer_name ?? 'dataLayer';
+
+                for (var i = 0; i < options.gtm.trackingIds.length; i++) {
+                    var trackingId = options.gtm.trackingIds[i];
+                    if (!options.gtm.gtm_just_data_layer) {
+                        console.log('[PYS] Google Tag Manager container code loaded');
+                        Utils.loadGTMScript(trackingId);
+                        break;
+                    }
+                }
+                if(options.gtm.gtm_just_data_layer) {
+                    console.warn && console.warn("[PYS] Google Tag Manager container code placement set to OFF !!!");
+                    console.warn && console.warn("[PYS] Data layer codes are active but GTM container must be loaded using custom coding !!!");
+                }
+
+                if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.hasOwnProperty("userDataEnable") && options.tracking_analytics.userDataEnable){
+                    var advanced = Utils.getAdvancedFormData();
+                    if(Object.keys(advanced).length > 0){
+                        window[datalayer_name].push({'user_data' : advanced});
+                    }
+                }
+
+
+                var config = {};
+
+                if(options.user_id && options.user_id != 0) {
+                    config.user_id = options.user_id;
+                }
+
+                // Cross-Domain tracking
+
+                var ids = options.gtm.trackingIds;
+
+
+                initialized = true;
+
+                Utils.fireStaticEvents('gtm');
+            },
+
+            fireEvent: function (name, data) {
+
+                if (!initialized || !this.isEnabled()) {
+                    return false;
+                }
+
+                data.delay = data.delay || 0;
+                data.params = data.params || {};
+
+                if (data.delay === 0) {
+
+                    fireEvent(name, data);
+
+                } else {
+
+                    setTimeout(function (name, params) {
+                        fireEvent(name, params);
+                    }, data.delay * 1000, name, data);
+
+                }
+
+                return true;
+
+            },
+
+            onCommentEvent: function (event) {
+                this.fireEvent(event.name, event);
+            },
+
+            onDownloadEvent: function (event) {
+                this.fireEvent(event.name, event);
+            },
+
+            onFormEvent: function (event) {
+                this.fireEvent(event.name, event);
+            },
+
+            onWooAddToCartOnButtonEvent: function (product_id, prod_info = null) {
+                if(!options.dynamicEvents.woo_add_to_cart_on_button_click.hasOwnProperty(this.tag()))
+                    return;
+                var event = Utils.clone(options.dynamicEvents.woo_add_to_cart_on_button_click[this.tag()]);
+
+                if (window.pysWooProductData.hasOwnProperty(product_id)) {
+                    if (window.pysWooProductData[product_id].hasOwnProperty('gtm')) {
+                        Utils.copyProperties(window.pysWooProductData[product_id]['gtm'].params, event.params)
+                        this.fireEvent(event.name, event);
+                    }
+                }
+
+            },
+
+            onWooAddToCartOnSingleEvent: function (product_id, qty, product_type, is_external, $form, prod_info) {
+                window.pysWooProductData = window.pysWooProductData || [];
+
+                if(!options.dynamicEvents.woo_add_to_cart_on_button_click.hasOwnProperty(this.tag()))
+                    return;
+                var event = Utils.clone(options.dynamicEvents.woo_add_to_cart_on_button_click[this.tag()]);
+
+                if (product_type === Utils.PRODUCT_VARIABLE && !options.gtm.wooVariableAsSimple) {
+                    product_id = parseInt($form.find('input[name="variation_id"]').val());
+                }
+
+                if (window.pysWooProductData.hasOwnProperty(product_id)) {
+                    if (window.pysWooProductData[product_id].hasOwnProperty('gtm')) {
+
+                        Utils.copyProperties(window.pysWooProductData[product_id]['gtm'].params, event.params);
+
+                        params = event.params.hasOwnProperty('ecommerce') ? event.params.ecommerce : event.params;
+
+                        if(product_type === Utils.PRODUCT_GROUPED ) {
+                            var groupValue = 0;
+                            $form.find(".woocommerce-grouped-product-list .qty").each(function(index){
+                                var childId = $(this).attr('name').replaceAll("quantity[","").replaceAll("]","");
+                                var quantity = parseInt($(this).val());
+                                if(isNaN(quantity)) {
+                                    quantity = 0;
+                                }
+                                var childItem = window.pysWooProductData[product_id]['gtm'].grouped[childId];
+                                params.items.forEach(function(el,index,array) {
+                                    if(el.id == childItem.content_id) {
+                                        if(quantity > 0){
+                                            el.quantity = quantity;
+                                            el.price = childItem.price;
+                                        } else {
+                                            array.splice(index, 1);
+                                        }
+                                    }
+                                });
+                                groupValue += childItem.price * quantity;
+                            });
+
+                            if(options.woo.addToCartOnButtonValueEnabled &&
+                                options.woo.addToCartOnButtonValueOption !== 'global' &&
+                                params.hasOwnProperty('value')) {
+                                params.value = groupValue;
+                            }
+
+                            if(groupValue == 0) return; // skip if no items selected
+                        } else {
+                            // update items qty param
+                            params.items[0].quantity = qty;
+                        }
+
+                        // maybe customize value option
+                        if (options.woo.addToCartOnButtonValueEnabled &&
+                            options.woo.addToCartOnButtonValueOption !== 'global' &&
+                            product_type !== Utils.PRODUCT_GROUPED)
+                        {
+                            if(params.hasOwnProperty('value')) {
+                                params.value = params.items[0].price * qty;
+                            }
+
+                        }
+
+
+                        this.fireEvent(event.name, event);
+                    }
+                }
+
+            },
+
+            onWooRemoveFromCartEvent: function (event) {
+
+                this.fireEvent(event.name, event);
+
+            },
+
+            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {
+                if(!options.dynamicEvents.edd_add_to_cart_on_button_click.hasOwnProperty(this.tag()))
+                    return;
+                var event = Utils.clone(options.dynamicEvents.edd_add_to_cart_on_button_click[this.tag()]);
+
+
+                if (window.pysEddProductData.hasOwnProperty(download_id)) {
+
+                    var index;
+
+                    if (price_index) {
+                        index = download_id + '_' + price_index;
+                    } else {
+                        index = download_id;
+                    }
+
+                    if (window.pysEddProductData[download_id].hasOwnProperty(index)) {
+                        if (window.pysEddProductData[download_id][index].hasOwnProperty('gtm')) {
+
+                            Utils.copyProperties(window.pysEddProductData[download_id][index]['gtm'].params, event.params);
+                            item = event.params.hasOwnProperty('ecommerce') ? event.params.ecommerce.items[0] : event.params.items[0];
+                            // update items qty param
+                            item.quantity = qty;
+
+                            this.fireEvent(event.name,event);
+
+                        }
+                    }
+
+                }
+
+            },
+
+            onEddRemoveFromCartEvent: function (event) {
+                this.fireEvent(event.name, event);
+            },
+            onPageScroll: function (event) {
+                this.fireEvent(event.name, event);
+            },
+            onTime: function (event) {
+                this.fireEvent(event.name, event);
+            },
+        };
+
+    }(options);
+
     window.pys = window.pys || {};
     window.pys.Facebook = Facebook;
     window.pys.Analytics = Analytics;
+    window.pys.GTM = GTM;
     window.pys.Utils = Utils;
 
 
@@ -2045,7 +2748,74 @@ if (!Array.prototype.includes) {
         var Pinterest = Utils.setupPinterestObject();
         var Bing = Utils.setupBingObject();
 
-        Utils.manageCookies();
+        if(options.hasOwnProperty('cookie'))
+        {
+            if(options.cookie.externalID_disabled_by_api || options.cookie.disabled_all_cookie)
+            {
+                Cookies.remove('pbid')
+            }
+            if(options.cookie.disabled_advanced_form_data_cookie || options.cookie.disabled_all_cookie)
+            {
+                Cookies.remove('pys_advanced_form_data')
+            }
+            if(options.cookie.disabled_landing_page_cookie || options.cookie.disabled_all_cookie)
+            {
+                Cookies.remove('pys_landing_page')
+                Cookies.remove('last_pys_landing_page')
+            }
+            if(options.cookie.disabled_trafficsource_cookie || options.cookie.disabled_all_cookie)
+            {
+                Cookies.remove('pysTrafficSource')
+                Cookies.remove('last_pysTrafficSource')
+            }
+            if(options.cookie.disabled_first_visit_cookie || options.cookie.disabled_all_cookie)
+            {
+                Cookies.remove('pys_first_visit')
+
+            }
+            if(options.cookie.disabled_utmTerms_cookie || options.cookie.disabled_all_cookie)
+            {
+                $.each(Utils.utmTerms, function (index, name) {
+                    Cookies.remove('pys_' + name)
+                });
+                $.each(Utils.utmTerms, function (index, name) {
+                    Cookies.remove('last_pys_' + name)
+                });
+            }
+            if(options.cookie.disabled_utmId_cookie || options.cookie.disabled_all_cookie)
+            {
+                $.each(Utils.utmId,function(index,name) {
+                    Cookies.remove('pys_' + name)
+                })
+                $.each(Utils.utmId,function(index,name) {
+                    Cookies.remove('last_pys_' + name)
+                });
+            }
+        }
+
+
+        if (options.gdpr.cookie_law_info_integration_enabled) {
+            var cli_cookie = Cookies.get('cookieyes-consent') ?? Cookies.get('viewed_cookie_policy');
+
+            if (typeof cli_cookie !== 'undefined') {
+                if (cli_cookie === Cookies.get('cookieyes-consent') && getCookieYes('analytics') == 'yes') {
+                    Utils.manageCookies();
+                } else if (cli_cookie === Cookies.get('viewed_cookie_policy') && cli_cookie == 'yes') {
+                    Utils.manageCookies();
+                }
+            }
+        }
+
+        if ( options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined" ) {
+            if ( CS_Data.cs_script_cat.pys == CS_Data.cs_necessary_cat_id || CS_Data.cs_script_cat.pys == 0 ) {
+                Utils.manageCookies();
+            } else if ( Cookies.get( 'cs_enabled_cookie_term' + CS_Data.test_prefix + '_' + CS_Data.cs_script_cat.pys ) == 'yes' ) {
+                Utils.manageCookies();
+            }
+        } else {
+            Utils.manageCookies();
+        }
+
         Utils.setupGdprCallbacks();
         // page scroll event
         if ( options.dynamicEvents.hasOwnProperty("automatic_event_scroll")
@@ -2191,6 +2961,7 @@ if (!Array.prototype.includes) {
                     if (typeof product_id !== 'undefined') {
                         Facebook.onWooAddToCartOnButtonEvent(product_id);
                         Analytics.onWooAddToCartOnButtonEvent(product_id);
+                        GTM.onWooAddToCartOnButtonEvent(product_id);
                         Pinterest.onWooAddToCartOnButtonEvent(product_id);
                         Bing.onWooAddToCartOnButtonEvent(product_id);
                     }
@@ -2249,6 +3020,8 @@ if (!Array.prototype.includes) {
 
                     Facebook.onWooAddToCartOnSingleEvent(product_id, qty, product_type, $form);
                     Analytics.onWooAddToCartOnSingleEvent(product_id, qty, product_type, $form);
+
+                    GTM.onWooAddToCartOnSingleEvent(product_id, qty, product_type, $form);
 
                     Pinterest.onWooAddToCartOnSingleEvent(product_id, qty, product_type, false, $form);
                     Bing.onWooAddToCartOnSingleEvent(product_id, qty, product_type, false, $form);
@@ -2364,6 +3137,7 @@ if (!Array.prototype.includes) {
 
                         Facebook.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                         Analytics.onEddAddToCartOnButtonEvent(download_id, price_index, q);
+                        GTM.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                         Pinterest.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                         Bing.onEddAddToCartOnButtonEvent(download_id, price_index, q);
 
@@ -2433,66 +3207,88 @@ if (!Array.prototype.includes) {
                 if ($form.hasClass('edd_form') || $form.hasClass('edd_download_purchase_form')) {
                     return;
                 }
+// exclude CF7 forms
+                if ($form.hasClass('wpcf7-form')) {
+                    return;
+                }
+                // exclude Forminator forms
+                if ($form.hasClass('forminator-custom-form') || $form.hasClass('forminator_ajax')) {
+                    return;
+                }
+                // exclude WPforms forms
+                if ($form.hasClass('wpforms-form') || $form.hasClass('wpforms-ajax-form')) {
+                    return;
+                }
+                // exclude Formidable forms
+                /*if ($form.hasClass('frm-show-form')) {
+                    return;
+                }*/
+                // exclude Ninja Forms forms
+                if ($form.parent().hasClass('nf-form-layout')) {
+                    return;
+                }
+                // exclude Fluent forms
+                if ($form.hasClass('frm-fluent-form')) {
+                    return;
+                }
+                if(!options.enable_success_send_form) {
+                    var params = {
+                        form_id: $form.attr('id'),
+                        form_class: $form.attr('class'),
+                        text: $form.find('[type="submit"]').is('input') ?
+                            $form.find('[type="submit"]').val() : $form.find('[type="submit"]').text()
+                    };
 
-                var params = {
-                    form_id: $form.attr('id'),
-                    form_class: $form.attr('class'),
-                    text: $form.find('[type="submit"]').is('input') ?
-                        $form.find('[type="submit"]').val() : $form.find('[type="submit"]').text()
-                };
+                    if (options.dynamicEvents.hasOwnProperty("automatic_event_form")) {
+                        var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
+                        for (var i = 0; i < pixels.length; i++) {
+                            var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
 
-                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
-                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
-                    for (var i = 0; i < pixels.length; i++) {
-                        var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
-
-                        if(pixels[i] === "tiktok") {
-                            getPixelBySlag(pixels[i]).fireEvent(event.name, event);
-                        } else {
-                            Utils.copyProperties(params, event.params,)
-                            Utils.copyProperties(Utils.getRequestParams(), event.params);
-                            getPixelBySlag(pixels[i]).onFormEvent(event);
+                            if (pixels[i] === "tiktok") {
+                                getPixelBySlag(pixels[i]).fireEvent(event.name, event);
+                            } else {
+                                Utils.copyProperties(params, event.params,)
+                                Utils.copyProperties(Utils.getRequestParams(), event.params);
+                                getPixelBySlag(pixels[i]).onFormEvent(event);
+                            }
                         }
                     }
                 }
             });
 
+            document.addEventListener( 'wpcf7mailsent', function( event ) {
+                var form_id = event.detail.contactFormId;
+                sendFormAction($(event.target), form_id);
+            }, false );
             //Forminator
-            $(document).on( 'forminator:form:submit:success', function( formData ){
-                var params = {
-                    form_id: $(formData.target).find('input[name="form_id"]').val(),
-                    text: $(formData.target).find('.forminator-button-submit').text()
-                };
-
-                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
-                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
-                    for (var i = 0; i < pixels.length; i++) {
-                        var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
-                        Utils.copyProperties(params, event.params)
-                        Utils.copyProperties(Utils.getRequestParams(), event.params);
-                        getPixelBySlag(pixels[i]).onFormEvent(event);
-                    }
-                }
+            $(document).on( 'forminator:form:submit:success', function( event ){
+                var form_id = $(event.target).find('input[name="form_id"]').val();
+                sendFormAction($(event.target), form_id);
             });
 
+            //WPForm
+            $('form.wpforms-form').on('wpformsAjaxSubmitSuccess', (event) => {
+                var form_id = $(event.target).attr('data-formid');
+                sendFormAction($(event.target), form_id);
+            })
+            $(document).on( 'frmFormComplete', function( event, form, response ) {
+                const form_id = $(form).find('input[name="form_id"]').val();
+                sendFormAction($(event.target), form_id);
+            });
             // Ninja Forms
-            $(document).onFirst('nfFormSubmitResponse', function (e, data) {
+            $(document).onFirst('nfFormSubmitResponse', function (event, data) {
+                const form_id = data.response.data.form_id;
+                sendFormAction($(event.target), form_id);
+            });
 
-                var params = {
-                    form_id: data.response.data.form_id,
-                    text: data.response.data.settings.title
-                };
-
-                if(options.dynamicEvents.hasOwnProperty("automatic_event_form") ) {
-                    var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
-                    for(var i = 0;i<pixels.length;i++) {
-                        var event = options.dynamicEvents.automatic_event_form[pixels[i]];
-                        Utils.copyProperties(params,event.params)
-                        Utils.copyProperties(Utils.getRequestParams(), event.params);
-                        getPixelBySlag(pixels[i]).onFormEvent(event);
-                    }
-                }
-
+            var fluentForms = $('form.frm-fluent-form');
+            fluentForms.each(function() {
+                var $form = $(this);
+                $form.on('fluentform_submission_success', function(event) {
+                    var $formItem = $(this);
+                    var form_id = $formItem.attr('data-form_id');
+                    sendFormAction($(event.target), form_id);
+                });
             });
 
         }
@@ -2506,17 +3302,35 @@ if (!Array.prototype.includes) {
         }
     });
 
+    var sendFormAction = function (form_target, formId){
+        var params = {
+            form_id: formId,
+            text: form_target.find('[type="submit"]').is('input') ? form_target.find('[type="submit"]').val() :
+                form_target.find('.forminator-button-submit').text() != '' ? form_target.find('.forminator-button-submit').text() :
+                    form_target.find('[type="submit"]').text()
+        };
+
+        if (options.dynamicEvents.hasOwnProperty("automatic_event_form")) {
+            var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
+            for (var i = 0; i < pixels.length; i++) {
+                var event = options.dynamicEvents.automatic_event_form[pixels[i]];
+                if (pixels[i] === "tiktok") {
+                    getPixelBySlag(pixels[i]).fireEvent(event.name, event);
+                } else {
+                    Utils.copyProperties(params, event.params)
+                    Utils.copyProperties(Utils.getRequestParams(), event.params);
+                    getPixelBySlag(pixels[i]).onFormEvent(event);
+                }
+            }
+        }
+    }
+
 }(jQuery, pysOptions);
 
-function pys_generate_token(length){
-    //edit the token allowed characters
-    var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
-    var b = [];
-    for (var i=0; i<length; i++) {
-        var j = (Math.random() * (a.length-1)).toFixed(0);
-        b[i] = a[j];
-    }
-    return b.join("");
+function pys_generate_token() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
 }
 
 function getBundlePriceOnSingleProduct(data) {
@@ -2537,11 +3351,12 @@ function getPixelBySlag(slug) {
     switch (slug) {
         case "facebook": return window.pys.Facebook;
         case "ga": return window.pys.Analytics;
+        case "gtm": return window.pys.GTM;
         case "bing": return window.pys.Bing;
         case "pinterest": return window.pys.Pinterest;
     }
 }
-var getUrlParameter = function getUrlParameter(sParam) {
+function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('&'),
         sParameterName,
@@ -2556,3 +3371,27 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
     return false;
 };
+function getCookieYes(key) {
+    const cookies = document.cookie
+        .split(";")
+        .reduce(
+            (ac, cv, i) =>
+                Object.assign(ac, { [cv.split("=")[0].trim()]: cv.split("=")[1] }),
+            {}
+        )["cookieyes-consent"];
+    const { [key]: value } = cookies
+        .split(",")
+        .reduce(
+            (obj, pair) => (
+                (pair = pair.split(":")), (obj[pair[0]] = pair[1]), obj
+            ),
+            {}
+        );
+    return value;
+}
+
+function getRootDomain(useSubdomain = false) {
+    const hostname = window.location.hostname; // Get the current hostname
+    const rootDomain = tldjs.getDomain(hostname); // Use tldjs to extract the root domain
+    return rootDomain && (useSubdomain == true) ? '.' + rootDomain : hostname; // Add leading dot for cookies
+}

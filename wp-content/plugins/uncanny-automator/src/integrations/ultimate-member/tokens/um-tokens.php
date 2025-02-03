@@ -58,27 +58,6 @@ class Um_Tokens {
 	}
 
 	/**
-	 * Only load this integration and its triggers and actions if the related plugin is active
-	 *
-	 * @param $status
-	 * @param $plugin
-	 *
-	 * @return bool
-	 */
-	public function plugin_active( $status, $plugin ) {
-
-		if ( self::$integration === $plugin ) {
-			if ( class_exists( 'UM' ) || defined( 'um_url' ) ) {
-				$status = true;
-			} else {
-				$status = false;
-			}
-		}
-
-		return $status;
-	}
-
-	/**
 	 * Parse the tokens.
 	 *
 	 * @param $value
@@ -107,7 +86,7 @@ class Um_Tokens {
 					foreach ( $trigger_data as $trigger ) {
 
 						// Form title.
-						if ( 'UMUSERREGISTER' === $pieces[1] && 'UMFORM_FORM_TITLE' === $pieces[2] ) {
+						if ( ( 'UMUSERREGISTER' === $pieces[1] && 'UMFORM_FORM_TITLE' === $pieces[2] ) || ( 'UMUSERLOGSIN' === $pieces[1] && 'UMFORM_FORM_TITLE' === $pieces[2] ) ) {
 							return $trigger['meta']['UMFORM_readable'];
 						}
 

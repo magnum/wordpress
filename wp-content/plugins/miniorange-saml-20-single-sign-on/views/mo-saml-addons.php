@@ -38,6 +38,9 @@ function mo_saml_show_addons_page() {
 		'guest_login'                 => __( 'Allows users to SSO into your site without creating a user account for them. This is useful when you dont want to manage the user accounts at the WordPress site.', 'miniorange-saml-20-single-sign-on' ),
 		'paid_mem_pro'                => __( 'Map your users to different Paid MembershipPro membership levels as per the group information sent by your Identity Provider.', 'miniorange-saml-20-single-sign-on' ),
 		'profile_picture_add_on'      => __( 'Maps raw image data or URL received from your Identity Provider into Gravatar for the user.', 'miniorange-saml-20-single-sign-on' ),
+		'salesforce_community_addon'  => __( 'It simplifies the process of configuring multiple communities by allowing you to configure login and logout URLs for each community in one place. This enables users from various Salesforce Communities to seamlessly single sign-on (SSO) into your WordPress site.', 'miniorange-saml-20-single-sign-on' ),
+		'ip_whitelisting_addon'       => __( 'Allows the whitelisted users to bypass redirection to the IDP for authentication based on their IP address.', 'miniorange-saml-20-single-sign-on' ),
+		'azure_multi_tenant_addon'    => __( 'It reduces the requirement of configuring multiple tenants separately. All the users from the configured tenants will be able to perform SSO login using only a single Azure AD application with a common endpoint.', 'miniorange-saml-20-single-sign-on' ),
 	);
 	?>
 	<div id="miniorange-addons" style="position:relative;z-index: 1">
@@ -65,8 +68,7 @@ function mo_saml_show_addons_page() {
 																							if ( ! $is_header_displayed ) {
 																								$is_header_displayed = true;
 																							}
-
-																							get_addon_tile( $addon, Mo_Saml_Options_Addons::$addon_title[ $addon ], $addon_desc[ $addon ], Mo_Saml_Options_Addons::$addons_url[ $addon ], true );
+																							get_addon_tile( $addon, Mo_Saml_Options_Addons::mo_saml_translate( $addon ), $addon_desc[ $addon ], Mo_Saml_Options_Addons::$addons_url[ $addon ] );
 																						}
 																						if ( ! $active_external_plugins ) {
 																							?>
@@ -77,7 +79,7 @@ function mo_saml_show_addons_page() {
 
 			if ( $is_header_displayed ) {
 				?>
-					<div class = "line_break_checkout"></div>
+					<div class = "line_break_checkout" style="display: flex; justify-content: space-between; margin-top: 30px;"></div>
 				<?php
 			}
 			?>
@@ -85,7 +87,7 @@ function mo_saml_show_addons_page() {
 														<?php
 														foreach ( $addon_desc as $key => $value ) {
 															if ( ! in_array( $key, $addons_displayed, true ) ) {
-																get_addon_tile( $key, Mo_Saml_Options_Addons::$addon_title[ $key ], $value, Mo_Saml_Options_Addons::$addons_url[ $key ], false );
+																get_addon_tile( $key, Mo_Saml_Options_Addons::mo_saml_translate( $key ), $value, Mo_Saml_Options_Addons::$addons_url[ $key ] );
 															}
 														}
 														?>
@@ -99,23 +101,22 @@ function mo_saml_show_addons_page() {
 /**
  * This function creates a card for displaying the add-ons.
  *
- * @param string  $addon_name this will display addon-name.
- * @param string  $addon_title this will display addon_title.
- * @param string  $addon_desc this will display addon_description.
- * @param string  $addon_url this will display addon_url.
- * @param boolean $active this will display if the addon is in the active state.
+ * @param string $addon_name this will display addon-name.
+ * @param string $addon_title this will display addon_title.
+ * @param string $addon_desc this will display addon_description.
+ * @param string $addon_url this will display addon_url.
  * @return void
  */
-function get_addon_tile( $addon_name, $addon_title, $addon_desc, $addon_url, $active ) {
+function get_addon_tile( $addon_name, $addon_title, $addon_desc, $addon_url ) {
 		$icon_url = Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/addons_logos/' . $addon_name . '.webp';
 	?>
-			<div class="mo-saml-add-ons-cards mo-saml-bootstrap-mt-3">
+			<div class="mo-saml-add-ons-cards mo-saml-bootstrap-mt-3 mo-saml-bootstrap-bg-white">
 				<h4 class="mo-saml-addons-head"><?php echo esc_attr( $addon_title ); ?></h4>
-				<p class="mo-saml-bootstrap-pt-4 mo-saml-bootstrap-pe-2 mo-saml-bootstrap-pb-4 mo-saml-bootstrap-ps-4"><?php echo esc_html( $addon_desc ); ?></p>
+				<p class="mo-saml-bootstrap-pe-2 mo-saml-bootstrap-ps-4 mo-saml-add-on-card-desc"><?php echo esc_html( $addon_desc ); ?></p>
 				<img src="<?php echo esc_url( $icon_url ); ?>" class="mo-saml-addons-logo" alt=" Image">
 				<span class="mo-saml-add-ons-rect"></span>
 				<span class="mo-saml-add-ons-tri"></span>
-				<a class="mo-saml-addons-readmore" href="<?php echo esc_url( $addon_url ); ?>" target="_blank">Learn More</a>
+				<a class="mo-saml-addons-readmore" href="<?php echo esc_url( $addon_url ); ?>" target="_blank"><?php esc_html_e( 'Learn More', 'miniorange-saml-20-single-sign-on' ); ?></a>
 			</div>
 	<?php
 }

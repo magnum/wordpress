@@ -12,17 +12,17 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Post_Types extends Ithemes_Sync_Verb {
-	public static $name = 'get-post-types';
-	public static $description = 'Retrieve post types from WordPress.';
+	public static $name                = 'get-post-types';
+	public static $description         = 'Retrieve post types from WordPress.';
 	public static $status_element_name = 'post-types';
 
-	private $default_arguments = array(
-		'args' => array(),
-		'output' => 'names',
+	private $default_arguments = [
+		'args'     => [],
+		'output'   => 'names',
 		'operator' => 'and',
-	);
+	];
 	
-	public function run( $arguments ) {	
+	public function run( $arguments ) { 
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		return get_post_types( $arguments['args'], $arguments['output'], $arguments['operator'] );
 	}

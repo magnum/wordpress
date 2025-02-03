@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,13 +21,14 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
-final class HttpMethod extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const POST = 'POST';
-    const PUT = 'PUT';
-    const GET = 'GET';
-    const DELETE = 'DELETE';
+
+final class HttpMethod extends AbstractEnum {
+  const POST = 'POST';
+  const PUT = 'PUT';
+  const GET = 'GET';
+  const DELETE = 'DELETE';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static UserLocalNewsSubscriptionStatusValues getInstance()
  */
-class UserLocalNewsSubscriptionStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const STATUS_OFF = 'STATUS_OFF';
-    const STATUS_ON = 'STATUS_ON';
+class UserLocalNewsSubscriptionStatusValues extends AbstractEnum {
+
+  const STATUS_OFF = 'STATUS_OFF';
+  const STATUS_ON = 'STATUS_ON';
 }

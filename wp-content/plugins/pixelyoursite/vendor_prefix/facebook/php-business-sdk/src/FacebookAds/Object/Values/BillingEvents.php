@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 /**
@@ -29,6 +29,4 @@ namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
  *
  * @method static BillingEvents getInstance()
  */
-class BillingEvents extends \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdSetBillingEventValues
-{
-}
+class BillingEvents extends AdSetBillingEventValues {}

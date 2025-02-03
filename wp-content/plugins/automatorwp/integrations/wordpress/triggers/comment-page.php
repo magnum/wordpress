@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Comment_Page extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_comment_page';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_comment_page';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -129,4 +140,5 @@ class AutomatorWP_WordPress_Comment_Page extends AutomatorWP_Integration_Trigger
 
 }
 
-new AutomatorWP_WordPress_Comment_Page();
+new AutomatorWP_WordPress_Comment_Page( 'wordpress' );
+new AutomatorWP_WordPress_Comment_Page( 'comments' );

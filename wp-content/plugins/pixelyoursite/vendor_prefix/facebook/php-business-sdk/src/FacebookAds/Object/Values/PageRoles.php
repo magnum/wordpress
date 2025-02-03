@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,17 +21,19 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static PageRoles getInstance()
  */
-class PageRoles extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADVERTISER = 'ADVERTISER';
-    const CONTENT_CREATOR = 'CONTENT_CREATOR';
-    const MANAGER = 'MANAGER';
-    const MODERATOR = 'MODERATOR';
-    const INSIGHTS_ANALYST = 'INSIGHTS_ANALYST';
+class PageRoles extends AbstractEnum {
+
+  const ADVERTISER  = 'ADVERTISER';
+  const CONTENT_CREATOR = 'CONTENT_CREATOR';
+  const MANAGER = 'MANAGER';
+  const MODERATOR = 'MODERATOR';
+  const INSIGHTS_ANALYST = 'INSIGHTS_ANALYST';
 }

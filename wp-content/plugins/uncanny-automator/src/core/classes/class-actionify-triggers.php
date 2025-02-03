@@ -1,4 +1,5 @@
 <?php
+
 namespace Uncanny_Automator;
 
 /**
@@ -11,9 +12,9 @@ class Actionify_Triggers {
 	/**
 	 * Property recipes.
 	 *
+	 * @deprecated v4.2
 	 * @var array
 	 *
-	 * @deprecated v4.2
 	 */
 	private $recipes = array();
 
@@ -89,6 +90,8 @@ class Actionify_Triggers {
 			add_action( $trigger_actions, $trigger_validation_function, $trigger_priority, $trigger_accepted_args );
 
 		}
+
+		do_action( 'automator_actionify_triggers_after', self::$actionified_triggers );
 
 	}
 
@@ -241,7 +244,6 @@ class Actionify_Triggers {
 		}
 
 		return apply_filters( 'actionified_triggers', $actionified_triggers, $this );
-
 	}
 
 	/**
@@ -257,11 +259,11 @@ class Actionify_Triggers {
 			$wpdb->prepare(
 				"SELECT pm.meta_value
 					FROM $wpdb->postmeta pm
-					JOIN $wpdb->posts trigger_details ON trigger_details.ID = pm.post_id 
-						AND trigger_details.post_status = %s 
+					JOIN $wpdb->posts trigger_details ON trigger_details.ID = pm.post_id
+						AND trigger_details.post_status = %s
 						AND trigger_details.post_type = 'uo-trigger'
-					JOIN $wpdb->posts recipe_details ON recipe_details.ID = trigger_details.post_parent 
-						AND recipe_details.post_status = %s 
+					JOIN $wpdb->posts recipe_details ON recipe_details.ID = trigger_details.post_parent
+						AND recipe_details.post_status = %s
 						AND recipe_details.post_type = 'uo-recipe'
 					WHERE pm.meta_key = 'add_action'",
 				'publish',

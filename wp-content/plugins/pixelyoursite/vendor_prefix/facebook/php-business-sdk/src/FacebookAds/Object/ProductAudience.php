@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,24 +21,25 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductAudienceFields;
-class ProductAudience extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     * @return string
-     */
-    protected function getEndpoint()
-    {
-        return 'product_audiences';
-    }
-    /**
-     * @return ProductAudienceFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductAudienceFields::getInstance();
-    }
+
+class ProductAudience extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   * @return string
+   */
+  protected function getEndpoint() {
+    return 'product_audiences';
+  }
+
+  /**
+   * @return ProductAudienceFields
+   */
+  public static function getFieldsEnum() {
+    return ProductAudienceFields::getInstance();
+  }
 }

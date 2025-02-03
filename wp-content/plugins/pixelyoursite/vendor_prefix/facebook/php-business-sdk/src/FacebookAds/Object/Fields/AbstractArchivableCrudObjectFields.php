@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,11 +21,13 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
-abstract class AbstractArchivableCrudObjectFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONFIGURED_STATUS = 'configured_status';
-    const EFFECTIVE_STATUS = 'effective_status';
+
+abstract class AbstractArchivableCrudObjectFields extends AbstractEnum {
+
+  const CONFIGURED_STATUS = 'configured_status';
+  const EFFECTIVE_STATUS = 'effective_status';
 }

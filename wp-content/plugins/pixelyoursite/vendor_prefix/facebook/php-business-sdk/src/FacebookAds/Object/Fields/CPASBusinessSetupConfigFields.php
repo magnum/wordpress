@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CPASBusinessSetupConfigFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCEPTED_COLLAB_ADS_TOS = 'accepted_collab_ads_tos';
-    const BUSINESS = 'business';
-    const BUSINESS_CAPABILITIES_STATUS = 'business_capabilities_status';
-    const CAPABILITIES_COMPLIANCE_STATUS = 'capabilities_compliance_status';
-    const ID = 'id';
-    const AD_ACCOUNTS = 'ad_accounts';
-    public function getFieldTypes()
-    {
-        return array('accepted_collab_ads_tos' => 'bool', 'business' => 'Business', 'business_capabilities_status' => 'map<string, string>', 'capabilities_compliance_status' => 'map<string, Object>', 'id' => 'string', 'ad_accounts' => 'list<string>');
-    }
+
+class CPASBusinessSetupConfigFields extends AbstractEnum {
+
+  const ACCEPTED_COLLAB_ADS_TOS = 'accepted_collab_ads_tos';
+  const BUSINESS = 'business';
+  const BUSINESS_CAPABILITIES_STATUS = 'business_capabilities_status';
+  const CAPABILITIES_COMPLIANCE_STATUS = 'capabilities_compliance_status';
+  const ID = 'id';
+  const AD_ACCOUNTS = 'ad_accounts';
+
+  public function getFieldTypes() {
+    return array(
+      'accepted_collab_ads_tos' => 'bool',
+      'business' => 'Business',
+      'business_capabilities_status' => 'map<string, string>',
+      'capabilities_compliance_status' => 'map<string, Object>',
+      'id' => 'string',
+      'ad_accounts' => 'list<string>',
+    );
+  }
 }

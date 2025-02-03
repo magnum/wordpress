@@ -55,7 +55,7 @@ class WC_REST_Customers_V2_Controller extends WC_REST_Customers_V1_Controller {
 		// Format date values.
 		foreach ( $format_date as $key ) {
 			// Date created is stored UTC, date modified is stored WP local time.
-			$datetime              = 'date_created' === $key ? get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $data[ $key ]->getTimestamp() ) ) : $data[ $key ];
+			$datetime              = 'date_created' === $key && is_subclass_of( $data[ $key ], 'DateTime' ) ? get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $data[ $key ]->getTimestamp() ) ) : $data[ $key ];
 			$data[ $key ]          = wc_rest_prepare_date_response( $datetime, false );
 			$data[ $key . '_gmt' ] = wc_rest_prepare_date_response( $datetime );
 		}
@@ -78,7 +78,14 @@ class WC_REST_Customers_V2_Controller extends WC_REST_Customers_V1_Controller {
 		);
 
 		if ( wc_current_user_has_role( 'administrator' ) ) {
-			$formatted_data['meta_data'] = $data['meta_data'];
+			$formatted_data['meta_data'] = array_values(
+				array_filter(
+					$data['meta_data'],
+					function ( $meta ) {
+						return ! is_protected_meta( $meta->key, 'user' );
+					}
+				)
+			);
 		}
 
 		return $formatted_data;
@@ -125,6 +132,9 @@ class WC_REST_Customers_V2_Controller extends WC_REST_Customers_V1_Controller {
 		if ( isset( $request['meta_data'] ) ) {
 			if ( is_array( $request['meta_data'] ) ) {
 				foreach ( $request['meta_data'] as $meta ) {
+					if ( is_protected_meta( $meta['key'], 'user' ) ) { // bypass internal keys.
+						continue;
+					}
 					$customer->update_meta_data( $meta['key'], $meta['value'], isset( $meta['id'] ) ? $meta['id'] : '' );
 				}
 			}

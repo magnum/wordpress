@@ -22,13 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object;
 
-use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Cursor;
-use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CopyrightAudioAssetFields;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Cursor;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CopyrightAudioAssetFields;
 /**
  * This class is auto-generated.
  *
@@ -37,14 +37,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CopyrightAudioAssetFields;
  * pull request for this class.
  *
  */
-class CopyrightAudioAsset extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
+class CopyrightAudioAsset extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
 {
     /**
      * @return CopyrightAudioAssetFields
      */
     public static function getFieldsEnum()
     {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CopyrightAudioAssetFields::getInstance();
+        return \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CopyrightAudioAssetFields::getInstance();
     }
     protected static function getReferencedEnums()
     {
@@ -56,7 +56,7 @@ class CopyrightAudioAsset extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCru
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\CopyrightAudioAsset(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\CopyrightAudioAsset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\CopyrightAudioAsset(), 'NODE', \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\CopyrightAudioAsset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

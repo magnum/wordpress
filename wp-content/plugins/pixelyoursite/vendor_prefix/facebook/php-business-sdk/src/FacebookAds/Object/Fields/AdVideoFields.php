@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,29 +21,31 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static AdVideoFields getInstance()
  */
-class AdVideoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATED_TIME = 'created_time';
-    const DESCRIPTION = 'description';
-    const EMBED_HTML = 'embed_html';
-    const EMBEDDABLE = 'embeddable';
-    const FILE_URL = 'file_url';
-    const FORMAT = 'format';
-    const FROM = 'from';
-    const ICON = 'icon';
-    const ID = 'id';
-    const IS_INSTAGRAM_ELIGIBLE = 'is_instagram_eligible';
-    const NAME = 'name';
-    const PICTURE = 'picture';
-    const PUBLISHED = 'published';
-    const SLIDESHOW_SPEC = 'slideshow_spec';
-    const SOURCE = 'source';
-    const THUMBNAILS = 'thumbnails';
-    const UPDATED_TIME = 'updated_time';
+class AdVideoFields extends AbstractEnum {
+
+  const CREATED_TIME = 'created_time';
+  const DESCRIPTION = 'description';
+  const EMBED_HTML = 'embed_html';
+  const EMBEDDABLE = 'embeddable';
+  const FILE_URL = 'file_url';
+  const FORMAT = 'format';
+  const FROM = 'from';
+  const ICON = 'icon';
+  const ID = 'id';
+  const IS_INSTAGRAM_ELIGIBLE = 'is_instagram_eligible';
+  const NAME = 'name';
+  const PICTURE = 'picture';
+  const PUBLISHED = 'published';
+  const SLIDESHOW_SPEC = 'slideshow_spec';
+  const SOURCE = 'source';
+  const THUMBNAILS = 'thumbnails';
+  const UPDATED_TIME = 'updated_time';
 }

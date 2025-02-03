@@ -2,6 +2,7 @@
 
 namespace Uncanny_Automator;
 
+use Error;
 use Exception;
 
 /**
@@ -67,6 +68,8 @@ class Initialize_Automator extends Set_Up_Automator {
 		// Loads integrations
 		try {
 			$this->initialize_add_integrations();
+		} catch ( Error $e ) {
+			throw new Automator_Error( $e->getMessage() );
 		} catch ( Exception $e ) {
 			throw new Automator_Exception( $e->getMessage() );
 		}
@@ -103,6 +106,8 @@ class Initialize_Automator extends Set_Up_Automator {
 			self::$auto_loaded_directories = $this->get_integrations_autoload_directories();
 			Automator()->cache->set( 'automator_integration_directories_loaded', self::$auto_loaded_directories, 'automator', Automator()->cache->long_expires );
 		}
+
+		$this->load_framework_integrations();
 	}
 
 	/**
@@ -113,6 +118,8 @@ class Initialize_Automator extends Set_Up_Automator {
 		// Loads all options and provide a hook for external options
 		try {
 			$this->initialize_integration_helpers();
+		} catch ( Error $e ) {
+			throw new Automator_Error( $e->getMessage() );
 		} catch ( Exception $e ) {
 			throw new Automator_Exception( $e->getMessage() );
 		}
@@ -130,6 +137,8 @@ class Initialize_Automator extends Set_Up_Automator {
 		// Loads all internal triggers, actions, and closures then provides hooks for external ones
 		try {
 			$this->initialize_triggers_actions_closures();
+		} catch ( Error $e ) {
+			throw new Automator_Error( $e->getMessage() );
 		} catch ( Exception $e ) {
 			throw new Automator_Exception( $e->getMessage() );
 		}
@@ -137,5 +146,35 @@ class Initialize_Automator extends Set_Up_Automator {
 		// Let others hook in and add triggers actions or tokens
 		do_action_deprecated( 'uncanny_automator_add_integration_triggers_actions_tokens', array(), '3.0', 'automator_add_integration_recipe_parts' );
 		do_action( 'automator_add_integration_recipe_parts' );
+	}
+
+	/**
+	 * load_framework_integrations
+	 *
+	 * Will scan the integrations folder and if one has the load.php file, it will include it.
+	 *
+	 * @return void
+	 */
+	public function load_framework_integrations() {
+
+		$vendor_dir = dirname( AUTOMATOR_BASE_FILE ) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'composer' . DIRECTORY_SEPARATOR;
+
+		$automator_file_map = include $vendor_dir . 'autoload_filemap.php';
+
+		if ( empty( $automator_file_map ) ) {
+			return;
+		}
+
+		foreach ( $automator_file_map as $file ) {
+			include_once $file;
+		}
+
+		if ( empty( $automator_file_map ) ) {
+			return;
+		}
+
+		foreach ( $automator_file_map as $file ) {
+			include_once $file;
+		}
 	}
 }

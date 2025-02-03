@@ -102,7 +102,7 @@ function automatorwp_buddypress_get_group_tags() {
 
     $groups_url =  get_option( 'home' ) . '/groups';
 
-    if( function_exists( 'bp_get_groups_directory_permalink' ) ) {
+    if( bp_is_active( 'groups' ) && function_exists( 'bp_get_groups_directory_permalink' ) ) {
         $groups_url = bp_get_groups_directory_permalink();
     }
 

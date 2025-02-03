@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoCopyrightRuleFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONDITION_GROUPS = 'condition_groups';
-    const COPYRIGHTS = 'copyrights';
-    const CREATED_DATE = 'created_date';
-    const CREATOR = 'creator';
-    const ID = 'id';
-    const IS_IN_MIGRATION = 'is_in_migration';
-    const NAME = 'name';
-    public function getFieldTypes()
-    {
-        return array('condition_groups' => 'list<VideoCopyrightConditionGroup>', 'copyrights' => 'list<string>', 'created_date' => 'datetime', 'creator' => 'User', 'id' => 'string', 'is_in_migration' => 'bool', 'name' => 'string');
-    }
+
+class VideoCopyrightRuleFields extends AbstractEnum {
+
+  const CONDITION_GROUPS = 'condition_groups';
+  const COPYRIGHTS = 'copyrights';
+  const CREATED_DATE = 'created_date';
+  const CREATOR = 'creator';
+  const ID = 'id';
+  const IS_IN_MIGRATION = 'is_in_migration';
+  const NAME = 'name';
+
+  public function getFieldTypes() {
+    return array(
+      'condition_groups' => 'list<VideoCopyrightConditionGroup>',
+      'copyrights' => 'list<string>',
+      'created_date' => 'datetime',
+      'creator' => 'User',
+      'id' => 'string',
+      'is_in_migration' => 'bool',
+      'name' => 'string',
+    );
+  }
 }

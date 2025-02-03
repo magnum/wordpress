@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PagePaymentOptionsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMEX = 'amex';
-    const CASH_ONLY = 'cash_only';
-    const DISCOVER = 'discover';
-    const MASTERCARD = 'mastercard';
-    const VISA = 'visa';
-    public function getFieldTypes()
-    {
-        return array('amex' => 'unsigned int', 'cash_only' => 'unsigned int', 'discover' => 'unsigned int', 'mastercard' => 'unsigned int', 'visa' => 'unsigned int');
-    }
+
+class PagePaymentOptionsFields extends AbstractEnum {
+
+  const AMEX = 'amex';
+  const CASH_ONLY = 'cash_only';
+  const DISCOVER = 'discover';
+  const MASTERCARD = 'mastercard';
+  const VISA = 'visa';
+
+  public function getFieldTypes() {
+    return array(
+      'amex' => 'unsigned int',
+      'cash_only' => 'unsigned int',
+      'discover' => 'unsigned int',
+      'mastercard' => 'unsigned int',
+      'visa' => 'unsigned int',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountDefaultObjectiveFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDefaultObjectiveDefaultObjectiveForUserValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDefaultObjectiveObjectiveForLevelValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDefaultObjectiveObjectiveF
  * pull request for this class.
  *
  */
-class AdAccountDefaultObjective extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAccountDefaultObjectiveFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountDefaultObjectiveFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['DefaultObjectiveForUser'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDefaultObjectiveDefaultObjectiveForUserValues::getInstance()->getValues();
-        $ref_enums['ObjectiveForLevel'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDefaultObjectiveObjectiveForLevelValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountDefaultObjective extends AbstractObject {
+
+  /**
+   * @return AdAccountDefaultObjectiveFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountDefaultObjectiveFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['DefaultObjectiveForUser'] = AdAccountDefaultObjectiveDefaultObjectiveForUserValues::getInstance()->getValues();
+    $ref_enums['ObjectiveForLevel'] = AdAccountDefaultObjectiveObjectiveForLevelValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

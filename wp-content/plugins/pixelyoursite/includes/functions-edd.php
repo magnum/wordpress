@@ -71,7 +71,7 @@ function getEddEventValue( $option, $amount, $global, $percent = 100 ) {
 
 		case 'percent':
 			$percents = (float) $percent;
-			$percents = str_replace( '%', null, $percents );
+			$percents = str_replace( '%', '', $percents );
 			$percents = (float) $percents / 100;
 			$value    = (float) $amount * $percents;
 			break;

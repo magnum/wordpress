@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Publish_Post extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_publish_post';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_publish_post';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -79,4 +90,5 @@ class AutomatorWP_WordPress_Publish_Post extends AutomatorWP_Integration_Trigger
 
 }
 
-new AutomatorWP_WordPress_Publish_Post();
+new AutomatorWP_WordPress_Publish_Post( 'wordpress' );
+new AutomatorWP_WordPress_Publish_Post( 'posts' );

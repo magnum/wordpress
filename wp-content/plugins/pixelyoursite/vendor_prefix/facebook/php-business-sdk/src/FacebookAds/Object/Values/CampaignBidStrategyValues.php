@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CampaignBidStrategyValues getInstance()
  */
-class CampaignBidStrategyValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COST_CAP = 'COST_CAP';
-    const LOWEST_COST_WITHOUT_CAP = 'LOWEST_COST_WITHOUT_CAP';
-    const LOWEST_COST_WITH_BID_CAP = 'LOWEST_COST_WITH_BID_CAP';
+class CampaignBidStrategyValues extends AbstractEnum {
+
+  const COST_CAP = 'COST_CAP';
+  const LOWEST_COST_WITHOUT_CAP = 'LOWEST_COST_WITHOUT_CAP';
+  const LOWEST_COST_WITH_BID_CAP = 'LOWEST_COST_WITH_BID_CAP';
 }

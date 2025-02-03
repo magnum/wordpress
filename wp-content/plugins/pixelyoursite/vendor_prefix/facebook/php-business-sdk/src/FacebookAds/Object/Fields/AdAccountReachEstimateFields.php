@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAccountReachEstimateFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ESTIMATE_READY = 'estimate_ready';
-    const USERS_LOWER_BOUND = 'users_lower_bound';
-    const USERS_UPPER_BOUND = 'users_upper_bound';
-    public function getFieldTypes()
-    {
-        return array('estimate_ready' => 'bool', 'users_lower_bound' => 'int', 'users_upper_bound' => 'int');
-    }
+
+class AdAccountReachEstimateFields extends AbstractEnum {
+
+  const ESTIMATE_READY = 'estimate_ready';
+  const USERS_LOWER_BOUND = 'users_lower_bound';
+  const USERS_UPPER_BOUND = 'users_upper_bound';
+
+  public function getFieldTypes() {
+    return array(
+      'estimate_ready' => 'bool',
+      'users_lower_bound' => 'int',
+      'users_upper_bound' => 'int',
+    );
+  }
 }

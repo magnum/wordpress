@@ -11,8 +11,9 @@ Version History
 */
 
 
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
+}
 
 
 delete_site_option( 'ithemes-sync-cache' );

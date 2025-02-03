@@ -164,8 +164,8 @@ function automatorwp_activecampaign_add_contact( $contact ) {
         'body' => json_encode( array(
             'contact' => array(
                 'email'     => $contact['email'],
-                'firstName' => $contact['first_name'],
-                'lastName'  => $contact['last_name'],
+                'firstName' => ( isset( $contact['firstName'] ) ? $contact['firstName'] : '' ),
+                'lastName'  => ( isset( $contact['lastName'] ) ? $contact['lastName'] : '' ),
                 'phone'     => ( isset( $contact['phone'] ) ? $contact['phone'] : '' )
             )
         ) )

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataImageOverlaySpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CUSTOM_TEXT_TYPE = 'custom_text_type';
-    const FLOAT_WITH_MARGIN = 'float_with_margin';
-    const OVERLAY_TEMPLATE = 'overlay_template';
-    const POSITION = 'position';
-    const TEXT_FONT = 'text_font';
-    const TEXT_TEMPLATE_TAGS = 'text_template_tags';
-    const TEXT_TYPE = 'text_type';
-    const THEME_COLOR = 'theme_color';
-    public function getFieldTypes()
-    {
-        return array('custom_text_type' => 'CustomTextType', 'float_with_margin' => 'bool', 'overlay_template' => 'OverlayTemplate', 'position' => 'Position', 'text_font' => 'TextFont', 'text_template_tags' => 'list<string>', 'text_type' => 'TextType', 'theme_color' => 'ThemeColor');
-    }
+
+class AdCreativeLinkDataImageOverlaySpecFields extends AbstractEnum {
+
+  const CUSTOM_TEXT_TYPE = 'custom_text_type';
+  const FLOAT_WITH_MARGIN = 'float_with_margin';
+  const OVERLAY_TEMPLATE = 'overlay_template';
+  const POSITION = 'position';
+  const TEXT_FONT = 'text_font';
+  const TEXT_TEMPLATE_TAGS = 'text_template_tags';
+  const TEXT_TYPE = 'text_type';
+  const THEME_COLOR = 'theme_color';
+
+  public function getFieldTypes() {
+    return array(
+      'custom_text_type' => 'CustomTextType',
+      'float_with_margin' => 'bool',
+      'overlay_template' => 'OverlayTemplate',
+      'position' => 'Position',
+      'text_font' => 'TextFont',
+      'text_template_tags' => 'list<string>',
+      'text_type' => 'TextType',
+      'theme_color' => 'ThemeColor',
+    );
+  }
 }

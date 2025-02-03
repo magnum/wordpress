@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,21 +34,34 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class HotelRoomFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APPLINKS = 'applinks';
-    const BASE_PRICE = 'base_price';
-    const CURRENCY = 'currency';
-    const DESCRIPTION = 'description';
-    const ID = 'id';
-    const IMAGES = 'images';
-    const MARGIN_LEVEL = 'margin_level';
-    const NAME = 'name';
-    const ROOM_ID = 'room_id';
-    const SALE_PRICE = 'sale_price';
-    const URL = 'url';
-    public function getFieldTypes()
-    {
-        return array('applinks' => 'CatalogItemAppLinks', 'base_price' => 'string', 'currency' => 'string', 'description' => 'string', 'id' => 'string', 'images' => 'list<string>', 'margin_level' => 'string', 'name' => 'string', 'room_id' => 'string', 'sale_price' => 'string', 'url' => 'string');
-    }
+
+class HotelRoomFields extends AbstractEnum {
+
+  const APPLINKS = 'applinks';
+  const BASE_PRICE = 'base_price';
+  const CURRENCY = 'currency';
+  const DESCRIPTION = 'description';
+  const ID = 'id';
+  const IMAGES = 'images';
+  const MARGIN_LEVEL = 'margin_level';
+  const NAME = 'name';
+  const ROOM_ID = 'room_id';
+  const SALE_PRICE = 'sale_price';
+  const URL = 'url';
+
+  public function getFieldTypes() {
+    return array(
+      'applinks' => 'CatalogItemAppLinks',
+      'base_price' => 'string',
+      'currency' => 'string',
+      'description' => 'string',
+      'id' => 'string',
+      'images' => 'list<string>',
+      'margin_level' => 'string',
+      'name' => 'string',
+      'room_id' => 'string',
+      'sale_price' => 'string',
+      'url' => 'string',
+    );
+  }
 }

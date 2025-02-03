@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CampaignSpecialAdCategoryValues getInstance()
  */
-class CampaignSpecialAdCategoryValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREDIT = 'CREDIT';
-    const EMPLOYMENT = 'EMPLOYMENT';
-    const HOUSING = 'HOUSING';
-    const ISSUES_ELECTIONS_POLITICS = 'ISSUES_ELECTIONS_POLITICS';
-    const NONE = 'NONE';
-    const ONLINE_GAMBLING_AND_GAMING = 'ONLINE_GAMBLING_AND_GAMING';
+class CampaignSpecialAdCategoryValues extends AbstractEnum {
+
+  const CREDIT = 'CREDIT';
+  const EMPLOYMENT = 'EMPLOYMENT';
+  const HOUSING = 'HOUSING';
+  const ISSUES_ELECTIONS_POLITICS = 'ISSUES_ELECTIONS_POLITICS';
+  const NONE = 'NONE';
+  const ONLINE_GAMBLING_AND_GAMING = 'ONLINE_GAMBLING_AND_GAMING';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,31 +21,45 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\Api;
 use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-class TargetingSearch extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @param string $query
-     * @param string $type
-     * @param string $class
-     * @param array $params
-     * @param Api $api
-     * @return Cursor
-     * @throws \InvalidArgumentException
-     */
-    public static function search($type, $class = null, $query = null, array $params = array(), \PYS_PRO_GLOBAL\FacebookAds\Api $api = null)
-    {
-        $api = $api ?: \PYS_PRO_GLOBAL\FacebookAds\Api::instance();
-        if (!$api) {
-            throw new \InvalidArgumentException('An Api instance must be provided as argument or ' . 'set as instance in the \\FacebookAds\\Api');
-        }
-        $params['type'] = $type;
-        $params = \array_merge($params, \array_filter(array('class' => $class, 'q' => $query)));
-        $response = $api->call('/search', \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, $params);
-        return new \PYS_PRO_GLOBAL\FacebookAds\Cursor($response, new \PYS_PRO_GLOBAL\FacebookAds\Object\TargetingSearch());
+
+class TargetingSearch extends AbstractObject {
+
+  /**
+   * @param string $query
+   * @param string $type
+   * @param string $class
+   * @param array $params
+   * @param Api $api
+   * @return Cursor
+   * @throws \InvalidArgumentException
+   */
+  public static function search(
+    $type,
+    $class=null,
+    $query=null,
+    array $params = array(),
+    Api $api = null) {
+
+    $api = $api ?: Api::instance();
+    if (!$api) {
+      throw new \InvalidArgumentException(
+        'An Api instance must be provided as argument or '.
+        'set as instance in the \PYS_PRO_GLOBAL\FacebookAds\Api');
     }
+
+    $params['type'] = $type;
+    $params = array_merge($params, array_filter(array(
+      'class' => $class,
+      'q' => $query,
+    )));
+
+    $response = $api->call('/search', RequestInterface::METHOD_GET, $params);
+    return new Cursor($response, new TargetingSearch());
+  }
 }

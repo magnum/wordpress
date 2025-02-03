@@ -20,22 +20,22 @@ Version History
 
 
 class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
-	public static $name = 'manage-plugins';
+	public static $name        = 'manage-plugins';
 	public static $description = 'Activate, deactivate, and uninstall plugins.';
 	
-	private $default_arguments = array();
+	private $default_arguments  = [];
 	private $handled_activation = false;
-	private $response = array();
-	private $current_action = '';
+	private $response           = [];
+	private $current_action     = '';
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		
 		
-		$actions = array(
+		$actions = [
 			'deactivate'           => 'deactivate_plugins',
 			'install'              => 'install_plugins',
 			'uninstall'            => 'uninstall_plugins',
@@ -43,7 +43,7 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 			'activate'             => 'activate_plugin',
 			'network-activate'     => 'network_activate_plugin',
 			'network_activate'     => 'network_activate_plugin',
-		);
+		];
 		
 		if ( isset( $actions['get-actions'] ) ) {
 			$this->response['get-actions'] = array_keys( $actions );
@@ -52,10 +52,10 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 		foreach ( $arguments as $action => $data ) {
 			$this->current_action = $action;
 			
-			if ( isset( $actions[$action] ) ) {
-				$this->response[$action] = call_user_func( array( $this, $actions[$action] ), $data );
+			if ( isset( $actions[ $action ] ) ) {
+				$this->response[ $action ] = call_user_func( [ $this, $actions[ $action ] ], $data );
 			} else {
-				$this->response[$action] = 'This action is not recognized';
+				$this->response[ $action ] = 'This action is not recognized';
 			}
 		}
 		
@@ -64,7 +64,7 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 	
 	private function set_fatal_error_handler() {
 		if ( function_exists( 'error_get_last' ) ) {
-			register_shutdown_function( array( $this, 'handle_fatal_error' ) );
+			register_shutdown_function( [ $this, 'handle_fatal_error' ] );
 		}
 	}
 	
@@ -72,10 +72,10 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 		$error = error_get_last();
 		
 		if ( is_array( $error ) ) {
-			$this->response['error'] = array(
+			$this->response['error'] = [
 				'error_trigger_action' => $this->current_action,
 				'error_details'        => $error,
-			);
+			];
 			
 			$GLOBALS['ithemes_sync_request_handler']->send_response( $this->response );
 		}
@@ -86,10 +86,10 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 			return new WP_Error( 'invalid-argument', 'The install-and-activate argument takes a string representing an individual plugin.' );
 		}
 		
-		$result['install'] = $this->install_plugins( array( $plugin ) );
+		$result['install'] = $this->install_plugins( [ $plugin ] );
 		
-		if ( isset( $result['install'][$plugin] ) ) {
-			$result['install'] = $result['install'][$plugin];
+		if ( isset( $result['install'][ $plugin ] ) ) {
+			$result['install'] = $result['install'][ $plugin ];
 		}
 		
 		$this->response['install-and-activate'] = $result;
@@ -147,22 +147,23 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 		}
 	}
 	
-	private function deactivate_plugins( $plugin ) { //We only send one at a time
+	private function deactivate_plugins( $plugin ) {
+		// We only send one at a time
 		$result['data'] = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin, true, false );
 		deactivate_plugins( (array) $plugin );
 		return $result;
 	}
 	
 	private function install_plugins( $plugins ) {
-		require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-		require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
-		require_once( $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php' );
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		require_once $GLOBALS['ithemes_sync_path'] . '/upgrader-skin.php';
 		
 		$upgrader = new Plugin_Upgrader( new Ithemes_Sync_Upgrader_Skin() );
 		
-		$results = array();
+		$results = [];
 		
 		
 		foreach ( (array) $plugins as $plugin ) {
@@ -171,7 +172,13 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 			if ( preg_match( '{^(http|https|ftp)://}i', $plugin ) ) {
 				$result = $upgrader->install( $plugin );
 			} else {
-				$api = plugins_api( 'plugin_information', array( 'slug' => $plugin, 'fields' => array( 'sections' => false ) ) );
+				$api = plugins_api(
+					'plugin_information',
+					[
+						'slug'   => $plugin,
+						'fields' => [ 'sections' => false ],
+					] 
+				);
 				
 				if ( is_wp_error( $api ) ) {
 					$result = $api;
@@ -181,18 +188,18 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 			}
 			
 			if ( is_wp_error( $result ) ) {
-				$results[$plugin]['error'] = array(
+				$results[ $plugin ]['error'] = [
 					'error_code'    => $result->get_error_code(),
 					'error_details' => $result->get_error_message(),
-				);
+				];
 			} else {
-				$results[$plugin] = array(
+				$results[ $plugin ] = [
 					'result' => $result,
 					'slug'   => $upgrader->plugin_info(),
-				);
+				];
 				
 				if ( true === $result ) {
-					$results[$plugin]['success'] = true;
+					$results[ $plugin ]['success'] = true;
 				}
 			}
 		}
@@ -204,7 +211,7 @@ class Ithemes_Sync_Verb_Manage_Plugins extends Ithemes_Sync_Verb {
 	}
 	
 	private function uninstall_plugins( $plugins ) {
-		require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		require_once ABSPATH . '/wp-admin/includes/file.php';
 		
 		// First ensure that the plugins are deactivated.
 		$result = $this->deactivate_plugins( $plugins );

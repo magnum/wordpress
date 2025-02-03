@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,17 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CommerceOrderReasonCodeValues getInstance()
  */
-class CommerceOrderReasonCodeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUYERS_REMORSE = 'BUYERS_REMORSE';
-    const DAMAGED_GOODS = 'DAMAGED_GOODS';
-    const FACEBOOK_INITIATED = 'FACEBOOK_INITIATED';
-    const NOT_AS_DESCRIBED = 'NOT_AS_DESCRIBED';
-    const QUALITY_ISSUE = 'QUALITY_ISSUE';
-    const REFUND_COMPROMISED = 'REFUND_COMPROMISED';
-    const REFUND_FOR_RETURN = 'REFUND_FOR_RETURN';
-    const REFUND_REASON_OTHER = 'REFUND_REASON_OTHER';
-    const REFUND_SFI_FAKE = 'REFUND_SFI_FAKE';
-    const REFUND_SFI_REAL = 'REFUND_SFI_REAL';
-    const WRONG_ITEM = 'WRONG_ITEM';
+class CommerceOrderReasonCodeValues extends AbstractEnum {
+
+  const BUYERS_REMORSE = 'BUYERS_REMORSE';
+  const DAMAGED_GOODS = 'DAMAGED_GOODS';
+  const FACEBOOK_INITIATED = 'FACEBOOK_INITIATED';
+  const NOT_AS_DESCRIBED = 'NOT_AS_DESCRIBED';
+  const QUALITY_ISSUE = 'QUALITY_ISSUE';
+  const REFUND_COMPROMISED = 'REFUND_COMPROMISED';
+  const REFUND_FOR_RETURN = 'REFUND_FOR_RETURN';
+  const REFUND_REASON_OTHER = 'REFUND_REASON_OTHER';
+  const REFUND_SFI_FAKE = 'REFUND_SFI_FAKE';
+  const REFUND_SFI_REAL = 'REFUND_SFI_REAL';
+  const WRONG_ITEM = 'WRONG_ITEM';
 }

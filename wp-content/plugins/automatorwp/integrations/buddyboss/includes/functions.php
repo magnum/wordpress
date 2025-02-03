@@ -61,6 +61,11 @@ function automatorwp_buddyboss_get_group_title( $group_id ) {
         return '';
     }
 
+    // Bail if BuddyBoss function does not exist
+    if ( ! function_exists( 'groups_get_group' ) ) {
+        return '';
+    }
+    
     $group = groups_get_group( $group_id );
 
     return $group->name;
@@ -108,6 +113,30 @@ function automatorwp_buddyboss_get_link_preview( $link ) {
         return false;
     }
 
+    $title = '';
+    $description = '';
+    $image_url = '';
+
+    // Check if BP parse URL can take the information
+    if( function_exists( 'bp_core_parse_url' ) ) {
+
+        $bp_data = bp_core_parse_url( $link );
+
+        $title = $bp_data['title'];
+        $description = $bp_data['description'];
+        $image_url = ( is_array( $bp_data['images'] ) && count( $bp_data['images'] ) ) ? $bp_data['images'][0] : '';
+
+        // All information done so return it here without continue
+        if( ! empty( $title ) && ! empty( $description ) && ! empty( $image_url ) ) {
+            return array(
+                'url' => $link,
+                'title' => $title,
+                'description' => $description,
+                'image_url' => $image_url
+            );
+        }
+    }
+
     // Extract HTML using curl
     $ch = curl_init();
 
@@ -119,17 +148,22 @@ function automatorwp_buddyboss_get_link_preview( $link ) {
     $data = curl_exec( $ch );
     curl_close( $ch );
 
+    if( empty( $data ) ) {
+        return false;
+    }
+
     // Load HTML to DOM Object
     $dom = new DOMDocument();
     @$dom->loadHTML( $data );
 
-    $title = '';
-    $description = '';
-    $image_url = '';
-
     // Parse DOM to get Title
-    $nodes = $dom->getElementsByTagName('title');
-    $title = $nodes->item(0)->nodeValue;
+    if( empty( $title ) ) {
+        $nodes = $dom->getElementsByTagName('title');
+
+        if( $nodes->length > 0 ) {
+            $title = $nodes->item(0)->nodeValue;
+        }
+    }
 
     // Parse DOM to get Meta Description
     $metas = $dom->getElementsByTagName('meta');
@@ -142,7 +176,7 @@ function automatorwp_buddyboss_get_link_preview( $link ) {
             $description = $meta->getAttribute('content');
         }
 
-        // OG Metas
+        // OG Metas (they have priority)
         if ( $meta->getAttribute('property') == 'og:title' ) {
             $title = $meta->getAttribute('content');
         }

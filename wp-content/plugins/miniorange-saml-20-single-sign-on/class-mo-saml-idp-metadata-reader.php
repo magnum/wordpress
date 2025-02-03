@@ -77,7 +77,6 @@ class Mo_SAML_IDP_Metadata_Reader {
 	public function mo_saml_get_service_providers() {
 		return $this->service_providers;
 	}
-
 }
 
 /**
@@ -169,7 +168,6 @@ class Mo_SAML_Identity_Providers {
 		$this->mo_saml_parse_sso_service( $idp_sso_descriptor_el );
 		$this->mo_saml_parse_slo_service( $idp_sso_descriptor_el );
 		$this->mo_saml_parsex509_certificate( $idp_sso_descriptor_el );
-
 	}
 
 	/**
@@ -354,6 +352,4 @@ class Mo_SAML_Identity_Providers {
 	public function mo_saml_is_request_signed() {
 		return $this->signed_request;
 	}
-
 }
-

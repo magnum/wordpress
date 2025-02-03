@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,37 +21,44 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http\Adapter;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\Client;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\Http\ResponseInterface;
-interface AdapterInterface
-{
-    /**
-     * @param Client $client
-     */
-    public function __construct(\PYS_PRO_GLOBAL\FacebookAds\Http\Client $client);
-    /**
-     * @return Client
-     */
-    public function getClient();
-    /**
-     * @return string
-     */
-    public function getCaBundlePath();
-    /**
-     * @return \ArrayObject
-     */
-    public function getOpts();
-    /**
-     * @param \ArrayObject $opts
-     * @return void
-     */
-    public function setOpts(\ArrayObject $opts);
-    /**
-     * @param RequestInterface $request
-     * @return ResponseInterface
-     */
-    public function sendRequest(\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface $request);
+
+interface AdapterInterface {
+
+  /**
+   * @param Client $client
+   */
+  public function __construct(Client $client);
+
+  /**
+   * @return Client
+   */
+  public function getClient();
+
+  /**
+   * @return string
+   */
+  public function getCaBundlePath();
+
+  /**
+   * @return \ArrayObject
+   */
+  public function getOpts();
+
+  /**
+   * @param \ArrayObject $opts
+   * @return void
+   */
+  public function setOpts(\ArrayObject $opts);
+
+  /**
+   * @param RequestInterface $request
+   * @return ResponseInterface
+   */
+  public function sendRequest(RequestInterface $request);
 }

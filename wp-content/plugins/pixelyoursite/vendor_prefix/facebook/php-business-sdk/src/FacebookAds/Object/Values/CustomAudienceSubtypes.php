@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,20 +21,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static CustomAudienceSubtypes getInstance()
  */
-class CustomAudienceSubtypes extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP = 'APP';
-    const APP_COMBINATION = 'APP_COMBINATION';
-    const CUSTOM = 'CUSTOM';
-    const LOOKALIKE = 'LOOKALIKE';
-    const MANAGED = 'MANAGED';
-    const PARTNER = 'PARTNER';
-    const VIDEO = 'VIDEO';
-    const WEBSITE = 'WEBSITE';
+class CustomAudienceSubtypes extends AbstractEnum {
+
+  const APP = 'APP';
+  const APP_COMBINATION = 'APP_COMBINATION';
+  const CUSTOM = 'CUSTOM';
+  const LOOKALIKE = 'LOOKALIKE';
+  const MANAGED = 'MANAGED';
+  const PARTNER = 'PARTNER';
+  const VIDEO = 'VIDEO';
+  const WEBSITE = 'WEBSITE';
 }

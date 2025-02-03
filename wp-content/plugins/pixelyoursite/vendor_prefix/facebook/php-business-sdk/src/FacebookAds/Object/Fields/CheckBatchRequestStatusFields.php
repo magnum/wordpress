@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CheckBatchRequestStatusFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ERRORS = 'errors';
-    const ERRORS_TOTAL_COUNT = 'errors_total_count';
-    const HANDLE = 'handle';
-    const IDS_OF_INVALID_REQUESTS = 'ids_of_invalid_requests';
-    const STATUS = 'status';
-    const WARNINGS = 'warnings';
-    const WARNINGS_TOTAL_COUNT = 'warnings_total_count';
-    public function getFieldTypes()
-    {
-        return array('errors' => 'list<Object>', 'errors_total_count' => 'int', 'handle' => 'string', 'ids_of_invalid_requests' => 'list<string>', 'status' => 'string', 'warnings' => 'list<Object>', 'warnings_total_count' => 'int');
-    }
+
+class CheckBatchRequestStatusFields extends AbstractEnum {
+
+  const ERRORS = 'errors';
+  const ERRORS_TOTAL_COUNT = 'errors_total_count';
+  const HANDLE = 'handle';
+  const IDS_OF_INVALID_REQUESTS = 'ids_of_invalid_requests';
+  const STATUS = 'status';
+  const WARNINGS = 'warnings';
+  const WARNINGS_TOTAL_COUNT = 'warnings_total_count';
+
+  public function getFieldTypes() {
+    return array(
+      'errors' => 'list<Object>',
+      'errors_total_count' => 'int',
+      'handle' => 'string',
+      'ids_of_invalid_requests' => 'list<string>',
+      'status' => 'string',
+      'warnings' => 'list<Object>',
+      'warnings_total_count' => 'int',
+    );
+  }
 }

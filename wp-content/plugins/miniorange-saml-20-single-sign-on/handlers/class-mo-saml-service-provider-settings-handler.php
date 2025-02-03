@@ -45,17 +45,17 @@ class Mo_SAML_Service_Provider_Settings_Handler {
 		if ( ! empty( $post_array[ Mo_Saml_Options_Enum_Service_Provider::IS_ENCODING_ENABLED ] ) ) {
 			$save_array[ Mo_Saml_Options_Enum_Service_Provider::IS_ENCODING_ENABLED ] = 'checked';
 		} else {
-			$save_array[ Mo_Saml_Options_Enum_Service_Provider::IS_ENCODING_ENABLED ] = '';
+			$save_array[ Mo_Saml_Options_Enum_Service_Provider::IS_ENCODING_ENABLED ] = 'unchecked';
 		}
 
 		if ( ! empty( $post_array[ Mo_Saml_Options_Enum_Service_Provider::ASSERTION_TIME_VALIDITY ] ) ) {
 			$save_array[ Mo_Saml_Options_Enum_Service_Provider::ASSERTION_TIME_VALIDITY ] = 'checked';
 		} else {
-			$save_array[ Mo_Saml_Options_Enum_Service_Provider::ASSERTION_TIME_VALIDITY ] = '';
+			$save_array[ Mo_Saml_Options_Enum_Service_Provider::ASSERTION_TIME_VALIDITY ] = 'unchecked';
 		}
-
+		$save_array[ Mo_Saml_Options_Enum_Sso_Login::SSO_BUTTON ] = 'true';
 		$db_handler->mo_saml_save_options( $save_array );
-		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::IDP_DETAILS_SUCCESS, 'SERVICE_PROVIDER_CONF', $save_array );
+		$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::SUCCESS, Mo_Saml_Messages::mo_saml_translate( 'IDP_DETAILS_SUCCESS' ), 'SERVICE_PROVIDER_CONF', $save_array );
 		$post_save->mo_saml_post_save_action();
 
 		$mo_saml_identity_provider_identifier_name = get_option( Mo_Saml_Options_Enum_Service_Provider::IDENTITY_PROVIDER_NAME );
@@ -86,7 +86,7 @@ class Mo_SAML_Service_Provider_Settings_Handler {
 
 				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Silenced this to avoid any additional warning messages if an invalid certificate is uploaded.
 				if ( ! @openssl_x509_read( $saml_x509_certificate[ $key ] ) ) {
-					$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_CERT, 'INVALID_CERT' );
+					$post_save = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_CERT' ), 'INVALID_CERT' );
 					$post_save->mo_saml_post_save_action();
 					return false;
 				}
@@ -104,18 +104,25 @@ class Mo_SAML_Service_Provider_Settings_Handler {
 	 * @return boolean
 	 */
 	public static function mo_saml_validate_service_provider_fields( $post_array ) {
+		$validate_fields_array = array(
+			$post_array[ Mo_Saml_Options_Enum_Service_Provider::LOGIN_URL ],
+			$post_array[ Mo_Saml_Options_Enum_Service_Provider::ISSUER ],
+			$post_array[ Mo_Saml_Options_Enum_Service_Provider::X509_CERTIFICATE ],
+		);
 
-		$validate_fields_array = array( $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ], $post_array[ Mo_Saml_Options_Enum_Service_Provider::LOGIN_URL ], $post_array[ Mo_Saml_Options_Enum_Service_Provider::ISSUER ], $post_array[ Mo_Saml_Options_Enum_Service_Provider::X509_CERTIFICATE ] );
+		if ( '0' !== $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ] ) {
+			array_push( $validate_fields_array, $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ] );
+		}
 		if ( Mo_SAML_Utilities::mo_saml_check_empty_or_null( $validate_fields_array ) ) {
 			$log_object = array(
 				Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME => $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ],
 				Mo_Saml_Options_Enum_Service_Provider::LOGIN_URL     => $post_array[ Mo_Saml_Options_Enum_Service_Provider::LOGIN_URL ],
 				Mo_Saml_Options_Enum_Service_Provider::ISSUER        => $post_array[ Mo_Saml_Options_Enum_Service_Provider::ISSUER ],
 			);
-			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::FIELDS_EMPTY, 'INVALID_CONFIGURATION_SETTING', $log_object );
+			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'FIELDS_EMPTY' ), 'INVALID_CONFIGURATION_SETTING', $log_object );
 		} elseif ( ! preg_match( '/^\w*$/', $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ] ) ) {
 			$log_object = array( Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME => $post_array[ Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME ] );
-			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::INVALID_FORMAT, 'INVALID_IDP_NAME_FORMAT', $log_object );
+			$post_save  = new Mo_SAML_Post_Save_Handler( Mo_Saml_Save_Status_Constants::ERROR, Mo_Saml_Messages::mo_saml_translate( 'INVALID_FORMAT' ), 'INVALID_IDP_NAME_FORMAT', $log_object );
 		}
 		if ( isset( $post_save ) ) {
 			$post_save->mo_saml_post_save_action();
@@ -123,5 +130,4 @@ class Mo_SAML_Service_Provider_Settings_Handler {
 		}
 		return true;
 	}
-
 }

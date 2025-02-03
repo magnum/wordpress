@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class MailingAddressFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CITY = 'city';
-    const CITY_PAGE = 'city_page';
-    const COUNTRY = 'country';
-    const ID = 'id';
-    const POSTAL_CODE = 'postal_code';
-    const REGION = 'region';
-    const STREET1 = 'street1';
-    const STREET2 = 'street2';
-    public function getFieldTypes()
-    {
-        return array('city' => 'string', 'city_page' => 'Page', 'country' => 'string', 'id' => 'string', 'postal_code' => 'string', 'region' => 'string', 'street1' => 'string', 'street2' => 'string');
-    }
+
+class MailingAddressFields extends AbstractEnum {
+
+  const CITY = 'city';
+  const CITY_PAGE = 'city_page';
+  const COUNTRY = 'country';
+  const ID = 'id';
+  const POSTAL_CODE = 'postal_code';
+  const REGION = 'region';
+  const STREET1 = 'street1';
+  const STREET2 = 'street2';
+
+  public function getFieldTypes() {
+    return array(
+      'city' => 'string',
+      'city_page' => 'Page',
+      'country' => 'string',
+      'id' => 'string',
+      'postal_code' => 'string',
+      'region' => 'string',
+      'street1' => 'string',
+      'street2' => 'string',
+    );
+  }
 }

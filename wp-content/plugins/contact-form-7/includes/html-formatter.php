@@ -95,8 +95,8 @@ class WPCF7_HTMLFormatter {
 	/**
 	 * Constructor.
 	 */
-	public function __construct( $args = '' ) {
-		$this->options = wp_parse_args( $args, array(
+	public function __construct( $options = '' ) {
+		$this->options = wp_parse_args( $options, array(
 			'auto_br' => true,
 			'auto_indent' => true,
 		) );
@@ -311,7 +311,7 @@ class WPCF7_HTMLFormatter {
 			// Split up the contents into paragraphs, separated by double line breaks.
 			$paragraphs = preg_split( '/\s*\n\s*\n\s*/', $content );
 
-			$paragraphs = array_filter( $paragraphs, function ( $paragraph ) {
+			$paragraphs = array_filter( $paragraphs, static function ( $paragraph ) {
 				return '' !== trim( $paragraph );
 			} );
 
@@ -378,6 +378,7 @@ class WPCF7_HTMLFormatter {
 		if ( in_array( $tag_name, self::p_child_elements ) ) {
 			if (
 				! $this->is_inside( 'p' ) and
+				! $this->is_inside( self::p_child_elements ) and
 				! $this->has_parent( self::p_nonparent_elements )
 			) {
 				// Open <p> if it does not exist.

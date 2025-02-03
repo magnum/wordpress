@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdStudyTypeValues getInstance()
  */
-class AdStudyTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CONTINUOUS_LIFT_CONFIG = 'CONTINUOUS_LIFT_CONFIG';
-    const GEO_LIFT = 'GEO_LIFT';
-    const LIFT = 'LIFT';
-    const SPLIT_TEST = 'SPLIT_TEST';
+class AdStudyTypeValues extends AbstractEnum {
+
+  const CONTINUOUS_LIFT_CONFIG = 'CONTINUOUS_LIFT_CONFIG';
+  const GEO_LIFT = 'GEO_LIFT';
+  const LIFT = 'LIFT';
+  const SPLIT_TEST = 'SPLIT_TEST';
 }

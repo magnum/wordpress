@@ -1,4 +1,5 @@
 <?php
+
 namespace cybot\cookiebot\lib;
 
 class Supported_Regions {
@@ -241,6 +242,10 @@ class Supported_Regions {
 			'GB'    => __( 'United Kingdom', 'cookiebot' ),
 			'US'    => __( 'United States', 'cookiebot' ),
 			'US-06' => __( 'United States - State of California', 'cookiebot' ),
+			'US-08' => __( 'United States - State of Colorado', 'cookiebot' ),
+			'US-09' => __( 'United States - State of Connecticut', 'cookiebot' ),
+			'US-49' => __( 'United States - State of Utah', 'cookiebot' ),
+			'US-51' => __( 'United States - State of Virginia', 'cookiebot' ),
 			'UM'    => __( 'United States Minor Outlying Islands', 'cookiebot' ),
 			'UY'    => __( 'Uruguay', 'cookiebot' ),
 			'UZ'    => __( 'Uzbekistan', 'cookiebot' ),
@@ -261,4 +266,15 @@ class Supported_Regions {
 
 		return $regions;
 	}
+
+	const OPTOUT_REGIONS = array(
+		'US-06',
+		'US-08',
+		'US-09',
+		'US-49',
+		'US-51',
+		'US',
+		'AU',
+		'CA',
+	);
 }

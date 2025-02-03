@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,29 +35,29 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static InstagramInsightsResultMetricValues getInstance()
  */
-class InstagramInsightsResultMetricValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAROUSEL_ALBUM_ENGAGEMENT = 'carousel_album_engagement';
-    const CAROUSEL_ALBUM_IMPRESSIONS = 'carousel_album_impressions';
-    const CAROUSEL_ALBUM_REACH = 'carousel_album_reach';
-    const CAROUSEL_ALBUM_SAVED = 'carousel_album_saved';
-    const CAROUSEL_ALBUM_VIDEO_VIEWS = 'carousel_album_video_views';
-    const COMMENTS = 'comments';
-    const ENGAGEMENT = 'engagement';
-    const EXITS = 'exits';
-    const FOLLOWS_FROM_IMPRESSIONS = 'follows_from_impressions';
-    const IMPRESSIONS = 'impressions';
-    const LIKES = 'likes';
-    const NAVIGATION = 'navigation';
-    const PLAYS = 'plays';
-    const PROFILE_VIEWS_FROM_IMPRESSIONS = 'profile_views_from_impressions';
-    const REACH = 'reach';
-    const REPLIES = 'replies';
-    const SAVED = 'saved';
-    const SHARES = 'shares';
-    const TAPS_BACK = 'taps_back';
-    const TAPS_FORWARD = 'taps_forward';
-    const TOTAL_INTERACTIONS = 'total_interactions';
-    const TOTAL_MEDIA_ATTRIBUTED_ACTIONS = 'total_media_attributed_actions';
-    const VIDEO_VIEWS = 'video_views';
+class InstagramInsightsResultMetricValues extends AbstractEnum {
+
+  const CAROUSEL_ALBUM_ENGAGEMENT = 'carousel_album_engagement';
+  const CAROUSEL_ALBUM_IMPRESSIONS = 'carousel_album_impressions';
+  const CAROUSEL_ALBUM_REACH = 'carousel_album_reach';
+  const CAROUSEL_ALBUM_SAVED = 'carousel_album_saved';
+  const CAROUSEL_ALBUM_VIDEO_VIEWS = 'carousel_album_video_views';
+  const COMMENTS = 'comments';
+  const ENGAGEMENT = 'engagement';
+  const EXITS = 'exits';
+  const FOLLOWS = 'follows';
+  const IMPRESSIONS = 'impressions';
+  const LIKES = 'likes';
+  const NAVIGATION = 'navigation';
+  const PLAYS = 'plays';
+  const PROFILE_ACTIVITY = 'profile_activity';
+  const PROFILE_VISITS = 'profile_visits';
+  const REACH = 'reach';
+  const REPLIES = 'replies';
+  const SAVED = 'saved';
+  const SHARES = 'shares';
+  const TAPS_BACK = 'taps_back';
+  const TAPS_FORWARD = 'taps_forward';
+  const TOTAL_INTERACTIONS = 'total_interactions';
+  const VIDEO_VIEWS = 'video_views';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleExecutionOptionsFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleExecutionOptionsOperatorValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleExecutionOptionsOperatorValue
  * pull request for this class.
  *
  */
-class AdRuleExecutionOptions extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdRuleExecutionOptionsFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdRuleExecutionOptionsFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Operator'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdRuleExecutionOptionsOperatorValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdRuleExecutionOptions extends AbstractObject {
+
+  /**
+   * @return AdRuleExecutionOptionsFields
+   */
+  public static function getFieldsEnum() {
+    return AdRuleExecutionOptionsFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Operator'] = AdRuleExecutionOptionsOperatorValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

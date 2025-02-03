@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class MessengerProfileFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT_LINKING_URL = 'account_linking_url';
-    const GET_STARTED = 'get_started';
-    const GREETING = 'greeting';
-    const ICE_BREAKERS = 'ice_breakers';
-    const PAYMENT_SETTINGS = 'payment_settings';
-    const PERSISTENT_MENU = 'persistent_menu';
-    const SUBJECT_TO_NEW_EU_PRIVACY_RULES = 'subject_to_new_eu_privacy_rules';
-    const TARGET_AUDIENCE = 'target_audience';
-    const WHITELISTED_DOMAINS = 'whitelisted_domains';
-    public function getFieldTypes()
-    {
-        return array('account_linking_url' => 'string', 'get_started' => 'Object', 'greeting' => 'list<Object>', 'ice_breakers' => 'list<Object>', 'payment_settings' => 'Object', 'persistent_menu' => 'list<Object>', 'subject_to_new_eu_privacy_rules' => 'bool', 'target_audience' => 'Object', 'whitelisted_domains' => 'list<string>');
-    }
+
+class MessengerProfileFields extends AbstractEnum {
+
+  const ACCOUNT_LINKING_URL = 'account_linking_url';
+  const GET_STARTED = 'get_started';
+  const GREETING = 'greeting';
+  const ICE_BREAKERS = 'ice_breakers';
+  const PAYMENT_SETTINGS = 'payment_settings';
+  const PERSISTENT_MENU = 'persistent_menu';
+  const SUBJECT_TO_NEW_EU_PRIVACY_RULES = 'subject_to_new_eu_privacy_rules';
+  const TARGET_AUDIENCE = 'target_audience';
+  const WHITELISTED_DOMAINS = 'whitelisted_domains';
+
+  public function getFieldTypes() {
+    return array(
+      'account_linking_url' => 'string',
+      'get_started' => 'Object',
+      'greeting' => 'list<Object>',
+      'ice_breakers' => 'list<Object>',
+      'payment_settings' => 'Object',
+      'persistent_menu' => 'list<Object>',
+      'subject_to_new_eu_privacy_rules' => 'bool',
+      'target_audience' => 'Object',
+      'whitelisted_domains' => 'list<string>',
+    );
+  }
 }

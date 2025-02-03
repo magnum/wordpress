@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ImageCopyrightFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ImageCopyrightGeoOwnershipValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,49 +39,75 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ImageCopyrightGeoOwnershipValues;
  * pull request for this class.
  *
  */
-class ImageCopyright extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return ImageCopyrightFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ImageCopyrightFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['GeoOwnership'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ImageCopyrightGeoOwnershipValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function deleteSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'NODE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ImageCopyright(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ImageCopyright::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('artist' => 'string', 'creator' => 'string', 'custom_id' => 'string', 'description' => 'string', 'geo_ownership' => 'list<geo_ownership_enum>', 'original_content_creation_date' => 'unsigned int', 'title' => 'string');
-        $enums = array('geo_ownership_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ImageCopyrightGeoOwnershipValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ImageCopyright(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ImageCopyright::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class ImageCopyright extends AbstractCrudObject {
+
+  /**
+   * @return ImageCopyrightFields
+   */
+  public static function getFieldsEnum() {
+    return ImageCopyrightFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['GeoOwnership'] = ImageCopyrightGeoOwnershipValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new ImageCopyright(),
+      'NODE',
+      ImageCopyright::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function updateSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'artist' => 'string',
+      'creator' => 'string',
+      'custom_id' => 'string',
+      'description' => 'string',
+      'geo_ownership' => 'list<geo_ownership_enum>',
+      'original_content_creation_date' => 'unsigned int',
+      'title' => 'string',
+    );
+    $enums = array(
+      'geo_ownership_enum' => ImageCopyrightGeoOwnershipValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/',
+      new ImageCopyright(),
+      'NODE',
+      ImageCopyright::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function mo_saml_display_log_page() {
 	$debugging_enabled = Mo_SAML_Logger::mo_saml_is_debugging_enabled();
-	mo_saml_display_plugin_header( 'debug' );
+	mo_saml_display_plugin_header();
 	?>  
 	<?php
 	$active_tab = mo_saml_get_active_debug_tab();
@@ -24,7 +24,7 @@ function mo_saml_display_log_page() {
 		?>
 	<div class="bg-main-cstm mo-saml-margin-left mo-saml-bootstrap-pb-5">
 			<div class="mo-saml-bootstrap-row mo-saml-bootstrap-container-fluid">
-				<div class="mo-saml-bootstrap-col-md-8 mo-saml-bootstrap-mt-4 mo-saml-bootstrap-ms-4">
+				<div class="mo-saml-bootstrap-col-md-8 mo-saml-bootstrap-mt-4">
 					<div class="mo-saml-bootstrap-p-4 shadow-cstm mo-saml-bootstrap-bg-white mo-saml-bootstrap-rounded">
 						<form action="" method="post" id="mo_saml_logger">
 							<?php wp_nonce_field( 'mo_saml_logger' ); ?>
@@ -82,7 +82,7 @@ function mo_saml_display_log_page() {
 
 								<h6 class="mo-saml-bootstrap-mt-3">
 									Copy this code <code>define('MO_SAML_LOGGING', true);</code>
-									and paste it in the <a href="https://wordpress.org/support/article/editing-wp-config-php/">wp-config.php</a>
+									and paste it in the <a href="https://wordpress.org/support/article/editing-wp-config-php/" target="_blank">wp-config.php</a>
 									file before the line
 									<br> <code>/* That's all, stop editing! Happy publishing. */</code> to enable the miniOrange
 									SAML logs.
@@ -109,8 +109,6 @@ function mo_saml_display_log_page() {
 			</div>
 	</div>
 		<?php
-	} elseif ( 'error-codes' === $active_tab ) {
-		error_codes();
 	} else {
 		?>
 		<div class="mo-saml-bootstrap-d-flex mo-saml-bootstrap-text-center mo-saml-bootstrap-pt-3 mo-saml-bootstrap-border-bottom mo-saml-bootstrap-justify-content-center">
@@ -118,7 +116,6 @@ function mo_saml_display_log_page() {
 		</div>
 		<?php
 	}
-
 }
 /**
  * This function returns the active tab in troubleshoot sub-menu.
@@ -144,7 +141,7 @@ function mo_saml_get_active_debug_tab() {
 function mo_saml_display_tabs_troubleshoot_page( $active_tab ) {
 	?>
 	<div class="bg-main-cstm mo-saml-bootstrap-pb-4 mo-saml-margin-left" id="container">
-		<div class="mo-saml-bootstrap-d-flex mo-saml-bootstrap-text-center mo-saml-bootstrap-pt-3 mo-saml-bootstrap-border-bottom mo-saml-bootstrap-ps-5">
+		<div class="mo-saml-bootstrap-d-flex mo-saml-bootstrap-text-center mo-saml-bootstrap-pt-3 mo-saml-bootstrap-border-bottom mo-saml-bootstrap-ps-5" id="mo-saml-tabs"> 
 
 		<?php
 		$server_uri = '';
@@ -153,8 +150,8 @@ function mo_saml_display_tabs_troubleshoot_page( $active_tab ) {
 		}
 		?>
 			<a id="sp-setup-tab" class="mo-saml-nav-tab-cstm <?php echo esc_html( 'debug-logs' === $active_tab ? 'mo-saml-nav-tab-active' : '' ); ?>" href="<?php echo esc_url( add_query_arg( array( 'tab' => 'debug-logs' ), $server_uri ) ); ?>"><?php esc_html_e( 'Debug Tools', 'miniorange-saml-20-single-sign-on' ); ?></a>
-			<a id="sp-setup-tab" class="mo-saml-nav-tab-cstm <?php echo esc_html( 'error-codes' === $active_tab ? 'mo-saml-nav-tab-active' : '' ); ?>" href="<?php echo esc_url( add_query_arg( array( 'tab' => 'error-codes' ), $server_uri ) ); ?>"><?php esc_html_e( 'Error Codes', 'miniorange-saml-20-single-sign-on' ); ?></a>
-			<a id="sp-setup-tab" class="mo-saml-nav-tab-cstm" target="_blank" href="https://faq.miniorange.com/kb/saml-single-sign-on/">FAQs</a>
+			<a id="sp-setup-tab" class="mo-saml-nav-tab-cstm" target="_blank" href="https://developers.miniorange.com/docs/saml/wordpress/error-codes"><?php esc_html_e( 'Error Codes', 'miniorange-saml-20-single-sign-on' ); ?></a>
+			<a id="sp-setup-tab" class="mo-saml-nav-tab-cstm" target="_blank" href="https://faq.miniorange.com/kb/saml-single-sign-on/"><?php esc_html_e( 'FAQs', 'miniorange-saml-20-single-sign-on' ); ?></a>
 		</div>
 	</div>
 	<?php

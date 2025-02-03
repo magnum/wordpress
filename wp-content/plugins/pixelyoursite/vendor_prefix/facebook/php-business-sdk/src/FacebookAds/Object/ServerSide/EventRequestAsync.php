@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,42 +21,92 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Api;
 use PYS_PRO_GLOBAL\FacebookAds\ApiConfig;
 use PYS_PRO_GLOBAL\FacebookAds\Http\Client;
-use PYS_PRO_GLOBAL\GuzzleHttp\Psr7\Request;
-use PYS_PRO_GLOBAL\GuzzleHttp\Psr7\MultipartStream;
-class EventRequestAsync extends \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\EventRequest
-{
-    /**
-     * Return an asynchronous request Promise
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function execute()
-    {
-        $normalized_param = $this->normalize();
-        $pixel_id = $this->container['pixel_id'];
-        return $this->eventPromise($pixel_id, $normalized_param);
+use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\Utils;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\MultipartStream;
+
+class EventRequestAsync extends EventRequest {
+  /**
+   * Return an asynchronous request Promise
+   * @return \GuzzleHttp\Promise\PromiseInterface
+   */
+  public function execute() {
+    $normalized_param = $this->normalize();
+    $pixel_id = $this->container['pixel_id'];
+    if ($this->endpoint_request != null && $this->endpoint_request->isSendToEndpointOnly()) {
+        return $this->endpoint_request->sendEventAsync($pixel_id, $this->container['events'])->then(function($customEndpointResponse) {
+            $response = $customEndpointResponse;
+            return new EventResponse(array(
+                'data' => array('events_received' => count($this->container['events']), 'custom_endpoint_responses'=>$response)
+            ));
+        });
     }
-    private function eventPromise($pixel_id, array $params = array())
-    {
-        $access_token = \PYS_PRO_GLOBAL\FacebookAds\Api::instance()->getSession()->getAccessToken();
-        $headers = array('User-Agent' => 'fbbizsdk-php-v' . \PYS_PRO_GLOBAL\FacebookAds\ApiConfig::APIVersion, 'Accept-Encoding' => '*');
-        $domain = \PYS_PRO_GLOBAL\FacebookAds\Http\Client::DEFAULT_LAST_LEVEL_DOMAIN . '.' . \PYS_PRO_GLOBAL\FacebookAds\Http\Client::DEFAULT_GRAPH_BASE_DOMAIN;
-        $base_url = 'https://' . $domain . '/v' . \PYS_PRO_GLOBAL\FacebookAds\ApiConfig::APIVersion;
-        $url = $base_url . '/' . $pixel_id . '/events';
-        $events_json = \PYS_PRO_GLOBAL\GuzzleHttp\json_encode($params['data']);
-        $multipart_contents = [['name' => 'access_token', 'contents' => $access_token, 'headers' => array('Content-Type' => 'multipart/form-data')], ['name' => 'data', 'contents' => $events_json, 'headers' => array('Content-Type' => 'multipart/form-data')]];
-        foreach ($params as $key => $value) {
-            if ($key !== 'data') {
-                $multipart_contents[] = ['name' => $key, 'contents' => $value, 'headers' => array('Content-Type' => 'multipart/form-data')];
-            }
-        }
-        $body = new \PYS_PRO_GLOBAL\GuzzleHttp\Psr7\MultipartStream($multipart_contents);
-        $request = new \PYS_PRO_GLOBAL\GuzzleHttp\Psr7\Request('POST', $url, $headers, $body);
-        $client = \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\AsyncClient::getInstance()->getClient();
-        return $client->sendAsync($request);
+    $sendCAPIRequestPromise = $this->eventPromise(
+          $pixel_id,
+          $normalized_param
+    );
+    if ($this->endpoint_request != null) {
+        $customEndpointRequestPromise = $this->endpoint_request->sendEventAsync($this->container['pixel_id'], $this->container['events']);
+        // put both promises in an an array
+        $promises = Utils::all(array($sendCAPIRequestPromise, $customEndpointRequestPromise));
+        $promises->then(function($responses) {
+                $CAPIResponse = $responses[0];
+                $customEndpointResponse = $responses[1];
+                $CAPIResponse->setCustomEndpointResponses($customEndpointResponse);
+                return $CAPIResponse;
+        });
+        return $promises;
     }
+    return $sendCAPIRequestPromise;
+  }
+
+  private function eventPromise($pixel_id, array $params = array()) {
+    $access_token = Api::instance()->getSession()->getAccessToken();
+    $headers = array(
+      'User-Agent' => 'fbbizsdk-php-v'.ApiConfig::APIVersion,
+      'Accept-Encoding' => '*',
+    );
+
+    $domain = Client::DEFAULT_LAST_LEVEL_DOMAIN . '.' . Client::DEFAULT_GRAPH_BASE_DOMAIN;
+    $base_url = 'https://' . $domain . '/v' . ApiConfig::APIVersion;
+
+    $url = $base_url.'/'.$pixel_id.'/events';
+
+    $events_json = \GuzzleHttp\json_encode($params['data']);
+    $multipart_contents = [
+      [
+        'name' => 'access_token',
+        'contents' => $access_token,
+        'headers' => array('Content-Type' => 'multipart/form-data'),
+      ],
+      [
+        'name' => 'data',
+        'contents' => $events_json,
+        'headers' => array('Content-Type' => 'multipart/form-data'),
+      ]
+    ];
+
+    foreach ($params as $key => $value) {
+      if ($key !== 'data') {
+        $multipart_contents[] = [
+          'name' => $key,
+          'contents' => $value,
+          'headers' => array('Content-Type' => 'multipart/form-data'),
+        ];
+      }
+    }
+
+    $body = new MultipartStream($multipart_contents);
+    $request = new Request('POST', $url, $headers, $body);
+
+    $client = AsyncClient::getInstance()->getClient();
+    return $client->sendAsync($request);
+  }
 }

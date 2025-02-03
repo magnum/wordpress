@@ -22,19 +22,19 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object;
 
-use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Cursor;
-use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCampaignActivityFields;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyNewValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyOldValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventNewValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventOldValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalNewValues;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalOldValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Cursor;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCampaignActivityFields;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyNewValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyOldValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventNewValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventOldValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalNewValues;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalOldValues;
 /**
  * This class is auto-generated.
  *
@@ -43,24 +43,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalO
  * pull request for this class.
  *
  */
-class AdCampaignActivity extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
+class AdCampaignActivity extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
 {
     /**
      * @return AdCampaignActivityFields
      */
     public static function getFieldsEnum()
     {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCampaignActivityFields::getInstance();
+        return \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCampaignActivityFields::getInstance();
     }
     protected static function getReferencedEnums()
     {
         $ref_enums = array();
-        $ref_enums['BidStrategyNew'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyNewValues::getInstance()->getValues();
-        $ref_enums['BidStrategyOld'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyOldValues::getInstance()->getValues();
-        $ref_enums['BillingEventNew'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventNewValues::getInstance()->getValues();
-        $ref_enums['BillingEventOld'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventOldValues::getInstance()->getValues();
-        $ref_enums['OptimizationGoalNew'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalNewValues::getInstance()->getValues();
-        $ref_enums['OptimizationGoalOld'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalOldValues::getInstance()->getValues();
+        $ref_enums['BidStrategyNew'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyNewValues::getInstance()->getValues();
+        $ref_enums['BidStrategyOld'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBidStrategyOldValues::getInstance()->getValues();
+        $ref_enums['BillingEventNew'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventNewValues::getInstance()->getValues();
+        $ref_enums['BillingEventOld'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityBillingEventOldValues::getInstance()->getValues();
+        $ref_enums['OptimizationGoalNew'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalNewValues::getInstance()->getValues();
+        $ref_enums['OptimizationGoalOld'] = \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCampaignActivityOptimizationGoalOldValues::getInstance()->getValues();
         return $ref_enums;
     }
     public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
@@ -68,7 +68,7 @@ class AdCampaignActivity extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrud
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdCampaignActivity(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdCampaignActivity::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AdCampaignActivity(), 'NODE', \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AdCampaignActivity::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

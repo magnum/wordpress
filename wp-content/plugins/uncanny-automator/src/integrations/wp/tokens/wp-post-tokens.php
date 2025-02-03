@@ -2,6 +2,9 @@
 
 namespace Uncanny_Automator;
 
+use WP_Comment;
+use WP_Post;
+
 /**
  * Class Wp_Post_Tokens
  *
@@ -20,8 +23,20 @@ class Wp_Post_Tokens {
 	 * WP_Anon_Tokens constructor.
 	 */
 	public function __construct() {
-		$codes = array( 'userspost', 'wpviewposttype', 'viewcustompost' );
+		$codes = array(
+			'userspost',
+			'wpviewposttype',
+			'viewcustompost',
+			'WP_POST_PUBLISHED',
+			'ELEM_POST_PUBLISHED',
+			'WP_USER_POST_UPDATED',
+			'ANON_POST_UPDATED_IN_TAXONOMY',
+			'WP_ANON_POST_UPDATED',
+			'WP_POST_PUBLISHED_IN_TAXONOMY',
+			'WP_USER_POST_PUBLISHED',
+		);
 		foreach ( $codes as $code ) {
+			$code = strtolower( $code );
 			add_filter(
 				'automator_maybe_trigger_wp_' . $code . '_tokens',
 				array(
@@ -45,24 +60,45 @@ class Wp_Post_Tokens {
 			20,
 			2
 		);
+
+		add_action( 'automator_before_trigger_completed', array( $this, 'save_token_data' ), 20, 2 );
 	}
 
 	/**
-	 * Only load this integration and its triggers and actions if the related plugin is active
+	 * @param $args
+	 * @param $trigger
 	 *
-	 * @param $status
-	 * @param $code
-	 *
-	 * @return bool
+	 * @return void
 	 */
-	public function plugin_active( $status, $code ) {
-
-		if ( self::$integration === $code ) {
-
-			$status = true;
+	public function save_token_data( $args, $trigger ) {
+		if ( ! isset( $args['trigger_args'] ) || ! isset( $args['entry_args']['code'] ) ) {
+			return;
 		}
 
-		return $status;
+		$triggers = array( 'WP_POST_PUBLISHED', 'ELEM_POST_PUBLISHED' );
+
+		if ( in_array( $args['entry_args']['code'], $triggers, true ) ) {
+			$wp_post_data                                        = $args['trigger_args'];
+			list( $post_id, $wp_post, $update, $wp_post_before ) = $wp_post_data;
+			if ( isset( $post_id ) && ! empty( $post_id ) ) {
+				Automator()->db->token->save( 'post_id', $post_id, $args['trigger_entry'] );
+			}
+		}
+
+		$post_update_triggers = array(
+			'WP_ANON_POST_UPDATED',
+			'WP_USER_POST_UPDATED',
+			'ANON_POST_UPDATED_IN_TAXONOMY',
+			'WP_USER_POST_PUBLISHED',
+		);
+
+		if ( in_array( $args['entry_args']['code'], $post_update_triggers, true ) ) {
+			$wp_post_data                                     = $args['trigger_args'];
+			list( $post_id, $wp_post_after, $wp_post_before ) = $wp_post_data;
+			if ( isset( $post_id ) && ! empty( $post_id ) ) {
+				Automator()->db->token->save( 'post_id', $post_id, $args['trigger_entry'] );
+			}
+		}
 	}
 
 	/**
@@ -104,7 +140,7 @@ class Wp_Post_Tokens {
 			),
 			array(
 				'tokenId'         => $post_id,
-				'tokenName'       => __( 'Post ID', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post ID', 'uncanny-automator' ),
 				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -115,14 +151,26 @@ class Wp_Post_Tokens {
 				'tokenIdentifier' => $trigger_code,
 			),
 			array(
+				'tokenId'         => 'POSTNAME',
+				'tokenName'       => __( 'Post slug', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			),
+			array(
 				'tokenId'         => 'POSTCONTENT',
-				'tokenName'       => __( 'Post content', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post content (raw)', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			),
+			array(
+				'tokenId'         => 'POSTCONTENT_BEAUTIFIED',
+				'tokenName'       => __( 'Post content (formatted)', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => $trigger_code,
 			),
 			array(
 				'tokenId'         => $post_excerpt,
-				'tokenName'       => __( 'Post excerpt', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post excerpt', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -140,7 +188,7 @@ class Wp_Post_Tokens {
 			),
 			array(
 				'tokenId'         => 'POSTIMAGEID',
-				'tokenName'       => __( 'Post featured image ID', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post featured image ID', 'uncanny-automator' ),
 				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -209,7 +257,7 @@ class Wp_Post_Tokens {
 			),
 			array(
 				'tokenId'         => 'POSTID',
-				'tokenName'       => __( 'Post ID', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post ID', 'uncanny-automator' ),
 				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -221,13 +269,19 @@ class Wp_Post_Tokens {
 			),
 			array(
 				'tokenId'         => 'POSTCONTENT',
-				'tokenName'       => __( 'Post content', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post content (raw)', 'uncanny-automator' ),
+				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			),
+			array(
+				'tokenId'         => 'POSTCONTENT_BEAUTIFIED',
+				'tokenName'       => __( 'Post content (formatted)', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => $trigger_code,
 			),
 			array(
 				'tokenId'         => 'POSTEXCERPT',
-				'tokenName'       => __( 'Post excerpt', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post excerpt', 'uncanny-automator' ),
 				'tokenType'       => 'text',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -245,7 +299,7 @@ class Wp_Post_Tokens {
 			),
 			array(
 				'tokenId'         => 'POSTIMAGEID',
-				'tokenName'       => __( 'Post featured image ID', 'uncanny_automator' ),
+				'tokenName'       => __( 'Post featured image ID', 'uncanny-automator' ),
 				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			),
@@ -283,6 +337,12 @@ class Wp_Post_Tokens {
 				'tokenId'         => 'POSTAUTHORURL',
 				'tokenName'       => __( 'Post author URL', 'uncanny-automator' ),
 				'tokenType'       => 'text',
+				'tokenIdentifier' => $trigger_code,
+			),
+			array(
+				'tokenId'         => 'POSTCOMMENTID',
+				'tokenName'       => __( 'Comment ID', 'uncanny-automator' ),
+				'tokenType'       => 'int',
 				'tokenIdentifier' => $trigger_code,
 			),
 			array(
@@ -358,7 +418,7 @@ class Wp_Post_Tokens {
 		$comment_id = Automator()->db->token->get( 'comment_id', $replace_args );
 		$comment    = get_comment( $comment_id );
 
-		if ( ! $comment instanceof \WP_Comment ) {
+		if ( ! $comment instanceof WP_Comment ) {
 			return $value;
 		}
 
@@ -374,12 +434,22 @@ class Wp_Post_Tokens {
 			case 'WPPOSTCOMMENTS_URL':
 				$value = get_permalink( $comment->comment_post_ID );
 				break;
+			case 'POSTNAME':
+			case 'WPPOSTCOMMENTS_POSTNAME':
+				$value = get_post_field( 'post_name', $comment->comment_post_ID );
+				break;
 			case 'POSTEXCERPT':
 			case 'WPPOSTCOMMENTS_EXCERPT':
 				$value = get_the_excerpt( $comment->comment_post_ID );
 				break;
 			case 'POSTCONTENT':
-				$value = get_the_content( $comment->comment_post_ID );
+				$value = get_post( $comment->comment_post_ID )->post_content;
+				break;
+			case 'POSTCONTENT_BEAUTIFIED':
+				$content = get_the_content( $comment->comment_post_ID );
+				$content = apply_filters( 'the_content', $content );
+				$content = str_replace( ']]>', ']]&gt;', $content ); //phpcs:ignore Generic.PHP.Syntax.PHPSyntax
+				$value   = $content;
 				break;
 			case 'POSTIMAGEID':
 			case 'WPPOSTCOMMENTS_THUMB_ID':
@@ -413,6 +483,11 @@ class Wp_Post_Tokens {
 				$author_id = get_post_field( 'post_author', $comment->comment_post_ID );
 				$value     = get_the_author_meta( 'url', $author_id );
 				break;
+			case 'POSTCOMMENTID':
+			case 'POSTCOMMENT_ID':
+			case 'COMMENTID':
+				$value = $comment->comment_ID;
+				break;
 			case 'POSTCOMMENTCONTENT':
 				$value = $comment->comment_content;
 				break;
@@ -444,9 +519,6 @@ class Wp_Post_Tokens {
 			case 'POSTCOMMENTSTATUS':
 				$value = ( $comment->comment_approved === 1 ) ? 'approved' : 'pending';
 				break;
-			case 'COMMENTID':
-				$value = $comment->comment_ID;
-				break;
 			case 'NUMTIMES':
 				$value = absint( $replace_args['run_number'] );
 				break;
@@ -476,9 +548,20 @@ class Wp_Post_Tokens {
 			return $value;
 		}
 
-		if ( ! in_array( 'USERSPOST', $pieces, true ) && ! in_array( 'WPVIEWPOSTTYPE', $pieces, true )
-			 && ! in_array( 'VIEWPOST', $pieces, true ) && ! in_array( 'VIEWPAGE', $pieces, true )
-			 && ! in_array( 'VIEWCUSTOMPOST', $pieces, true ) ) {
+		if (
+			! in_array( 'USERSPOST', $pieces, true ) &&
+			! in_array( 'WPVIEWPOSTTYPE', $pieces, true ) &&
+			! in_array( 'VIEWPOST', $pieces, true ) &&
+			! in_array( 'VIEWPAGE', $pieces, true ) &&
+			! in_array( 'VIEWCUSTOMPOST', $pieces, true ) &&
+			! in_array( 'WP_POST_PUBLISHED', $pieces, true ) &&
+			! in_array( 'ELEM_POST_PUBLISHED', $pieces, true ) &&
+			! in_array( 'WP_USER_POST_UPDATED', $pieces, true ) &&
+			! in_array( 'WP_POST_PUBLISHED_IN_TAXONOMY', $pieces, true ) &&
+			! in_array( 'WP_ANON_POST_UPDATED', $pieces, true ) &&
+			! in_array( 'WP_USER_POST_PUBLISHED', $pieces, true ) &&
+			! in_array( 'ANON_POST_UPDATED_IN_TAXONOMY', $pieces, true )
+		) {
 			return $value;
 		}
 
@@ -486,7 +569,7 @@ class Wp_Post_Tokens {
 		$post_id    = Automator()->db->token->get( 'post_id', $replace_args );
 		$post       = get_post( $post_id );
 
-		if ( ! $post instanceof \WP_Post ) {
+		if ( ! $post instanceof WP_Post ) {
 			return $value;
 		}
 
@@ -510,6 +593,13 @@ class Wp_Post_Tokens {
 			case 'WPCUSTOMPOST_URL':
 				$value = get_permalink( $post->ID );
 				break;
+			case 'WPPOSTTYPES_POSTNAME':
+			case 'WPPOST_POSTNAME':
+			case 'WPPAGE_POSTNAME':
+			case 'WPCUSTOMPOST_POSTNAME':
+			case 'POSTNAME':
+				$value = $post->post_name;
+				break;
 			case 'POSTEXCERPT':
 			case 'WPPOST_EXCERPT':
 			case 'WPCUSTOMPOST_EXCERPT':
@@ -525,6 +615,15 @@ class Wp_Post_Tokens {
 			case 'WPPAGE_CONTENT':
 			case 'WPPOSTTYPES_CONTENT':
 				$value = $post->post_content;
+				break;
+			case 'POSTCONTENT_BEAUTIFIED':
+			case 'WPPOST_CONTENT_BEAUTIFIED':
+			case 'WPPAGE_CONTENT_BEAUTIFIED':
+			case 'WPPOSTTYPES_CONTENT_BEAUTIFIED':
+				$content = get_the_content( null, false, $post->ID );
+				$content = apply_filters( 'the_content', $content );
+				$content = str_replace( ']]>', ']]&gt;', $content ); //phpcs:ignore Generic.PHP.Syntax.PHPSyntax
+				$value   = $content;
 				break;
 			case 'WPPOSTTYPES_THUMB_ID':
 			case 'WPPOST_THUMB_ID':

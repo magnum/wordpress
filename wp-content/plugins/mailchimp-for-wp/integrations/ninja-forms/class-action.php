@@ -1,149 +1,203 @@
-<?php if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+<?php
 
 /**
  * Class MC4WP_Ninja_Forms_Action
  */
-final class MC4WP_Ninja_Forms_Action extends NF_Abstracts_ActionNewsletter {
+class MC4WP_Ninja_Forms_Action extends NF_Abstracts_Action
+{
+    protected $_name           = 'mc4wp_subscribe';
+    protected $_nicename       = 'Mailchimp';
+    protected $_tags           = [ 'newsletter' ];
+    protected $_timing         = 'normal';
+    protected $_priority       = '10';
+    protected $_settings       = [];
+    protected $_setting_labels = [
+        'list'   => 'List',
+        'fields' => 'List Field Mapping',
+    ];
 
-	/**
-	 * @var string
-	 */
-	protected $_name = 'mc4wp_subscribe';
+    public function __construct()
+    {
+        $this->_settings['double_optin']    = [
+            'name'    => 'double_optin',
+            'type'    => 'select',
+            'label'   => 'Use double opt-in?',
+            'width'   => 'full',
+            'group'   => 'primary',
+            'value'   => 1,
+            'options' => [
+                [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ],
+                [
+                    'value' => 0,
+                    'label' => 'No',
+                ],
+            ],
+        ];
+        $this->_settings['update_existing'] = [
+            'name'    => 'update_existing',
+            'type'    => 'select',
+            'label'   => 'Update existing subscribers?',
+            'width'   => 'full',
+            'group'   => 'primary',
+            'value'   => 0,
+            'options' => [
+                [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ],
+                [
+                    'value' => 0,
+                    'label' => 'No',
+                ],
+            ],
+        ];
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		parent::__construct();
+        add_action('wp_ajax_nf_' . $this->_name . '_get_lists', [$this, '_get_lists']);
+        add_action('init', [$this, 'translate_props']);
+        add_action('init', [$this, 'get_list_settings']);
+    }
 
-		$this->_nicename = __( 'Mailchimp', 'mailchimp-for-wp' );
-		$prefix          = $this->get_name();
+    public function translate_props()
+    {
+        $this->_settings['double_optin']['label']    = __('Use double opt-in?', 'mailchimp-for-wp');
+        $this->_settings['update_existing']['label'] = __('Update existing subscribers?', 'mailchimp-for-wp');
 
-		unset( $this->_settings[ $prefix . 'newsletter_list_groups' ] );
+        $this->_settings[ $this->get_name() . 'newsletter_list_fields' ]['label'] = __('List Field Mapping', 'mailchimp-for-wp');
+    }
 
-		$this->_settings['double_optin'] = array(
-			'name'    => 'double_optin',
-			'type'    => 'select',
-			'label'   => __( 'Use double opt-in?', 'mailchimp-for-wp' ),
-			'width'   => 'full',
-			'group'   => 'primary',
-			'value'   => 1,
-			'options' => array(
-				array(
-					'value' => 1,
-					'label' => 'Yes',
-				),
-				array(
-					'value' => 0,
-					'label' => 'No',
-				),
-			),
-		);
+    /*
+    * PUBLIC METHODS
+    */
 
-		$this->_settings['update_existing'] = array(
-			'name'    => 'update_existing',
-			'type'    => 'select',
-			'label'   => __( 'Update existing subscribers?', 'mailchimp-for-wp' ),
-			'width'   => 'full',
-			'group'   => 'primary',
-			'value'   => 0,
-			'options' => array(
-				array(
-					'value' => 1,
-					'label' => 'Yes',
-				),
-				array(
-					'value' => 0,
-					'label' => 'No',
-				),
-			),
-		);
+    public function save($action_settings)
+    {
+    }
 
-		//        $this->_settings[ 'replace_interests' ] = array(
-		//            'name' => 'replace_interests',
-		//            'type' => 'select',
-		//            'label' => __( 'Replace existing interest groups?', 'mailchimp-for-wp'),
-		//            'width' => 'full',
-		//            'group' => 'primary',
-		//            'value' => 0,
-		//            'options' => array(
-		//                array(
-		//                    'value' => 1,
-		//                    'label' => 'Yes',
-		//                ),
-		//                array(
-		//                    'value' => 0,
-		//                    'label' => 'No',
-		//                ),
-		//            ),
-		//        );
-	}
+    public function process($action_settings, $form_id, $data)
+    {
+        if (empty($action_settings['newsletter_list']) || empty($action_settings['EMAIL'])) {
+            return;
+        }
 
-	/*
-	* PUBLIC METHODS
-	*/
+        // find "mc4wp_optin" type field, bail if not checked.
+        foreach ($data['fields'] as $field_data) {
+            if ($field_data['type'] === 'mc4wp_optin' && empty($field_data['value'])) {
+                return;
+            }
+        }
 
-	public function save( $action_settings ) {
-	}
+        $list_id       = $action_settings['newsletter_list'];
+        $email_address = $action_settings['EMAIL'];
+        $mailchimp     = new MC4WP_MailChimp();
 
-	public function process( $action_settings, $form_id, $data ) {
-		if ( empty( $action_settings['newsletter_list'] ) || empty( $action_settings['EMAIL'] ) ) {
-			return;
-		}
+        $merge_fields = $mailchimp->get_list_merge_fields($list_id);
+        foreach ($merge_fields as $merge_field) {
+            if (! empty($action_settings[ $merge_field->tag ])) {
+                $merge_fields[ $merge_field->tag ] = $action_settings[ $merge_field->tag ];
+            }
+        }
 
-		// find "mc4wp_optin" type field, bail if not checked.
-		foreach ( $data['fields'] as $field_data ) {
-			if ( $field_data['type'] === 'mc4wp_optin' && empty( $field_data['value'] ) ) {
-				return;
-			}
-		}
+        $double_optin      = (int) $action_settings['double_optin'] !== 0;
+        $update_existing   = (int) $action_settings['update_existing'] === 1;
+        $replace_interests = isset($action_settings['replace_interests']) && (int) $action_settings['replace_interests'] === 1;
 
-		$list_id       = $action_settings['newsletter_list'];
-		$email_address = $action_settings['EMAIL'];
-		$mailchimp     = new MC4WP_MailChimp();
+        do_action('mc4wp_integration_ninja_forms_subscribe', $email_address, $merge_fields, $list_id, $double_optin, $update_existing, $replace_interests, $form_id);
+    }
 
-		$merge_fields = $mailchimp->get_list_merge_fields( $list_id );
-		foreach ( $merge_fields as $merge_field ) {
-			if ( ! empty( $action_settings[ $merge_field->tag ] ) ) {
-				$merge_fields[ $merge_field->tag ] = $action_settings[ $merge_field->tag ];
-			}
-		}
+    public function ajax_get_lists_handler()
+    {
+        check_ajax_referer('ninja_forms_builder_nonce', 'security');
+        $lists = $this->get_lists();
+        array_unshift($return, [ 'value' => 0, 'label' => '-', 'fields' => [], 'groups' => [] ]);
+        echo wp_json_encode([ 'lists' => $return ]);
+        wp_die();
+    }
 
-		$double_optin      = (int) $action_settings['double_optin'] !== 0;
-		$update_existing   = (int) $action_settings['update_existing'] === 1;
-		$replace_interests = isset( $action_settings['replace_interests'] ) && (int) $action_settings['replace_interests'] === 1;
+    private function get_lists()
+    {
+        $mailchimp = new MC4WP_MailChimp();
 
-		do_action( 'mc4wp_integration_ninja_forms_subscribe', $email_address, $merge_fields, $list_id, $double_optin, $update_existing, $replace_interests, $form_id );
-	}
+        /** @var array $lists */
+        $lists  = $mailchimp->get_lists();
+        $return = [];
 
-	protected function get_lists() {
-		$mailchimp = new MC4WP_MailChimp();
+        foreach ($lists as $list) {
+            $list_fields = [];
 
-		/** @var array $lists */
-		$lists  = $mailchimp->get_lists();
-		$return = array();
+            foreach ($mailchimp->get_list_merge_fields($list->id) as $merge_field) {
+                $list_fields[] = [
+                    'value' => $merge_field->tag,
+                    'label' => $merge_field->name,
+                ];
+            }
 
-		foreach ( $lists as $list ) {
-			$list_fields = array();
+            // TODO: Add support for groups once base class supports this.
+            $return[] = [
+                'value'  => $list->id,
+                'label'  => $list->name,
+                'fields' => $list_fields,
+            ];
+        }
 
-			foreach ( $mailchimp->get_list_merge_fields( $list->id ) as $merge_field ) {
-				$list_fields[] = array(
-					'value' => $merge_field->tag,
-					'label' => $merge_field->name,
-				);
-			}
+        return $return;
+    }
 
-			// TODO: Add support for groups once base class supports this.
+    public function get_list_settings()
+    {
+        $label_defaults = [
+            'list'   => 'List',
+            'fields' => 'List Field Mapping',
+        ];
+        $labels         = array_merge($label_defaults, $this->_setting_labels);
+        $prefix         = $this->get_name();
+        $lists          = $this->get_lists();
 
-			$return[] = array(
-				'value'  => $list->id,
-				'label'  => $list->name,
-				'fields' => $list_fields,
-			);
-		}
+        if (empty($lists)) {
+            return;
+        }
 
-		return $return;
-	}
+        $this->_settings[ $prefix . 'newsletter_list' ] = [
+            'name' => 'newsletter_list',
+            'type' => 'select',
+            'label' => $labels[ 'list' ] . ' <a class="js-newsletter-list-update extra"><span class="dashicons dashicons-update"></span></a>',
+            'width' => 'full',
+            'group' => 'primary',
+            'value' => '0',
+            'options' => [],
+        ];
+
+        $fields = [];
+        foreach ($lists as $list) {
+            $this->_settings[ $prefix . 'newsletter_list' ][ 'options' ][] = $list;
+
+            //Check to see if list has fields array set.
+            if (isset($list[ 'fields' ])) {
+                foreach ($list[ 'fields' ] as $field) {
+                    $name     = $list[ 'value' ] . '_' . $field[ 'value' ];
+                    $fields[] = [
+                        'name' => $name,
+                        'type' => 'textbox',
+                        'label' => $field[ 'label' ],
+                        'width' => 'full',
+                        'use_merge_tags' => [
+                            'exclude' => [
+                                'user', 'post', 'system', 'querystrings',
+                            ],
+                        ],
+                    ];
+                }
+            }
+        }
+
+        $this->_settings[ $prefix . 'newsletter_list_fields' ] = [
+            'name' => 'newsletter_list_fields',
+            'label' => 'List Field Mapping',
+            'type' => 'fieldset',
+            'group' => 'primary',
+            'settings' => [],
+        ];
+    }
 }

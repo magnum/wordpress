@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeLinkDataFormatOptionValues getInstance()
  */
-class AdCreativeLinkDataFormatOptionValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CAROUSEL_AR_EFFECTS = 'carousel_ar_effects';
-    const CAROUSEL_IMAGES_MULTI_ITEMS = 'carousel_images_multi_items';
-    const CAROUSEL_IMAGES_SINGLE_ITEM = 'carousel_images_single_item';
-    const CAROUSEL_SLIDESHOWS = 'carousel_slideshows';
-    const SINGLE_IMAGE = 'single_image';
+class AdCreativeLinkDataFormatOptionValues extends AbstractEnum {
+
+  const CAROUSEL_AR_EFFECTS = 'carousel_ar_effects';
+  const CAROUSEL_IMAGES_MULTI_ITEMS = 'carousel_images_multi_items';
+  const CAROUSEL_IMAGES_SINGLE_ITEM = 'carousel_images_single_item';
+  const CAROUSEL_SLIDESHOWS = 'carousel_slideshows';
+  const SINGLE_IMAGE = 'single_image';
 }

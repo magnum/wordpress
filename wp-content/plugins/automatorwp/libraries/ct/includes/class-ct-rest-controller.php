@@ -941,6 +941,10 @@ class CT_REST_Controller extends WP_REST_Controller {
 
             $value = isset( $object->$field ) ? $object->$field : '';
 
+            if( $field === 'id' ) {
+                $value = $object->$primary_key;
+            }
+
             /**
              * Filters the object field value for a response.
              *

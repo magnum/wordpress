@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,19 +21,21 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static ProductAudienceFields getInstance()
  */
-class ProductAudienceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const NAME = 'name';
-    const DESCRIPTION = 'description';
-    const PRODUCT_SET_ID = 'product_set_id';
-    const PIXEL_ID = 'pixel_id';
-    const INCLUSIONS = 'inclusions';
-    const EXCLUSIONS = 'exclusions';
+class ProductAudienceFields extends AbstractEnum {
+
+  const ID = 'id';
+  const NAME = 'name';
+  const DESCRIPTION = 'description';
+  const PRODUCT_SET_ID = 'product_set_id';
+  const PIXEL_ID = 'pixel_id';
+  const INCLUSIONS = 'inclusions';
+  const EXCLUSIONS = 'exclusions';
 }

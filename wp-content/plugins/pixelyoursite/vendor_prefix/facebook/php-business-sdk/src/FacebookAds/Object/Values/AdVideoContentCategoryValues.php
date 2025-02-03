@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,24 +35,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdVideoContentCategoryValues getInstance()
  */
-class AdVideoContentCategoryValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BEAUTY_FASHION = 'BEAUTY_FASHION';
-    const BUSINESS = 'BUSINESS';
-    const CARS_TRUCKS = 'CARS_TRUCKS';
-    const COMEDY = 'COMEDY';
-    const CUTE_ANIMALS = 'CUTE_ANIMALS';
-    const ENTERTAINMENT = 'ENTERTAINMENT';
-    const FAMILY = 'FAMILY';
-    const FOOD_HEALTH = 'FOOD_HEALTH';
-    const HOME = 'HOME';
-    const LIFESTYLE = 'LIFESTYLE';
-    const MUSIC = 'MUSIC';
-    const NEWS = 'NEWS';
-    const OTHER = 'OTHER';
-    const POLITICS = 'POLITICS';
-    const SCIENCE = 'SCIENCE';
-    const SPORTS = 'SPORTS';
-    const TECHNOLOGY = 'TECHNOLOGY';
-    const VIDEO_GAMING = 'VIDEO_GAMING';
+class AdVideoContentCategoryValues extends AbstractEnum {
+
+  const BEAUTY_FASHION = 'BEAUTY_FASHION';
+  const BUSINESS = 'BUSINESS';
+  const CARS_TRUCKS = 'CARS_TRUCKS';
+  const COMEDY = 'COMEDY';
+  const CUTE_ANIMALS = 'CUTE_ANIMALS';
+  const ENTERTAINMENT = 'ENTERTAINMENT';
+  const FAMILY = 'FAMILY';
+  const FOOD_HEALTH = 'FOOD_HEALTH';
+  const HOME = 'HOME';
+  const LIFESTYLE = 'LIFESTYLE';
+  const MUSIC = 'MUSIC';
+  const NEWS = 'NEWS';
+  const OTHER = 'OTHER';
+  const POLITICS = 'POLITICS';
+  const SCIENCE = 'SCIENCE';
+  const SPORTS = 'SPORTS';
+  const TECHNOLOGY = 'TECHNOLOGY';
+  const VIDEO_GAMING = 'VIDEO_GAMING';
 }

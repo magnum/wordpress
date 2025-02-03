@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdRuleTriggerFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FIELD = 'field';
-    const OPERATOR = 'operator';
-    const TYPE = 'type';
-    const VALUE = 'value';
-    public function getFieldTypes()
-    {
-        return array('field' => 'string', 'operator' => 'Operator', 'type' => 'Type', 'value' => 'Object');
-    }
+
+class AdRuleTriggerFields extends AbstractEnum {
+
+  const FIELD = 'field';
+  const OPERATOR = 'operator';
+  const TYPE = 'type';
+  const VALUE = 'value';
+
+  public function getFieldTypes() {
+    return array(
+      'field' => 'string',
+      'operator' => 'Operator',
+      'type' => 'Type',
+      'value' => 'Object',
+    );
+  }
 }

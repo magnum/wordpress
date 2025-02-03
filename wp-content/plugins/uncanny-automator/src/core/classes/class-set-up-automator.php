@@ -83,7 +83,8 @@ class Set_Up_Automator {
 	 */
 	public function get_integrations_autoload_directories() {
 		try {
-			$integrations = self::read_directory( $this->integrations_directory_path );
+			$legacy_integrations = new Legacy_Integrations();
+			$integrations        = $legacy_integrations->generate_integrations_file_map();
 		} catch ( Exception $e ) {
 			throw new Automator_Exception( $e->getTraceAsString() );
 		}
@@ -188,9 +189,12 @@ class Set_Up_Automator {
 		if ( ! self::$auto_loaded_directories ) {
 			return;
 		}
+
 		foreach ( self::$auto_loaded_directories as $directory ) {
+
 			$files    = array();
 			$dir_name = basename( $directory );
+
 			if ( ! isset( self::$all_integrations[ $dir_name ] ) ) {
 				continue;
 			}
@@ -203,23 +207,29 @@ class Set_Up_Automator {
 			if ( ! $files ) {
 				continue;
 			}
+
 			foreach ( $files as $file ) {
 				// bail early if the $file is not a string
 				if ( is_array( $file ) ) {
 					continue;
 				}
+
+				if ( ! file_exists( $file ) ) {
+					continue;
+				}
+
 				$class = apply_filters( 'automator_integrations_class_name', $this->get_class_name( $file, false, $dir_name ), $file );
 				if ( class_exists( $class, false ) ) {
 					continue;
 				}
-				if ( ! is_file( $file ) ) {
-					continue;
-				}
+
 				include_once $file;
+
 				$i                = new $class();
 				$integration_code = method_exists( $i, 'get_integration' ) ? $i->get_integration() : $class::$integration;
 				$active           = method_exists( $i, 'get_integration' ) ? $i->plugin_active() : $i->plugin_active( 0, $integration_code );
 				$active           = apply_filters( 'automator_maybe_integration_active', $active, $integration_code );
+
 				/**
 				 * Store all the integrations, regardless of the status,
 				 * to get integration name and the icon
@@ -354,7 +364,7 @@ class Set_Up_Automator {
 
 		// Adding textdomain fix trigger/action
 		// sentences not getting translated
-		Automator()->automator_load_textdomain();
+		//Automator()->automator_load_textdomain();
 
 		foreach ( $this->active_directories as $dir_name => $object ) {
 			$mod = $dir_name;
@@ -374,15 +384,15 @@ class Set_Up_Automator {
 			}
 			// Loop through all files in directory to create class names from file name
 			foreach ( $files as $file ) {
+				if ( ! is_file( $file ) ) {
+					continue;
+				}
 				// bail early if the $file is not a string
 				if ( is_array( $file ) ) {
 					continue;
 				}
 				$class = apply_filters( 'automator_recipe_parts_class_name', $this->get_class_name( $file, true, $mod ), $file );
 				if ( ! class_exists( $class, false ) ) {
-					if ( ! is_file( $file ) ) {
-						continue;
-					}
 					include_once $file;
 					Utilities::add_class_instance( $class, new $class() );
 				}
@@ -409,7 +419,8 @@ class Set_Up_Automator {
 		}
 
 		// Check if it's an internal Automator file
-		$pattern = '/(' . addcslashes( $this->integrations_directory_path, '/-:\\' ) . ')/';
+		$esc_characters = apply_filters( 'automator_esc_with_slash_characters', '/-:\\()_,.' );
+		$pattern        = '/(' . addcslashes( $this->integrations_directory_path, $esc_characters ) . ')/';
 		if ( preg_match( $pattern, $file ) ) {
 			$class_name = __NAMESPACE__ . '\\' . $class_name;
 		} else {

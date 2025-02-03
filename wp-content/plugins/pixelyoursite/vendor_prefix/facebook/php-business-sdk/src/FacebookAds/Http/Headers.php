@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,8 +21,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http;
 
-class Headers extends \ArrayObject
-{
+class Headers extends \ArrayObject {
+
+  /**
+   * @return array
+   */
+  public function export() {
+    $data = array();
+    foreach ($this as $key => $value) {
+      $data[$key] = is_null($value) || is_scalar($value)
+        ? $value
+        : $this->exportNonScalar($value);
+    }
+
+    return $data;
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,61 +35,61 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdAccountCurrencyValues getInstance()
  */
-class AdAccountCurrencyValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AED = 'AED';
-    const ARS = 'ARS';
-    const AUD = 'AUD';
-    const BDT = 'BDT';
-    const BOB = 'BOB';
-    const BRL = 'BRL';
-    const CAD = 'CAD';
-    const CHF = 'CHF';
-    const CLP = 'CLP';
-    const CNY = 'CNY';
-    const COP = 'COP';
-    const CRC = 'CRC';
-    const CZK = 'CZK';
-    const DKK = 'DKK';
-    const DZD = 'DZD';
-    const EGP = 'EGP';
-    const EUR = 'EUR';
-    const GBP = 'GBP';
-    const GTQ = 'GTQ';
-    const HKD = 'HKD';
-    const HNL = 'HNL';
-    const HUF = 'HUF';
-    const IDR = 'IDR';
-    const ILS = 'ILS';
-    const INR = 'INR';
-    const ISK = 'ISK';
-    const JPY = 'JPY';
-    const KES = 'KES';
-    const KRW = 'KRW';
-    const LKR = 'LKR';
-    const MOP = 'MOP';
-    const MXN = 'MXN';
-    const MYR = 'MYR';
-    const NGN = 'NGN';
-    const NIO = 'NIO';
-    const NOK = 'NOK';
-    const NZD = 'NZD';
-    const PEN = 'PEN';
-    const PHP = 'PHP';
-    const PKR = 'PKR';
-    const PLN = 'PLN';
-    const PYG = 'PYG';
-    const QAR = 'QAR';
-    const RON = 'RON';
-    const SAR = 'SAR';
-    const SEK = 'SEK';
-    const SGD = 'SGD';
-    const THB = 'THB';
-    const VALUE_TRY = 'TRY';
-    const TWD = 'TWD';
-    const UAH = 'UAH';
-    const USD = 'USD';
-    const UYU = 'UYU';
-    const VND = 'VND';
-    const ZAR = 'ZAR';
+class AdAccountCurrencyValues extends AbstractEnum {
+
+  const AED = 'AED';
+  const ARS = 'ARS';
+  const AUD = 'AUD';
+  const BDT = 'BDT';
+  const BOB = 'BOB';
+  const BRL = 'BRL';
+  const CAD = 'CAD';
+  const CHF = 'CHF';
+  const CLP = 'CLP';
+  const CNY = 'CNY';
+  const COP = 'COP';
+  const CRC = 'CRC';
+  const CZK = 'CZK';
+  const DKK = 'DKK';
+  const DZD = 'DZD';
+  const EGP = 'EGP';
+  const EUR = 'EUR';
+  const GBP = 'GBP';
+  const GTQ = 'GTQ';
+  const HKD = 'HKD';
+  const HNL = 'HNL';
+  const HUF = 'HUF';
+  const IDR = 'IDR';
+  const ILS = 'ILS';
+  const INR = 'INR';
+  const ISK = 'ISK';
+  const JPY = 'JPY';
+  const KES = 'KES';
+  const KRW = 'KRW';
+  const LKR = 'LKR';
+  const MOP = 'MOP';
+  const MXN = 'MXN';
+  const MYR = 'MYR';
+  const NGN = 'NGN';
+  const NIO = 'NIO';
+  const NOK = 'NOK';
+  const NZD = 'NZD';
+  const PEN = 'PEN';
+  const PHP = 'PHP';
+  const PKR = 'PKR';
+  const PLN = 'PLN';
+  const PYG = 'PYG';
+  const QAR = 'QAR';
+  const RON = 'RON';
+  const SAR = 'SAR';
+  const SEK = 'SEK';
+  const SGD = 'SGD';
+  const THB = 'THB';
+  const VALUE_TRY = 'TRY';
+  const TWD = 'TWD';
+  const UAH = 'UAH';
+  const USD = 'USD';
+  const UYU = 'UYU';
+  const VND = 'VND';
+  const ZAR = 'ZAR';
 }

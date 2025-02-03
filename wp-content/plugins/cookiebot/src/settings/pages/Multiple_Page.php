@@ -2,6 +2,7 @@
 
 namespace cybot\cookiebot\settings\pages;
 
+use cybot\cookiebot\lib\Cookiebot_Frame;
 use cybot\cookiebot\lib\Cookiebot_WP;
 use cybot\cookiebot\lib\Supported_Regions;
 use InvalidArgumentException;
@@ -10,13 +11,31 @@ use function cybot\cookiebot\lib\include_view;
 
 class Multiple_Page implements Settings_Page_Interface {
 
-	private function selectedRegionList() {
-		$countries = Supported_Regions::get();
-		$list      = explode( ', ', esc_attr( get_option( 'cookiebot-second-banner-regions' ) ) );
-		$ccpa      = esc_attr( get_option( 'cookiebot-ccpa' ) );
 
-		if ( $ccpa === '1' && ! in_array( 'US-06', $list, true ) ) {
-			array_push( $list, 'US-06' );
+	private function get_multiple_banners() {
+		$banners = get_option( 'cookiebot-multiple-banners' );
+
+		if ( ! $banners ) {
+			return null;
+		}
+
+		foreach ( $banners as $banner => $data ) {
+			$format_region                = $this->selected_region_list( $data['region'], false );
+			$banners[ $banner ]['region'] = $format_region;
+		}
+
+		return $banners;
+	}
+
+	private function selected_region_list( $option, $second ) {
+		$countries = Supported_Regions::get();
+		$list      = explode( ', ', $option );
+
+		if ( $second ) {
+			$ccpa = esc_attr( get_option( 'cookiebot-ccpa' ) );
+			if ( $ccpa === '1' && ! in_array( 'US-06', $list, true ) ) {
+				array_push( $list, 'US-06' );
+			}
 		}
 
 		$selected = array();
@@ -58,7 +77,8 @@ class Multiple_Page implements Settings_Page_Interface {
 			'secondary_group_id' => $this->retroSecondaryId(),
 			'supported_regions'  => Supported_Regions::get(),
 			'ccpa_compatibility' => esc_attr( get_option( 'cookiebot-ccpa' ) ),
-			'selected_regions'   => $this->selectedRegionList(),
+			'selected_regions'   => $this->selected_region_list( esc_attr( get_option( 'cookiebot-second-banner-regions' ) ), true ),
+			'multiple_banners'   => $this->get_multiple_banners(),
 		);
 
 		wp_enqueue_style(
@@ -76,6 +96,6 @@ class Multiple_Page implements Settings_Page_Interface {
 			true
 		);
 
-		include_view( 'admin/settings/multiple-configuration/page.php', $args );
+		include_view( Cookiebot_Frame::get_view_path() . 'settings/multiple-configuration/page.php', $args );
 	}
 }

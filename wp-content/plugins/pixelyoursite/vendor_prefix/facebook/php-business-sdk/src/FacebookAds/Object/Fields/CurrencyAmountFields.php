@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CurrencyAmountFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMOUNT = 'amount';
-    const AMOUNT_IN_HUNDREDTHS = 'amount_in_hundredths';
-    const CURRENCY = 'currency';
-    const OFFSETTED_AMOUNT = 'offsetted_amount';
-    public function getFieldTypes()
-    {
-        return array('amount' => 'string', 'amount_in_hundredths' => 'string', 'currency' => 'string', 'offsetted_amount' => 'string');
-    }
+
+class CurrencyAmountFields extends AbstractEnum {
+
+  const AMOUNT = 'amount';
+  const AMOUNT_IN_HUNDREDTHS = 'amount_in_hundredths';
+  const CURRENCY = 'currency';
+  const OFFSETTED_AMOUNT = 'offsetted_amount';
+
+  public function getFieldTypes() {
+    return array(
+      'amount' => 'string',
+      'amount_in_hundredths' => 'string',
+      'currency' => 'string',
+      'offsetted_amount' => 'string',
+    );
+  }
 }

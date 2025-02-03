@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class EngagementFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNT = 'count';
-    const COUNT_STRING = 'count_string';
-    const COUNT_STRING_WITH_LIKE = 'count_string_with_like';
-    const COUNT_STRING_WITHOUT_LIKE = 'count_string_without_like';
-    const SOCIAL_SENTENCE = 'social_sentence';
-    const SOCIAL_SENTENCE_WITH_LIKE = 'social_sentence_with_like';
-    const SOCIAL_SENTENCE_WITHOUT_LIKE = 'social_sentence_without_like';
-    public function getFieldTypes()
-    {
-        return array('count' => 'unsigned int', 'count_string' => 'string', 'count_string_with_like' => 'string', 'count_string_without_like' => 'string', 'social_sentence' => 'string', 'social_sentence_with_like' => 'string', 'social_sentence_without_like' => 'string');
-    }
+
+class EngagementFields extends AbstractEnum {
+
+  const COUNT = 'count';
+  const COUNT_STRING = 'count_string';
+  const COUNT_STRING_WITH_LIKE = 'count_string_with_like';
+  const COUNT_STRING_WITHOUT_LIKE = 'count_string_without_like';
+  const SOCIAL_SENTENCE = 'social_sentence';
+  const SOCIAL_SENTENCE_WITH_LIKE = 'social_sentence_with_like';
+  const SOCIAL_SENTENCE_WITHOUT_LIKE = 'social_sentence_without_like';
+
+  public function getFieldTypes() {
+    return array(
+      'count' => 'unsigned int',
+      'count_string' => 'string',
+      'count_string_with_like' => 'string',
+      'count_string_without_like' => 'string',
+      'social_sentence' => 'string',
+      'social_sentence_with_like' => 'string',
+      'social_sentence_without_like' => 'string',
+    );
+  }
 }

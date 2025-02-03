@@ -11,116 +11,116 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Pixel IDs -->
 <div class="card card-static">
     <div class="card-header">
-        Pixel IDs
+        <div class="row align-items-center mt-2">
+            <div class="col-12">
+                <?php PYS()->render_switcher_input("enable_all_tracking_ids"); ?>
+                <h4 class="switcher-label">Tracking IDs</h4>
+            </div>
+        </div>
     </div>
     <div class="card-body">
 
-        <?php if ( Facebook()->enabled() ) : ?>
-
-            <div class="row align-items-center mb-3">
-                <div class="col-2  py-2">
-                    <img class="tag-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/facebook-small-square.png">
-                </div>
-                <div class="col-6">
-                    Your Meta Pixel (formerly Facebook Pixel)
-                </div>
-                <div class="col-4">
-                    <label for="fb_settings_switch" class="btn btn-block btn-sm btn-primary btn-settings">Click for settings</label>
+        <div class="row align-items-center mb-3">
+            <div class="col-2  py-2">
+                <img class="tag-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/facebook-small-square.png">
+            </div>
+            <div class="col-6">
+                Your Meta Pixel (formerly Facebook Pixel)
+            </div>
+            <div class="col-4">
+                <label for="fb_settings_switch" class="btn btn-block btn-sm btn-primary btn-settings">Click for settings</label>
+            </div>
+        </div>
+        <input type="checkbox" id="fb_settings_switch" style="display: none">
+        <div class="settings_content">
+            <div class="row  mb-2">
+                <div class="col-12">
+                    <?php Facebook()->render_switcher_input("use_server_api"); ?>
+                    <h4 class="switcher-label">Enable Conversion API (add the token below)</h4>
                 </div>
             </div>
-            <input type="checkbox" id="fb_settings_switch" style="display: none">
-            <div class="settings_content">
-                <div class="row  mb-2">
+            <div class="row mb-3">
+                <div class="col">
+                    <?php Facebook()->render_switcher_input( 'advanced_matching_enabled' ); ?>
+                    <h4 class="switcher-label">Enable Advanced Matching</h4>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <p>
+                        Learn about Conversion API and Advanced Matching privacy and consent:
+                        <a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">watch video</a>
+                    </p>
+                    <p>
+                        Install multiple Facebook Pixles with CAPI support:
+                        <a href="https://www.youtube.com/watch?v=HM98mGZshvc" target="_blank">watch video</a>
+                    </p>
+                    <p>
+                        What is Events Matching and EMQ and how you can improve it:
+                        <a href=" https://www.youtube.com/watch?v=3soI_Fl0JQw" target="_blank">watch video</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="plate pt-3 pb-3 mb-3">
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <?php Facebook()->render_switcher_input( 'enabled' ); ?>
+                        <h4 class="switcher-label">Enable Pixel</h4>
+                    </div>
+                </div>
+                <div class="row mb-3">
                     <div class="col-12">
-                        <?php Facebook()->render_switcher_input("use_server_api"); ?>
-                        <h4 class="switcher-label">Enable Conversion API (add the token below)</h4>
+                        <h4 class="label">Meta Pixel (formerly Facebook Pixel) ID:</h4>
+                        <?php Facebook()->render_pixel_id( 'pixel_id', 'Meta Pixel (formerly Facebook Pixel) ID' ); ?>
+                        <small class="form-text">
+                            <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-facebook-pixel?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
+                               target="_blank">How to get it?</a>
+                        </small>
+                        <p class="mt-3 mb-0">Add multiple Meta Pixel (formerly Facebook Pixel)s with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
+                                                                                      target="_blank">pro version</a>.</p>
                     </div>
                 </div>
+                <div class="row align-items-center mb-3">
+                    <div class="col-12">
+                        <h4 class="label">Conversion API (recommended):</h4>
+                        <?php Facebook()->render_text_area_array_item("server_access_api_token","Api token") ?>
+                    </div>
+                </div>
+
                 <div class="row mb-3">
                     <div class="col">
-                        <?php Facebook()->render_switcher_input( 'advanced_matching_enabled' ); ?>
-                        <h4 class="switcher-label">Enable Advanced Matching</h4>
+                        Send events directly from your web server to Facebook through the Conversion API. This can help you capture more events. An access token is required to use the server-side API.
+                        <a href='https://www.pixelyoursite.com/facebook-conversion-api-capi' target='_blank'>Learn how to generate the token and how to test Conversion API</a>
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col">
-                        <p>
-                            Learn about Conversion API and Advanced Matching privacy and consent:
-                            <a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">watch video</a>
-                        </p>
-                        <p>
-                            Install multiple Facebook Pixles with CAPI support:
-                            <a href="https://www.youtube.com/watch?v=HM98mGZshvc" target="_blank">watch video</a>
-                        </p>
-                        <p>
-                            What is Events Matching and EMQ and how you can improve it:
-                            <a href=" https://www.youtube.com/watch?v=3soI_Fl0JQw" target="_blank">watch video</a>
-                        </p>
+                <div class="row align-items-center mb-3">
+                    <div class="col-12">
+                        <h4 class="label">test_event_code :</h4>
+                        <?php Facebook()->render_text_input_array_item("test_api_event_code","Code"); ?>
+                        <?php Facebook()->render_text_input_array_item("test_api_event_code_expiration_at", "", 0, true); ?>
+
+                        <small class="form-text">
+                            Use this if you need to test the server-side event. <strong>Remove it after
+                                testing.</strong> The code will auto-delete itself after 24 hours.
+                        </small>
                     </div>
                 </div>
-
-                <div class="plate pt-3 pb-3 mb-3">
+                <?php if(isWPMLActive()) : ?>
                     <div class="row mb-3">
                         <div class="col-12">
-                            <h4 class="label">Meta Pixel (formerly Facebook Pixel) ID:</h4>
-                            <?php Facebook()->render_pixel_id( 'pixel_id', 'Meta Pixel (formerly Facebook Pixel) ID' ); ?>
-                            <small class="form-text">
-                                <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-facebook-pixel?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
-                                   target="_blank">How to get it?</a>
-                            </small>
-                            <p class="mt-3 mb-0">Add multiple Meta Pixel (formerly Facebook Pixel)s with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
-                                                                                          target="_blank">pro version</a>.</p>
+                            <strong>WPML Detected. </strong> With the <a target="_blank" href="https://www.pixelyoursite.com/plugins/pixelyoursite-professional?utm_medium=plugin&utm_campaign=multilingual">Advanced and Agency</a> licenses, you can fire a different pixel for each language.
                         </div>
                     </div>
-                    <div class="row align-items-center mb-3">
-                        <div class="col-12">
-                            <h4 class="label">Conversion API (recommended):</h4>
-                            <?php Facebook()->render_text_area_array_item("server_access_api_token","Api token") ?>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col">
-                            Send events directly from your web server to Facebook through the Conversion API. This can help you capture more events. An access token is required to use the server-side API.
-                            <a href='https://www.pixelyoursite.com/facebook-conversion-api-capi' target='_blank'>Learn how to generate the token and how to test Conversion API</a>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3 mb-3">
-                        <div class="col-12">
-                            <?php Facebook()->render_checkbox_input("server_event_use_ajax","Use Ajax when conversion API is enabled. Keep this option active if you use a cache");?>
-                        </div>
-                    </div>
-
-                    <div class="row align-items-center mb-3">
-                        <div class="col-12">
-                            <h4 class="label">test_event_code :</h4>
-                            <?php Facebook()->render_text_input_array_item("test_api_event_code","Code"); ?>
-                            <?php Facebook()->render_text_input_array_item("test_api_event_code_expiration_at", "", 0, true); ?>
-
-                            <small class="form-text">
-                                Use this if you need to test the server-side event. <strong>Remove it after
-                                    testing.</strong> The code will auto-delete itself after 24 hours.
-                            </small>
-                        </div>
-                    </div>
-                    <?php if(isWPMLActive()) : ?>
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <strong>WPML Detected. </strong> With the <a target="_blank" href="https://www.pixelyoursite.com/plugins/pixelyoursite-professional?utm_medium=plugin&utm_campaign=multilingual">Advanced and Agency</a> licenses, you can fire a different pixel for each language.
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <?php addMetaTagFields(Facebook(),"https://www.pixelyoursite.com/verify-domain-facebook"); ?>
+                <?php endif; ?>
             </div>
+            <?php addMetaTagFields(Facebook(),"https://www.pixelyoursite.com/verify-domain-facebook"); ?>
+        </div>
 
-            <hr>
-        <?php endif; ?>
-
-
-	    <?php if ( GA()->enabled() ) : ?>
+        <hr>
 
             <div class="row align-items-center mb-3">
                 <div class="col-2 py-2">
@@ -134,24 +134,143 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
 
+                    <?php
+                    $noticeRenderNotSupportUA = false;
+                    $noticeOnlyUA = true;
+                    if(GA()->enabled() && !empty(GA()->getOption( 'tracking_id' )))
+                    {
+                        $trackingId = GA()->getOption('tracking_id');
+                        if (!isGaV4($trackingId)) {
+                            $noticeRenderNotSupportUA = true;
+                        }
+                        else{
+                            $noticeOnlyUA = false;
+                        }
+                    }
+                    if($noticeRenderNotSupportUA){
+                        ?>
+                        <div class="row align-items-center mb-3 py-2 not-supported">
+                        <div class="col-12">
+                        <?php
+                        if($noticeOnlyUA){
+                            ?>
+                            <p>The old Universal Analytics properties are not supported by Google Analytics anymore. You must use the new GA4 properties instead. <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">Watch this video to find how to get your GA4 tag</a>.</p>
+                            <?php
+                        }
+                        else{
+                            ?>
+                            <p>Your old Universal Analytics property does't send data anymore, consider removing it. Google Analytics supports only GA4 properties. <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">Watch this video to find how to get your GA4 tag</a>.</p>
+                            <?php
+                        }
+                        ?>
+                        </div>
+                        </div>
+                        <?php
+                    }?>
+
         <input type="checkbox" id="gan_settings_switch" style="display: none">
         <div class="settings_content">
             <div class="plate pt-3 pb-3">
+                <div class="row mb-2">
+                    <div class="col">
+						<?php GA()->render_switcher_input( 'enabled' ); ?>
+                        <h4 class="switcher-label">Enable Pixel</h4>
+                    </div>
+                </div>
+                <div class="row  mb-2">
+                    <div class="col-12">
+                        <?php renderDummySwitcher(false); ?>
+                        <h4 class="switcher-label">Enable Measurement Protocol (add the api_secret)</h4>
+                        <?php renderProBadge(); ?>
+                    </div>
+                </div>
                 <div class="row mb-3">
                     <div class="col-12">
                         <h4 class="label mb-3 mt-3">Google Analytics tracking ID:</h4>
                         <?php GA()->render_pixel_id( 'tracking_id', 'Google Analytics tracking ID' ); ?>
+                        <p class="ga_pixel_info small">
+                            <?php
+                            $pixels = GA()->getPixelIDs();
+                            if (count($pixels)) {
+                                if (strpos($pixels[0], 'G') === 0) {
+                                    echo 'We identified this tag as a GA4 property.';
+                                } else {
+                                    echo '<span class="not-support-tag">We identified this tag as a Google Analytics Universal property.</span>';
+                                }
+                            }
+
+                            ?>
+                        </p>
                         <small class="form-text" mb-2>
                             <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-google-analytics-code?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                target="_blank">How to get it?</a>
                         </small>
-                        <div class ="mt-2">
-                            <input type="checkbox" class="custom-control-input" name="pys[ga][is_enable_debug_mode][-1]" value="0" checked />
-                            <?php GA()->render_checkbox_input_array("is_enable_debug_mode","Enable Analytics Debug mode for this property");?>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <h4 class="label">Measurement Protocol API secret: <?php renderProBadge(); ?></h4>
+
+                                <?php renderDummyTextInput("API secret") ?>
+                            </div>
                         </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                Generate the API secret inside your Google Analytics account: navigate to <b>Admin > Data Streams > choose your stream > Measurement Protocol API secrets</b>. The Measurement Protocol is used for WooCommerce and Easy Digital Downloads "Google Analytics Advanced Purchase Tracking" and refund tracking. Required for GA4 properties only.
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input"
+                                       name="pys[ga][is_enable_debug_mode][-1]" value="0" checked/>
+                                <?php GA()->render_checkbox_input_array("is_enable_debug_mode", "Enable Analytics Debug mode for this property"); ?>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <div class="mb-1">
+                                    <input type="text" class="custom-control-input"
+                                           name="pys[ga][enable_server_container][-1]" value="0" checked/>
+                                    <?php GA()->render_switcher_input("enable_server_container"); ?>
+                                    <h4 class="switcher-label">Enable Server container url (Beta)</h4>
+                                </div>
+                                <p>
+                                    <?php _e('Learn how to use it: ', 'pys');?>
+                                    <a href="https://www.youtube.com/watch?v=WZnmSoSJyBc" target="_blank">watch video</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <h4 class="label">Server container url (optional): </h4>
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][server_container_url][-1]" value="0" checked/>
+                                <?php GA()->render_text_input_array_item("server_container_url", "https://analytics.example.com", 0); ?>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <h4 class="label">Transport url (optional): </h4>
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][transport_url][-1]" value="0" checked/>
+                                <?php GA()->render_text_input_array_item("transport_url", "https://tagging.mywebsite.com", 0); ?>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][first_party_collection][-1]" value="0" checked/>
+                                <?php GA()->render_checkbox_input("first_party_collection", "First party cookies selector first_party_collection (recommended)"); ?>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mt-1">
+                            <strong>How to enable Google Consent Mode V2:</strong>
+                            <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                        </p>
                         <p>
                             Learn how to get the Google Analytics 4 tag ID and how to test it:
-                            <a href="https://www.youtube.com/watch?v=fwegcsO-yrc" target="_blank">watch video</a>
+                            <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">watch video</a>
                         </p>
                         <p class="mt-3 ">Add multiple Google Analytics tags with the <a href="https://www.pixelyoursite.com/?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                                                                         target="_blank">pro version</a>.</p>
@@ -161,6 +280,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </p>
                     </div>
                 </div>
+
                 <?php if(isWPMLActive()) : ?>
                     <div class="row mb-3">
                         <div class="col-12">
@@ -171,10 +291,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
         </div>
 
-
-            <hr>
-
-	    <?php endif; ?>
+        <hr>
 
         <?php do_action( 'pys_admin_pixel_ids' ); ?>
 
@@ -187,16 +304,20 @@ if ( ! defined( 'ABSPATH' ) ) {
                         href="https://www.pixelyoursite.com/google-ads-tag?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                         target="_blank">pro version</a>.
                 <div class="mt-3">
+                    <strong>How to enable Google Consent Mode V2:</strong>
+                    <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                </div>
+                <div class="mt-3">
                     Learn how to install the Google Ads Tag:
-                    <a href="https://www.youtube.com/watch?v=plkv_v4nz8I" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=dft-TRigkj0" target="_blank">watch video</a>
                 </div>
                 <div class="mt-3">
                     How to configure Google Ads Conversions:
-                    <a href="https://www.youtube.com/watch?v=x1VvVDa5L7c" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=5kb-jQe-Psg" target="_blank">watch video</a>
                 </div>
                 <div class="mt-3">
                     Lear how to use Enhanced Conversions:
-                    <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=-bN5D_HJyuA" target="_blank">watch video</a>
                 </div>
             </div>
         </div>
@@ -211,7 +332,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         target="_blank">pro version</a>.
                 <div class="small">TikTok Tag integration is in beta.</div>
                 <div class="mt-3">
-                    How to install the TikTok tag and how to get the ID: <a href="https://www.youtube.com/watch?v=zkb67djRnd0" target="_blank">watch video</a>
+                    How to install the TikTok tag and how to enable TikTok API: <a href="https://www.youtube.com/watch?v=OCSR6zacnFM" target="_blank">watch video</a>
                 </div>
             </div>
         </div>
@@ -219,6 +340,141 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 </div>
 
+    <div class="card card-static">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-12">
+                    GTM Tag
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center mb-3 py-2">
+                <div class="col-2">
+                    <img class="tag-logo" src="<?php echo PYS_FREE_URL; ?>/dist/images/gtm-square-small.png">
+                </div>
+                <div class="col-6">
+                    Your GTM Tag
+                </div>
+                <div class="col-4">
+                    <label for="gtm_settings_switch" class="btn btn-block btn-sm btn-primary btn-settings">Click
+                        for settings</label>
+                </div>
+            </div>
+
+            <input type="checkbox" id="gtm_settings_switch" style="display: none">
+            <div class="settings_content">
+
+                <div class="plate pixel_info pt-3">
+                    <div class="row mb-2">
+                        <div class="col">
+							<?php GTM()->render_switcher_input( 'enabled' ); ?>
+                            <h4 class="switcher-label">Enable GTM</h4>
+                        </div>
+                    </div>
+                    <div class="row pt-3 pb-3">
+                        <div class="col-12">
+                            <h4 class="label">GTM Tag:</h4>
+                            <?php GTM()->render_pixel_id('gtm_id', 'GTM-123456789'); ?>
+                            <p>
+                                <small>
+                                    If you want to use the dataLayer setting without the container itself, enter "GTM-123456789" in the field and disable the container on the <a href="<?php echo buildAdminUrl( 'pixelyoursite', 'gtm_tags_settings' );?>">GTM settings page.</a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <b>Beta version:</b> This feature is now in Beta and can change in the future.
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row ">
+                        <div class="col-12">
+                            <?php GTM()->render_switcher_input('gtm_just_data_layer'); ?>
+                            <h4 class="switcher-label"><?php _e('Send just the data layer', 'pys');?></h4>
+                            <p>
+                                <small>
+                                    <?php _e('Turning ON this option will remove both the head and the body part of the container code but leave data layer code working. This should be only used in specific cases where you need to place the container code manually or using another tool.', 'pys');?>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row pt-2 pb-3">
+                        <div class="col-12">
+                            <p>
+                                <?php _e('<b>Important:</b> Don\'t use GTM and our native integrations for the same tag/pixel ID. A pixel installed with the native integration must not be installed with GTM.', 'pys');?>
+                            </p>
+                            <hr>
+                            <?php $containers = new gtmContainers();
+                            $download_template_nonce = wp_create_nonce('download_template_nonce');
+                            if(!empty($containers)):
+                                ?>
+                                <p>
+                                    <b><?php _e('GTM Container Import:', 'pys');?> </b>
+                                </p>
+                                <?php
+                                foreach ($containers->getContainers() as $container) {
+                                    if (!$container['enable'] || empty($container['file_name'])) continue;
+                                    ?>
+                                    <p>
+                                        <a href="<?php echo esc_url( add_query_arg(['download_container' => $container['file_name'], '_wpnonce_template_logs' => $download_template_nonce],buildAdminUrl( 'pixelyoursite', 'containers' ))); ?>" target="_blank"><?php echo $container['show_name']; ?></a><?php echo !empty($container['description']) ? ' - '.$container['description'] : '';?>
+                                    </p>
+                                    <?php
+                                } ?>
+                                <p class="mt-2">
+                                    <?php _e('Learn how to use the file: ', 'pys');?> <a href="https://www.youtube.com/watch?v=qKJ3mmCgT3M" target="_blank">watch video</a>
+                                </p>
+                                <hr>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="row pt-3 pb-3">
+                        <div class="col-12">
+
+                            <?php if ( isSuperPackActive() ) {
+                                if ( SuperPack()->getOption( 'additional_ids_enabled' ) ) : ?>
+                                    <p>
+                                        <?php GTM()->render_checkbox_input( 'is_fire_signal', 'Fire the active automated events for this pixel' ); ?>
+                                    </p>
+                                    <?php if ( isWooCommerceActive() ) : ?>
+                                        <p>
+                                            <?php GTM()->render_checkbox_input( 'is_fire_woo', 'Fire the WooCommerce events for this pixel' ); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                    <?php if ( isEddActive() ) : ?>
+                                        <p>
+                                            <?php GTM()->render_checkbox_input( 'is_fire_edd', 'Fire the Easy Digital Downloads events for this pixel' ); ?>
+                                        </p>
+                                    <?php endif; ?>
+
+                                    <p>
+                                        <strong>Display conditions:</strong>
+                                        <?php
+                                        $main_pixel = GTM()->getOption( 'main_pixel' );
+                                        if ( !empty( $main_pixel ) && isset( $main_pixel[ 0 ] ) ) {
+                                            $conditions = SuperPack\SPPixelId::fromArray( json_decode( $main_pixel[ 0 ], true ) );
+                                            SuperPack\SpPixelCondition()->renderHtml( $conditions->displayConditions );
+                                        } else {
+                                            SuperPack\SpPixelCondition()->renderHtml();
+                                        } ?>
+                                    </p>
+                                <?php endif; ?>
+
+                                <?php
+                                if ( SuperPack()->getOption( 'enable_hide_this_tag_by_tags' ) || SuperPack()->getOption( 'enable_hide_this_tag_by_url' ) ) {
+                                    GTM()->render_hide_pixel_block();
+                                }
+                            } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="panel panel-primary link_youtube">
     <div class="row">
         <div class="col">
@@ -238,26 +494,22 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card-body">
         <div class="row">
             <div class="col">
+
+                <p><a href="https://www.youtube.com/watch?v=bEK3qaaRvNg" target="_blank">Google Tag Manager and PixelYourSite (7:48 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=uXTpgFu2V-E" target="_blank">How to configure Facebook Conversion API (2:51 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=DZzFP4pSitU" target="_blank">Meta Pixel (formerly Facebook Pixel), CAPI, and PixelYourSite MUST WATCH (8:19) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=QqAIO1ONc0I" target="_blank">How to test Facebook Conversion API (10:16 min) - watch now</a></p>
-                <p><a href="https://www.youtube.com/watch?v=sM9yNkBK6Eg" target="_blank">Potentially Violating Personal Data Sent to Facebook (7:30 min) - watch now</a></p>
-                <p><a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">Facebook Conversion API and the Consent Problem (9:25 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=kEp5BDg7dP0" target="_blank">How to fire EVENTS with PixelYourSite (22:28) - watch now</a></p>
-                <p><a href="https://www.youtube.com/watch?v=zkb67djRnd0" target="_blank">FIX IT: PixelYourSite high number of admin-ajax requests (9:04) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=EvzGMAvBnbs" target="_blank">How to create Meta (Facebook) Custom Audiences & Lookalikes based on Events & Parameters (21:53) - watch now</a></p>
                 <p>
-                    <a href="https://www.youtube.com/watch?v=w97FATUy7ok" target="_blank">
-                        How to configure Custom Conversions on Meta (Facebook) based on Events & Parameters (11:03) - watch now
+                <a href="https://www.youtube.com/watch?v=w97FATUy7ok" target="_blank">How to configure Custom Conversions on Meta (Facebook) based on Events & Parameters (11:03) - watch now
                     </a>
                 </p>
-                <p>
-                    <a href="https://www.youtube.com/watch?v=a5jPcLbdgy0" target="_blank">
-                        How to run A/B tests with Google Optimize and GA4 (6:07)
-                    </a>
-                </p>
+
                 <p><a href="https://www.youtube.com/watch?v=snUKcsTbvCk" target="_blank">Improve META (Facebook) EMQ score
                         with form automatic data detection (11:48) - watch now</a></p>
+                <p><a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">
+                        Fire a LEAD event on form submit - WordPress & PixelYourSite (5:58) - watch video</a></p>
             </div>
         </div>
         <div class="row">
@@ -289,11 +541,32 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php PYS()->render_switcher_input('automatic_event_form_enabled'); ?>Track Forms <?php cardCollapseBtn(); ?>
             </div>
             <div class="card-body">
+                <p>
+                    The Form event will fire when a form is successfully submitted for the following plugins: Contact Form 7, Forminator, WP Forms, Formidable Pro, Ninja Forms, and Fluent Forms. For forms added by different means, we will fire the event when the submit button is clicked. Watch <a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">this video</a> to learn more.
+                </p>
                 <?php
-                enableEventForEachPixel('automatic_event_form_enabled', true, true, true, true, true, true);
+                enableEventForEachPixel('automatic_event_form_enabled', true, true, true, true, true, true, true);
                 ?>
                 <br/>
                 <p>Fires when the website visitor clicks form submit buttons.</p>
+                <br>
+                <?php
+                $eventsFormFactory = apply_filters("pys_form_event_factory",[]);
+                foreach ($eventsFormFactory as $activeFormPlugin) : ?>
+                    <p><strong><?php echo $activeFormPlugin->getName(); ?> detected</strong> - we will fire the Form event for each successfully submited form.</p>
+
+                <?php
+                endforeach;
+                if($eventsFormFactory) :
+                    ?>
+                    <div class="col">
+                        <?php PYS()->render_checkbox_input( 'enable_success_send_form',
+                            'Fire the event only for the supported plugins, when the form is succesfully submited.' ); ?>
+                    </div>
+                    <br>
+                    <p>Configure Lead or other events using our <a href="<?php echo buildAdminUrl( 'pixelyoursite', 'events' ); ?>">events triggers</a>. Learn how from <a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">this video</a></p>
+                    <br>
+                <?php endif; ?>
                 <p><strong>Event name: </strong>Form</p>
                 <p><strong>Event name on TikTok: </strong>FormSubmit</p>
                 <p><strong>Specific parameters: </strong><i>text, from_class, form_id</i></p>
@@ -335,12 +608,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <h4 class="switcher-label">Enable on Google Analytics</h4>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col col-offset-left">
-                            <?php GA()->render_checkbox_input("automatic_event_signup_non_interactive_enabled",
-                                'Non-interactive event'); ?>
-                        </div>
-                    </div>
+
                 <?php endif; ?>
 
                 <?php if ( Bing()->enabled()) : ?>
@@ -358,6 +626,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <h4 class="switcher-label">Enable on Pinterest</h4>
                         </div>
                     </div>
+                <?php endif; ?>
+
+                <?php if ( GTM()->enabled()) : ?>
+                    <hr class="mb-3 mt-3">
+                    <div class="row">
+                        <div class="col">
+                            <?php GTM()->render_switcher_input('automatic_event_signup_enabled'); ?>
+                            <h4 class="switcher-label">Enable on GTM dataLayer</h4>
+                        </div>
+                    </div>
+                    <hr class="mb-3 mt-3">
                 <?php endif; ?>
                 <br/>
                 <p>Fires when the website visitor signup for a WordPress account.</p>
@@ -378,7 +657,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_login_enabled', true, true, true, true, false, true);
+                enableEventForEachPixel('automatic_event_login_enabled', true, true, true, true, true, false, true);
                 ?>
                 <br/>
                 <p>Fires when the website visitor logins a WordPress account.</p>
@@ -395,7 +674,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_download_enabled', true, true, true, true, true, true);
+                enableEventForEachPixel('automatic_event_download_enabled', true, true, true, true, true, true, true);
                 ?>
                 <br/>
                 <div>Extension of files to track as downloads:</div>
@@ -417,7 +696,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_comment_enabled', true, true, true, true, false, true);
+                enableEventForEachPixel('automatic_event_comment_enabled', true, true, true, true, true, false, true);
                 ?>
                 <br/>
                 <p>Fires when the website visitor ads a comment.</p>
@@ -433,7 +712,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_scroll_enabled', true, true, true, true, false, true);
+                enableEventForEachPixel('automatic_event_scroll_enabled', true, true, true, true, true, false, true);
                 ?>
                 <br/>
                 <div class="mb-2 form-inline">
@@ -455,7 +734,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_time_on_page_enabled', true, true, true, true, false, true);
+                enableEventForEachPixel('automatic_event_time_on_page_enabled', true, true, true, true, true, false, true);
                 ?>
                 <br/>
                 <div class="mb-2 form-inline">
@@ -466,14 +745,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <p><strong>Event name: </strong>TimeOnPage</p>
             </div>
         </div>
-
+        <div class="card">
+            <div class="card-header has_switch">
+                <?php PYS()->render_switcher_input('automatic_event_404_enabled'); ?>Track 404 pages <?php cardCollapseBtn(); ?>
+            </div>
+            <div class="card-body">
+                <?php
+                enableEventForEachPixel('automatic_event_404', false, true, false, true, false, false, false);
+                ?>
+                <br/>
+                <p><strong>Event name: </strong>404</p>
+            </div>
+        </div>
         <div class="card">
             <div class="card-header has_switch">
                 <?php PYS()->render_switcher_input('automatic_event_search_enabled'); ?>Track searches <?php cardCollapseBtn(); ?>
             </div>
             <div class="card-body">
                 <?php
-                enableEventForEachPixel('automatic_event_search_enabled', true, true, true, true, true, true);
+                enableEventForEachPixel('automatic_event_search_enabled', true, true, true, true, true, true, true);
                 ?>
                 <br/>
                 <p><strong>Event name: </strong></p>
@@ -531,7 +821,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Dynamic Ads for Blog Setup -->
 <div class="card" >
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('fdp_enabled');?>Dynamic Ads for Blog Setup <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('fdp_enabled'); ?>Dynamic Ads for Blog Setup <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
         <div class="row mt-3">
@@ -725,14 +1015,14 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row mt-3">
             <div class="col-12">
                 <hr>
-                <?php PYS()->render_switcher_input("enable_page_title_param");?>
+                <?php PYS()->render_switcher_input("enable_page_title_param"); ?>
                 <h4 class="switcher-label">page_title</h4>
                 <hr>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col-12">
-                <?php PYS()->render_switcher_input("enable_post_type_param");?>
+                <?php PYS()->render_switcher_input("enable_post_type_param"); ?>
                 <h4 class="switcher-label">post_type</h4>
                 <hr>
             </div>
@@ -746,7 +1036,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
         <div class="row mt-3">
             <div class="col-12">
-                <?php PYS()->render_switcher_input("enable_post_id_param");?>
+                <?php PYS()->render_switcher_input("enable_post_id_param"); ?>
                 <h4 class="switcher-label">post_id</h4>
                 <hr>
             </div>
@@ -774,6 +1064,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <hr>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
                 <?php renderDummySwitcher(); ?>
@@ -853,142 +1144,49 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 </div>
 
-<h2 class="section-title mt-3">Global Settings</h2>
-
-<div class="panel">
-    <div class="row mb-3">
-        <div class="col">
-			<?php PYS()->render_switcher_input( 'debug_enabled' ); ?>
-            <h4 class="switcher-label">Debugging mode. You will be able to see details about the events inside your
-                browser console (developer tools).</h4>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col">
-            <?php PYS()->render_switcher_input( 'enable_remove_source_url_params' ); ?>
-            <h4 class="switcher-label">Remove URL parameters from  <i>event_source_url</i></h4>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col">
-            <?php PYS()->render_switcher_input( 'enable_remove_download_url_param' ); ?>
-            <h4 class="switcher-label">Remove download_url parameters.</h4>
-
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            <div class="form-inline">
-                <?php PYS()->render_switcher_input('compress_front_js'); ?>
-                <h4 class="switcher-label">Compress frontend js</h4>
-            </div>
-
-            <small class="mt-1">Compress JS files (please test all your events if you enable this option because it can create conflicts with various caches).</small>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <?php renderDummySwitcher(false); ?>
-            <h4 class="switcher-label">Advanced user-data detection <a href="https://www.youtube.com/watch?v=snUKcsTbvCk" target="_blank">Watch video</a></h4>
-            <?php renderProBadge(); ?>
-            <small class="mt-1 d-block">
-                The plugin will try to detect user-related data like email, phone, first name, or last name and use it for subsequent Meta CAPI events personal parameters, and Meta browser events Advanced Matching. It works with most WordPress forms (email, phone number) and WooCommerce orders.
-            </small>
-            <hr>
-        </div>
-    </div>
-
-    <div class="row mt-3">
-        <div class="col">
-            <div class="form-inline">
-                <label>First Visit Options:</label>
-                <?php renderDummyNumberInput(7); ?>
-                <label>day(s)</label>
-                <a class="ml-3 badge badge-pill badge-pro" href="https://www.pixelyoursite.com/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature" target="_blank">Pro Feature <i class="fa fa-external-link" aria-hidden="true"></i></a>
-            </div>
-            <small class="mt-1">Define for how long we will store cookies for the "First Visit" attribution model.
-                Used for events parameters (<i>landing page, traffic source, UTMs</i>) and WooCommerce or EDD Reports.
-            </small>
-
-        </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col">
-            <div class="form-inline">
-                <label>Last Visit Options:</label>
-                <?php renderDummyNumberInput(60); ?>
-                <label>min</label>
-                <a class="ml-3 badge badge-pill badge-pro" href="https://www.pixelyoursite.com/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature" target="_blank">Pro Feature <i class="fa fa-external-link" aria-hidden="true"></i></a>
-            </div>
-
-            <small class="mt-1">Define for how long we will store the cookies for the "Last Visit" attribution model.
-                Used for events parameters (<i>landing page, traffic source, UTMs</i>) and WooCommerce or EDD Reports.</small>
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col collapse-inner">
-            <label>Attribution model for events parameters:<a class="ml-3 badge badge-pill badge-pro" href="https://www.pixelyoursite.com/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature/?utm_source=pys-free-plugin&amp;utm_medium=pro-badge&amp;utm_campaign=pro-feature" target="_blank">Pro Feature <i class="fa fa-external-link" aria-hidden="true"></i></a></label>
-            <div class="custom-controls-stacked">
-                <?php renderDummyRadioInput( 'First Visit',true ); ?>
-                <?php renderDummyRadioInput( 'Last Visit',false ); ?>
-            </div>
-            <hr/>
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            <?php PYS()->render_switcher_input('block_robot_enabled'); ?>
-            <h4 class="switcher-label">Disable the plugin for known web crawlers</h4>
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            <?php PYS()->render_switcher_input('block_ip_enabled'); ?>
-            <h4 class="switcher-label">Disable the plugin for these IP addresses:</h4>
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            <?php PYS()->render_tags_select_input('blocked_ips',false); ?>
-        </div>
-    </div>
-
-    <hr>
-    <div class="row form-group">
-        <div class="col">
-            <h4 class="label">Ignore these user roles from tracking:</h4>
-			<?php PYS()->render_multi_select_input( 'do_not_track_user_roles', getAvailableUserRoles() ); ?>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h4 class="label">Permissions:</h4>
-			<?php PYS()->render_multi_select_input( 'admin_permissions', getAvailableUserRoles() ); ?>
-        </div>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="row">
-        <div class="col">
-            <div class="d-flex justify-content-between">
-                <span class="mt-2">Track more key actions with the PRO version:</span>
-                <a target="_blank" class="btn btn-sm btn-primary float-right" href="https://www.pixelyoursite.com/facebook-pixel-plugin/buy-pixelyoursite-pro?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-upgrade-blue">UPGRADE</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <hr>
 <div class="row justify-content-center">
     <div class="col-4">
         <button class="btn btn-block btn-save">Save Settings</button>
     </div>
 </div>
-    <?php function enableEventForEachPixel($event, $fb = true, $ga = true, $ads = true, $bi = true, $tic = true, $pin = true)
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const checkbox = document.getElementById("pys_core_enable_all_tracking_ids");
+        const parentCard = checkbox.closest(".card");
+        const cardBody = parentCard.querySelector(".card-body");
+
+        function setCardBodyState(isEnabled) {
+            if (isEnabled) {
+                cardBody.classList.remove("disabled");
+                cardBody.style.pointerEvents = "auto";
+                cardBody.style.opacity = "1";
+                cardBody.style.backgroundColor = "";
+                cardBody.querySelectorAll("input, select, textarea, button").forEach(function(element) {
+                    element.removeAttribute("disabled");
+                });
+            } else {
+                cardBody.classList.add("disabled");
+                cardBody.style.pointerEvents = "none";
+                cardBody.style.opacity = "0.3";
+                cardBody.style.backgroundColor = "rgba(0, 0, 0, 0.13)";
+                cardBody.querySelectorAll("input, select, textarea, button").forEach(function(element) {
+                    element.setAttribute("disabled", "disabled");
+                });
+            }
+        }
+
+        // Set the initial state
+        setCardBodyState(checkbox.checked);
+
+        // Checkbox state change handler
+        checkbox.addEventListener("change", function() {
+            setCardBodyState(this.checked);
+        });
+    });
+</script>
+    <?php function enableEventForEachPixel($event, $fb = true, $ga = true, $ads = true,$gtm = true, $bi = true, $tic = true, $pin = true)
 { ?>
     <?php if ($fb && Facebook()->enabled()) : ?>
     <div class="row">
@@ -1005,13 +1203,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <h4 class="switcher-label">Enable on Google Analytics</h4>
         </div>
     </div>
-    <div class="row mt-2">
-        <?php $interactive = str_replace("_enabled","_non_interactive_enabled",$event)?>
-        <div class="col col-offset-left">
-            <?php GA()->render_checkbox_input($interactive,
-                'Non-interactive event'); ?>
-        </div>
-    </div>
+
 <?php endif; ?>
 
 
@@ -1031,6 +1223,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
     </div>
 <?php endif; ?>
-
+    <?php if ($gtm && GTM()->enabled()) : ?>
+    <hr class="mb-3 mt-3">
+    <div class="row">
+        <div class="col">
+            <?php GTM()->render_switcher_input($event); ?>
+            <h4 class="switcher-label">Enable on GTM dataLayer</h4>
+        </div>
+    </div>
+    <hr class="mb-3 mt-3">
+<?php endif; ?>
     <?php
 }

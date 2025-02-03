@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CustomAudiencesharedAccountInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT_ID = 'account_id';
-    const ACCOUNT_NAME = 'account_name';
-    const BUSINESS_ID = 'business_id';
-    const BUSINESS_NAME = 'business_name';
-    const SHARING_STATUS = 'sharing_status';
-    public function getFieldTypes()
-    {
-        return array('account_id' => 'string', 'account_name' => 'string', 'business_id' => 'string', 'business_name' => 'string', 'sharing_status' => 'string');
-    }
+
+class CustomAudiencesharedAccountInfoFields extends AbstractEnum {
+
+  const ACCOUNT_ID = 'account_id';
+  const ACCOUNT_NAME = 'account_name';
+  const BUSINESS_ID = 'business_id';
+  const BUSINESS_NAME = 'business_name';
+  const SHARING_STATUS = 'sharing_status';
+
+  public function getFieldTypes() {
+    return array(
+      'account_id' => 'string',
+      'account_name' => 'string',
+      'business_id' => 'string',
+      'business_name' => 'string',
+      'sharing_status' => 'string',
+    );
+  }
 }

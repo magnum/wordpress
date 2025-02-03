@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '332b18a8d1b8698d241d83a8da150caf8a3a6da3',
+    'reference' => 'e3037b82d601b5af63a57e0ccfbb145e8505089a',
     'name' => 'uncanny-owl/uncanny-automator',
   ),
   'versions' => 
@@ -44,15 +44,6 @@ private static $installed = array (
       ),
       'reference' => 'bddc5aaea1c1c0a270e6c96f3719c48afa6cb7f0',
     ),
-    'firebase/php-jwt' => 
-    array (
-      'pretty_version' => 'v5.5.1',
-      'version' => '5.5.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '83b609028194aa042ea33b5af2d41a7427de80e6',
-    ),
     'uncanny-owl/uncanny-automator' => 
     array (
       'pretty_version' => 'dev-master',
@@ -60,7 +51,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '332b18a8d1b8698d241d83a8da150caf8a3a6da3',
+      'reference' => 'e3037b82d601b5af63a57e0ccfbb145e8505089a',
     ),
   ),
 );

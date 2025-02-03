@@ -68,6 +68,30 @@ class REST_Products {
 				),
 			)
 		);
+
+		register_rest_route(
+			'my-jetpack/v1',
+			'site/products/(?P<product>[a-z\-]+)/install-standalone',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::EDITABLE,
+					'callback'            => __CLASS__ . '::install_standalone',
+					'permission_callback' => __CLASS__ . '::edit_permissions_callback',
+				),
+			)
+		);
+
+		register_rest_route(
+			'my-jetpack/v1',
+			'site/products-ownership',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => __CLASS__ . '::get_products_by_ownership',
+					'permission_callback' => __CLASS__ . '::permissions_callback',
+				),
+			)
+		);
 	}
 
 	/**
@@ -128,6 +152,19 @@ class REST_Products {
 	}
 
 	/**
+	 * Site products endpoint.
+	 *
+	 * @return array of site products list.
+	 */
+	public static function get_products_by_ownership() {
+		$response = array(
+			'unownedProducts' => Products::get_products_by_ownership( 'unowned' ),
+			'ownedProducts'   => Products::get_products_by_ownership( 'owned' ),
+		);
+		return rest_ensure_response( $response, 200 );
+	}
+
+	/**
 	 * Site single product endpoint.
 	 *
 	 * @param \WP_REST_Request $request The request object.
@@ -175,6 +212,7 @@ class REST_Products {
 			$activate_product_result->add_data( array( 'status' => 400 ) );
 			return $activate_product_result;
 		}
+		set_transient( 'my_jetpack_product_activated', $product_slug, 10 );
 
 		return rest_ensure_response( Products::get_product( $product_slug ), 200 );
 	}
@@ -205,4 +243,29 @@ class REST_Products {
 		return rest_ensure_response( Products::get_product( $product_slug ), 200 );
 	}
 
+	/**
+	 * Callback for installing the standalone plugin on a Hybrid Product.
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 * @return \WP_REST_Response
+	 */
+	public static function install_standalone( $request ) {
+		$product_slug = $request->get_param( 'product' );
+		$product      = Products::get_product( $product_slug );
+		if ( ! isset( $product['class'] ) ) {
+			return new \WP_Error(
+				'not_implemented',
+				__( 'The product class handler is not implemented', 'jetpack-my-jetpack' ),
+				array( 'status' => 501 )
+			);
+		}
+
+		$install_product_result = call_user_func( array( $product['class'], 'install_and_activate_standalone' ) );
+		if ( is_wp_error( $install_product_result ) ) {
+			$install_product_result->add_data( array( 'status' => 400 ) );
+			return $install_product_result;
+		}
+
+		return rest_ensure_response( Products::get_product( $product_slug ), 200 );
+	}
 }

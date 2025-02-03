@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LiveVideoErrorFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATION_TIME = 'creation_time';
-    const ERROR_CODE = 'error_code';
-    const ERROR_MESSAGE = 'error_message';
-    const ERROR_TYPE = 'error_type';
-    const ID = 'id';
-    public function getFieldTypes()
-    {
-        return array('creation_time' => 'datetime', 'error_code' => 'int', 'error_message' => 'string', 'error_type' => 'string', 'id' => 'string');
-    }
+
+class LiveVideoErrorFields extends AbstractEnum {
+
+  const CREATION_TIME = 'creation_time';
+  const ERROR_CODE = 'error_code';
+  const ERROR_MESSAGE = 'error_message';
+  const ERROR_TYPE = 'error_type';
+  const ID = 'id';
+
+  public function getFieldTypes() {
+    return array(
+      'creation_time' => 'datetime',
+      'error_code' => 'int',
+      'error_message' => 'string',
+      'error_type' => 'string',
+      'id' => 'string',
+    );
+  }
 }

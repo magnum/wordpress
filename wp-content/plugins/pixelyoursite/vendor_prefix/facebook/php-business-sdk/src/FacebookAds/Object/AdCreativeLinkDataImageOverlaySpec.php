@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -35,6 +35,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecP
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecTextFontValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecTextTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecThemeColorValues;
+
 /**
  * This class is auto-generated.
  *
@@ -43,24 +44,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecT
  * pull request for this class.
  *
  */
-class AdCreativeLinkDataImageOverlaySpec extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdCreativeLinkDataImageOverlaySpecFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdCreativeLinkDataImageOverlaySpecFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['CustomTextType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues::getInstance()->getValues();
-        $ref_enums['OverlayTemplate'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecOverlayTemplateValues::getInstance()->getValues();
-        $ref_enums['Position'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecPositionValues::getInstance()->getValues();
-        $ref_enums['TextFont'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecTextFontValues::getInstance()->getValues();
-        $ref_enums['TextType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecTextTypeValues::getInstance()->getValues();
-        $ref_enums['ThemeColor'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdCreativeLinkDataImageOverlaySpecThemeColorValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdCreativeLinkDataImageOverlaySpec extends AbstractObject {
+
+  /**
+   * @return AdCreativeLinkDataImageOverlaySpecFields
+   */
+  public static function getFieldsEnum() {
+    return AdCreativeLinkDataImageOverlaySpecFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['CustomTextType'] = AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues::getInstance()->getValues();
+    $ref_enums['OverlayTemplate'] = AdCreativeLinkDataImageOverlaySpecOverlayTemplateValues::getInstance()->getValues();
+    $ref_enums['Position'] = AdCreativeLinkDataImageOverlaySpecPositionValues::getInstance()->getValues();
+    $ref_enums['TextFont'] = AdCreativeLinkDataImageOverlaySpecTextFontValues::getInstance()->getValues();
+    $ref_enums['TextType'] = AdCreativeLinkDataImageOverlaySpecTextTypeValues::getInstance()->getValues();
+    $ref_enums['ThemeColor'] = AdCreativeLinkDataImageOverlaySpecThemeColorValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

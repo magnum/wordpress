@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,16 +35,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductEventStatDeviceTypeValues getInstance()
  */
-class ProductEventStatDeviceTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESKTOP = 'desktop';
-    const MOBILE_ANDROID_PHONE = 'mobile_android_phone';
-    const MOBILE_ANDROID_TABLET = 'mobile_android_tablet';
-    const MOBILE_IPAD = 'mobile_ipad';
-    const MOBILE_IPHONE = 'mobile_iphone';
-    const MOBILE_IPOD = 'mobile_ipod';
-    const MOBILE_PHONE = 'mobile_phone';
-    const MOBILE_TABLET = 'mobile_tablet';
-    const MOBILE_WINDOWS_PHONE = 'mobile_windows_phone';
-    const UNKNOWN = 'unknown';
+class ProductEventStatDeviceTypeValues extends AbstractEnum {
+
+  const DESKTOP = 'desktop';
+  const MOBILE_ANDROID_PHONE = 'mobile_android_phone';
+  const MOBILE_ANDROID_TABLET = 'mobile_android_tablet';
+  const MOBILE_IPAD = 'mobile_ipad';
+  const MOBILE_IPHONE = 'mobile_iphone';
+  const MOBILE_IPOD = 'mobile_ipod';
+  const MOBILE_PHONE = 'mobile_phone';
+  const MOBILE_TABLET = 'mobile_tablet';
+  const MOBILE_WINDOWS_PHONE = 'mobile_windows_phone';
+  const UNKNOWN = 'unknown';
 }

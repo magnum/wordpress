@@ -58,11 +58,11 @@ abstract class Mo_SAML_Basic_Enum {
 	/**
 	 * Function to check for valid value of constant classes.
 	 *
-	 * @param  mixed   $value accepts the constant value.
-	 * @param  boolean $strict bool check.
+	 * @param  mixed $value accepts the constant value.
+	 *
 	 * @return boolean
 	 */
-	public static function is_valid_value( $value, $strict = true ) {
+	public static function is_valid_value( $value ) {
 		$values = array_values( self::get_constants() );
 		return in_array( $value, $values, true );
 	}

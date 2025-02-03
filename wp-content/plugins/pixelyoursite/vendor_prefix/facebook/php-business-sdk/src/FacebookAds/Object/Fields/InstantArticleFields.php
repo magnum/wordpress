@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class InstantArticleFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CANONICAL_URL = 'canonical_url';
-    const DEVELOPMENT_MODE = 'development_mode';
-    const HTML_SOURCE = 'html_source';
-    const ID = 'id';
-    const MOST_RECENT_IMPORT_STATUS = 'most_recent_import_status';
-    const PHOTOS = 'photos';
-    const PUBLISH_STATUS = 'publish_status';
-    const PUBLISHED = 'published';
-    const VIDEOS = 'videos';
-    public function getFieldTypes()
-    {
-        return array('canonical_url' => 'string', 'development_mode' => 'bool', 'html_source' => 'string', 'id' => 'string', 'most_recent_import_status' => 'Object', 'photos' => 'list<Object>', 'publish_status' => 'string', 'published' => 'bool', 'videos' => 'list<Object>');
-    }
+
+class InstantArticleFields extends AbstractEnum {
+
+  const CANONICAL_URL = 'canonical_url';
+  const DEVELOPMENT_MODE = 'development_mode';
+  const HTML_SOURCE = 'html_source';
+  const ID = 'id';
+  const MOST_RECENT_IMPORT_STATUS = 'most_recent_import_status';
+  const PHOTOS = 'photos';
+  const PUBLISH_STATUS = 'publish_status';
+  const PUBLISHED = 'published';
+  const VIDEOS = 'videos';
+
+  public function getFieldTypes() {
+    return array(
+      'canonical_url' => 'string',
+      'development_mode' => 'bool',
+      'html_source' => 'string',
+      'id' => 'string',
+      'most_recent_import_status' => 'Object',
+      'photos' => 'list<Object>',
+      'publish_status' => 'string',
+      'published' => 'bool',
+      'videos' => 'list<Object>',
+    );
+  }
 }

@@ -79,6 +79,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row">
             <div class="col">
                 <p><a href="https://www.youtube.com/watch?v=uXTpgFu2V-E" target="_blank">The biggest problem with consent messages (7:02 min) - watch now</a></p>
+								<p><a href="https://www.youtube.com/watch?v=L_YYjrmxykU" target="_blank">Improve tracking under GDPR consent with this smart option (5:31 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=ZOlNbIPS_Uc" target="_blank">Target your visitors with the right consent rule (12:29 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=P8CLxslSPDk" target="_blank">The right to change your mind (2:46 min) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank">Facebook Conversion API and the Consent Problem (9:25 min) - watch now</a></p>
@@ -159,6 +160,15 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="col-4">
                 <?php PYS()->render_text_input( 'gdpr_cookiebot_bing_consent_category',
+                    'Enter consent category', ! isCookiebotPluginActivated() ); ?>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-4">
+                <label class="label-inline">Tiktok consent category:</label>
+            </div>
+            <div class="col-4">
+                <?php PYS()->render_text_input( 'gdpr_cookiebot_tiktok_consent_category',
                     'Enter consent category', ! isCookiebotPluginActivated() ); ?>
             </div>
         </div>
@@ -290,6 +300,48 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <p class="mb-0">First filter will disable all pixels, other can be used to disable particular pixel.
                     Simply pass <code>TRUE</code> value to disable a pixel.
                 </p>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <h2>Use the following filters to control each cookie:</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p>
+                <p><code>pys_disable_all_cookie</code> - disable all PYS cookies</p>
+                <p><code>pys_disabled_start_session_cookie</code> - disable start_session & session_limit cookie</p>
+                <p><code>pys_disable_first_visit_cookie</code> - disable pys_first_visit cookie</p>
+                <p><code>pys_disable_landing_page_cookie</code> - disable pys_landing_page & last_pys_landing_page cookies</p>
+                <p><code>pys_disable_trafficsource_cookie</code> - disable pysTrafficSource & last_pysTrafficSource cookies</p>
+                <p><code>pys_disable_utmTerms_cookie</code> - disable ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content' ,'utm_term'] with prefix <code>pys_</code> and <code>last_pys_</code> cookies</p>
+                <p><code>pys_disable_utmId_cookie</code> - disable ['fbadid', 'gadid', 'padid', 'bingid'] with prefix <code>pys_</code> and <code>last_pys_</code> cookies</p>
+                <p><code>pys_disable_advance_data_cookie</code> - disable pys_advanced_data cookies</p>
+                <p><code>pys_disable_externalID_by_gdpr</code> - disable pbid(external_id) cookie</p>
+                </p>
+                <p class="mb-0">
+                    To disable cookies, use filters where necessary.<br>
+                    First filter will disable all cookies, other can be used to disable particular cookie.
+                    Simply pass <code>__return_true</code> value to disable a cookie.
+                </p>
+                <p>
+                    Example:<br>
+                    <code>add_filter( 'pys_disable_advance_data_cookie', '__return_true', 10, 2 );</code>
+                </p>
+
+                <p>Use these filters to add Google Consent Mode V2 support:</p>
+
+                <p class="mb-0"><code>pys_{mode name}_mode</code> - Fire pixel with Google consent mode</p>
+                <p class="mb-0"> {mode name} - analytics_storage, ad_storage, ad_user_data, ad_personalization</p>
+                <p class="mb-0">
+                    Example:<br>
+                    <code>add_filter( 'pys_analytics_storage_mode', '__return_true' );</code>
+                </p>
+                <p>Fire the pixel with consent mode "analytics_storage": "granted"</p>
             </div>
         </div>
     </div>

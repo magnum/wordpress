@@ -65,7 +65,7 @@ $utms = [
 
         <div class="bg-gray">
             <h4 class="label">Your URL:</h4>
-            <input type="text" class="site_url form-control mt-2" value="<?=get_site_url();?>"/>
+            <input type="text" class="site_url form-control mt-2" value="<?=get_site_url(); ?>"/>
         </div>
         <?php
         foreach ($utms as $utm) : ?>

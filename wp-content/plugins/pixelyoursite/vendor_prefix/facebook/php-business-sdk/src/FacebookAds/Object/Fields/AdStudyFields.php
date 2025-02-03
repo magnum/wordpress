@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,30 +34,56 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdStudyFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS = 'business';
-    const CANCELED_TIME = 'canceled_time';
-    const COOLDOWN_START_TIME = 'cooldown_start_time';
-    const CREATED_BY = 'created_by';
-    const CREATED_TIME = 'created_time';
-    const DESCRIPTION = 'description';
-    const END_TIME = 'end_time';
-    const ID = 'id';
-    const NAME = 'name';
-    const OBSERVATION_END_TIME = 'observation_end_time';
-    const RESULTS_FIRST_AVAILABLE_DATE = 'results_first_available_date';
-    const START_TIME = 'start_time';
-    const TYPE = 'type';
-    const UPDATED_BY = 'updated_by';
-    const UPDATED_TIME = 'updated_time';
-    const CELLS = 'cells';
-    const CLIENT_BUSINESS = 'client_business';
-    const CONFIDENCE_LEVEL = 'confidence_level';
-    const OBJECTIVES = 'objectives';
-    const VIEWERS = 'viewers';
-    public function getFieldTypes()
-    {
-        return array('business' => 'Business', 'canceled_time' => 'datetime', 'cooldown_start_time' => 'datetime', 'created_by' => 'User', 'created_time' => 'datetime', 'description' => 'string', 'end_time' => 'datetime', 'id' => 'string', 'name' => 'string', 'observation_end_time' => 'datetime', 'results_first_available_date' => 'string', 'start_time' => 'datetime', 'type' => 'string', 'updated_by' => 'User', 'updated_time' => 'datetime', 'cells' => 'list<Object>', 'client_business' => 'string', 'confidence_level' => 'float', 'objectives' => 'list<Object>', 'viewers' => 'list<int>');
-    }
+
+class AdStudyFields extends AbstractEnum {
+
+  const BUSINESS = 'business';
+  const CANCELED_TIME = 'canceled_time';
+  const CLIENT_BUSINESS = 'client_business';
+  const COOLDOWN_START_TIME = 'cooldown_start_time';
+  const CREATED_BY = 'created_by';
+  const CREATED_TIME = 'created_time';
+  const DESCRIPTION = 'description';
+  const END_TIME = 'end_time';
+  const ID = 'id';
+  const MEASUREMENT_CONTACT = 'measurement_contact';
+  const NAME = 'name';
+  const OBSERVATION_END_TIME = 'observation_end_time';
+  const RESULTS_FIRST_AVAILABLE_DATE = 'results_first_available_date';
+  const SALES_CONTACT = 'sales_contact';
+  const START_TIME = 'start_time';
+  const TYPE = 'type';
+  const UPDATED_BY = 'updated_by';
+  const UPDATED_TIME = 'updated_time';
+  const CELLS = 'cells';
+  const CONFIDENCE_LEVEL = 'confidence_level';
+  const OBJECTIVES = 'objectives';
+  const VIEWERS = 'viewers';
+
+  public function getFieldTypes() {
+    return array(
+      'business' => 'Business',
+      'canceled_time' => 'datetime',
+      'client_business' => 'Business',
+      'cooldown_start_time' => 'datetime',
+      'created_by' => 'User',
+      'created_time' => 'datetime',
+      'description' => 'string',
+      'end_time' => 'datetime',
+      'id' => 'string',
+      'measurement_contact' => 'User',
+      'name' => 'string',
+      'observation_end_time' => 'datetime',
+      'results_first_available_date' => 'string',
+      'sales_contact' => 'User',
+      'start_time' => 'datetime',
+      'type' => 'string',
+      'updated_by' => 'User',
+      'updated_time' => 'datetime',
+      'cells' => 'list<Object>',
+      'confidence_level' => 'float',
+      'objectives' => 'list<Object>',
+      'viewers' => 'list<int>',
+    );
+  }
 }

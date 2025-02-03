@@ -34,7 +34,7 @@ class Twitter_Functions {
 	 */
 	public function get_client() {
 
-		$tokens = get_option( '_uncannyowl_twitter_settings', array() );
+		$tokens = automator_get_option( '_uncannyowl_twitter_settings', array() );
 
 		if ( empty( $tokens['oauth_token'] ) || empty( $tokens['oauth_token_secret'] ) ) {
 			throw new \Exception( 'Twitter is not connected' );
@@ -65,7 +65,7 @@ class Twitter_Functions {
 	/**
 	 * @param string $option_code
 	 * @param string $label
-	 * @param bool $tokens
+	 * @param bool   $tokens
 	 * @param string $type
 	 * @param string $default
 	 * @param bool
@@ -107,9 +107,10 @@ class Twitter_Functions {
 	/**
 	 * api_request
 	 *
-	 * @param  array $body
-	 * @param  array $action_data
-	 * @param  int $timeout
+	 * @param array $body
+	 * @param array $action_data
+	 * @param int   $timeout
+	 *
 	 * @return mixed
 	 */
 	public function api_request( $body, $action_data = null, $timeout = null ) {
@@ -135,17 +136,6 @@ class Twitter_Functions {
 		}
 
 		$response = Api_Server::api_call( $params );
-
-		if ( 200 !== $response['statusCode'] ) {
-
-			$error = __( 'Something went wrong.', 'uncanny-automator' );
-
-			if ( ! empty( $response['data']['detail'] ) ) {
-				$error = $response['statusCode'] . ': ' . $response['data']['detail'];
-			}
-
-			throw new \Exception( $error, $response['statusCode'] );
-		}
 
 		return $response;
 	}
@@ -210,8 +200,8 @@ class Twitter_Functions {
 			return;
 		}
 
-		delete_option( '_uncannyowl_twitter_settings' );
-		delete_option( 'automator_twitter_user' );
+		automator_delete_option( '_uncannyowl_twitter_settings' );
+		automator_delete_option( 'automator_twitter_user' );
 
 		// Reload the page
 		wp_safe_redirect( $this->get_settings_page_url() );
@@ -269,7 +259,8 @@ class Twitter_Functions {
 	 *
 	 * Makes a request to the API to verify the entered credentials.
 	 *
-	 * @param  array $client
+	 * @param array $client
+	 *
 	 * @return mixed
 	 */
 	public function verify_credentials( $client ) {
@@ -285,49 +276,10 @@ class Twitter_Functions {
 		$response = Api_Server::api_call( $params );
 
 		if ( 200 !== $response['statusCode'] || empty( $response['data'] ) ) {
-			throw new \Exception( 'Could not verify your Twitter app credentials.' );
+			throw new \Exception( 'Could not verify your X/Twitter app credentials.' );
 		}
 
 		return $response['data'];
-	}
-
-	/**
-	 * parse_errors
-	 *
-	 * @param  string $error_msg
-	 * @return string
-	 */
-	public function parse_errors( $error_msg ) {
-
-		$output = array();
-
-		// The message has several lines, parse them into array.
-		$lines = explode( "\n", $error_msg );
-
-		// The second line usually has a json string, but let's loop through all of them just in case.
-		foreach ( $lines as $line ) {
-
-			$error_array = json_decode( $line, true );
-
-			if ( ! empty( $error_array['errors'] ) ) {
-
-				foreach ( $error_array['errors'] as $error ) {
-
-					if ( empty( $error['code'] ) || empty( $error['message'] ) ) {
-						continue;
-					}
-
-					$output[] = 'Error code ' . $error['code'] . ': ' . $error['message'];
-				}
-			}
-		}
-
-		// Return the original string if no errors were parsed.
-		if ( empty( $output ) ) {
-			return $error_msg;
-		}
-
-		return implode( '<br>', $output );
 	}
 
 	/**
@@ -342,6 +294,11 @@ class Twitter_Functions {
 		$body['action'] = 'statuses_update';
 		$body['status'] = $status;
 		$body['media']  = $media;
+
+		// If a user app is used, switch the action
+		if ( $this->is_user_app_connected() ) {
+			$body['action'] = 'manage_tweets_user_app';
+		}
 
 		$response = $this->api_request( $body, $action_data, 60 );
 
@@ -381,7 +338,7 @@ class Twitter_Functions {
 		if ( $tokens ) {
 
 			// Save them
-			update_option( '_uncannyowl_twitter_settings', $tokens );
+			automator_update_option( '_uncannyowl_twitter_settings', $tokens );
 
 			$connect = 1;
 		}
@@ -428,5 +385,50 @@ class Twitter_Functions {
 		);
 	}
 
+	/**
+	 * get_username
+	 *
+	 * @return string
+	 */
+	public function get_username() {
+
+		if ( $this->is_user_app_connected() ) {
+			return $this->get_user_app_username();
+		}
+
+		return $this->get_oauth_username();
+	}
+
+	/**
+	 * get_user_app_username
+	 *
+	 * @return string
+	 */
+	public function get_user_app_username() {
+
+		$user = automator_get_option( 'automator_twitter_user', array() );
+
+		if ( ! empty( $user['screen_name'] ) ) {
+			return $user['screen_name'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * get_oauth_username
+	 *
+	 * @return string
+	 */
+	public function get_oauth_username() {
+
+		try {
+			$client = $this->get_client();
+
+			return $client['screen_name'];
+		} catch ( \Exception $e ) {
+			return '';
+		}
+	}
 }
 

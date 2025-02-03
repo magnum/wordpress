@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\EntityAtTextRangeFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EntityAtTextRangeTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\EntityAtTextRangeTypeValues;
  * pull request for this class.
  *
  */
-class EntityAtTextRange extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return EntityAtTextRangeFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\EntityAtTextRangeFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\EntityAtTextRangeTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class EntityAtTextRange extends AbstractCrudObject {
+
+  /**
+   * @return EntityAtTextRangeFields
+   */
+  public static function getFieldsEnum() {
+    return EntityAtTextRangeFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Type'] = EntityAtTextRangeTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

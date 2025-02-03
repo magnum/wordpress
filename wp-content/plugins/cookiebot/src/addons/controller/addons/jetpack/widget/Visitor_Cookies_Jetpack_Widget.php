@@ -6,6 +6,7 @@ use function cybot\cookiebot\lib\cookiebot_addons_cookieconsent_optout;
 use function cybot\cookiebot\lib\cookiebot_addons_remove_class_action;
 
 class Visitor_Cookies_Jetpack_Widget extends Base_Jetpack_Widget {
+
 	const LABEL               = 'Visitor cookies';
 	const WIDGET_OPTION_NAME  = 'visitor_cookies';
 	const DEFAULT_PLACEHOLDER = 'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to watch this video.';
@@ -93,26 +94,5 @@ class Visitor_Cookies_Jetpack_Widget extends Base_Jetpack_Widget {
 		if ( has_action( 'init', 'jetpack_mobile_request_handler' ) ) {
 			remove_action( 'init', 'jetpack_mobile_request_handler' );
 		}
-
-		/**
-		 * Show message to accept preferences consent to save
-		 */
-		if ( $this->is_widget_placeholder_enabled() ) {
-			add_action( 'wp_footer', array( $this, 'view_accept_preferences_consent' ) );
-		}
 	}
-
-	/**
-	 * Display message to enable
-	 *
-	 * @since 1.2.0
-	 */
-	public function view_accept_preferences_consent() {
-		$classname  = cookiebot_addons_cookieconsent_optout( $this->get_widget_cookie_types() );
-		$inner_html = $this->get_default_placeholder();
-		echo '<div class="' . esc_attr( $classname ) . '">
-						  ' . esc_html( $inner_html ) . '
-						</div>';
-	}
-
 }

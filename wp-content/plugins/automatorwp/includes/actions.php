@@ -25,6 +25,7 @@ function automatorwp_register_action( $action, $args ) {
         'select_option'     => '',
         'edit_label'        => '',
         'options'           => array(),
+        'tags'              => array(),
     ) );
 
     /**

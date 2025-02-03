@@ -117,12 +117,27 @@
 
 						<?php esc_html_e( 'To obtain your ActiveCampaign API URL and Key, follow these steps in your ActiveCampaign account:', 'uncanny-automator' ); ?>
 
-						<ol class="uap-spacing-top uap-spacing-top--small uap-spacing-bottom uap-spacing-bottom--none">
+						<ol>
+							<li>
+								<?php
+								echo wp_kses(
+									__( 'Log in to your <a target="_blank" href="https://www.activecampaign.com/login" target="_blank">ActiveCampaign account</a>.', 'uncanny-automator' ),
+									array(
+										'a' => array(
+											'href'   => array(),
+											'target' => array(),
+										),
+									)
+								);
+								?>
+							</li>
 							<li><?php esc_html_e( 'Click the "Settings" option located in the left side navigation menu.', 'uncanny-automator' ); ?></li>
 							<li><?php esc_html_e( 'The Account Settings menu will appear. Click the "Developer" option.', 'uncanny-automator' ); ?></li>
-							<li><?php esc_html_e( 'The Developer Settings page will load and will display your ActiveCampaign API URL and Key.', 'uncanny-automator' ); ?></li>
+							<li><?php esc_html_e( 'On the "Developer Settings" page, copy your API URL and API Key.', 'uncanny-automator' ); ?></li>
+							<li><?php esc_html_e( 'Paste the API URL and API Key into the respective fields in the form below.', 'uncanny-automator' ); ?></li>
+							<li><?php esc_html_e( 'Click the "Connect ActiveCampaign account" button to save your details and complete the setup.', 'uncanny-automator' ); ?></li>
 						</ol>
-					
+
 					</uo-alert>
 
 				<?php } ?>
@@ -155,10 +170,13 @@
 
 					<uo-alert
 						heading="<?php echo esc_attr( $this->button_labels['default'] ); ?>"
-						type="info"
+						type="default"
+						id="active-campaign-local-sync-alert"
 					>
-						<p class="uap-spacing-bottom uap-spacing-bottom--none">
-							<uo-button id="active-campaign-local-syn-btn" color="secondary">
+						<p id="active-campaign-local-sync-p" class="uap-spacing-bottom uap-spacing-bottom--none">
+							<hr/>
+							<uo-button size="extra-small" id="active-campaign-local-syn-btn" color="secondary">
+								<uo-icon id="sync"></uo-icon>
 								<?php esc_html_e( 'Refresh', 'uncanny-automator' ); ?>
 							</uo-button>
 						</p>
@@ -179,7 +197,7 @@
 								<?php
 
 									echo sprintf(
-										esc_html__( "Enabling ActiveCampaign triggers requires setting up a webhook in your ActiveCampaign account using the URL below. A few steps and you'll be up and running in no time. Visit our %1\$s for simple instructions.", 'uncanny-automator-pro' ),
+										esc_html__( "Enabling ActiveCampaign triggers requires setting up a webhook in your ActiveCampaign account using the URL below. A few steps and you'll be up and running in no time. Visit our %1\$s for simple instructions.", 'uncanny-automator' ),
 										'<a href="' . esc_url( $this->kb_link ) . '" target="_blank">' . esc_html__( 'Knowledge Base article', 'uncanny-automator' ) . ' <uo-icon id="external-link"></uo-icon></a>'
 									);
 
@@ -200,16 +218,16 @@
 								color="secondary"
 								class="uap-spacing-top"
 							>
-								<uo-icon id="sync"></uo-icon> 
+								<uo-icon id="sync"></uo-icon>
 								<?php esc_attr_e( 'Regenerate webhook URL', 'uncanny-automator' ); ?>
 							</uo-button>
-						
+
 						</uo-alert>
 
 					</div>
 
-				<?php } ?> 
-					
+				<?php } ?>
+
 			</div>
 
 		</div>
@@ -281,7 +299,7 @@
 					</uo-button>
 
 				<?php } ?>
-					
+
 				</div>
 
 		</div>

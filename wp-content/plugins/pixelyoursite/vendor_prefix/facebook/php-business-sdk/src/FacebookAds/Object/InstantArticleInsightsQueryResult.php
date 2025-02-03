@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InstantArticleInsightsQueryResultFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstantArticleInsightsQueryResultBreakdownValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstantArticleInsightsQueryResultPeriodValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstantArticleInsightsQueryResultPe
  * pull request for this class.
  *
  */
-class InstantArticleInsightsQueryResult extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return InstantArticleInsightsQueryResultFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InstantArticleInsightsQueryResultFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Breakdown'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstantArticleInsightsQueryResultBreakdownValues::getInstance()->getValues();
-        $ref_enums['Period'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstantArticleInsightsQueryResultPeriodValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class InstantArticleInsightsQueryResult extends AbstractObject {
+
+  /**
+   * @return InstantArticleInsightsQueryResultFields
+   */
+  public static function getFieldsEnum() {
+    return InstantArticleInsightsQueryResultFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Breakdown'] = InstantArticleInsightsQueryResultBreakdownValues::getInstance()->getValues();
+    $ref_enums['Period'] = InstantArticleInsightsQueryResultPeriodValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

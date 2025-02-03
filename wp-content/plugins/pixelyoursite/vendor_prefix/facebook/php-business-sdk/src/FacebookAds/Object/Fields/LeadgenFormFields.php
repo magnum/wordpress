@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,32 +34,58 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LeadgenFormFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ALLOW_ORGANIC_LEAD = 'allow_organic_lead';
-    const BLOCK_DISPLAY_FOR_NON_TARGETED_VIEWER = 'block_display_for_non_targeted_viewer';
-    const CONTEXT_CARD = 'context_card';
-    const CREATED_TIME = 'created_time';
-    const EXPIRED_LEADS_COUNT = 'expired_leads_count';
-    const FOLLOW_UP_ACTION_TEXT = 'follow_up_action_text';
-    const FOLLOW_UP_ACTION_URL = 'follow_up_action_url';
-    const ID = 'id';
-    const IS_OPTIMIZED_FOR_QUALITY = 'is_optimized_for_quality';
-    const LEADS_COUNT = 'leads_count';
-    const LEGAL_CONTENT = 'legal_content';
-    const LOCALE = 'locale';
-    const NAME = 'name';
-    const ORGANIC_LEADS_COUNT = 'organic_leads_count';
-    const PAGE = 'page';
-    const PAGE_ID = 'page_id';
-    const PRIVACY_POLICY_URL = 'privacy_policy_url';
-    const QUESTION_PAGE_CUSTOM_HEADLINE = 'question_page_custom_headline';
-    const QUESTIONS = 'questions';
-    const STATUS = 'status';
-    const THANK_YOU_PAGE = 'thank_you_page';
-    const TRACKING_PARAMETERS = 'tracking_parameters';
-    public function getFieldTypes()
-    {
-        return array('allow_organic_lead' => 'bool', 'block_display_for_non_targeted_viewer' => 'bool', 'context_card' => 'Object', 'created_time' => 'datetime', 'expired_leads_count' => 'unsigned int', 'follow_up_action_text' => 'string', 'follow_up_action_url' => 'string', 'id' => 'string', 'is_optimized_for_quality' => 'bool', 'leads_count' => 'unsigned int', 'legal_content' => 'Object', 'locale' => 'string', 'name' => 'string', 'organic_leads_count' => 'unsigned int', 'page' => 'Page', 'page_id' => 'string', 'privacy_policy_url' => 'string', 'question_page_custom_headline' => 'string', 'questions' => 'list<LeadGenQuestion>', 'status' => 'string', 'thank_you_page' => 'Object', 'tracking_parameters' => 'map<string, string>');
-    }
+
+class LeadgenFormFields extends AbstractEnum {
+
+  const ALLOW_ORGANIC_LEAD = 'allow_organic_lead';
+  const BLOCK_DISPLAY_FOR_NON_TARGETED_VIEWER = 'block_display_for_non_targeted_viewer';
+  const CONTEXT_CARD = 'context_card';
+  const CREATED_TIME = 'created_time';
+  const CREATOR = 'creator';
+  const EXPIRED_LEADS_COUNT = 'expired_leads_count';
+  const FOLLOW_UP_ACTION_TEXT = 'follow_up_action_text';
+  const FOLLOW_UP_ACTION_URL = 'follow_up_action_url';
+  const ID = 'id';
+  const IS_OPTIMIZED_FOR_QUALITY = 'is_optimized_for_quality';
+  const LEADS_COUNT = 'leads_count';
+  const LEGAL_CONTENT = 'legal_content';
+  const LOCALE = 'locale';
+  const NAME = 'name';
+  const ORGANIC_LEADS_COUNT = 'organic_leads_count';
+  const PAGE = 'page';
+  const PAGE_ID = 'page_id';
+  const PRIVACY_POLICY_URL = 'privacy_policy_url';
+  const QUESTION_PAGE_CUSTOM_HEADLINE = 'question_page_custom_headline';
+  const QUESTIONS = 'questions';
+  const STATUS = 'status';
+  const THANK_YOU_PAGE = 'thank_you_page';
+  const TRACKING_PARAMETERS = 'tracking_parameters';
+
+  public function getFieldTypes() {
+    return array(
+      'allow_organic_lead' => 'bool',
+      'block_display_for_non_targeted_viewer' => 'bool',
+      'context_card' => 'Object',
+      'created_time' => 'datetime',
+      'creator' => 'User',
+      'expired_leads_count' => 'unsigned int',
+      'follow_up_action_text' => 'string',
+      'follow_up_action_url' => 'string',
+      'id' => 'string',
+      'is_optimized_for_quality' => 'bool',
+      'leads_count' => 'unsigned int',
+      'legal_content' => 'Object',
+      'locale' => 'string',
+      'name' => 'string',
+      'organic_leads_count' => 'unsigned int',
+      'page' => 'Page',
+      'page_id' => 'string',
+      'privacy_policy_url' => 'string',
+      'question_page_custom_headline' => 'string',
+      'questions' => 'list<LeadGenQuestion>',
+      'status' => 'string',
+      'thank_you_page' => 'Object',
+      'tracking_parameters' => 'map<string, string>',
+    );
+  }
 }

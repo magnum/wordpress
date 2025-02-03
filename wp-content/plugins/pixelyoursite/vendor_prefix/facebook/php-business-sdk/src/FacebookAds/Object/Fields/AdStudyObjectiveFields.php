@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdStudyObjectiveFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const IS_PRIMARY = 'is_primary';
-    const LAST_UPDATED_RESULTS = 'last_updated_results';
-    const NAME = 'name';
-    const RESULTS = 'results';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('id' => 'string', 'is_primary' => 'bool', 'last_updated_results' => 'string', 'name' => 'string', 'results' => 'list<string>', 'type' => 'string');
-    }
+
+class AdStudyObjectiveFields extends AbstractEnum {
+
+  const ID = 'id';
+  const IS_PRIMARY = 'is_primary';
+  const LAST_UPDATED_RESULTS = 'last_updated_results';
+  const NAME = 'name';
+  const RESULTS = 'results';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'id' => 'string',
+      'is_primary' => 'bool',
+      'last_updated_results' => 'string',
+      'name' => 'string',
+      'results' => 'list<string>',
+      'type' => 'string',
+    );
+  }
 }

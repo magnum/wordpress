@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CustomAudienceSessionFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const END_TIME = 'end_time';
-    const NUM_INVALID_ENTRIES = 'num_invalid_entries';
-    const NUM_MATCHED = 'num_matched';
-    const NUM_RECEIVED = 'num_received';
-    const PROGRESS = 'progress';
-    const SESSION_ID = 'session_id';
-    const STAGE = 'stage';
-    const START_TIME = 'start_time';
-    public function getFieldTypes()
-    {
-        return array('end_time' => 'string', 'num_invalid_entries' => 'string', 'num_matched' => 'string', 'num_received' => 'string', 'progress' => 'string', 'session_id' => 'string', 'stage' => 'string', 'start_time' => 'string');
-    }
+
+class CustomAudienceSessionFields extends AbstractEnum {
+
+  const END_TIME = 'end_time';
+  const NUM_INVALID_ENTRIES = 'num_invalid_entries';
+  const NUM_MATCHED = 'num_matched';
+  const NUM_RECEIVED = 'num_received';
+  const PROGRESS = 'progress';
+  const SESSION_ID = 'session_id';
+  const STAGE = 'stage';
+  const START_TIME = 'start_time';
+
+  public function getFieldTypes() {
+    return array(
+      'end_time' => 'string',
+      'num_invalid_entries' => 'string',
+      'num_matched' => 'string',
+      'num_received' => 'string',
+      'progress' => 'string',
+      'session_id' => 'string',
+      'stage' => 'string',
+      'start_time' => 'string',
+    );
+  }
 }

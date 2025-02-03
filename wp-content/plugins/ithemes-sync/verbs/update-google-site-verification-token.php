@@ -12,12 +12,18 @@ Version History
 
 
 class Ithemes_Sync_Verb_Update_Google_Site_Verification_Token extends Ithemes_Sync_Verb {
-	public static $name = 'update-google-site-verification-token';
+	public static $name        = 'update-google-site-verification-token';
 	public static $description = 'Temporarily sets a meta token to verify sites w/ Google';
 	
 	public function run( $arguments ) {
-		update_option( 'ithemes-sync-googst', array( 'code' => $arguments, 'expiry' => time() + ( 60 * 60 * 24 ) ) );
+		update_option(
+			'ithemes-sync-googst',
+			[
+				'code'   => $arguments,
+				'expiry' => time() + ( 60 * 60 * 24 ),
+			] 
+		);
 				
-		return array( 'success' => 1 );
+		return [ 'success' => 1 ];
 	}
 }

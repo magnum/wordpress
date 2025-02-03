@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,22 +34,36 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BroadTargetingCategoriesFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CATEGORY_DESCRIPTION = 'category_description';
-    const ID = 'id';
-    const NAME = 'name';
-    const PARENT_CATEGORY = 'parent_category';
-    const PATH = 'path';
-    const SIZE_LOWER_BOUND = 'size_lower_bound';
-    const SIZE_UPPER_BOUND = 'size_upper_bound';
-    const SOURCE = 'source';
-    const TYPE = 'type';
-    const TYPE_NAME = 'type_name';
-    const UNTRANSLATED_NAME = 'untranslated_name';
-    const UNTRANSLATED_PARENT_NAME = 'untranslated_parent_name';
-    public function getFieldTypes()
-    {
-        return array('category_description' => 'string', 'id' => 'string', 'name' => 'string', 'parent_category' => 'string', 'path' => 'list<string>', 'size_lower_bound' => 'int', 'size_upper_bound' => 'int', 'source' => 'string', 'type' => 'int', 'type_name' => 'string', 'untranslated_name' => 'string', 'untranslated_parent_name' => 'string');
-    }
+
+class BroadTargetingCategoriesFields extends AbstractEnum {
+
+  const CATEGORY_DESCRIPTION = 'category_description';
+  const ID = 'id';
+  const NAME = 'name';
+  const PARENT_CATEGORY = 'parent_category';
+  const PATH = 'path';
+  const SIZE_LOWER_BOUND = 'size_lower_bound';
+  const SIZE_UPPER_BOUND = 'size_upper_bound';
+  const SOURCE = 'source';
+  const TYPE = 'type';
+  const TYPE_NAME = 'type_name';
+  const UNTRANSLATED_NAME = 'untranslated_name';
+  const UNTRANSLATED_PARENT_NAME = 'untranslated_parent_name';
+
+  public function getFieldTypes() {
+    return array(
+      'category_description' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'parent_category' => 'string',
+      'path' => 'list<string>',
+      'size_lower_bound' => 'int',
+      'size_upper_bound' => 'int',
+      'source' => 'string',
+      'type' => 'int',
+      'type_name' => 'string',
+      'untranslated_name' => 'string',
+      'untranslated_parent_name' => 'string',
+    );
+  }
 }

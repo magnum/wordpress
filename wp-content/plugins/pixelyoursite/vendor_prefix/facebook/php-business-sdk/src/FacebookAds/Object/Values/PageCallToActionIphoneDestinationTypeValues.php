@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PageCallToActionIphoneDestinationTypeValues getInstance()
  */
-class PageCallToActionIphoneDestinationTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP_DEEPLINK = 'APP_DEEPLINK';
-    const BECOME_A_VOLUNTEER = 'BECOME_A_VOLUNTEER';
-    const EMAIL = 'EMAIL';
-    const FACEBOOK_APP = 'FACEBOOK_APP';
-    const FOLLOW = 'FOLLOW';
-    const MARKETPLACE_INVENTORY_PAGE = 'MARKETPLACE_INVENTORY_PAGE';
-    const MENU_ON_FACEBOOK = 'MENU_ON_FACEBOOK';
-    const MESSENGER = 'MESSENGER';
-    const MINI_SHOP = 'MINI_SHOP';
-    const NONE = 'NONE';
-    const PHONE_CALL = 'PHONE_CALL';
-    const SHOP_ON_FACEBOOK = 'SHOP_ON_FACEBOOK';
-    const WEBSITE = 'WEBSITE';
+class PageCallToActionIphoneDestinationTypeValues extends AbstractEnum {
+
+  const APP_DEEPLINK = 'APP_DEEPLINK';
+  const BECOME_A_VOLUNTEER = 'BECOME_A_VOLUNTEER';
+  const EMAIL = 'EMAIL';
+  const FACEBOOK_APP = 'FACEBOOK_APP';
+  const FOLLOW = 'FOLLOW';
+  const MARKETPLACE_INVENTORY_PAGE = 'MARKETPLACE_INVENTORY_PAGE';
+  const MENU_ON_FACEBOOK = 'MENU_ON_FACEBOOK';
+  const MESSENGER = 'MESSENGER';
+  const MINI_SHOP = 'MINI_SHOP';
+  const NONE = 'NONE';
+  const PHONE_CALL = 'PHONE_CALL';
+  const SHOP_ON_FACEBOOK = 'SHOP_ON_FACEBOOK';
+  const WEBSITE = 'WEBSITE';
 }

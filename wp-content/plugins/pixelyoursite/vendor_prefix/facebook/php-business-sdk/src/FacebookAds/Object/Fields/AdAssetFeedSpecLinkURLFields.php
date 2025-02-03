@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAssetFeedSpecLinkURLFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADLABELS = 'adlabels';
-    const CAROUSEL_SEE_MORE_URL = 'carousel_see_more_url';
-    const DEEPLINK_URL = 'deeplink_url';
-    const DISPLAY_URL = 'display_url';
-    const URL_TAGS = 'url_tags';
-    const WEBSITE_URL = 'website_url';
-    public function getFieldTypes()
-    {
-        return array('adlabels' => 'list<AdAssetFeedSpecAssetLabel>', 'carousel_see_more_url' => 'string', 'deeplink_url' => 'string', 'display_url' => 'string', 'url_tags' => 'string', 'website_url' => 'string');
-    }
+
+class AdAssetFeedSpecLinkURLFields extends AbstractEnum {
+
+  const ADLABELS = 'adlabels';
+  const CAROUSEL_SEE_MORE_URL = 'carousel_see_more_url';
+  const DEEPLINK_URL = 'deeplink_url';
+  const DISPLAY_URL = 'display_url';
+  const URL_TAGS = 'url_tags';
+  const WEBSITE_URL = 'website_url';
+
+  public function getFieldTypes() {
+    return array(
+      'adlabels' => 'list<AdAssetFeedSpecAssetLabel>',
+      'carousel_see_more_url' => 'string',
+      'deeplink_url' => 'string',
+      'display_url' => 'string',
+      'url_tags' => 'string',
+      'website_url' => 'string',
+    );
+  }
 }

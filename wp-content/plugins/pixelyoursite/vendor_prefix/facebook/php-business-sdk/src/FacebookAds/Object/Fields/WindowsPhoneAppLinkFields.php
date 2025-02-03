@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class WindowsPhoneAppLinkFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APP_ID = 'app_id';
-    const APP_NAME = 'app_name';
-    const URL = 'url';
-    public function getFieldTypes()
-    {
-        return array('app_id' => 'string', 'app_name' => 'string', 'url' => 'string');
-    }
+
+class WindowsPhoneAppLinkFields extends AbstractEnum {
+
+  const APP_ID = 'app_id';
+  const APP_NAME = 'app_name';
+  const URL = 'url';
+
+  public function getFieldTypes() {
+    return array(
+      'app_id' => 'string',
+      'app_name' => 'string',
+      'url' => 'string',
+    );
+  }
 }

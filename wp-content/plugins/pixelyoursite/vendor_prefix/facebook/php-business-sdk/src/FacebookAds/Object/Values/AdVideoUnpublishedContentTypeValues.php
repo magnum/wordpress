@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdVideoUnpublishedContentTypeValues getInstance()
  */
-class AdVideoUnpublishedContentTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADS_POST = 'ADS_POST';
-    const DRAFT = 'DRAFT';
-    const INLINE_CREATED = 'INLINE_CREATED';
-    const PUBLISHED = 'PUBLISHED';
-    const REVIEWABLE_BRANDED_CONTENT = 'REVIEWABLE_BRANDED_CONTENT';
-    const SCHEDULED = 'SCHEDULED';
-    const SCHEDULED_RECURRING = 'SCHEDULED_RECURRING';
+class AdVideoUnpublishedContentTypeValues extends AbstractEnum {
+
+  const ADS_POST = 'ADS_POST';
+  const DRAFT = 'DRAFT';
+  const INLINE_CREATED = 'INLINE_CREATED';
+  const PUBLISHED = 'PUBLISHED';
+  const REVIEWABLE_BRANDED_CONTENT = 'REVIEWABLE_BRANDED_CONTENT';
+  const SCHEDULED = 'SCHEDULED';
+  const SCHEDULED_RECURRING = 'SCHEDULED_RECURRING';
 }

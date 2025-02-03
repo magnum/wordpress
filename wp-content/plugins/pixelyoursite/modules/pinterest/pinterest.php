@@ -50,7 +50,7 @@ class Pinterest extends Settings implements Pixel {
 	
 	public function outputNoScriptEvents() {}
 
-	public function render_switcher_input( $key, $collapse = false, $disabled = false ) {
+	public function render_switcher_input( $key, $collapse = false, $disabled = false, $default = false) {
 	    //@todo: review
 
 		$attr_name = "pys[pinterest][$key]";

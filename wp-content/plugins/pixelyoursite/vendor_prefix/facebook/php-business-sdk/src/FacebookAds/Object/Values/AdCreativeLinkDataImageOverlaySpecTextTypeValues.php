@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,15 +35,15 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeLinkDataImageOverlaySpecTextTypeValues getInstance()
  */
-class AdCreativeLinkDataImageOverlaySpecTextTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUTOMATED_PERSONALIZE = 'automated_personalize';
-    const CUSTOM = 'custom';
-    const DISCLAIMER = 'disclaimer';
-    const FROM_PRICE = 'from_price';
-    const GUEST_RATING = 'guest_rating';
-    const PERCENTAGE_OFF = 'percentage_off';
-    const PRICE = 'price';
-    const STAR_RATING = 'star_rating';
-    const STRIKETHROUGH_PRICE = 'strikethrough_price';
+class AdCreativeLinkDataImageOverlaySpecTextTypeValues extends AbstractEnum {
+
+  const AUTOMATED_PERSONALIZE = 'automated_personalize';
+  const CUSTOM = 'custom';
+  const DISCLAIMER = 'disclaimer';
+  const FROM_PRICE = 'from_price';
+  const GUEST_RATING = 'guest_rating';
+  const PERCENTAGE_OFF = 'percentage_off';
+  const PRICE = 'price';
+  const STAR_RATING = 'star_rating';
+  const STRIKETHROUGH_PRICE = 'strikethrough_price';
 }

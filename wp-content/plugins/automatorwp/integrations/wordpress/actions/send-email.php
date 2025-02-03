@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Send_Email extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_send_email';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_send_email';
+
+        parent::__construct();
+
+    }
 
     /**
      * Store the action result
@@ -61,27 +72,50 @@ class AutomatorWP_WordPress_Send_Email extends AutomatorWP_Integration_Action {
                     'fields' => array(
                         'from' => array(
                             'name' => __( 'From:', 'automatorwp' ),
-                            'desc' => __( 'Leave empty to use default WordPress email.', 'automatorwp' ),
+                            'desc' => __( 'Leave empty to use default WordPress email settings.', 'automatorwp' ),
                             'type' => 'text',
-                            'default' => ''
+                            'attributes'  => array(
+                                'placeholder' => __( 'sample@email.com', 'automatorwp' ),
+                            ),
+                            'classes' => 'automatorwp-col-6',
+                            'default' => '',
+                        ),
+                        'from_name' => array(
+                            'name' => __( 'From Name:', 'automatorwp' ),
+                            'desc' => __( 'Leave empty to use default WordPress email settings.', 'automatorwp' ),
+                            'type' => 'text',
+                            'attributes'  => array(
+                                'placeholder' => __( 'John Doe', 'automatorwp' ),
+                            ),
+                            'classes' => 'automatorwp-col-6',
+                            'default' => '',
                         ),
                         'to' => array(
                             'name' => __( 'To:', 'automatorwp' ),
                             'desc' => __( 'Email address(es) to send the email. Accepts single or comma-separated list of emails.', 'automatorwp' )
                                 . '<br>' . __( 'Leave empty to use the email of the user that completes the automation.', 'automatorwp' ),
                             'type' => 'text',
+                            'attributes'  => array(
+                                'placeholder' => __( 'sample@email.com', 'automatorwp' ),
+                            ),
                             'default' => ''
                         ),
                         'cc' => array(
                             'name' => __( 'CC:', 'automatorwp' ),
                             'desc' => __( 'Email address(es) that will receive a copy of this email. Accepts single or comma-separated list of emails.', 'automatorwp' ),
                             'type' => 'text',
+                            'attributes'  => array(
+                                'placeholder' => __( 'email1@email.com, email2@email.com, email3@email.com, ...', 'automatorwp' ),
+                            ),
                             'default' => ''
                         ),
                         'bcc' => array(
                             'name' => __( 'BCC:', 'automatorwp' ),
                             'desc' => __( 'Email address(es) that will receive a copy of this email. Accepts single or comma-separated list of emails.', 'automatorwp' ),
                             'type' => 'text',
+                            'attributes'  => array(
+                                'placeholder' => __( 'email1@email.com, email2@email.com, email3@email.com, ...', 'automatorwp' ),
+                            ),
                             'default' => ''
                         ),
                         'subject' => array(
@@ -130,6 +164,7 @@ class AutomatorWP_WordPress_Send_Email extends AutomatorWP_Integration_Action {
         $this->result = automatorwp_send_email( array(
             // Email parameters
             'from'              => $action_options['from'],
+            'from_name'         => ( isset( $action_options['from_name'] ) ? $action_options['from_name'] : '' ),
             'to'                => $to,
             'cc'                => $action_options['cc'],
             'bcc'               => $action_options['bcc'],
@@ -252,4 +287,5 @@ class AutomatorWP_WordPress_Send_Email extends AutomatorWP_Integration_Action {
 
 }
 
-new AutomatorWP_WordPress_Send_Email();
+new AutomatorWP_WordPress_Send_Email( 'wordpress' );
+new AutomatorWP_WordPress_Send_Email( 'emails' );

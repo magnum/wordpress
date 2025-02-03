@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,29 +34,52 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BLOCK_OFFLINE_ANALYTICS = 'block_offline_analytics';
-    const COLLABORATIVE_ADS_MANAGED_PARTNER_BUSINESS_INFO = 'collaborative_ads_managed_partner_business_info';
-    const COLLABORATIVE_ADS_MANAGED_PARTNER_ELIGIBILITY = 'collaborative_ads_managed_partner_eligibility';
-    const CREATED_BY = 'created_by';
-    const CREATED_TIME = 'created_time';
-    const EXTENDED_UPDATED_TIME = 'extended_updated_time';
-    const ID = 'id';
-    const IS_HIDDEN = 'is_hidden';
-    const LINK = 'link';
-    const NAME = 'name';
-    const PRIMARY_PAGE = 'primary_page';
-    const PROFILE_PICTURE_URI = 'profile_picture_uri';
-    const TIMEZONE_ID = 'timezone_id';
-    const TWO_FACTOR_TYPE = 'two_factor_type';
-    const UPDATED_BY = 'updated_by';
-    const UPDATED_TIME = 'updated_time';
-    const VERIFICATION_STATUS = 'verification_status';
-    const VERTICAL = 'vertical';
-    const VERTICAL_ID = 'vertical_id';
-    public function getFieldTypes()
-    {
-        return array('block_offline_analytics' => 'bool', 'collaborative_ads_managed_partner_business_info' => 'ManagedPartnerBusiness', 'collaborative_ads_managed_partner_eligibility' => 'BusinessManagedPartnerEligibility', 'created_by' => 'Object', 'created_time' => 'datetime', 'extended_updated_time' => 'datetime', 'id' => 'string', 'is_hidden' => 'bool', 'link' => 'string', 'name' => 'string', 'primary_page' => 'Page', 'profile_picture_uri' => 'string', 'timezone_id' => 'unsigned int', 'two_factor_type' => 'string', 'updated_by' => 'Object', 'updated_time' => 'datetime', 'verification_status' => 'string', 'vertical' => 'string', 'vertical_id' => 'unsigned int');
-    }
+
+class BusinessFields extends AbstractEnum {
+
+  const BLOCK_OFFLINE_ANALYTICS = 'block_offline_analytics';
+  const COLLABORATIVE_ADS_MANAGED_PARTNER_BUSINESS_INFO = 'collaborative_ads_managed_partner_business_info';
+  const COLLABORATIVE_ADS_MANAGED_PARTNER_ELIGIBILITY = 'collaborative_ads_managed_partner_eligibility';
+  const COLLABORATIVE_ADS_PARTNER_PREMIUM_OPTIONS = 'collaborative_ads_partner_premium_options';
+  const CREATED_BY = 'created_by';
+  const CREATED_TIME = 'created_time';
+  const EXTENDED_UPDATED_TIME = 'extended_updated_time';
+  const ID = 'id';
+  const IS_HIDDEN = 'is_hidden';
+  const LINK = 'link';
+  const NAME = 'name';
+  const PRIMARY_PAGE = 'primary_page';
+  const PROFILE_PICTURE_URI = 'profile_picture_uri';
+  const TIMEZONE_ID = 'timezone_id';
+  const TWO_FACTOR_TYPE = 'two_factor_type';
+  const UPDATED_BY = 'updated_by';
+  const UPDATED_TIME = 'updated_time';
+  const VERIFICATION_STATUS = 'verification_status';
+  const VERTICAL = 'vertical';
+  const VERTICAL_ID = 'vertical_id';
+
+  public function getFieldTypes() {
+    return array(
+      'block_offline_analytics' => 'bool',
+      'collaborative_ads_managed_partner_business_info' => 'ManagedPartnerBusiness',
+      'collaborative_ads_managed_partner_eligibility' => 'BusinessManagedPartnerEligibility',
+      'collaborative_ads_partner_premium_options' => 'BusinessPartnerPremiumOptions',
+      'created_by' => 'Object',
+      'created_time' => 'datetime',
+      'extended_updated_time' => 'datetime',
+      'id' => 'string',
+      'is_hidden' => 'bool',
+      'link' => 'string',
+      'name' => 'string',
+      'primary_page' => 'Page',
+      'profile_picture_uri' => 'string',
+      'timezone_id' => 'unsigned int',
+      'two_factor_type' => 'string',
+      'updated_by' => 'Object',
+      'updated_time' => 'datetime',
+      'verification_status' => 'string',
+      'vertical' => 'string',
+      'vertical_id' => 'unsigned int',
+    );
+  }
 }

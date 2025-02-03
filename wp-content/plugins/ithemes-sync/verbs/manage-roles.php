@@ -12,41 +12,41 @@ Version History
 
 
 class Ithemes_Sync_Verb_Manage_Roles extends Ithemes_Sync_Verb {
-	public static $name = 'manage-roles';
+	public static $name        = 'manage-roles';
 	public static $description = 'Create, edit, and delete roles.';
 	
-	private $default_arguments = array();
-	private $response = array();
-	private $role_cache = array();
+	private $default_arguments = [];
+	private $response          = [];
+	private $role_cache        = [];
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
 		
-		$actions = array(
-			'add'         => 'add_role',
-			'add-cap'     => array( $this, 'add_cap' ),
-			'remove-cap'  => array( $this, 'remove_cap' ),
-			'delete'      => 'remove_role',
-		);
+		$actions = [
+			'add'        => 'add_role',
+			'add-cap'    => [ $this, 'add_cap' ],
+			'remove-cap' => [ $this, 'remove_cap' ],
+			'delete'     => 'remove_role',
+		];
 		
 		foreach ( $arguments as $action => $data ) {
 			if ( 'get-actions' == $action ) {
-				$this->response[$action] = array_keys( $actions );
+				$this->response[ $action ] = array_keys( $actions );
 				continue;
 			}
 			
-			if ( ! isset( $actions[$action] ) ) {
-				$this->response[$action] = 'This action is not recognized.';
+			if ( ! isset( $actions[ $action ] ) ) {
+				$this->response[ $action ] = 'This action is not recognized.';
 				continue;
 			}
 			if ( ! is_array( $data ) ) {
-				$this->response[$action] = new WP_Error( 'invalid-argument', 'This action requires an array.' );
+				$this->response[ $action ] = new WP_Error( 'invalid-argument', 'This action requires an array.' );
 				continue;
 			}
 			
-			$this->response[$action] = $this->run_function( $actions[$action], $data );
+			$this->response[ $action ] = $this->run_function( $actions[ $action ], $data );
 		}
 		
 		return $this->response;
@@ -58,39 +58,39 @@ class Ithemes_Sync_Verb_Manage_Roles extends Ithemes_Sync_Verb {
 		}
 		
 		
-		$response = array();
+		$response = [];
 		
 		foreach ( $data as $id => $params ) {
 			if ( ! is_array( $function ) ) {
-				$response[$id] = call_user_func_array( $function, array_values( $params ) );
+				$response[ $id ] = call_user_func_array( $function, array_values( $params ) );
 				continue;
 			}
 			
 			
 			$function = $function[1];
 			
-			if ( isset( $this->role_cache[$id] ) ) {
-				$role = $this->role_cache[$id];
+			if ( isset( $this->role_cache[ $id ] ) ) {
+				$role = $this->role_cache[ $id ];
 			} else {
-				$role = get_role( $id );
-				$this->role_cache[$id] = $role;
+				$role                    = get_role( $id );
+				$this->role_cache[ $id ] = $role;
 			}
 			
 			if ( ! is_object( $role ) || ! is_a( $role, 'WP_Role' ) ) {
-				$response[$id] = new WP_Error( 'invalid-role-name', "Unable to find the requested role with the name of $id." );
+				$response[ $id ] = new WP_Error( 'invalid-role-name', "Unable to find the requested role with the name of $id." );
 				continue;
 			}
 			
-			if ( ! is_callable( array( $role, $function ) ) ) {
-				$response[$id] = new WP_Error( "missing-function-role-$function", "Due to an unknown issue, the \$role->$function function is not available." );
+			if ( ! is_callable( [ $role, $function ] ) ) {
+				$response[ $id ] = new WP_Error( "missing-function-role-$function", "Due to an unknown issue, the \$role->$function function is not available." );
 				continue;
 			}
 			
 			if ( ! is_array( $params[0] ) ) {
-				$response[$id] = call_user_func_array( array( $role, $function ), array_values( $params ) );
+				$response[ $id ] = call_user_func_array( [ $role, $function ], array_values( $params ) );
 			} else {
 				foreach ( $params as $index => $param ) {
-					$response[$id][$index] = call_user_func_array( array( $role, $function ), array_values( $param ) );
+					$response[ $id ][ $index ] = call_user_func_array( [ $role, $function ], array_values( $param ) );
 				}
 			}
 		}

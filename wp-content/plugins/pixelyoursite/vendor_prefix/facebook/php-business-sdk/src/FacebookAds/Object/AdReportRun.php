@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,6 +29,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdReportRunFields;
+
 /**
  * This class is auto-generated.
  *
@@ -37,55 +38,83 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdReportRunFields;
  * pull request for this class.
  *
  */
-class AdReportRun extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'insights';
+
+class AdReportRun extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'insights';
+  }
+
+  /**
+   * @return AdReportRunFields
+   */
+  public static function getFieldsEnum() {
+    return AdReportRunFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    return $ref_enums;
+  }
+
+
+  public function getInsights(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/insights',
+      new AdsInsights(),
+      'EDGE',
+      AdsInsights::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new AdReportRun(),
+      'NODE',
+      AdReportRun::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function setDataTrigger(array $data) {
+    if (array_key_exists('report_run_id', $data)) {
+      $this->data['id'] = $data['report_run_id'];
     }
-    /**
-     * @return AdReportRunFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdReportRunFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        return $ref_enums;
-    }
-    public function getInsights(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/insights', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdsInsights(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdsInsights::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdReportRun(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdReportRun::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function setDataTrigger(array $data)
-    {
-        if (\array_key_exists('report_run_id', $data)) {
-            $this->data['id'] = $data['report_run_id'];
-        }
-    }
-    public function isComplete()
-    {
-        return $this->{\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdReportRunFields::ASYNC_PERCENT_COMPLETION} === 100 && $this->{\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdReportRunFields::ASYNC_STATUS} === 'Job Completed';
-    }
+  }
+
+  public function isComplete() {
+    return $this->{AdReportRunFields::ASYNC_PERCENT_COMPLETION} === 100 &&
+      $this->{AdReportRunFields::ASYNC_STATUS} ===  'Job Completed';
+  }
 }

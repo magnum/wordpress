@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedUploadInputMethodValues getInstance()
  */
-class ProductFeedUploadInputMethodValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const GOOGLE_SHEETS_FETCH = 'Google Sheets Fetch';
-    const MANUAL_UPLOAD = 'Manual Upload';
-    const REUPLOAD_LAST_FILE = 'Reupload Last File';
-    const SERVER_FETCH = 'Server Fetch';
-    const USER_INITIATED_SERVER_FETCH = 'User initiated server fetch';
+class ProductFeedUploadInputMethodValues extends AbstractEnum {
+
+  const GOOGLE_SHEETS_FETCH = 'Google Sheets Fetch';
+  const MANUAL_UPLOAD = 'Manual Upload';
+  const REUPLOAD_LAST_FILE = 'Reupload Last File';
+  const SERVER_FETCH = 'Server Fetch';
+  const USER_INITIATED_SERVER_FETCH = 'User initiated server fetch';
 }

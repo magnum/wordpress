@@ -7,6 +7,7 @@ namespace Uncanny_Automator;
  *
  * @package Uncanny_Automator
  */
+#[\AllowDynamicProperties]
 class Automator_Helpers_Recipe extends Automator_Helpers {
 
 	/**
@@ -81,6 +82,11 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 * @var Memberpress_Helpers
 	 */
 	public $memberpress;
+
+	/**
+	 * @var Memberpress_Courses_Helpers
+	 */
+	public $memberpress_courses;
 	/**
 	 * @var Ninja_Forms_Helpers
 	 */
@@ -90,7 +96,7 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 */
 	public $paid_memberships_pro;
 	/**
-	 * @var Popup_Maker_Helpers
+	 * @var \Popup_Maker_Helpers
 	 */
 	public $popup_maker;
 	/**
@@ -210,7 +216,7 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 */
 	public $presto;
 	/**
-	 * @var Modern_Events_Calendar_Helpers;
+	 * @var \Modern_Events_Calendar_Helpers;
 	 */
 	public $modern_events_calendar;
 	/**
@@ -297,6 +303,75 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	 */
 	public $load_helpers = false;
 
+	/**
+	 * @var mixed $active_campaign
+	 */
+	public $active_campaign;
+
+	/**
+	 * @var mixed $clickup
+	 */
+	public $clickup;
+
+	/**
+	 * @var mixed $convertkit
+	 */
+	public $convertkit;
+
+	/**
+	 * @var mixed $drip
+	 */
+	public $drip;
+
+	/**
+	 * @var mixed $emails
+	 */
+	public $emails;
+
+	/**
+	 * @var mixed $gotowebinar
+	 */
+	public $gotowebinar;
+
+	/**
+	 * @var mixed $helpscout
+	 */
+	public $helpscout;
+
+	/**
+	 * @var mixed $integromat
+	 */
+	public $integromat;
+
+	/**
+	 * @var mixed $linkedin
+	 */
+	public $linkedin;
+
+	/**
+	 * @var mixed $open_ai
+	 */
+	public $open_ai;
+
+	/**
+	 * @var mixed $telegram
+	 */
+	public $telegram;
+
+	/**
+	 * @var mixed $trello
+	 */
+	public $trello;
+
+	/**
+	 * @var mixed $whatsapp
+	 */
+	public $whatsapp;
+
+	/**
+	 * @var mixed $zoho_campaigns
+	 */
+	public $zoho_campaigns;
 
 	/**
 	 * Automator_Helpers_Recipe constructor.
@@ -404,6 +479,57 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 	}
 
 	/**
+	 * Is it a valid endpoint to return query and return tokens
+	 * @return bool
+	 */
+	public function is_valid_token_endpoint() {
+
+		// If it's not a valid rest call, return
+		if ( ! $this->is_rest() ) {
+			return false;
+		}
+
+		//      $current_url = wp_parse_url( add_query_arg( array() ) );
+		//      $match       = isset( $current_url['path'] ) ? $current_url['path'] : '';
+		//
+		//      $valid_endpoints = array(
+		//          'add',
+		//          'change_post_status',
+		//          'user-selector',
+		//          'update',
+		//          'schedule_actions',
+		//          'actions_conditions_update',
+		//      );
+		//
+		//      return in_array( basename( $match ), $valid_endpoints, true );
+		return true;
+	}
+
+	/**
+	 * @param $meta
+	 *
+	 * @return bool
+	 */
+	public function is_action_or_trigger_active( $meta ) {
+		global $wpdb;
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.ID AS child_ID, pp.ID AS recipe_ID
+FROM $wpdb->postmeta pm
+JOIN $wpdb->posts p
+ON pm.post_id = p.ID AND pm.meta_value = %s AND p.post_status = %s
+JOIN $wpdb->posts pp
+ON p.post_parent = pp.ID AND pp.post_status = %s;",
+				$meta,
+				'publish',
+				'publish'
+			)
+		);
+
+		return empty( $results );
+	}
+
+	/**
 	 * Decode data coming from Automator API.
 	 *
 	 * @param string $message Original message string to decode.
@@ -424,6 +550,26 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 
 		return $tokens;
 	}
+
+	/**
+	 * Encrypt any outgoing data.
+	 *
+	 * @param array $args The message to decrypt.
+	 * @param string $secret The secret key to pass for decoding.
+	 *
+	 * @return string The encrypted data.
+	 */
+	public static function encrypt( $args, $secret ) {
+		$message_to_encrypt = serialize( $args ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+		$method             = 'AES128';
+		$ivlen              = openssl_cipher_iv_length( $method );
+		$iv                 = openssl_random_pseudo_bytes( $ivlen );
+		$encrypted_message  = openssl_encrypt( $message_to_encrypt, $method, $secret, 0, $iv );
+		$encrypted_message  = base64_encode( $iv . $encrypted_message ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+
+		return urlencode( $encrypted_message ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.urlencode_urlencode
+	}
+
 
 	/**
 	 * @param mixed $options
@@ -966,4 +1112,80 @@ class Automator_Helpers_Recipe extends Automator_Helpers {
 			)
 		);
 	}
+
+	/**
+	 * action_is_finished
+	 *
+	 * @param array $action
+	 *
+	 * @return bool
+	 */
+	public function action_is_finished( $action ) {
+
+		if ( empty( $action['action_data']['completed'] ) ) {
+			return false;
+		}
+
+		$action_status = (int) $action['action_data']['completed'];
+
+		return \Uncanny_Automator\Automator_Status::finished( $action_status );
+	}
+
+	/**
+	 * Sets the properties of a Trigger that will be displayed in the logs.
+	 *
+	 * @param array{array{type:string,label:string,content:string,code_language:string}} $properties_args The key `code_language` is optional. Only needed for non-text `type`.
+	 * @param string $type Defaults to 'action'.
+	 *
+	 * @return array{array{type:string,label:string,content:string,code_language:string}} Returns mixed array of the properties args.
+	 */
+	public function set_trigger_log_properties( $properties_args ) {
+
+		return $this->set_log_properties( $properties_args, 'trigger' );
+
+	}
+
+	/**
+	 * Sets the properties of an action that will be displayed in the logs.
+	 *
+	 * @param array{array{type:string,label:string,content:string,code_language:string}} $properties_args The key `code_language` is optional. Only needed for non-text `type`.
+	 * @param string $type Defaults to 'action'.
+	 *
+	 * @return array{array{type:string,label:string,content:string,code_language:string}} Returns mixed array of the properties args.
+	 */
+	public function set_log_properties( $properties_args = array(), $type = 'action' ) {
+
+		$properties = new Services\Properties();
+
+		foreach ( (array) $properties_args as $property_arg ) {
+
+			$props = wp_parse_args(
+				$property_arg,
+				array(
+					'type'       => '',
+					'label'      => '',
+					'value'      => '',
+					'attributes' => array(),
+				)
+			);
+
+			if ( empty( $props['type'] ) || empty( $props['label'] || empty( $props['value'] ) ) ) {
+				continue; // Skip. The "type", "label", and "value" are required.
+			}
+
+			$properties->add_item( $props );
+
+		}
+
+		if ( 'action' === $type ) {
+			$properties->dispatch();
+		}
+
+		if ( 'trigger' === $type ) {
+			$properties->dispatch_trigger();
+		}
+
+		return $properties;
+	}
+
 }

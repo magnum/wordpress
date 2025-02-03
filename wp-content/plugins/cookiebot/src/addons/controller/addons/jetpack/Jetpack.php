@@ -8,7 +8,6 @@ use cybot\cookiebot\addons\controller\addons\jetpack\widget\Google_Maps_Jetpack_
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Facebook_Jetpack_Widget;
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Googleplus_Badge_Jetpack_Widget;
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Goodreads_Jetpack_Widget;
-use cybot\cookiebot\addons\controller\addons\jetpack\widget\Internet_Defense_League_Jetpack_Widget;
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Twitter_Timeline_Jetpack_Widget;
 use cybot\cookiebot\addons\controller\addons\jetpack\widget\Visitor_Cookies_Jetpack_Widget;
 use cybot\cookiebot\lib\buffer\Buffer_Output_Interface;
@@ -18,6 +17,7 @@ use cybot\cookiebot\lib\Settings_Service_Interface;
 use Exception;
 
 class Jetpack extends Base_Cookiebot_Plugin_Addon {
+
 
 	const ADDON_NAME                  = 'Jetpack';
 	const DEFAULT_PLACEHOLDER_CONTENT = 'Please accept [renew_consent]%cookie_types[/renew_consent] cookies to enable tracking.';
@@ -78,18 +78,6 @@ class Jetpack extends Base_Cookiebot_Plugin_Addon {
 		 * @since 1.2.0
 		 */
 		$this->widgets[] = new Google_Maps_Jetpack_Widget(
-			$this->settings,
-			$this->script_loader_tag,
-			$this->cookie_consent,
-			$this->buffer_output
-		);
-
-		/**
-		 * Load configuration for internet defense league widget
-		 *
-		 * @since 1.2.0
-		 */
-		$this->widgets[] = new Internet_Defense_League_Jetpack_Widget(
 			$this->settings,
 			$this->script_loader_tag,
 			$this->cookie_consent,

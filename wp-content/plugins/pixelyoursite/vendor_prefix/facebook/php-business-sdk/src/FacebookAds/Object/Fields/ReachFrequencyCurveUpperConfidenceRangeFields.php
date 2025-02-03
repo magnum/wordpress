@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ReachFrequencyCurveUpperConfidenceRangeFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const IMPRESSION_UPPER = 'impression_upper';
-    const NUM_POINTS = 'num_points';
-    const REACH = 'reach';
-    const REACH_UPPER = 'reach_upper';
-    const UNIQ_VIDEO_VIEWS_2S_UPPER = 'uniq_video_views_2s_upper';
-    const VIDEO_VIEWS_2S_UPPER = 'video_views_2s_upper';
-    public function getFieldTypes()
-    {
-        return array('impression_upper' => 'list<int>', 'num_points' => 'unsigned int', 'reach' => 'list<int>', 'reach_upper' => 'list<int>', 'uniq_video_views_2s_upper' => 'list<int>', 'video_views_2s_upper' => 'list<int>');
-    }
+
+class ReachFrequencyCurveUpperConfidenceRangeFields extends AbstractEnum {
+
+  const IMPRESSION_UPPER = 'impression_upper';
+  const NUM_POINTS = 'num_points';
+  const REACH = 'reach';
+  const REACH_UPPER = 'reach_upper';
+  const UNIQ_VIDEO_VIEWS_2S_UPPER = 'uniq_video_views_2s_upper';
+  const VIDEO_VIEWS_2S_UPPER = 'video_views_2s_upper';
+
+  public function getFieldTypes() {
+    return array(
+      'impression_upper' => 'list<int>',
+      'num_points' => 'unsigned int',
+      'reach' => 'list<int>',
+      'reach_upper' => 'list<int>',
+      'uniq_video_views_2s_upper' => 'list<int>',
+      'video_views_2s_upper' => 'list<int>',
+    );
+  }
 }

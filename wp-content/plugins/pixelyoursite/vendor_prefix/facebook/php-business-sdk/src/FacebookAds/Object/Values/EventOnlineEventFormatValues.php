@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static EventOnlineEventFormatValues getInstance()
  */
-class EventOnlineEventFormatValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FB_LIVE = 'fb_live';
-    const MESSENGER_ROOM = 'messenger_room';
-    const NONE = 'none';
-    const OTHER = 'other';
-    const THIRD_PARTY = 'third_party';
+class EventOnlineEventFormatValues extends AbstractEnum {
+
+  const FB_LIVE = 'fb_live';
+  const MESSENGER_ROOM = 'messenger_room';
+  const NONE = 'none';
+  const OTHER = 'other';
+  const THIRD_PARTY = 'third_party';
 }

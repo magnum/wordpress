@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static PrivateLiftStudyInstanceOperationValues getInstance()
  */
-class PrivateLiftStudyInstanceOperationValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AGGREGATE = 'AGGREGATE';
-    const COMPUTE = 'COMPUTE';
-    const ID_MATCH = 'ID_MATCH';
-    const NEXT = 'NEXT';
-    const NONE = 'NONE';
+class PrivateLiftStudyInstanceOperationValues extends AbstractEnum {
+
+  const AGGREGATE = 'AGGREGATE';
+  const CANCEL = 'CANCEL';
+  const COMPUTE = 'COMPUTE';
+  const ID_MATCH = 'ID_MATCH';
+  const NEXT = 'NEXT';
+  const NONE = 'NONE';
 }

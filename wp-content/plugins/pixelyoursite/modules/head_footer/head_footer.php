@@ -35,7 +35,7 @@ class HeadFooter extends Settings {
 			/** @var PYS $core */
 			$core->registerPlugin( $this );
 		} );
-		
+
 		if ( $this->getOption( 'enabled' ) ) {
 			add_action( 'add_meta_boxes', array( $this, 'register_meta_box' ) );
 			add_action( 'save_post', array( $this, 'save_meta_box' ) );
@@ -52,16 +52,16 @@ class HeadFooter extends Settings {
 	 */
 	public function register_meta_box() {
 		
-		if ( current_user_can( 'manage_pys' ) ) {
-			
+		if ( current_user_can( 'manage_pys' ) && current_user_can('unfiltered_html') ) {
+
 			$screens = get_post_types( array( 'public' => true ) );
-			
+
 			foreach ( $screens as $screen ) {
 				add_meta_box( 'pys-head-footer', 'PixelYourSite Head & Footer Scripts',
 					array( $this, 'render_meta_box' ),
 					$screen );
 			}
-			
+
 		}
 
 	}
@@ -69,14 +69,45 @@ class HeadFooter extends Settings {
 	public function render_meta_box() {
 		include 'views/html-meta-box.php';
 	}
+	/*function check_for_script_with_base64_or_base64($data) {
+		// Checking for the presence of a <script> tag with base64 data
+		if (preg_match_all('/<script\b[^>]*>(.*?)<\/script>/is', $data, $matches)) {
+			foreach ($matches[1] as $script_content) {
+				// Checking the contents of the <script> tag for the presence of a base64 string
+				if ($this->is_base64($script_content)) {
+					return true;
+				}
+			}
+		}
 
+		// Checking for a base64 encoded string
+		if ($this->is_base64($data)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	function is_base64($string) {
+		// Checking if the string is potentially base64 (valid characters only)
+		if (preg_match('/^[a-zA-Z0-9\/+]*={0,2}$/', $string)) {
+			// Trying to decode a string
+			$decoded_data = base64_decode($string, true);
+
+			// If decoding is successful and the result is encoded back into the same string
+			if ($decoded_data !== false && base64_encode($decoded_data) === $string) {
+				return true;
+			}
+		}
+		return false;
+	}*/
 	public function save_meta_box( $post_id ) {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
 		}
 		
-		if ( ! current_user_can( 'manage_pys' ) ) {
+		if ( ! current_user_can( 'manage_pys' ) && ! current_user_can('unfiltered_html')) {
 			return;
 		}
 
@@ -86,16 +117,36 @@ class HeadFooter extends Settings {
 		}
 
 		$data = $_POST['pys_head_footer'];
-
-		$meta = array(
-			'disable_global' => isset( $data['disable_global'] ) ? true : false,
-			'head_any'       => isset( $data['head_any'] ) ? trim( $data['head_any'] ) : '',
-			'head_desktop'   => isset( $data['head_desktop'] ) ? trim( $data['head_desktop'] ) : '',
-			'head_mobile'    => isset( $data['head_mobile'] ) ? trim( $data['head_mobile'] ) : '',
-			'footer_any'     => isset( $data['footer_any'] ) ? trim( $data['footer_any'] ) : '',
-			'footer_desktop' => isset( $data['footer_desktop'] ) ? trim( $data['footer_desktop'] ) : '',
-			'footer_mobile'  => isset( $data['footer_mobile'] ) ? trim( $data['footer_mobile'] ) : '',
-		);
+        $meta = array(
+            'disable_global' => isset( $data['disable_global'] ) ? true : false,
+        );
+        foreach ( $data as $key => $val ) {
+	        /*if (!empty($val) && $this->check_for_script_with_base64_or_base64($val)) {
+		        //
+		        error_log('Find base64 in:'. print_r($val,true));
+				continue;
+	        }*/
+			switch ($key) {
+				case "head_any":
+					$meta['head_any'] = isset($val) ? trim($val) : '';
+					break;
+				case "head_desktop":
+					$meta['head_desktop'] = isset($val) ? trim($val) : '';
+					break;
+				case "head_mobile":
+					$meta['head_mobile'] = isset($val) ? trim($val) : '';
+					break;
+				case "footer_any":
+					$meta['footer_any'] = isset($val) ? trim($val) : '';
+					break;
+				case "footer_desktop":
+					$meta['footer_desktop'] = isset($val) ? trim($val) : '';
+					break;
+				case "footer_mobile":
+					$meta['footer_mobile'] = isset($val) ? trim($val) : '';
+					break;
+			}
+        }
 
 		update_post_meta( $post_id, '_pys_head_footer', $meta );
 
@@ -114,12 +165,12 @@ class HeadFooter extends Settings {
 		 * WooCommerce Order Received page
 		 */
 
-		if ( isWooCommerceActive() && is_order_received_page() ) {
+		if ( isWooCommerceActive() && PYS()->woo_is_order_received_page() ) {
 			add_action( 'wp_head', array( $this, 'output_head_woo_order_received' ) );
 			add_action( 'wp_footer', array( $this, 'output_footer_woo_order_received' ) );
 		}
 
-		$disabled_by_woo = isWooCommerceActive() && is_order_received_page() &&
+		$disabled_by_woo = isWooCommerceActive() && PYS()->woo_is_order_received_page() &&
 		                   $this->getOption( 'woo_order_received_disable_global' );
 
 		if ( $disabled_by_woo ) {
@@ -156,7 +207,7 @@ class HeadFooter extends Settings {
 
 	public function output_head_woo_order_received() {
 
-		$scripts_any = $this->getOption( 'woo_order_received_head_any' );
+		$scripts_any = esc_js($this->getOption( 'woo_order_received_head_any' ));
 
 		if ( $scripts_any ) {
             echo "\r\n{$scripts_any}\r\n";

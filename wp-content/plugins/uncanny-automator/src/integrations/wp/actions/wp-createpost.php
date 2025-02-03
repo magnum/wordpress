@@ -2,6 +2,9 @@
 
 namespace Uncanny_Automator;
 
+use Exception;
+use LogicException;
+
 /**
  * Class WP_CREATEPOST
  *
@@ -11,22 +14,34 @@ class WP_CREATEPOST {
 
 	use Recipe\Action_Tokens;
 
+	/**
+	 * @var string
+	 */
 	public static $integration = 'WP';
 
+	/**
+	 * @var string
+	 */
 	private $action_code = 'CREATEPOST';
 
+	/**
+	 * @var string
+	 */
 	private $action_meta = 'WPPOSTFIELDS';
 
+	/**
+	 *
+	 */
 	public function __construct() {
 
-		if ( is_admin() ) {
-			add_action( 'wp_loaded', array( $this, 'define_action' ), 99 );
-		} else {
-			$this->define_action();
-		}
+		$this->define_action();
 
 	}
 
+	/**
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function define_action() {
 
 		$action = array(
@@ -67,6 +82,9 @@ class WP_CREATEPOST {
 
 	}
 
+	/**
+	 * @return array
+	 */
 	public function load_options() {
 
 		Automator()->helpers->recipe->wp->options->load_options = true;
@@ -77,6 +95,19 @@ class WP_CREATEPOST {
 					$this->action_code => array(
 
 						$this->get_all_post_types(),
+
+						Automator()->helpers->recipe->field->select_field_args(
+							array(
+								'option_code'           => 'PARENT_POST',
+								'label'                 => esc_attr__( 'Parent post', 'uncanny-automator' ),
+								'options'               => array(),
+								'is_ajax'               => true,
+								'endpoint'              => 'select_specific_post_type_taxonomies',
+								'target_field'          => 'TAXONOMY',
+								'supports_custom_value' => true,
+								'relevant_tokens'       => array(),
+							)
+						),
 
 						array(
 							'input_type'               => 'select',
@@ -133,6 +164,16 @@ class WP_CREATEPOST {
 							true
 						),
 
+						array(
+							'option_code'   => 'IS_UNIQUE',
+							'label'         => esc_attr__( 'Title must be unique', 'uncanny-automator' ),
+							'description'   => esc_attr__( 'If a post with the same title is found, the action will not create a new post.', 'uncanny-automator' ),
+							'input_type'    => 'checkbox',
+							'is_toggle'     => true,
+							'required'      => false,
+							'default_value' => false,
+						),
+
 						Automator()->helpers->recipe->field->text_field(
 							'WPCPOSTSLUG',
 							esc_attr__( 'Slug', 'uncanny-automator' ),
@@ -149,6 +190,100 @@ class WP_CREATEPOST {
 							'textarea',
 							'',
 							false
+						),
+
+						array(
+							'option_code' => 'WPCPOSTCONTENTCUSTOMCSSCHECKBOX',
+							'label'       => _x( 'Add custom CSS', 'WordPress', 'uncanny-automator' ),
+							'input_type'  => 'checkbox',
+							'is_toggle'   => true,
+							'required'    => false,
+						),
+
+						array(
+							'option_code'        => 'WPCPOSTCONTENTCUSTOMCSS',
+							'label'              => _x( 'Custom CSS', 'WordPress', 'uncanny-automator' ),
+							'input_type'         => 'textarea',
+							'required'           => false,
+							'description'        => _x( 'Enter your CSS code into the field above. Please make sure that your CSS rules are correct and targeted appropriately.', 'WordPress', 'uncanny-automator' ),
+
+							'dynamic_visibility' => array(
+								// 'default_state' specifies the initial visibility state of the element
+								'default_state'    => 'hidden', // Possible values: 'hidden', 'visible'
+
+								// 'visibility_rules' is an array of rules that define conditions for changing the visibility state
+								'visibility_rules' => array(
+									// Each array within 'visibility_rules' represents a single rule
+									array(
+										// 'operator' specifies how to evaluate the conditions within the rule.
+										// 'AND' means all conditions must be true, 'OR' means any condition can be true
+										'operator'        => 'AND', // Possible values: 'AND', 'OR'
+
+										// 'rule_conditions' is an array of condition objects
+										'rule_conditions' => array(
+											// Each condition object within 'rule_conditions' specifies a single condition to evaluate
+											array(
+												'option_code' => 'WPCPOSTCONTENTCUSTOMCSSCHECKBOX', // The unique identifier for the option/element being evaluated
+												'compare' => '==', // The operator used for comparison (e.g., '==', '!=', etc.)
+												'value'   => true,  // The value to compare against
+											),
+											// Additional conditions can be added here if needed
+										),
+
+										// 'resulting_visibility' specifies what the visibility should be if the rule conditions are met
+										'resulting_visibility' => 'show', // Possible values: 'show', 'hide'
+									),
+									// Additional rules can be added here if needed
+								),
+							),
+
+						),
+
+						array(
+							'option_code' => 'WPCPOSTCONTENTCUSTOMJSCHECKBOX',
+							'label'       => _x( 'Add custom JavaScript', 'WordPress', 'uncanny-automator' ),
+							'input_type'  => 'checkbox',
+							'is_toggle'   => true,
+							'required'    => false,
+						),
+
+						array(
+							'option_code'        => 'WPCPOSTCONTENTCUSTOMJS',
+							'label'              => _x( 'Custom JavaScript', 'WordPress', 'uncanny-automator' ),
+							'input_type'         => 'textarea',
+							'required'           => false,
+							'description'        => _x( "Enter your JavaScript code into the field above. Because JavaScript can affect your site's behaviour and security, only use scripts from trusted sources and make sure to validate and sanitize your inputs.", 'WordPress', 'uncanny-automator' ),
+
+							'dynamic_visibility' => array(
+								// 'default_state' specifies the initial visibility state of the element
+								'default_state'    => 'hidden', // Possible values: 'hidden', 'visible'
+
+								// 'visibility_rules' is an array of rules that define conditions for changing the visibility state
+								'visibility_rules' => array(
+									// Each array within 'visibility_rules' represents a single rule
+									array(
+										// 'operator' specifies how to evaluate the conditions within the rule.
+										// 'AND' means all conditions must be true, 'OR' means any condition can be true
+										'operator'        => 'AND', // Possible values: 'AND', 'OR'
+
+										// 'rule_conditions' is an array of condition objects
+										'rule_conditions' => array(
+											// Each condition object within 'rule_conditions' specifies a single condition to evaluate
+											array(
+												'option_code' => 'WPCPOSTCONTENTCUSTOMJSCHECKBOX', // The unique identifier for the option/element being evaluated
+												'compare' => '==', // The operator used for comparison (e.g., '==', '!=', '>', '<', etc.)
+												'value'   => true,  // The value to compare against
+											),
+											// Additional conditions can be added here if needed
+										),
+
+										// 'resulting_visibility' specifies what the visibility should be if the rule conditions are met
+										'resulting_visibility' => 'show', // Possible values: 'show', 'hide'
+									),
+									// Additional rules can be added here if needed
+								),
+							),
+
 						),
 
 						array(
@@ -171,9 +306,21 @@ class WP_CREATEPOST {
 							'description' => esc_attr__( 'The URL must include a supported image file extension (e.g. .jpg, .png, .svg, etc.). Some sites may block remote image download.', 'uncanny-automator' ),
 						),
 
+						// The photo url field.
+						array(
+							'option_code'   => 'OPEN_COMMENTS',
+							/* translators: Allow comment field */
+							'label'         => esc_attr__( 'Allow people to submit comments', 'uncanny-automator' ),
+							'input_type'    => 'checkbox',
+							'is_toggle'     => true,
+							'required'      => false,
+							'default_value' => 'open' === get_option( 'default_comment_status', 'open' ),
+						),
+
 						array(
 							'input_type'        => 'repeater',
 							'option_code'       => 'CPMETA_PAIRS',
+							'relevant_tokens'   => array(),
 							'label'             => esc_attr__( 'Meta', 'uncanny-automator' ),
 							'required'          => false,
 							'fields'            => array(
@@ -210,27 +357,87 @@ class WP_CREATEPOST {
 	 * @param $action_data
 	 * @param $recipe_id
 	 * @param $args
+	 *
+	 * @throw Exception
 	 */
 	public function create_post( $user_id, $action_data, $recipe_id, $args ) {
 
-		$post_title                = Automator()->parse->text( $action_data['meta']['WPCPOSTTITLE'], $recipe_id, $user_id, $args );
-		$post_terms                = Automator()->parse->text( $action_data['meta']['TERM'], $recipe_id, $user_id, $args );
-		$post_slug                 = Automator()->parse->text( $action_data['meta']['WPCPOSTSLUG'], $recipe_id, $user_id, $args );
-		$post_content              = Automator()->parse->text( $action_data['meta']['WPCPOSTCONTENT'], $recipe_id, $user_id, $args );
-		$post_excerpt              = Automator()->parse->text( $action_data['meta']['WPCPOSTEXCERPT'], $recipe_id, $user_id, $args );
-		$post_author               = Automator()->parse->text( $action_data['meta']['WPCPOSTAUTHOR'], $recipe_id, $user_id, $args );
-		$post_status               = Automator()->parse->text( $action_data['meta']['WPCPOSTSTATUS'], $recipe_id, $user_id, $args );
-		$post_fimage               = Automator()->parse->text( $action_data['meta']['FEATURED_IMAGE_URL'], $recipe_id, $user_id, $args );
-		$post_fimage               = filter_var( $post_fimage, FILTER_SANITIZE_URL );
-		$post_type                 = $action_data['meta'][ $this->action_code ];
-		$post_args                 = array();
-		$post_args['post_title']   = sanitize_text_field( $post_title );
-		$post_args['post_name']    = sanitize_title( $post_slug );
-		$post_args['post_content'] = $post_content;
-		$post_args['post_excerpt'] = $post_excerpt;
-		$post_args['post_type']    = $post_type;
-		$post_args['post_status']  = $post_status;
-		$post_args['post_author']  = 0;
+		$post_title = Automator()->parse->text( $action_data['meta']['WPCPOSTTITLE'], $recipe_id, $user_id, $args );
+		$post_terms = Automator()->parse->text( $action_data['meta']['TERM'], $recipe_id, $user_id, $args );
+		$post_slug  = Automator()->parse->text( $action_data['meta']['WPCPOSTSLUG'], $recipe_id, $user_id, $args );
+		$content    = Automator()->parse->text( $action_data['meta']['WPCPOSTCONTENT'], $recipe_id, $user_id, $args );
+
+		// The post type.
+		$post_type = $action_data['meta'][ $this->action_code ] ?? '';
+
+		// The meta value of the unique title toggle.
+		$unique_title_field_val = $action_data['meta']['IS_UNIQUE'] ?? '';
+
+		if ( 'true' === $unique_title_field_val && true === $this->post_title_exists( $post_title, $post_type ) ) {
+			throw new LogicException(
+				sprintf(
+					"Error: Post title must be unique. A post with the title '%s' already exists.",
+					$post_title
+				),
+				1001 // Exception code for duplicate title.
+			);
+		}
+
+		$post_content = '';
+
+		// Add custom CSS
+		if ( isset( $action_data['meta']['WPCPOSTCONTENTCUSTOMCSSCHECKBOX'] ) &&
+			'true' === $action_data['meta']['WPCPOSTCONTENTCUSTOMCSSCHECKBOX']
+		) {
+			$custom_css = Automator()->parse->text( $action_data['meta']['WPCPOSTCONTENTCUSTOMCSS'], $recipe_id, $user_id, $args );
+
+			$post_content .= '<!-- wp:html --><style>' . $custom_css . '</style><!-- /wp:html -->';
+		}
+
+		// Add custom JS
+		if ( isset( $action_data['meta']['WPCPOSTCONTENTCUSTOMJSCHECKBOX'] ) &&
+			'true' === $action_data['meta']['WPCPOSTCONTENTCUSTOMJSCHECKBOX']
+		) {
+			$custom_js = Automator()->parse->text( $action_data['meta']['WPCPOSTCONTENTCUSTOMJS'], $recipe_id, $user_id, $args );
+
+			$post_content .= '<!-- wp:html --><script>' . $custom_js . '</script><!-- /wp:html -->';
+		}
+
+		$should_wp_slash = apply_filters( 'automator_create_posts_should_wpslash', false, $action_data );
+
+		if ( true === $should_wp_slash ) {
+			$content = wp_slash( $content );
+		}
+
+		$post_content = $post_content . $content;
+
+		$post_excerpt       = Automator()->parse->text( $action_data['meta']['WPCPOSTEXCERPT'], $recipe_id, $user_id, $args );
+		$post_author        = Automator()->parse->text( $action_data['meta']['WPCPOSTAUTHOR'], $recipe_id, $user_id, $args );
+		$post_status        = Automator()->parse->text( $action_data['meta']['WPCPOSTSTATUS'], $recipe_id, $user_id, $args );
+		$post_fimage        = Automator()->parse->text( $action_data['meta']['FEATURED_IMAGE_URL'], $recipe_id, $user_id, $args );
+		$post_fimage        = filter_var( $post_fimage, FILTER_SANITIZE_URL );
+		$post_open_comments = 'open' === get_option( 'default_comment_status', 'closed' ) ? 'true' : 'false';
+		$post_type          = $action_data['meta'][ $this->action_code ];
+		$post_parent        = 0;
+
+		if ( isset( $action_data['meta']['PARENT_POST'] ) ) {
+			$post_parent = Automator()->parse->text( $action_data['meta']['PARENT_POST'], $recipe_id, $user_id, $args );
+		}
+
+		if ( isset( $action_data['meta']['OPEN_COMMENTS'] ) ) {
+			$post_open_comments = sanitize_text_field( $action_data['meta']['OPEN_COMMENTS'] );
+		}
+
+		$post_args                   = array();
+		$post_args['post_title']     = sanitize_text_field( $post_title );
+		$post_args['post_name']      = sanitize_title( $post_slug );
+		$post_args['post_content']   = $post_content;
+		$post_args['post_excerpt']   = $post_excerpt;
+		$post_args['post_type']      = $post_type;
+		$post_args['post_status']    = $post_status;
+		$post_args['post_author']    = 0;
+		$post_args['post_parent']    = $post_parent;
+		$post_args['comment_status'] = ( 'true' === $post_open_comments ) ? 'open' : 'closed';
 
 		$fields_to_check = array( 'ID', 'login', 'email', 'slug' );
 
@@ -243,7 +450,17 @@ class WP_CREATEPOST {
 			}
 		}
 
-		$post_id = wp_insert_post( $post_args );
+		$return_wp_error  = apply_filters( 'automator_create_post_return_wp_error', true, $post_args, $recipe_id, $action_data );
+		$fire_after_hooks = apply_filters( 'automator_create_post_fire_after_hooks', true, $post_args, $recipe_id, $action_data );
+
+		$post_id = wp_insert_post( $post_args, $return_wp_error, $fire_after_hooks );
+
+		if ( is_wp_error( $post_id ) ) {
+			$action_data['complete_with_errors'] = true;
+			Automator()->complete_action( $user_id, $action_data, $recipe_id, $post_id->get_error_message() );
+
+			return;
+		}
 
 		if ( $post_id ) {
 
@@ -257,8 +474,22 @@ class WP_CREATEPOST {
 
 			if ( ! empty( $meta_pairs ) ) {
 				foreach ( $meta_pairs as $pair ) {
-					$meta_key   = sanitize_title( $pair['KEY'] );
-					$meta_value = sanitize_text_field( Automator()->parse->text( $pair['VALUE'], $recipe_id, $user_id, $args ) );
+					$meta_key   = $pair['KEY'];
+					$meta_value = Automator()->parse->text( $pair['VALUE'], $recipe_id, $user_id, $args );
+					if (
+						true === apply_filters( 'automator_create_post_sanitize_meta_values', true, $meta_key, $meta_value, $recipe_id ) &&
+						true === apply_filters( 'automator_create_post_sanitize_meta_values_' . $recipe_id, true, $meta_key, $meta_value ) &&
+						true === apply_filters( 'automator_create_post_sanitize_meta_values_' . sanitize_title( $meta_key ), true, $meta_value, $recipe_id )
+					) {
+						$meta_key   = Automator()->utilities->automator_sanitize(
+							$meta_key,
+							apply_filters( 'automator_sanitize_get_field_type', 'text', $meta_key, array() )
+						);
+						$meta_value = Automator()->utilities->automator_sanitize(
+							$meta_value,
+							apply_filters( 'automator_sanitize_get_field_type', 'text', $meta_value, array() )
+						);
+					}
 					update_post_meta( $post_id, $meta_key, $meta_value );
 				}
 			}
@@ -321,64 +552,42 @@ class WP_CREATEPOST {
 	 */
 	public function add_featured_image( $image_url, $post_id ) {
 
-		$upload_dir = wp_upload_dir();
-		$image_data = file_get_contents( $image_url );
-		$filename   = basename( $image_url );
-
-		if ( wp_mkdir_p( $upload_dir['path'] ) ) {
-			$file = $upload_dir['path'] . '/' . $filename;
-		} else {
-			$file = $upload_dir['basedir'] . '/' . $filename;
-		}
-
-		file_put_contents( $file, $image_data );
-
-		$wp_filetype = wp_check_filetype( $filename, null );
-
-		$attachment = array(
-			'post_mime_type' => $wp_filetype['type'],
-			'post_title'     => sanitize_file_name( $filename ),
-			'post_content'   => '',
-			'post_status'    => 'inherit',
-		);
-
-		$attach_id = wp_insert_attachment( $attachment, $file, $post_id );
-
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+		// Prevents double image downloading.
+		$existing_media_id = absint( attachment_url_to_postid( $image_url ) );
 
-		$res1 = wp_update_attachment_metadata( $attach_id, $attach_data );
-
-		$res2 = set_post_thumbnail( $post_id, $attach_id );
-
-	}
-
-	public function get_custom_post_types() {
-
-		// Only public post type is available.
-		$args = array(
-			'public'   => true,
-			'_builtin' => true,
-		);
-
-		$options = array();
-
-		$post_types = get_post_types( $args, 'object', 'and' );
-
-		if ( ! empty( $post_types ) ) {
-
-			foreach ( $post_types as $post_type ) {
-
-				$options[ $post_type->name ] = esc_html( $post_type->labels->singular_name );
-
-			}
+		// If existing_media_id is not equals 0, it means media already exists.
+		if ( 0 !== $existing_media_id ) {
+			// Overwrite the image url with the existing media.
+			$image_url = $existing_media_id;
 		}
 
-		return array_merge( $options, $custom_post_types['options'] );
+		// Supports numeric input.
+		if ( is_numeric( $image_url ) ) {
+			// The $image_url is numeric.
+			return set_post_thumbnail( $post_id, $image_url );
+		}
+
+		// Otherwise, download and store the image as attachment.
+		$attachment_id = media_sideload_image( $image_url, $post_id, null, 'id' );
+
+		// Assign the downloaded attachment ID to the post.
+		set_post_thumbnail( $post_id, $attachment_id );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			automator_log( $attachment_id->get_error_message(), self::class . '->add_featured_image error', true, 'wp-createpost' );
+		}
+
+		return $attachment_id;
 
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get_post_statuses() {
 
 		// Get all the post stati objects.
@@ -450,15 +659,42 @@ class WP_CREATEPOST {
 			array(
 				'token'        => false,
 				'is_ajax'      => true,
-				'endpoint'     => 'select_specific_post_type_taxonomies',
-				'target_field' => 'TAXONOMY',
+				'endpoint'     => 'select_all_post_from_SELECTEDPOSTTYPE',
+				'target_field' => 'PARENT_POST',
 			)
 		);
 
 		// Removed any options.
-		unset( $field['options'][-1] );
+		unset( $field['options']['-1'] );
 
 		return $field;
+
+	}
+
+	/**
+	 * Check if a post with a specific title exists, regardless of case.
+	 *
+	 * @param string $title The title to search for.
+	 * @return bool True if a post with the title exists (case-insensitive), false otherwise.
+	 */
+	public function post_title_exists( $title, $post_type ) {
+
+		global $wpdb;
+
+		$title = sanitize_title( $title );
+
+		// Modify the query for case-insensitive comparison
+		$query = $wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s",
+			$title,
+			$post_type
+		);
+
+		// Execute the query
+		$post_id = $wpdb->get_var( $query );
+
+		// Check if a post ID was returned
+		return ! empty( $post_id );
 
 	}
 

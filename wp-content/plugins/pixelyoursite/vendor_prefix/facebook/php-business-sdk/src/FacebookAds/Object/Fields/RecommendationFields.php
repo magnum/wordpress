@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class RecommendationFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATED_TIME = 'created_time';
-    const HAS_RATING = 'has_rating';
-    const HAS_REVIEW = 'has_review';
-    const OPEN_GRAPH_STORY = 'open_graph_story';
-    const RATING = 'rating';
-    const RECOMMENDATION_TYPE = 'recommendation_type';
-    const REVIEW_TEXT = 'review_text';
-    const REVIEWER = 'reviewer';
-    public function getFieldTypes()
-    {
-        return array('created_time' => 'datetime', 'has_rating' => 'bool', 'has_review' => 'bool', 'open_graph_story' => 'Object', 'rating' => 'int', 'recommendation_type' => 'string', 'review_text' => 'string', 'reviewer' => 'User');
-    }
+
+class RecommendationFields extends AbstractEnum {
+
+  const CREATED_TIME = 'created_time';
+  const HAS_RATING = 'has_rating';
+  const HAS_REVIEW = 'has_review';
+  const OPEN_GRAPH_STORY = 'open_graph_story';
+  const RATING = 'rating';
+  const RECOMMENDATION_TYPE = 'recommendation_type';
+  const REVIEW_TEXT = 'review_text';
+  const REVIEWER = 'reviewer';
+
+  public function getFieldTypes() {
+    return array(
+      'created_time' => 'datetime',
+      'has_rating' => 'bool',
+      'has_review' => 'bool',
+      'open_graph_story' => 'Object',
+      'rating' => 'int',
+      'recommendation_type' => 'string',
+      'review_text' => 'string',
+      'reviewer' => 'User',
+    );
+  }
 }

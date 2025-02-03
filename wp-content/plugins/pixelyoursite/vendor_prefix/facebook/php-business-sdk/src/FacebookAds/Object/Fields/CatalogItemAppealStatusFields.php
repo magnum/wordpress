@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CatalogItemAppealStatusFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const HANDLE = 'handle';
-    const ITEM_ID = 'item_id';
-    const STATUS = 'status';
-    const USE_CASES = 'use_cases';
-    public function getFieldTypes()
-    {
-        return array('handle' => 'string', 'item_id' => 'int', 'status' => 'string', 'use_cases' => 'list<Object>');
-    }
+
+class CatalogItemAppealStatusFields extends AbstractEnum {
+
+  const HANDLE = 'handle';
+  const ITEM_ID = 'item_id';
+  const STATUS = 'status';
+  const USE_CASES = 'use_cases';
+
+  public function getFieldTypes() {
+    return array(
+      'handle' => 'string',
+      'item_id' => 'int',
+      'status' => 'string',
+      'use_cases' => 'list<Object>',
+    );
+  }
 }

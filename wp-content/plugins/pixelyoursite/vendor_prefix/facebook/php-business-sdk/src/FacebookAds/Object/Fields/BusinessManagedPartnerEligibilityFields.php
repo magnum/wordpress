@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessManagedPartnerEligibilityFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const IS_ELIGIBLE = 'is_eligible';
-    const REASON_CODE = 'reason_code';
-    const REASON_DESCRIPTION = 'reason_description';
-    public function getFieldTypes()
-    {
-        return array('is_eligible' => 'bool', 'reason_code' => 'string', 'reason_description' => 'string');
-    }
+
+class BusinessManagedPartnerEligibilityFields extends AbstractEnum {
+
+  const IS_ELIGIBLE = 'is_eligible';
+  const REASON_CODE = 'reason_code';
+  const REASON_DESCRIPTION = 'reason_description';
+
+  public function getFieldTypes() {
+    return array(
+      'is_eligible' => 'bool',
+      'reason_code' => 'string',
+      'reason_description' => 'string',
+    );
+  }
 }

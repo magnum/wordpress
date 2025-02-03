@@ -15,17 +15,38 @@ require_once 'class-mo-saml-basic-enum.php';
  * Defines constants for options used throughout the plugin.
  */
 class Mo_Saml_Options_Enum extends Mo_SAML_Basic_Enum {
-	const SAML_MESSAGE                   = 'mo_saml_message';
-	const NEW_USER                       = 'mo_is_new_user';
-	const MO_SAML_KEEP_SETTINGS_DELETION = 'mo_saml_keep_settings_on_deletion';
-	const PLUGIN_DO_ACTIVATION           = 'mo_plugin_do_activation_redirect';
+	const SAML_MESSAGE         = 'mo_saml_message';
+	const NEW_USER             = 'mo_is_new_user';
+	const PLUGIN_DO_ACTIVATION = 'mo_plugin_do_activation_redirect';
+}
+
+/**
+ * Defines Required PHP extensions
+ */
+class Mo_Saml_Required_PHP_Extensions extends Mo_SAML_Basic_Enum {
+	const PHP_EXTENSIONS = array(
+		'curl'    => 'CURL',
+		'dom'     => 'DOM',
+		'openssl' => 'OpenSSL',
+	);
+}
+
+/**
+ * Plugin page to show the extensions disabled or uninstalled.
+ */
+class Mo_Saml_Plugin_Pages extends Mo_SAML_Basic_Enum {
+	const PLUGIN_PAGES = array(
+		'mo_saml_settings',
+		'mo_saml_enable_debug_logs',
+	);
 }
 
 /**
  * Defines constants for Redirection SSO Links tab.
  */
 class Mo_Saml_Options_Enum_Sso_Login extends Mo_SAML_Basic_Enum {
-	const SSO_BUTTON = 'mo_saml_add_sso_button_wp';
+	const SSO_BUTTON                     = 'mo_saml_add_sso_button_wp';
+	const MO_SAML_KEEP_SETTINGS_DELETION = 'mo_saml_keep_settings_on_deletion';
 }
 
 /**
@@ -55,13 +76,14 @@ class Mo_Saml_Options_Enum_Service_Provider extends Mo_SAML_Basic_Enum {
  * Defines constants for Redirection SSO Links tab.
  */
 class Mo_Saml_Sso_Constants extends Mo_SAML_Basic_Enum {
-	const MO_SAML_REDIRECT_ERROR        = 'mo_saml_redirect_error_code';
-	const MO_SAML_REDIRECT_ERROR_REASON = 'mo_saml_redirect_error_reason';
-	const MO_SAML_REQUIRED_CERTIFICATE  = 'mo_saml_required_certificate';
-	const MO_SAML_REQUIRED_ISSUER       = 'mo_saml_required_issuer';
-	const MO_SAML_TEST_STATUS           = 'MO_SAML_TEST_STATUS';
-	const MO_SAML_EXPIRE_NOTICE         = 'mo_date_expire_notice';
-	const MO_SAML_CLOSE_NOTICE          = 'mo_saml_close_notice';
+	const MO_SAML_REDIRECT_ERROR          = 'mo_saml_redirect_error_code';
+	const MO_SAML_REDIRECT_ERROR_REASON   = 'mo_saml_redirect_error_reason';
+	const MO_SAML_REQUIRED_CERTIFICATE    = 'mo_saml_required_certificate';
+	const MO_SAML_VALID_AGAINST_ENTITY_ID = 'mo_saml_valid_against_entity_id';
+	const MO_SAML_REQUIRED_ISSUER         = 'mo_saml_required_issuer';
+	const MO_SAML_TEST_STATUS             = 'MO_SAML_TEST_STATUS';
+	const MO_SAML_EXPIRE_NOTICE           = 'mo_date_expire_notice';
+	const MO_SAML_CLOSE_NOTICE            = 'mo_saml_close_notice';
 }
 
 /**
@@ -136,6 +158,15 @@ class Mo_Saml_Account_Setup_Constants extends Mo_SAML_Basic_Enum {
 }
 
 /**
+ * Defines constants for the external links.
+ */
+class Mo_Saml_External_Links extends Mo_SAML_Basic_Enum {
+	const FAQ_DOWNLOAD_PAID_PLUGIN = 'https://faq.miniorange.com/knowledgebase/install-premium-plugin-free-plugin/';
+	const PRICING_PAGE             = 'https://plugins.miniorange.com/wordpress-single-sign-on-sso#pricing';
+	const SAML_TRACER_FAQ          = 'https://faq.miniorange.com/knowledgebase/error-during-sso-test-configuration/';
+}
+
+/**
  * Defines customer account constants.
  */
 class Mo_Saml_Customer_Constants extends Mo_SAML_Basic_Enum {
@@ -150,26 +181,42 @@ class Mo_Saml_Customer_Constants extends Mo_SAML_Basic_Enum {
  * Defines Error constants.
  */
 class Mo_Saml_Options_Error_Constants extends Mo_SAML_Basic_Enum {
-	const ERROR_NO_CERTIFICATE      = 'Unable to find a certificate .';
-	const CAUSE_NO_CERTIFICATE      = 'No signature found in SAML Response or Assertion. Please sign at least one of them.';
-	const ERROR_WRONG_CERTIFICATE   = 'Unable to find a certificate matching the configured fingerprint.';
-	const CAUSE_WRONG_CERTIFICATE   = 'X.509 Certificate field in plugin does not match the certificate found in SAML Response.';
-	const ERROR_INVALID_AUDIENCE    = 'Invalid Audience URI.';
-	const CAUSE_INVALID_AUDIENCE    = "The value of 'Audience URI' field on Identity Provider's side is incorrect";
-	const ERROR_ISSUER_NOT_VERIFIED = 'Issuer cannot be verified.';
-	const CAUSE_ISSUER_NOT_VERIFIED = 'IdP Entity ID configured and the one found in SAML Response do not match';
+
+	/**
+	 * Translate a given message key to the corresponding translated message.
+	 *
+	 * @param string $message_key The key of the message to be translated.
+	 *
+	 * @return string Translated message corresponding to the provided key.
+	 */
+	public static function mo_saml_translate( $message_key ) {
+		$messages = array(
+			'ERROR_NO_CERTIFICATE'      => __( 'Unable to find a certificate .', 'miniorange-saml-20-single-sign-on' ),
+			'CAUSE_NO_CERTIFICATE'      => __( 'No signature found in SAML Response or Assertion. Please sign at least one of them.', 'miniorange-saml-20-single-sign-on' ),
+			'ERROR_WRONG_CERTIFICATE'   => __( 'Unable to find a certificate matching the configured fingerprint.', 'miniorange-saml-20-single-sign-on' ),
+			'CAUSE_WRONG_CERTIFICATE'   => __( 'X.509 Certificate field in plugin does not match the certificate found in SAML Response.', 'miniorange-saml-20-single-sign-on' ),
+			'ERROR_INVALID_AUDIENCE'    => __( 'Invalid Audience URI.', 'miniorange-saml-20-single-sign-on' ),
+			'CAUSE_INVALID_AUDIENCE'    => __( "The value of 'Audience URI' field on Identity Provider's side is incorrect", 'miniorange-saml-20-single-sign-on' ),
+			'ERROR_ISSUER_NOT_VERIFIED' => __( 'Issuer cannot be verified.', 'miniorange-saml-20-single-sign-on' ),
+			'CAUSE_ISSUER_NOT_VERIFIED' => __( 'IdP Entity ID configured and the one found in SAML Response do not match', 'miniorange-saml-20-single-sign-on' ),
+		);
+
+		if ( isset( $messages[ $message_key ] ) ) {
+			return $messages[ $message_key ];
+		}
+	}
 }
 
 /**
  * Defines Plugin Constants.
  */
-class Mo_Saml_Options_Plugin_Constants extends  Mo_SAML_Basic_Enum {
+class Mo_Saml_Options_Plugin_Constants extends Mo_SAML_Basic_Enum {
 	const CMS_NAME         = 'WP';
 	const APPLICATION_NAME = 'WP miniOrange SAML 2.0 SSO Plugin';
 	const APPLICATION_TYPE = 'SAML';
-	const VERSION          = '5.0.0';
+	const VERSION          = '5.2.4';
 	const HOSTNAME         = 'https://login.xecurify.com';
-	const WP_VERSION       = '6.1';
+	const WP_VERSION       = '6.7';
 	const PLUGIN_FILE      = 'miniorange-saml-20-single-sign-on/login.php';
 }
 
@@ -178,89 +225,93 @@ class Mo_Saml_Options_Plugin_Constants extends  Mo_SAML_Basic_Enum {
  */
 class Mo_Saml_Options_Plugin_Idp_Specific_Ads extends Mo_SAML_Basic_Enum {
 	/**
-	 * An array of arrays defining ads links and texts based on the IDP name.
+	 * Get IDP specific ads links and texts.
 	 *
-	 * @var array
+	 * @return array
 	 */
-	public static $idp_specific_ads = array(
-		'ADFS'        => array(
-			'Text'       => 'miniOrange SAML Single Sign On Plugin allows users in a corporate Active Directory setup to log into WordPress using their Windows Credentials. Once the user is logged in to a domain joined machine, they will not have to re-enter credentials in order to log into WordPress.',
-			'Link'       => 'https://plugins.miniorange.com/saml-single-sign-on-sso-wordpress-using-adfs#step8',
-			'Heading'    => 'Enable Windows SSO',
-			'Link_Title' => 'See Configuration',
-		),
+	public static function mo_saml_get_idp_specific_ads() {
+		return array(
+			'ADFS'        => array(
+				'Text'       => __( 'miniOrange SAML Single Sign On Plugin allows users in a corporate Active Directory setup to log into WordPress using their Windows Credentials. Once the user is logged in to a domain joined machine, they will not have to re-enter credentials in order to log into WordPress.', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://plugins.miniorange.com/saml-single-sign-on-sso-wordpress-using-adfs#step8',
+				'Heading'    => __( 'Enable Windows SSO', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'See Configuration', 'miniorange-saml-20-single-sign-on' ),
+			),
 
-		'Azure AD'    => array(
-			'Text'       => 'User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with Microsoft Azure AD Graph APIs and provides Bi-directional User Synchronization, Creation of <a target = "blank" href = "https://wordpress.org/plugins/employee-staff-directory/ "> Employee Directory</a>, <a target = "blank" href = "https://wordpress.org/plugins/embed-power-bi-reports/ ">PowerBI integration </a>, <a target = "blank" href = "https://wordpress.org/plugins/embed-sharepoint-onedrive-documents/ ">Sharepoint integration </a>, etc.',
-			'Link'       => 'https://wordpress.org/plugins/user-sync-for-azure-office365/',
-			'Heading'    => 'User Sync for Azure AD / Azure B2C',
-			'Link_Title' => 'Download',
-			'Know_Title' => 'Know More',
-			'Know_Link'  => 'https://plugins.miniorange.com/wordpress-azure-office365-integrations',
-		),
+			'Azure AD'    => array(
+				'Text'       => __( 'User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with Microsoft Azure AD Graph APIs and provides Bi-directional User Synchronization, Creation of <a target = "blank" href = "https://wordpress.org/plugins/employee-staff-directory/"> Employee Directory</a>, <a target = "blank" href = "https://wordpress.org/plugins/embed-power-bi-reports/">PowerBI integration </a>, <a target = "blank" href = "https://wordpress.org/plugins/embed-sharepoint-onedrive-documents/">Sharepoint integration </a>, etc.', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://wordpress.org/plugins/user-sync-for-azure-office365/',
+				'Heading'    => __( 'User Sync for Azure AD / Azure B2C', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'Download', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Title' => __( 'Know More', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Link'  => 'https://plugins.miniorange.com/wordpress-azure-office365-integrations',
+			),
 
-		'Azure B2C'   => array(
-			'Text'       => 'User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with Microsoft Azure AD Graph APIs and provides Bi-directional User Synchronization, PowerBI integration, Sharepoint integration, etc.',
-			'Link'       => 'https://wordpress.org/plugins/user-sync-for-azure-office365/',
-			'Heading'    => 'User Sync for Azure AD / Azure B2C',
-			'Link_Title' => 'Download',
-			'Know_Title' => 'Know More',
-			'Know_Link'  => 'https://plugins.miniorange.com/wordpress-azure-office365-integrations',
-		),
-		'SalesForce'  => array(
-			'Text'       => 'Object Data Sync For Salesforce plugin provides a bi-directional data synchronization between WP and Salesforce objects',
-			'Link'       => 'https://wordpress.org/plugins/object-data-sync-for-salesforce/',
-			'Heading'    => 'Object Data Sync For Salesforce',
-			'Link_Title' => 'Download',
-			'Know_Title' => 'Know More',
-			'Know_Link'  => 'https://plugins.miniorange.com/wordpress-object-sync-for-salesforce',
-		),
-		'Community'   => array(
-			'Text'       => 'Object Data Sync For Salesforce plugin provides a bi-directional data synchronization between WP and Salesforce objects',
-			'Link'       => 'https://wordpress.org/plugins/object-data-sync-for-salesforce/',
-			'Heading'    => 'Object Data Sync For Salesforce',
-			'Link_Title' => 'Download',
-			'Know_Title' => 'Know More',
-			'Know_Link'  => 'https://plugins.miniorange.com/wordpress-object-sync-for-salesforce',
-		),
-		'Windows SSO' => array(
-			'Text'       => 'miniOrange SAML Single Sign On Plugin allows users in a corporate Active Directory setup to log into WordPress using their Windows Credentials. Once the user is logged in to a domain joined machine, they will not have to re-enter credentials in order to log into WordPress.',
-			'Link'       => 'https://plugins.miniorange.com/saml-single-sign-on-sso-wordpress-using-adfs#step8',
-			'Heading'    => 'Enable Windows SSO',
-			'Link_Title' => 'See Configuration',
-		),
-	);
+			'Azure B2C'   => array(
+				'Text'       => __( 'User Sync for Azure AD / Azure B2C plugin Offers WordPress integrations with Microsoft Azure AD Graph APIs and provides Bi-directional User Synchronization, PowerBI integration, Sharepoint integration, etc.', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://wordpress.org/plugins/user-sync-for-azure-office365/',
+				'Heading'    => __( 'User Sync for Azure AD / Azure B2C', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'Download', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Title' => __( 'Know More', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Link'  => 'https://plugins.miniorange.com/wordpress-azure-office365-integrations',
+			),
+			'SalesForce'  => array(
+				'Text'       => __( 'Object Data Sync For Salesforce plugin provides a bi-directional data synchronization between WP and Salesforce objects', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://wordpress.org/plugins/object-data-sync-for-salesforce/',
+				'Heading'    => __( 'Object Data Sync For Salesforce', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'Download', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Title' => __( 'Know More', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Link'  => 'https://plugins.miniorange.com/wordpress-object-sync-for-salesforce',
+			),
+			'Community'   => array(
+				'Text'       => __( 'Object Data Sync For Salesforce plugin provides a bi-directional data synchronization between WP and Salesforce objects', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://wordpress.org/plugins/object-data-sync-for-salesforce/',
+				'Heading'    => __( 'Object Data Sync For Salesforce', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'Download', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Title' => __( 'Know More', 'miniorange-saml-20-single-sign-on' ),
+				'Know_Link'  => 'https://plugins.miniorange.com/wordpress-object-sync-for-salesforce',
+			),
+			'Windows SSO' => array(
+				'Text'       => __( 'miniOrange SAML Single Sign On Plugin allows users in a corporate Active Directory setup to log into WordPress using their Windows Credentials. Once the user is logged in to a domain joined machine, they will not have to re-enter credentials in order to log into WordPress.', 'miniorange-saml-20-single-sign-on' ),
+				'Link'       => 'https://plugins.miniorange.com/saml-single-sign-on-sso-wordpress-using-adfs#step8',
+				'Heading'    => __( 'Enable Windows SSO', 'miniorange-saml-20-single-sign-on' ),
+				'Link_Title' => __( 'See Configuration', 'miniorange-saml-20-single-sign-on' ),
+			),
+		);
+	}
 }
 
 /**
  * Defines constants for recommended addons.
  */
-class Mo_Saml_Options_Suggested_Add_Ons extends  Mo_SAML_Basic_Enum {
+class Mo_Saml_Options_Suggested_Add_Ons extends Mo_SAML_Basic_Enum {
 	/**
 	 * An array of arrays defining the text and links for the addons based on its name.
 	 *
-	 * @var array
+	 * @return array The array of addon names and titles.
 	 */
-	public static $suggested_addons = array(
-		'page-restriction' => array(
-			'title'    => 'Page / Post Restriction',
-			'text'     => 'Restrict access to WordPress pages/posts based on user roles and their login status, thereby protecting these pages/posts from unauthorized access.',
-			'link'     => 'https://wordpress.org/plugins/page-and-post-restriction/',
-			'knw-link' => 'https://plugins.miniorange.com/wordpress-page-restriction',
-		),
-		'scim'             => array(
-			'title'    => 'SCIM User Provisioning',
-			'text'     => 'Allows real-time user sync (automatic user create, delete, and update) from your Identity Provider such as Azure, Okta, Onelogin into your WordPress site.',
-			'link'     => 'https://wordpress.org/plugins/scim-user-provisioning/',
-			'knw-link' => 'https://plugins.miniorange.com/wordpress-user-provisioning',
-		),
-	);
+	public static function mo_saml_get_suggested_addons() {
+		return array(
+			'page-restriction' => array(
+				'title'    => __( 'Page / Post Restriction', 'miniorange-saml-20-single-sign-on' ),
+				'text'     => __( 'Restrict access to WordPress pages/posts based on user roles and their login status, thereby protecting these pages/posts from unauthorized access.', 'miniorange-saml-20-single-sign-on' ),
+				'link'     => 'https://wordpress.org/plugins/page-and-post-restriction/',
+				'knw-link' => 'https://plugins.miniorange.com/wordpress-page-restriction',
+			),
+			'scim'             => array(
+				'title'    => __( 'SCIM User Provisioning', 'miniorange-saml-20-single-sign-on' ),
+				'text'     => __( 'Allows real-time user sync (automatic user create, delete, and update) from your Identity Provider such as Azure, Okta, Onelogin into your WordPress site.', 'miniorange-saml-20-single-sign-on' ),
+				'link'     => 'https://wordpress.org/plugins/scim-user-provisioning/',
+				'knw-link' => 'https://plugins.miniorange.com/wordpress-user-provisioning',
+			),
+		);
+	}
 }
 
 /**
  * Defines IDP constants.
  */
-class Mo_Saml_Options_Plugin_Idp extends  Mo_SAML_Basic_Enum {
+class Mo_Saml_Options_Plugin_Idp extends Mo_SAML_Basic_Enum {
 	/**
 	 * An array of arrays defining the key and slug for the IDPs used by the admin notice ad.
 	 *
@@ -312,26 +363,33 @@ class Mo_Saml_Options_Plugin_Idp extends  Mo_SAML_Basic_Enum {
 		'Shibboleth 3'   => array( 'shibboleth3', 'saml-single-sign-on-sso-wordpress-using-shibboleth3' ),
 		'AbsorbLMS'      => array( 'absorb-lms', 'saml-single-sign-on-sso-wordpress-using-absorb-lms' ),
 		'Gluu Server'    => array( 'gluu-server', 'saml-single-sign-on-sso-wordpress-using-gluu-server' ),
+		'Dynamic CRM'    => array( 'dynamic-crm', 'saml-single-sign-on-wordpress-using-dynamics-365-crm' ),
+		'Sharepoint'     => array( 'sharepoint', 'saml-single-sign-on-wordpress-using-microsoft-sharepoint' ),
 		'JumpCloud'      => array( 'jumpcloud', 'saml-single-sign-on-sso-wordpress-using-jumpcloud' ),
 		'IdentityServer' => array( 'identityserver4', 'saml-single-sign-on-sso-wordpress-using-identityserver4' ),
+		'VMware'         => array( 'vmware', 'saml-single-sign-on-sso-wordpress-using-vmware-identity-manager' ),
 		'Degreed'        => array( 'degreed', 'saml-single-sign-on-sso-wordpress-using-degreed' ),
 		'CyberArk'       => array( 'cyberark', 'saml-single-sign-on-sso-for-wordpress-using-cyberark' ),
 		'Duo'            => array( 'duo', 'saml-single-sign-on-sso-wordpress-using-duo' ),
 		'FusionAuth'     => array( 'fusionauth', 'saml-single-sign-on-sso-wordpress-using-fusionauth' ),
+		'SiteMinder'     => array( 'siteminder', 'siteminder-saml-single-sign-on-sso-login-wordpress' ),
 		'SecureAuth'     => array( 'secureauth', 'saml-single-sign-on-sso-wordpress-using-secureauth' ),
-		'NetIQ'          => array( 'netIQ', 'saml-single-sign-on-sso-wordpress-using-netIQ' ),
+		'NetIQ'          => array( 'netiq', 'saml-single-sign-on-sso-wordpress-using-netIQ' ),
 		'Fonteva'        => array( 'fonteva', 'saml-single-sign-on-sso-wordpress-using-fonteva' ),
 		'SURFconext'     => array( 'surfconext', 'surfconext-saml-single-sign-on-sso-in-wordpress' ),
 		'PhenixID'       => array( 'phenixid', 'phenixid-saml-single-sign-on-sso-login-wordpresss' ),
+		'LastPass'       => array( 'lastpass', 'saml-single-sign-on-sso-wordpress-using-lastpass' ),
 		'Authanvil'      => array( 'authanvil', 'saml-single-sign-on-sso-wordpress-using-authanvil' ),
 		'Bitium'         => array( 'bitium', 'saml-single-sign-on-sso-wordpress-using-bitium' ),
 		'CA Identity'    => array( 'ca-identity', 'saml-single-sign-on-sso-wordpress-using-ca-identity' ),
 		'OpenAM'         => array( 'openam', 'saml-single-sign-on-sso-wordpress-using-openam' ),
+		'OpenAthens'     => array( 'openathens', 'openathens-saml-single-sign-on-sso-login-wordpress' ),
 		'Oracle'         => array( 'oracle-enterprise-manager', 'saml-single-sign-on-sso-wordpress-using-oracle-enterprise-manager' ),
 		'PingOne'        => array( 'pingone', 'saml-single-sign-on-sso-wordpress-using-pingone' ),
 		'RSA SecureID'   => array( 'rsa-secureid', 'saml-single-sign-on-sso-wordpress-using-rsa-secureid' ),
 		'SimpleSAMLphp'  => array( 'simplesaml', 'saml-single-sign-on-sso-wordpress-using-simplesaml' ),
 		'WSO2'           => array( 'wso2', 'saml-single-sign-on-sso-wordpress-using-wso2' ),
+		'Drupal'         => array( 'drupal', 'wordpress-sso-login-with-drupal-idp' ),
 		'Custom IDP'     => array( 'custom-idp', 'saml-single-sign-on-sso-wordpress-using-custom-idp' ),
 
 	);
@@ -340,7 +398,7 @@ class Mo_Saml_Options_Plugin_Idp extends  Mo_SAML_Basic_Enum {
 /**
  * Defines constants for IDP guide videos.
  */
-class Mo_Saml_Options_Plugin_Idp_Videos extends  Mo_SAML_Basic_Enum {
+class Mo_Saml_Options_Plugin_Idp_Videos extends Mo_SAML_Basic_Enum {
 	/**
 	 * A map for idp key and video link's path.
 	 *
@@ -363,6 +421,13 @@ class Mo_Saml_Options_Plugin_Idp_Videos extends  Mo_SAML_Basic_Enum {
 		'centrify'                  => '',
 		'oracle-enterprise-manager' => '',
 		'bitium'                    => '',
+		'drupal'                    => '',
+		'openathens'                => '',
+		'lastpass'                  => '',
+		'siteminder'                => '',
+		'dynamic-crm'               => '',
+		'vmware'                    => '',
+		'sharepoint'                => '',
 		'shibboleth2'               => '',
 		'shibboleth3'               => '',
 		'gluu-server'               => '',
@@ -382,7 +447,7 @@ class Mo_Saml_Options_Plugin_Idp_Videos extends  Mo_SAML_Basic_Enum {
 		'duo'                       => '',
 		'fusionauth'                => '',
 		'secureauth'                => '',
-		'netIQ'                     => '',
+		'netiq'                     => '',
 		'fonteva'                   => '',
 		'windows'                   => 'rLBHbRbrY5E',
 		'surfconext'                => '',
@@ -423,9 +488,10 @@ class Mo_Saml_Options_Addons extends Mo_SAML_Basic_Enum {
 		'guest_login'                 => 'https://plugins.miniorange.com/guest-user-login',
 		'profile_picture_add_on'      => 'https://plugins.miniorange.com/wordpress-profile-picture-map',
 		'power_bi'                    => 'https://plugins.miniorange.com/microsoft-power-bi-embed-for-wordpress',
-		'sharepoint'                  => 'https://plugins.miniorange.com/wordpress-azure-office365-integrations',
-
-
+		'sharepoint'                  => 'https://plugins.miniorange.com/microsoft-sharepoint-wordpress-integration',
+		'salesforce_community_addon'  => 'https://plugins.miniorange.com/single-sign-on-sso-login-into-wordpress-for-multiple-salesforce-communities',
+		'ip_whitelisting_addon'       => 'https://plugins.miniorange.com/wordpress-ip-whitelisting',
+		'azure_multi_tenant_addon'    => 'https://plugins.miniorange.com/azure-ad-multi-tenant-single-sign-on-sso-login-wordpress',
 	);
 
 	/**
@@ -439,33 +505,53 @@ class Mo_Saml_Options_Addons extends Mo_SAML_Basic_Enum {
 	);
 
 	/**
-	 * A map for addon name and title.
+	 * Get the entire array of addon names and titles.
 	 *
-	 * @var array
+	 * @return array The array of addon names and titles.
 	 */
-	public static $addon_title = array(
+	public static function mo_saml_get_addon_titles() {
+		return array(
+			'salesforce_sync'             => __( 'Object Data Sync for Salesforce', 'miniorange-saml-20-single-sign-on' ),
+			'power_bi'                    => __( 'Embed Power BI Report', 'miniorange-saml-20-single-sign-on' ),
+			'sharepoint'                  => __( 'Sharepoint/ One-Drive Integration', 'miniorange-saml-20-single-sign-on' ),
+			'employee_directory'          => __( 'Employee Staff Directory', 'miniorange-saml-20-single-sign-on' ),
+			'azure_sync'                  => __( 'Azure AD/Office 365 Integrations', 'miniorange-saml-20-single-sign-on' ),
+			'scim'                        => __( 'SCIM User Provisioning', 'miniorange-saml-20-single-sign-on' ),
+			'page_restriction'            => __( 'Page and Post Restriction', 'miniorange-saml-20-single-sign-on' ),
+			'file_prevention'             => __( 'Prevent File Access', 'miniorange-saml-20-single-sign-on' ),
+			'ssologin'                    => __( 'SSO Login Audit', 'miniorange-saml-20-single-sign-on' ),
+			'buddypress'                  => __( 'BuddyPress Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'learndash'                   => __( 'Learndash Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'attribute_based_redirection' => __( 'Attribute Based Redirection', 'miniorange-saml-20-single-sign-on' ),
+			'ssosession'                  => __( 'SSO Session Management', 'miniorange-saml-20-single-sign-on' ),
+			'fsso'                        => __( 'Federation Single Sign-On', 'miniorange-saml-20-single-sign-on' ),
+			'memberpress'                 => __( 'MemberPress Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'wp_members'                  => __( 'WP-Members Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'woocommerce'                 => __( 'WooCommerce Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'guest_login'                 => __( 'Guest Login', 'miniorange-saml-20-single-sign-on' ),
+			'profile_picture_add_on'      => __( 'Profile Picture Add-on', 'miniorange-saml-20-single-sign-on' ),
+			'paid_mem_pro'                => __( 'PaidMembership Pro Integrator', 'miniorange-saml-20-single-sign-on' ),
+			'salesforce_community_addon'  => __( 'Salesforce Community Add-on', 'miniorange-saml-20-single-sign-on' ),
+			'ip_whitelisting_addon'       => __( 'IP Whitelisting Add-on', 'miniorange-saml-20-single-sign-on' ),
+			'azure_multi_tenant_addon'    => __( 'Azure Multitenant Add-on', 'miniorange-saml-20-single-sign-on' ),
+		);
+	}
 
-		'salesforce_sync'             => 'Object Data Sync for Salesforce',
-		'power_bi'                    => 'Embed Power BI Report',
-		'sharepoint'                  => 'Sharepoint/ One-Drive Integration',
-		'employee_directory'          => 'Employee Staff Directory',
-		'azure_sync'                  => 'Azure AD/Office 365 Integrations',
-		'scim'                        => 'SCIM User Provisioning',
-		'page_restriction'            => 'Page and Post Restriction',
-		'file_prevention'             => 'Prevent File Access',
-		'ssologin'                    => 'SSO Login Audit',
-		'buddypress'                  => 'BuddyPress Integrator',
-		'learndash'                   => 'Learndash Integrator',
-		'attribute_based_redirection' => 'Attribute Based Redirection',
-		'ssosession'                  => 'SSO Session Management',
-		'fsso'                        => 'Federation Single Sign-On',
-		'memberpress'                 => 'MemberPress Integrator',
-		'wp_members'                  => 'WP-Members Integrator',
-		'woocommerce'                 => 'WooCommerce Integrator',
-		'guest_login'                 => 'Guest Login',
-		'profile_picture_add_on'      => 'Profile Picture Add-on',
-		'paid_mem_pro'                => 'PaidMembership Pro Integrator',
-	);
+	/**
+	 * Translate a given message key to the corresponding translated message.
+	 *
+	 * @param string $message_key The key of the message to be translated.
+	 *
+	 * @return string Translated message corresponding to the provided key.
+	 */
+	public static function mo_saml_translate( $message_key ) {
+		$addon_titles = self::mo_saml_get_addon_titles();
+
+		if ( isset( $addon_titles[ $message_key ] ) ) {
+			return $addon_titles[ $message_key ];
+		}
+	}
+
 
 	/**
 	 * A map for plugins name and slug for displaying recommended addons.
@@ -497,45 +583,9 @@ class Mo_Saml_Options_Addons extends Mo_SAML_Basic_Enum {
 }
 
 /**
- * Defines Licensing plans constants.
- */
-class Mo_Saml_License_Plans extends Mo_SAML_Basic_Enum {
-
-	/**
-	 * A map for plan slug and plan name.
-	 *
-	 * @var array
-	 */
-	public static $license_plans = array(
-		'standard'                => 'WP SAML SSO Standard Plan',
-		'premium'                 => 'WP SAML SSO Premium Plan',
-		'enterprise'              => 'WP SAML SSO Enterprise Plan',
-		'enterprise-multiple-idp' => 'WP SAML SSO Enterprise Multiple-IDP Plan',
-		'all-inclusive'           => 'WP SAML SSO All Inclusive Plan',
-		'premium-multisite'       => 'WP SAML SSO Premium Multisite Plan',
-		'enterprise-multisite'    => 'WP SAML SSO Enterprise Multisite Plan',
-		'all-inclusive-multisite' => 'WP SAML SSO All Inclusive Multisite Plan',
-		'help'                    => 'Not Sure',
-	);
-
-	/**
-	 * A map for plan slug and version number for demo.
-	 *
-	 * @var array
-	 */
-	public static $license_plans_slug = array(
-		'standard'                => '16.0.2@16.0.2',
-		'premium'                 => '12.0.2@12.0.2',
-		'enterprise'              => '12.0.2@12.0.2',
-		'enterprise-multiple-idp' => '25.0.1@25.0.1',
-		'all-inclusive'           => '25.0.1@25.0.1',
-	);
-}
-
-/**
  * Defines constants for time zones used in the support form.
  */
-class Mo_Saml_Time_Zones extends  Mo_SAML_Basic_Enum {
+class Mo_Saml_Time_Zones extends Mo_SAML_Basic_Enum {
 
 	/**
 	 * A map for time zone and region.
@@ -943,8 +993,7 @@ class Mo_Saml_Error_Log extends Mo_SAML_Basic_Enum {
 	const LOGIN_WIDGET_AUTHN_REQUEST                        = '[MO SAML SSO] Initiating SAML Request:
                           [ SSO URL = {{ssoUrl}},
                             ACS URL = {{acsUrl}},
-                            Force Authentication = {{force_authn}},
-                            SP Entity ID = {{sp_entity_id}},
+                            SP Entity ID = {{spEntityId}},
                             RelayState = {{sendRelayState}} ]';
 	const LOGIN_WIDGET_SAML_REQUEST                         = '[MO SAML SSO] SAML Request generated: [ SAMLRequest = {{samlRequest}} ]';
 	const LOGIN_WIDGET_RELAYSTATE_SENT                      = '[MO SAML SSO] Sending SAML Request to IDP SSO URL: {{redirect}}';
@@ -973,6 +1022,9 @@ class Mo_Saml_Error_Log extends Mo_SAML_Basic_Enum {
 	const UTILITIES_INVALID_ISSUER                          = '[MO SAML SSO] Invalid Issuer found for the SAML Response:
                                      [ IDP Entity ID = {{issuerToValidateAgainst}},
                                      Issuer = {{issuer}} ]';
+	const LOGIN_WIDGET_CERT_NOT_MATCHED_ENCODED             = '[MO SAML SSO] Certificate mismatched after the iconv encoding.';
+	const LOGIN_WIDGET_UNABLE_TO_PROCESS_RESPONSE           = '[MO SAML SSO] Unable to process the SAML response';
+
 	/**
 	 * Prints message in the log file.
 	 *
@@ -980,7 +1032,7 @@ class Mo_Saml_Error_Log extends Mo_SAML_Basic_Enum {
 	 * @param array  $data Any additional data to be printed in the log file.
 	 * @return string The message printed in the log file.
 	 */
-	public static function mo_saml_write_message( $message, $data = array() ) : string {
+	public static function mo_saml_write_message( $message, $data = array() ) {
 		$message = constant( 'self::' . $message );
 		if ( ! empty( $data ) ) {
 			foreach ( $data as $key => $value ) {
@@ -993,49 +1045,64 @@ class Mo_Saml_Error_Log extends Mo_SAML_Basic_Enum {
 		}
 		return $message;
 	}
-
-
 }
 
 /**
  * Defines admin notice messages.
  */
 class Mo_Saml_Messages extends Mo_SAML_Basic_Enum {
-	const IDP_DETAILS_SUCCESS      = 'Identity Provider details saved successfully.';
-	const INVALID_CERT             = 'Invalid certificate: Please provide a valid X.509 certificate.';
-	const FIELDS_EMPTY             = 'All the fields are required. Please enter valid entries.';
-	const INVALID_FORMAT           = 'Please match the requested format for Identity Provider Name. Only alphabets, numbers and underscore is allowed.';
-	const METADATA_EMPTY           = 'Please upload a valid metadata file or URL.';
-	const IDP_NAME_EMPTY           = 'IDP Name cannot be empty. Please enter a valid Identity Provider Name.';
-	const METADATA_NAME_EMPTY      = 'Error uploading metadata. Please upload a valid metadata file.';
-	const INVALID_IDP_NAME_FORMAT  = 'Please match the requested format for Identity Provider Name. Only alphabets, numbers and underscore is allowed.';
-	const INVALID_METADATA_FILE    = 'Please provide a valid metadata file.';
-	const INVALID_METADATA_URL     = 'Please provide a valid metadata URL.';
-	const INVALID_METADATA_CONFIG  = 'Unable to fetch Metadata. Please check your metadata again.';
-	const METADATA_UPLOAD_SUCCESS  = 'Identity Provider details saved successfully.';
-	const SETTINGS_UPDATED         = 'Settings updated successfully.';
-	const CONTACT_EMAIL_EMPTY      = 'Please fill up required fields to submit your query.';
-	const CONTACT_EMAIL_INVALID    = 'Please enter a valid email address.';
-	const CALL_SETUP_DETAILS_EMPTY = 'Please fill up Schedule Call Details to submit your query.';
-	const QUERY_NOT_SUBMITTED      = 'Your query could not be submitted. Please try again.';
-	const QUERY_SUBMITTED          = 'Thanks for getting in touch! We will reach out on your email shortly.';
-	const UPDATED_DEFAULT_ROLE     = 'Role Mapping details saved successfully.';
-	const SP_NOT_CONFIGURED        = 'Please complete Service Provider configuration in Service Provider Setup first.';
-	const DEMO_REQUEST_FAILED      = 'Something went wrong. Please reach out to us using the Support/Contact Us form to get help with the demo.';
-	const PASSWORD_PATTERN_INVALID = 'Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*-_) are allowed.';
-	const PASSWORD_MISMATCH        = 'Passwords do not match.';
-	const ACCOUNT_EXISTS           = 'You already have an account with miniOrange. Please enter a valid password.';
-	const INVALID_CREDENTIALS      = 'Invalid username or password. Please try again.';
-	const REGISTER_SUCCESS         = 'Thank you for registering with miniOrange.';
-	const CUSTOMER_FOUND           = 'Customer retrieved successfully.';
-	const ATTRIBUTES_CLEARED       = 'List of attributes cleared.';
-	const LOG_FILE_NOT_FOUND       = "Log file doesn't exists.";
-	const LOG_FILE_CLEARED         = 'Successfully cleared log files.';
-	const WPCONFIG_ERROR           = 'WP-config.php is not writable, please follow the manual steps to enable/disable the debug logs.';
-	const PLUGIN_DEACTIVATED       = 'Plugin deactivated successfully.';
-	const FEEDBACK_SUCCESS         = 'Thank you for the feedback.';
 
+	/**
+	 * Translate a given message key to the corresponding translated message.
+	 *
+	 * @param string $message_key The key of the message to be translated.
+	 *
+	 * @return string Translated message corresponding to the provided key.
+	 */
+	public static function mo_saml_translate( $message_key ) {
+
+		$messages = array(
+			'IDP_DETAILS_SUCCESS'      => __( 'Identity Provider details saved successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_CERT'             => __( 'Invalid certificate: Please provide a valid X.509 certificate.', 'miniorange-saml-20-single-sign-on' ),
+			'FIELDS_EMPTY'             => __( 'All the fields are required. Please enter valid entries.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_FORMAT'           => __( 'Please match the requested format for Identity Provider Name. Only alphabets, numbers and underscore is allowed.', 'miniorange-saml-20-single-sign-on' ),
+			'METADATA_EMPTY'           => __( 'Please upload a valid metadata file or URL.', 'miniorange-saml-20-single-sign-on' ),
+			'IDP_NAME_EMPTY'           => __( 'IDP Name cannot be empty. Please enter a valid Identity Provider Name.', 'miniorange-saml-20-single-sign-on' ),
+			'METADATA_NAME_EMPTY'      => __( 'Error uploading metadata. Please upload a valid metadata file.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_IDP_NAME_FORMAT'  => __( 'Please match the requested format for Identity Provider Name. Only alphabets, numbers and underscore is allowed.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_METADATA_FILE'    => __( 'Please provide a valid metadata file.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_METADATA_URL'     => __( 'Please provide a valid metadata URL.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_METADATA_CONFIG'  => __( 'Unable to fetch Metadata. Please check your metadata again.', 'miniorange-saml-20-single-sign-on' ),
+			'METADATA_UPLOAD_SUCCESS'  => __( 'Identity Provider details saved successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'SETTINGS_UPDATED'         => __( 'Settings updated successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'CONTACT_EMAIL_EMPTY'      => __( 'Please fill up required fields to submit your query.', 'miniorange-saml-20-single-sign-on' ),
+			'CONTACT_EMAIL_INVALID'    => __( 'Please enter a valid email address.', 'miniorange-saml-20-single-sign-on' ),
+			'CALL_SETUP_DETAILS_EMPTY' => __( 'Please fill up Schedule Call Details to submit your query.', 'miniorange-saml-20-single-sign-on' ),
+			'QUERY_NOT_SUBMITTED'      => __( 'Your query could not be submitted. Please try again.', 'miniorange-saml-20-single-sign-on' ),
+			'QUERY_SUBMITTED'          => __( 'Thanks for getting in touch! We will reach out on your email shortly.', 'miniorange-saml-20-single-sign-on' ),
+			'UPDATED_DEFAULT_ROLE'     => __( 'Role Mapping details saved successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'DEMO_REQUEST_FAILED'      => __( 'Something went wrong. Please reach out to us using the Support/Contact Us form to get help with the demo.', 'miniorange-saml-20-single-sign-on' ),
+			'PASSWORD_PATTERN_INVALID' => __( 'Minimum 6 characters should be present. Maximum 15 characters should be present. Only following symbols (!@#.$%^&*-_) are allowed.', 'miniorange-saml-20-single-sign-on' ),
+			'PASSWORD_MISMATCH'        => __( 'Passwords do not match.', 'miniorange-saml-20-single-sign-on' ),
+			'ACCOUNT_EXISTS'           => __( 'You already have an account with miniOrange. Please enter a valid password.', 'miniorange-saml-20-single-sign-on' ),
+			'INVALID_CREDENTIALS'      => __( 'Invalid username or password. Please try again.', 'miniorange-saml-20-single-sign-on' ),
+			'REGISTER_SUCCESS'         => __( 'Thank you for registering with miniOrange.', 'miniorange-saml-20-single-sign-on' ),
+			'CUSTOMER_FOUND'           => __( 'Customer retrieved successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'ATTRIBUTES_CLEARED'       => __( 'List of attributes cleared.', 'miniorange-saml-20-single-sign-on' ),
+			'LOG_FILE_NOT_FOUND'       => __( 'Log file doesn\'t exist.', 'miniorange-saml-20-single-sign-on' ),
+			'LOG_FILE_CLEARED'         => __( 'Successfully cleared log files.', 'miniorange-saml-20-single-sign-on' ),
+			'WPCONFIG_ERROR'           => __( 'WP-config.php is not writable, please follow the manual steps to enable/disable the debug logs.', 'miniorange-saml-20-single-sign-on' ),
+			'PLUGIN_DEACTIVATED'       => __( 'Plugin deactivated successfully.', 'miniorange-saml-20-single-sign-on' ),
+			'FEEDBACK_SUCCESS'         => __( 'Thank you for the feedback.', 'miniorange-saml-20-single-sign-on' ),
+		);
+
+		if ( isset( $messages[ $message_key ] ) ) {
+			return $messages[ $message_key ];
+		}
+	}
 }
+
+
 /**
  * Defines Save Status Constants.
  */
@@ -1050,6 +1117,14 @@ class Mo_Saml_Save_Status_Constants extends Mo_SAML_Basic_Enum {
 class Mo_Saml_Api_Status_Constants extends Mo_SAML_Basic_Enum {
 	const ERROR   = 'ERROR';
 	const SUCCESS = 'SUCCESS';
+}
+
+/**
+ * Defines Encoding Methods constants.
+ */
+class Mo_Saml_Options_Enum_Encoding extends Mo_Saml_Basic_Enum {
+	const ENCODING_CP1252 = 'CP1252';
+	const ENCODING_UTF_8  = 'UTF-8';
 }
 
 // phpcs:enable Generic.Files.OneObjectStructurePerFile.MultipleFound

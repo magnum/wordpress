@@ -2,7 +2,7 @@
 
 add_action(
 	'wp_enqueue_scripts',
-	function () {
+	static function () {
 		$assets = array();
 		$asset_file = wpcf7_plugin_path( 'includes/swv/js/index.asset.php' );
 
@@ -19,7 +19,7 @@ add_action(
 			wpcf7_plugin_url( 'includes/swv/js/index.js' ),
 			$assets['dependencies'],
 			$assets['version'],
-			true
+			array( 'in_footer' => true )
 		);
 	},
 	10, 0

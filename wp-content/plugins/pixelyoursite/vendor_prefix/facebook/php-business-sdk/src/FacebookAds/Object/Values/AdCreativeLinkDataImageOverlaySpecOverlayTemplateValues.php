@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeLinkDataImageOverlaySpecOverlayTemplateValues getInstance()
  */
-class AdCreativeLinkDataImageOverlaySpecOverlayTemplateValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CIRCLE_WITH_TEXT = 'circle_with_text';
-    const PILL_WITH_TEXT = 'pill_with_text';
-    const TRIANGLE_WITH_TEXT = 'triangle_with_text';
+class AdCreativeLinkDataImageOverlaySpecOverlayTemplateValues extends AbstractEnum {
+
+  const CIRCLE_WITH_TEXT = 'circle_with_text';
+  const PILL_WITH_TEXT = 'pill_with_text';
+  const TRIANGLE_WITH_TEXT = 'triangle_with_text';
 }

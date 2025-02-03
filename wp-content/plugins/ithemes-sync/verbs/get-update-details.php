@@ -14,12 +14,12 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Update_Details extends Ithemes_Sync_Verb {
-	public static $name = 'get-update-details';
-	public static $description = 'Find details about all available updates on the site. This includes details about updates to WordPress, plugins, themes, and translations.';
-	public static $status_element_name = 'updates';
+	public static $name                      = 'get-update-details';
+	public static $description               = 'Find details about all available updates on the site. This includes details about updates to WordPress, plugins, themes, and translations.';
+	public static $status_element_name       = 'updates';
 	public static $show_in_status_by_default = true;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {

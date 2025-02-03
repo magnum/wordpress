@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InsightsResultFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InsightsResultDatePresetValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InsightsResultPeriodValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InsightsResultPeriodValues;
  * pull request for this class.
  *
  */
-class InsightsResult extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return InsightsResultFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InsightsResultFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['DatePreset'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InsightsResultDatePresetValues::getInstance()->getValues();
-        $ref_enums['Period'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InsightsResultPeriodValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class InsightsResult extends AbstractCrudObject {
+
+  /**
+   * @return InsightsResultFields
+   */
+  public static function getFieldsEnum() {
+    return InsightsResultFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['DatePreset'] = InsightsResultDatePresetValues::getInstance()->getValues();
+    $ref_enums['Period'] = InsightsResultPeriodValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

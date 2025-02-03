@@ -6,6 +6,7 @@ use InvalidArgumentException;
 
 class Settings_Page_Tab {
 
+
 	/**
 	 * @var string
 	 */
@@ -36,7 +37,7 @@ class Settings_Page_Tab {
 	 * @param $label
 	 * @param $settings_fields_option_group
 	 * @param $page_name
-	 * @param bool $has_submit_button
+	 * @param bool                         $has_submit_button
 	 *
 	 * @throws InvalidArgumentException
 	 */
@@ -112,13 +113,12 @@ class Settings_Page_Tab {
 	}
 
 	public function get_tab_href() {
-		$query = http_build_query(
-			array(
-				'page' => $this->page_name,
-				'tab'  => $this->name,
-			)
+		$query = array(
+			'page' => $this->page_name,
+			'tab'  => $this->name,
 		);
-		return admin_url( 'admin.php?' . $query );
+
+		return add_query_arg( $query, admin_url( 'admin.php' ) );
 	}
 
 	/**
@@ -134,5 +134,4 @@ class Settings_Page_Tab {
 	public function has_submit_button() {
 		return $this->has_submit_button;
 	}
-
 }

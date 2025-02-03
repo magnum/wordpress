@@ -154,6 +154,20 @@ function automatorwp_ninja_forms_parse_automation_tags( $parsed_content, $replac
         }
 
         // Look for form field tags
+        preg_match_all( "/\{t:" . $trigger->id . ":form_field:\s*(.*?)\s*\}/", $parsed_content, $matches );
+        
+        if( is_array( $matches ) && isset( $matches[1] ) ) {
+
+            foreach( $matches[1] as $field_name ) {
+                // Replace {t:ID:form_field:NAME} by the field value
+                if( isset( $form_fields[$field_name] ) ) {
+                    $new_replacements['{t:' . $trigger->id . ':form_field:' . $field_name . '}'] = $form_fields[$field_name];
+                }
+            }
+
+        }
+
+        // Look for form field tags
         preg_match_all( "/\{" . $trigger->id . ":form_field:\s*(.*?)\s*\}/", $parsed_content, $matches );
 
         if( is_array( $matches ) && isset( $matches[1] ) ) {

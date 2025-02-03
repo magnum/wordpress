@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAssetFeedSpecImageFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADLABELS = 'adlabels';
-    const HASH = 'hash';
-    const IMAGE_CROPS = 'image_crops';
-    const URL = 'url';
-    const URL_TAGS = 'url_tags';
-    public function getFieldTypes()
-    {
-        return array('adlabels' => 'list<AdAssetFeedSpecAssetLabel>', 'hash' => 'string', 'image_crops' => 'AdsImageCrops', 'url' => 'string', 'url_tags' => 'string');
-    }
+
+class AdAssetFeedSpecImageFields extends AbstractEnum {
+
+  const ADLABELS = 'adlabels';
+  const HASH = 'hash';
+  const IMAGE_CROPS = 'image_crops';
+  const URL = 'url';
+  const URL_TAGS = 'url_tags';
+
+  public function getFieldTypes() {
+    return array(
+      'adlabels' => 'list<AdAssetFeedSpecAssetLabel>',
+      'hash' => 'string',
+      'image_crops' => 'AdsImageCrops',
+      'url' => 'string',
+      'url_tags' => 'string',
+    );
+  }
 }

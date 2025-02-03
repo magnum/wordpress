@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,32 +21,34 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers;
 
 use PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers\ValueNormalizerInterface;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceMultikeySchemaFields;
-class HashNormalizer implements \PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers\ValueNormalizerInterface
-{
+
+class HashNormalizer implements ValueNormalizerInterface {
+
     /**
      *  @var string
      */
     const HASH_TYPE_SHA256 = 'sha256';
+
     /**
      * @param string $key
      * @param string $key_value
      * @return boolean
      */
-    public function shouldNormalize($key, $key_value)
-    {
-        return $key !== \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceMultikeySchemaFields::LOOKALIKE_VALUE;
+    public function shouldNormalize($key, $key_value) {
+        return $key !== CustomAudienceMultikeySchemaFields::LOOKALIKE_VALUE;
     }
+
     /**
      * @param string $key
      * @param string $key_value
      * @return string
      */
-    public function normalize($key, $key_value)
-    {
-        return \hash(self::HASH_TYPE_SHA256, $key_value);
+    public function normalize($key, $key_value) {
+        return hash(self::HASH_TYPE_SHA256, $key_value);
     }
 }

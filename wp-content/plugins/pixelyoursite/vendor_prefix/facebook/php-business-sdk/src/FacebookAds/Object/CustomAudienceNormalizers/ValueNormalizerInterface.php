@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,20 +21,22 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers;
 
-interface ValueNormalizerInterface
-{
-    /**
-     * @param string $key
-     * @param string $key_value
-     * @return boolean
-     */
-    public function shouldNormalize($key, $val);
-    /**
-     * @param string $key
-     * @param string $key_value
-     * @return string
-     */
-    public function normalize($key, $val);
+interface ValueNormalizerInterface {
+
+  /**
+   * @param string $key
+   * @param string $key_value
+   * @return boolean
+   */
+  public function shouldNormalize($key, $val);
+
+  /**
+   * @param string $key
+   * @param string $key_value
+   * @return string
+   */
+  public function normalize($key, $val);
 }

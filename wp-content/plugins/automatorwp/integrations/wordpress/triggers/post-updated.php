@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Post_Updated extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_post_updated';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_post_updated';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -70,10 +81,32 @@ class AutomatorWP_WordPress_Post_Updated extends AutomatorWP_Integration_Trigger
         if( $post_before->post_status === 'auto-draft' ) {
             return;
         }
+
+        if ( isset( $_POST['original_post_status'] ) ) {
+            if ( !empty( $_POST ) || $_POST['original_post_status'] === 'auto-draft' ) {
+                return;
+            }
+        }    
+
+        // Bail if post is removed
+        if ( $post_after->post_status === 'trash' ) {
+            return;
+        }
+
+        /**
+         * User ID for post updated triggers
+         *
+         * @since 1.0.0
+         *
+         * @param int    $user_id    The user ID
+         * @param int    $post_ID    The post ID
+         * @param string $trigger    The trigger
+         */
+        $user_id = apply_filters( 'automatorwp_post_updated_user_id', $post_after->post_author, $post_ID, $this->trigger );
     
         automatorwp_trigger_event( array(
             'trigger' => $this->trigger,
-            'user_id' => $post_after->post_author,
+            'user_id' => $user_id,
             'post_id' => $post_ID,
         ) );
 
@@ -111,4 +144,5 @@ class AutomatorWP_WordPress_Post_Updated extends AutomatorWP_Integration_Trigger
 
 }
 
-new AutomatorWP_WordPress_Post_Updated();
+new AutomatorWP_WordPress_Post_Updated( 'wordpress' );
+new AutomatorWP_WordPress_Post_Updated( 'posts' );

@@ -2,10 +2,14 @@
 
 namespace Uncanny_Automator;
 
+use Uncanny_Automator\Recipe\Log_Properties;
+
 /**
  *
  */
 class WP_USERCREATESPOST {
+
+	use Log_Properties;
 
 	/**
 	 * Integration code
@@ -71,12 +75,32 @@ class WP_USERCREATESPOST {
 	 */
 	private $matched_recipes = array();
 
+	/**
+	 *  Property child_term_log_properties
+	 *
+	 * @var array
+	 */
+	private $child_term_log_properties = array();
 
+	/**
+	 * @var string
+	 */
+	private $action_hook;
+
+	/**
+	 * @var int
+	 */
+	private $internal_post_id = 288662867; // Automator in numbers
+
+	/**
+	 * WP_USERCREATESPOST constructor.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
-
 		$this->trigger_code = 'USERSPOST';
-
 		$this->trigger_meta = 'WPPOSTTYPES';
+		$this->action_hook  = 'automator_userspost_posts_published';
 
 		if ( Automator()->helpers->recipe->is_edit_page() ) {
 			add_action(
@@ -91,13 +115,18 @@ class WP_USERCREATESPOST {
 		}
 		$this->define_trigger();
 
+		// Legacy support for posts published in a specific post type
 		add_action( 'uoa_wp_after_insert_post', array( $this, 'post_published' ), 99, 1 );
+
+		// New support for posts published in a specific post type
+		add_action( $this->action_hook, array( $this, 'posts_published' ), 99 );
 	}
 
 	/**
 	 * Define and register the trigger by pushing it into the Automator object
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function define_trigger() {
 		$trigger = array(
@@ -113,7 +142,7 @@ class WP_USERCREATESPOST {
 				'WPTAXONOMIES:' . $this->trigger_meta
 			),
 			/* translators: Logged-in trigger - WordPress */
-			'select_option_name'  => esc_attr__( 'A user publishes a {{type of}} post with {{a taxonomy term}} in {{a taxonomy}}', 'uncanny-automator' ),
+			'select_option_name'  => esc_attr__( 'A user publishes a post in a taxonomy', 'uncanny-automator' ),
 			'action'              => 'wp_after_insert_post',
 			'priority'            => 90,
 			'accepted_args'       => 4,
@@ -127,7 +156,7 @@ class WP_USERCREATESPOST {
 	/**
 	 * Method load_options.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function load_options() {
 
@@ -142,7 +171,6 @@ class WP_USERCREATESPOST {
 				'target_field'        => 'WPTAXONOMIES',
 				'endpoint'            => 'select_post_type_taxonomies',
 				'use_zero_as_default' => true,
-				'default_value'       => 'post',
 			)
 		);
 
@@ -166,6 +194,7 @@ class WP_USERCREATESPOST {
 							)
 						),
 						Automator()->helpers->recipe->field->select_field( 'WPTAXONOMYTERM', esc_attr__( 'Term', 'uncanny-automator' ) ),
+						Automator()->helpers->recipe->wp->options->conditional_child_taxonomy_checkbox(),
 					),
 				),
 			)
@@ -175,21 +204,50 @@ class WP_USERCREATESPOST {
 	}
 
 	/**
+	 * @return void
+	 */
+	public function posts_published() {
+		$post_metas = Wp_Helpers::get_pending_posts( $this->action_hook );
+		if ( empty( $post_metas ) ) {
+			return;
+		}
+
+		$post_ids = array();
+
+		// Process each post ID
+		foreach ( $post_metas as $post_meta ) {
+			$post_id = absint( $post_meta->meta_value );
+
+			if ( in_array( $post_id, $post_ids, true ) ) {
+				Wp_Helpers::delete_post_after_trigger( $post_meta );
+				continue;
+			}
+
+			$post_ids[] = $post_id;
+
+			if ( Wp_Helpers::delete_post_after_trigger( $post_meta ) ) {
+				$this->post_published( $post_id );
+			}
+		}
+
+	}
+
+	/**
 	 * @param $post_id
 	 * @param $post
 	 * @param $update
 	 * @param $post_before
+	 *
+	 * @return void|null
 	 */
 	public function schedule_a_post( $post_id, $post, $update, $post_before ) {
-		if ( ! empty( $post_before ) && 'publish' === $post_before->post_status ) {
+		// only run when posts
+		// are published first time
+		if ( ! Automator()->utilities->is_wp_post_being_published( $post, $post_before ) ) {
 			return;
 		}
 
-		if ( 'publish' !== $post->post_status ) {
-			return;
-		}
-
-		$cron_enabled = apply_filters( 'automator_wp_user_creates_post_cron_enabled', '__return_true', $post_id, $post, $update, $post_before, $this );
+		$cron_enabled = apply_filters( 'automator_wp_user_creates_post_cron_enabled', true, $post_id, $post, $update, $post_before, $this );
 
 		// Allow people to disable cron processing.
 		if ( false === $cron_enabled ) {
@@ -197,34 +255,33 @@ class WP_USERCREATESPOST {
 			return $this->post_published( $post_id );
 		}
 
-		if ( wp_next_scheduled( 'uoa_wp_after_insert_post', array( $post_id ) ) ) {
-			return;
-		}
-
-		// Scheduling for 5 sec so that all tax/terms are stored
-		return wp_schedule_single_event(
-			apply_filters( 'automator_schedule_a_post_time', time() + 5, $post_id, $post, $update, $post_before ),
-			'uoa_wp_after_insert_post',
-			array(
-				$post_id,
-			)
-		);
-
+		// Add the post ID to the post meta table.
+		Wp_Helpers::add_pending_post( $post_id, $this->action_hook );
 	}
 
 	/**
 	 * Fires when a post is transitioned from one status to another.
+	 * Fires when a post is transitioned from one status to another.
 	 *
 	 * @param $post_id
+	 *
+	 * @return void
 	 */
 	public function post_published( $post_id ) {
-		$post                   = get_post( $post_id );
-		$this->post             = $post;
-		$user_id                = absint( isset( $post->post_author ) ? $post->post_author : 0 );
-		$recipes                = Automator()->get->recipes_from_trigger_code( $this->trigger_code );
-		$required_post_type     = Automator()->get->meta_from_recipes( $recipes, 'WPPOSTTYPES' );
-		$required_post_taxonomy = Automator()->get->meta_from_recipes( $recipes, 'WPTAXONOMIES' );
-		$required_post_term     = Automator()->get->meta_from_recipes( $recipes, 'WPTAXONOMYTERM' );
+		// Check if the post has already been postponed to avoid duplicate recipe runs.
+		if ( $this->maybe_post_postponed( $post_id ) ) {
+			return;
+		}
+
+		$post                      = get_post( $post_id );
+		$this->post                = $post;
+		$user_id                   = absint( isset( $post->post_author ) ? $post->post_author : 0 );
+		$recipes                   = Automator()->get->recipes_from_trigger_code( $this->trigger_code );
+		$required_post_type        = Automator()->get->meta_from_recipes( $recipes, 'WPPOSTTYPES' );
+		$required_post_taxonomy    = Automator()->get->meta_from_recipes( $recipes, 'WPTAXONOMIES' );
+		$required_post_term        = Automator()->get->meta_from_recipes( $recipes, 'WPTAXONOMYTERM' );
+		$include_taxonomy_children = Automator()->get->meta_from_recipes( $recipes, 'WPTAXONOMIES_CHILDREN' );
+		$include_taxonomy_children = ! empty( $include_taxonomy_children ) ? $include_taxonomy_children : array();
 
 		// no recipes found, bail
 		if ( empty( $recipes ) ) {
@@ -265,32 +322,73 @@ class WP_USERCREATESPOST {
 
 		// No taxonomies found, bail
 		if ( empty( $taxonomy_recipes ) ) {
+			Wp_Helpers::requeue_post( $post_id, $this->action_hook );
 			return;
 		}
 
 		// Match terms with current $post
-		$terms_recipe = $this->get_recipes_term_matches( $required_post_term, $required_post_taxonomy, $post );
+		$terms_recipe = $this->get_recipes_term_matches( $required_post_term, $required_post_taxonomy, $post, $include_taxonomy_children );
 
 		// No terms found, bail
 		if ( empty( $terms_recipe ) ) {
+			Wp_Helpers::requeue_post( $post_id, $this->action_hook );
 			return;
 		}
 
 		// Find common recipes between post type + taxonomies + terms
 		$matched = array_intersect( $post_type_recipes, $taxonomy_recipes, $terms_recipe );
+
 		// Empty, bail
 		if ( empty( $matched ) ) {
 			return;
 		}
 		// build matched recipes ids array
 		$matched_recipe_ids = $this->get_matched_recipes( $matched );
-
 		if ( empty( $matched_recipe_ids ) ) {
 			return;
 		}
 
 		// Complete trigger
 		$this->complete_trigger( $matched_recipe_ids, $user_id, $post );
+	}
+
+	/**
+	 * @param      $post
+	 * @param null $request
+	 * @param null $creating
+	 */
+	public function store_thumbnail( $post, $request = null, $creating = null ) {
+
+		// Post Featured Image URL
+		$this->trigger_meta_log['meta_key']   = $this->result['args']['trigger_id'] . ':' . $this->trigger_code . ':POSTIMAGEURL';
+		$this->trigger_meta_log['meta_value'] = maybe_serialize( get_the_post_thumbnail_url( $this->post->ID, 'full' ) );
+		Automator()->insert_trigger_meta( $this->trigger_meta_log );
+
+		// Post Featured Image ID
+		$this->trigger_meta_log['meta_key']   = $this->result['args']['trigger_id'] . ':' . $this->trigger_code . ':POSTIMAGEID';
+		$this->trigger_meta_log['meta_value'] = maybe_serialize( get_post_thumbnail_id( $this->post->ID ) );
+		Automator()->insert_trigger_meta( $this->trigger_meta_log );
+
+	}
+
+	/**
+	 * @param $post_id
+	 * @param bool $legacy
+	 *
+	 * @return bool
+	 */
+	private function maybe_post_postponed( $post_id ) {
+
+		$post         = get_post( $post_id );
+		$cron_enabled = apply_filters( 'automator_wp_user_creates_post_cron_enabled', true, $post_id, $post, false, $post, $this );
+
+		// Allow people to disable cron processing.
+		if ( false === $cron_enabled ) {
+			// Immediately run post_publised if cron not enabled.
+			return false;
+		}
+
+		return Wp_Helpers::maybe_post_postponed( $post_id, $this->action_hook );
 	}
 
 	/**
@@ -319,13 +417,22 @@ class WP_USERCREATESPOST {
 				);
 
 				$args = Automator()->maybe_add_trigger_entry( $pass_args, false );
+
 				if ( empty( $args ) ) {
 					continue;
 				}
+
 				foreach ( $args as $result ) {
 					if ( false === $result['result'] ) {
 						continue;
 					}
+
+					if ( isset( $this->child_term_log_properties[ $recipe_id ] ) ) {
+						if ( isset( $this->child_term_log_properties[ $recipe_id ][ $trigger_id ] ) ) {
+							$this->set_trigger_log_properties( $this->child_term_log_properties[ $recipe_id ][ $trigger_id ] );
+						}
+					}
+
 					$this->store_tokens( $result, $user_id, $post, $recipe_id, $trigger_id );
 					Automator()->maybe_trigger_complete( $result['args'] );
 				}
@@ -450,10 +557,11 @@ class WP_USERCREATESPOST {
 	 * @param $required_post_term
 	 * @param $required_post_taxonomy
 	 * @param $post
+	 * @param $include_term_children
 	 *
 	 * @return array
 	 */
-	private function get_recipes_term_matches( $required_post_term, $required_post_taxonomy, $post ) {
+	private function get_recipes_term_matches( $required_post_term, $required_post_taxonomy, $post, $include_term_children ) {
 		$matched = array();
 		$post_id = $post->ID;
 
@@ -477,16 +585,38 @@ class WP_USERCREATESPOST {
 				if ( ! isset( $required_post_taxonomy[ $recipe_id ][ $trigger_id ] ) ) {
 					continue;
 				}
+
+				// Check if we should be including Children of the selected term.
+				$include_children = isset( $include_term_children[ $recipe_id ] ) ? $include_term_children[ $recipe_id ] : array();
+				$include_children = isset( $include_children[ $trigger_id ] ) ? $include_children[ $trigger_id ] : false;
+				$include_children = filter_var( strtolower( $include_children ), FILTER_VALIDATE_BOOLEAN );
+
 				// if the term is specific then tax and post type are also specified
 				$post_terms = $this->get_taxonomy( $post_id, $required_post_taxonomy[ $recipe_id ][ $trigger_id ] );
 
 				if ( empty( $post_terms ) ) {
 					continue;
 				}
+
 				// check if the post has the required term
 				$post_term_ids = array_map( 'absint', array_column( $post_terms, 'term_id' ) );
 				if ( ! in_array( absint( $required_post_term[ $recipe_id ][ $trigger_id ] ), $post_term_ids, true ) ) {
-					continue;
+					$child_term = false;
+					if ( $include_children ) {
+						$child_term = Automator()->helpers->recipe->wp->options->get_term_child_of(
+							$post_terms,
+							$required_post_term[ $recipe_id ][ $trigger_id ],
+							$required_post_taxonomy[ $recipe_id ][ $trigger_id ],
+							$post_id
+						);
+					}
+
+					// Term or Child Term not found.
+					if ( empty( $child_term ) ) {
+						continue;
+					} else {
+						$this->set_child_matched_log_properties( $recipe_id, $trigger_id, $child_term );
+					}
 				}
 				$matched[] = $recipe_id;
 
@@ -567,21 +697,23 @@ class WP_USERCREATESPOST {
 	}
 
 	/**
-	 * @param $post
-	 * @param null $request
-	 * @param null $creating
+	 * Set matched child term info to log properties.
+	 *
+	 * @param $recipe_id
+	 * @param $trigger_id
+	 * @param $child_term
+	 *
+	 * @return void
 	 */
-	public function store_thumbnail( $post, $request = null, $creating = null ) {
-
-		// Post Featured Image URL
-		$this->trigger_meta_log['meta_key']   = $this->result['args']['trigger_id'] . ':' . $this->trigger_code . ':POSTIMAGEURL';
-		$this->trigger_meta_log['meta_value'] = maybe_serialize( get_the_post_thumbnail_url( $this->post->ID, 'full' ) );
-		Automator()->insert_trigger_meta( $this->trigger_meta_log );
-
-		// Post Featured Image ID
-		$this->trigger_meta_log['meta_key']   = $this->result['args']['trigger_id'] . ':' . $this->trigger_code . ':POSTIMAGEID';
-		$this->trigger_meta_log['meta_value'] = maybe_serialize( get_post_thumbnail_id( $this->post->ID ) );
-		Automator()->insert_trigger_meta( $this->trigger_meta_log );
-
+	private function set_child_matched_log_properties( $recipe_id, $trigger_id, $child_term ) {
+		if ( ! isset( $this->child_term_log_properties[ $recipe_id ] ) ) {
+			$this->child_term_log_properties[ $recipe_id ] = array();
+		}
+		$this->child_term_log_properties[ $recipe_id ][ $trigger_id ] = array(
+			'type'       => 'string',
+			'label'      => _x( 'Matched Child Term', 'WordPress', 'uncanny-automator' ),
+			'value'      => $child_term->term_id . '( ' . $child_term->name . ' )',
+			'attributes' => array(),
+		);
 	}
 }

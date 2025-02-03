@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class OutcomePredictionPointFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTIONS = 'actions';
-    const IMPRESSIONS = 'impressions';
-    const REACH = 'reach';
-    const SPEND = 'spend';
-    public function getFieldTypes()
-    {
-        return array('actions' => 'float', 'impressions' => 'float', 'reach' => 'float', 'spend' => 'int');
-    }
+
+class OutcomePredictionPointFields extends AbstractEnum {
+
+  const ACTIONS = 'actions';
+  const IMPRESSIONS = 'impressions';
+  const REACH = 'reach';
+  const SPEND = 'spend';
+
+  public function getFieldTypes() {
+    return array(
+      'actions' => 'float',
+      'impressions' => 'float',
+      'reach' => 'float',
+      'spend' => 'int',
+    );
+  }
 }

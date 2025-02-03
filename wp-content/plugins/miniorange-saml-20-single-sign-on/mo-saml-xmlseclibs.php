@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
 
-$xmlseclibs_srcdir = dirname( __FILE__ ) . '/includes/lib/SAML2Core';
+$xmlseclibs_srcdir = __DIR__ . '/includes/lib/SAML2Core';
 require $xmlseclibs_srcdir . '/class-mo-saml-xml-security-key.php';
 require $xmlseclibs_srcdir . '/class-mo-saml-xml-security-dsig.php';
 require $xmlseclibs_srcdir . '/class-mo-saml-xml-sec-enc.php';

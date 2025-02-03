@@ -12,6 +12,7 @@ use cybot\cookiebot\settings\pages\Support_Page;
 
 class Menu_Settings {
 
+
 	const MENU = array(
 		Dashboard_Page::class,
 		Settings_Page::class,
@@ -47,7 +48,11 @@ class Menu_Settings {
 	 */
 	public function register_cookiebot_settings() {
 		register_setting( 'cookiebot', 'cookiebot-cbid' );
+		register_setting( 'cookiebot', 'cookiebot-cbid-override' );
+		register_setting( 'cookiebot', 'cookiebot-ruleset-id' );
+		register_setting( 'cookiebot', 'cookiebot-cbid-first-run' );
 		register_setting( 'cookiebot', 'cookiebot-language' );
+		register_setting( 'cookiebot', 'cookiebot-front-language' );
 		register_setting( 'cookiebot', 'cookiebot-nooutput' );
 		register_setting( 'cookiebot', 'cookiebot-nooutput-admin' );
 		register_setting( 'cookiebot', 'cookiebot-output-logged-in' );
@@ -56,18 +61,28 @@ class Menu_Settings {
 		register_setting( 'cookiebot', 'cookiebot-script-tag-uc-attribute' );
 		register_setting( 'cookiebot', 'cookiebot-script-tag-cd-attribute' );
 		register_setting( 'cookiebot', 'cookiebot-cookie-blocking-mode' );
-		register_setting( 'cookiebot', 'cookiebot-consent-mapping' );
 		register_setting( 'cookiebot', 'cookiebot-iab' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-version' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-purposes' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-special-purposes' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-features' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-special-features' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-vendors' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-disallowed' );
+		register_setting( 'cookiebot', 'cookiebot-tcf-ac-vendors' );
 		register_setting( 'cookiebot', 'cookiebot-ccpa' );
 		register_setting( 'cookiebot-legislations', 'cookiebot-ccpa-domain-group-id' );
 		register_setting( 'cookiebot', 'cookiebot-gtm' );
 		register_setting( 'cookiebot', 'cookiebot-gtm-id' );
+		register_setting( 'cookiebot', 'cookiebot-gtm-cookies' );
 		register_setting( 'cookiebot', 'cookiebot-data-layer' );
 		register_setting( 'cookiebot', 'cookiebot-gcm' );
 		register_setting( 'cookiebot', 'cookiebot-gcm-first-run' );
 		register_setting( 'cookiebot', 'cookiebot-gcm-url-passthrough' );
+		register_setting( 'cookiebot', 'cookiebot-gcm-cookies' );
 		register_setting( 'cookiebot', 'cookiebot-multiple-config' );
 		register_setting( 'cookiebot', 'cookiebot-second-banner-regions' );
 		register_setting( 'cookiebot', 'cookiebot-second-banner-id' );
+		register_setting( 'cookiebot', 'cookiebot-multiple-banners' );
 	}
 }

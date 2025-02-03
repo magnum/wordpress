@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,16 +21,18 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static SystemUserFields getInstance()
  */
-class SystemUserFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const NAME = 'name';
-    const PERMISSIONS = 'permissions';
-    const ROLE = 'role';
+class SystemUserFields extends AbstractEnum {
+
+  const ID = 'id';
+  const NAME = 'name';
+  const PERMISSIONS = 'permissions';
+  const ROLE = 'role';
 }

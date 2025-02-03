@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,36 +21,39 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Http;
 
-class Parameters extends \ArrayObject
-{
-    /**
-     * @param array $data
-     */
-    public function enhance(array $data)
-    {
-        foreach ($data as $key => $value) {
-            $this[$key] = $value;
-        }
+class Parameters extends \ArrayObject {
+
+  /**
+   * @param array $data
+   */
+  public function enhance(array $data) {
+    foreach ($data as $key => $value) {
+      $this[$key] = $value;
     }
-    /**
-     * @param mixed $value
-     * @return string
-     */
-    protected function exportNonScalar($value)
-    {
-        return \json_encode($value);
+  }
+
+  /**
+   * @param mixed $value
+   * @return string
+   */
+  protected function exportNonScalar($value) {
+    return json_encode($value);
+  }
+
+  /**
+   * @return array
+   */
+  public function export() {
+    $data = array();
+    foreach ($this as $key => $value) {
+      $data[$key] = is_null($value) || is_scalar($value)
+        ? $value
+        : $this->exportNonScalar($value);
     }
-    /**
-     * @return array
-     */
-    public function export()
-    {
-        $data = array();
-        foreach ($this as $key => $value) {
-            $data[$key] = \is_null($value) || \is_scalar($value) ? $value : $this->exportNonScalar($value);
-        }
-        return $data;
-    }
+
+    return $data;
+  }
 }

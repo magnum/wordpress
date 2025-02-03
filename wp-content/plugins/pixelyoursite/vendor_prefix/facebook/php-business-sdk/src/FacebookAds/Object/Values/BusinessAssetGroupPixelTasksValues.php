@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static BusinessAssetGroupPixelTasksValues getInstance()
  */
-class BusinessAssetGroupPixelTasksValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AA_ANALYZE = 'AA_ANALYZE';
-    const ADVERTISE = 'ADVERTISE';
-    const ANALYZE = 'ANALYZE';
-    const EDIT = 'EDIT';
-    const UPLOAD = 'UPLOAD';
+class BusinessAssetGroupPixelTasksValues extends AbstractEnum {
+
+  const AA_ANALYZE = 'AA_ANALYZE';
+  const ADVERTISE = 'ADVERTISE';
+  const ANALYZE = 'ANALYZE';
+  const EDIT = 'EDIT';
+  const UPLOAD = 'UPLOAD';
 }

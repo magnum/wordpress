@@ -1,5 +1,5 @@
 jQuery( document ).ready( function ( $ ) {
-    var cookieBlockingMode = cookiebotNetworkSettings.cbm
+    let cookieBlockingMode = cookiebotNetworkSettings.cbm
     $( 'input[type=radio][name=cookiebot-cookie-blocking-mode]' ).on( 'change', function () {
         if ( this.value === 'auto' && cookieBlockingMode !== this.value ) {
             $( '#cookiebot-setting-async, #cookiebot-setting-hide-popup' ).css( 'opacity', 0.4 )
@@ -22,9 +22,91 @@ jQuery( document ).ready( function ( $ ) {
         jQuery(this).addClass('hidden');
     });
 
-    jQuery(':input').change(
-        function(){
-            jQuery('p.submit #submit').addClass('enabled');
-        }
-    );
+    const initialValues = jQuery('form').serialize();
+    const events = {
+        change: 'input:not([type=text]), select',
+        input: 'input[type="text"], textarea'
+    };
+
+    Object.entries(events).forEach(entry => {
+        const [eventName, elements] = entry;
+        jQuery(document).on(eventName,elements,{initialValues: initialValues},function(event){
+            checkValues(event.data.initialValues)
+        });
+    });
+
+    ruleset_id();
+    remove_account();
 } )
+
+function check_id_frame(){
+    const cbFrameReg = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+    return cbFrameReg.test(jQuery( '#cookiebot-cbid' ).val())
+}
+
+function ruleset_id(){
+    const cbidField = jQuery( '#cookiebot-cbid' );
+    const cbidCheck = jQuery( '.cookiebot-cbid-check' );
+    let fieldTimer;
+    let fieldInterval = 3000;
+
+    cbidField.on('keyup', function () {
+        clearTimeout(fieldTimer);
+        cbidField.addClass('check-progress');
+        cbidCheck.removeClass('check-pass').addClass('check-progress');
+        fieldTimer = setTimeout(show_ruleset_selector, fieldInterval);
+    });
+
+    cbidField.on('keydown', function () {
+        clearTimeout(fieldTimer);
+    });
+}
+function show_ruleset_selector() {
+    const cbidField = jQuery( '#cookiebot-cbid' );
+    const cbidCheck = jQuery( '.cookiebot-cbid-check' );
+    const cbidRulesetSelector = jQuery('#cookiebot-ruleset-id-selector');
+    const cbidSubmit = jQuery('.cookiebot-cbid-container p.submit #submit');
+
+    cbidCheck.removeClass('check-progress');
+    cbidField.removeClass('check-progress');
+
+    if(!cbidField.val()){
+        cbidCheck.removeClass('check-pass');
+        cbidRulesetSelector.addClass('hidden');
+        cbidSubmit.addClass('disabled');
+        return;
+    }
+
+    !check_id_frame() ? cbidRulesetSelector.removeClass('hidden') : cbidRulesetSelector.addClass('hidden');
+
+    cbidSubmit.removeClass('disabled');
+}
+
+function remove_account(){
+    const removeCta = jQuery('#cookiebot-cbid-reset-dialog');
+    const cbidAlert = jQuery('.cb-cbid-alert__msg');
+    const confirmCta = jQuery('#cookiebot-cbid-reset');
+    const cancelCta = jQuery('#cookiebot-cbid-cancel');
+    removeCta.on('click', function(){
+        cbidAlert.removeClass('hidden');
+        removeCta.addClass('disabled');
+    });
+    confirmCta.on('click', function(){
+        jQuery('#cookiebot-cbid').val('').removeClass('cbid-active');
+        jQuery('.cb-settings__header p.submit #submit').click();
+    });
+    cancelCta.on('click', function(){
+        cbidAlert.addClass('hidden');
+        removeCta.removeClass('disabled');
+    });
+}
+
+function checkValues(initialValues){
+    let submitBtn = jQuery('p.submit #submit');
+    let newValues = jQuery('form').serialize();
+    if(newValues !== initialValues) {
+        submitBtn.addClass('enabled');
+    }else{
+        submitBtn.removeClass('enabled');
+    }
+}

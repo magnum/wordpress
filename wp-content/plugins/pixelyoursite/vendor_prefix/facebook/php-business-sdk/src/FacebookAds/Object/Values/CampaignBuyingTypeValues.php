@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,14 +21,16 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static CampaignBuyingTypeValues getInstance()
  */
-class CampaignBuyingTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUCTION = 'AUCTION';
-    const RESERVED = 'RESERVED';
+class CampaignBuyingTypeValues extends AbstractEnum {
+
+  const AUCTION  = 'AUCTION';
+  const RESERVED = 'RESERVED';
 }

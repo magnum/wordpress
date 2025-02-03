@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CommerceOrderTransactionDetailFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const NET_PAYMENT_AMOUNT = 'net_payment_amount';
-    const ORDER_DETAILS = 'order_details';
-    const PAYOUT_REFERENCE_ID = 'payout_reference_id';
-    const PROCESSING_FEE = 'processing_fee';
-    const TAX_RATE = 'tax_rate';
-    const TRANSACTION_DATE = 'transaction_date';
-    const TRANSACTION_TYPE = 'transaction_type';
-    const TRANSFER_ID = 'transfer_id';
-    const ID = 'id';
-    public function getFieldTypes()
-    {
-        return array('net_payment_amount' => 'Object', 'order_details' => 'CommerceOrder', 'payout_reference_id' => 'string', 'processing_fee' => 'Object', 'tax_rate' => 'string', 'transaction_date' => 'string', 'transaction_type' => 'string', 'transfer_id' => 'string', 'id' => 'string');
-    }
+
+class CommerceOrderTransactionDetailFields extends AbstractEnum {
+
+  const NET_PAYMENT_AMOUNT = 'net_payment_amount';
+  const ORDER_DETAILS = 'order_details';
+  const PAYOUT_REFERENCE_ID = 'payout_reference_id';
+  const PROCESSING_FEE = 'processing_fee';
+  const TAX_RATE = 'tax_rate';
+  const TRANSACTION_DATE = 'transaction_date';
+  const TRANSACTION_TYPE = 'transaction_type';
+  const TRANSFER_ID = 'transfer_id';
+  const ID = 'id';
+
+  public function getFieldTypes() {
+    return array(
+      'net_payment_amount' => 'Object',
+      'order_details' => 'CommerceOrder',
+      'payout_reference_id' => 'string',
+      'processing_fee' => 'Object',
+      'tax_rate' => 'string',
+      'transaction_date' => 'string',
+      'transaction_type' => 'string',
+      'transfer_id' => 'string',
+      'id' => 'string',
+    );
+  }
 }

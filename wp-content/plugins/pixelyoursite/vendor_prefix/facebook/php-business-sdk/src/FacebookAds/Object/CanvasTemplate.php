@@ -22,13 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object;
 
-use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Cursor;
-use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CanvasTemplateFields;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Cursor;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CanvasTemplateFields;
 /**
  * This class is auto-generated.
  *
@@ -37,14 +37,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CanvasTemplateFields;
  * pull request for this class.
  *
  */
-class CanvasTemplate extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
+class CanvasTemplate extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
 {
     /**
      * @return CanvasTemplateFields
      */
     public static function getFieldsEnum()
     {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CanvasTemplateFields::getInstance();
+        return \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CanvasTemplateFields::getInstance();
     }
     protected static function getReferencedEnums()
     {
@@ -56,7 +56,7 @@ class CanvasTemplate extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObje
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\CanvasTemplate(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\CanvasTemplate::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\CanvasTemplate(), 'NODE', \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\CanvasTemplate::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

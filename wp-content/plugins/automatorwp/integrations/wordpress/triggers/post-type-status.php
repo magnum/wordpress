@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Post_Type_Status extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_post_type_status';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_post_type_status';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -86,9 +97,20 @@ class AutomatorWP_WordPress_Post_Type_Status extends AutomatorWP_Integration_Tri
             return;
         }
 
+        /**
+         * User ID for post updated triggers
+         *
+         * @since 1.0.0
+         *
+         * @param int    $user_id    The user ID
+         * @param int    $post_ID    The post ID
+         * @param string $trigger    The trigger
+         */
+        $user_id = apply_filters( 'automatorwp_post_updated_user_id', $post->post_author, $post->ID, $this->trigger );
+
         automatorwp_trigger_event( array(
             'trigger'       => $this->trigger,
-            'user_id'       => $post->post_author,
+            'user_id'       => $user_id,
             'post_id'       => $post->ID,
             'post_status'   => $new_status,
         ) );
@@ -143,4 +165,5 @@ class AutomatorWP_WordPress_Post_Type_Status extends AutomatorWP_Integration_Tri
 
 }
 
-new AutomatorWP_WordPress_Post_Type_Status();
+new AutomatorWP_WordPress_Post_Type_Status( 'wordpress' );
+new AutomatorWP_WordPress_Post_Type_Status( 'posts' );

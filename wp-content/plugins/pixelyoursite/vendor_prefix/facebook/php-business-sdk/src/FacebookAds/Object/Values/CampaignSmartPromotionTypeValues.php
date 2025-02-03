@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CampaignSmartPromotionTypeValues getInstance()
  */
-class CampaignSmartPromotionTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const GUIDED_CREATION = 'GUIDED_CREATION';
-    const SMART_APP_PROMOTION = 'SMART_APP_PROMOTION';
+class CampaignSmartPromotionTypeValues extends AbstractEnum {
+
+  const GUIDED_CREATION = 'GUIDED_CREATION';
+  const SMART_APP_PROMOTION = 'SMART_APP_PROMOTION';
 }

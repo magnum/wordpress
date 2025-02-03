@@ -572,6 +572,10 @@ function automatorwp_automation_item_edit_html( $object, $item_type, $automation
         $integration['icon'] = AUTOMATORWP_URL . 'assets/img/automatorwp-all-posts.svg';
     }
 
+    if( $item_type === 'trigger' && $object->type === 'automatorwp_import_file' ) {
+        $integration['icon'] = AUTOMATORWP_URL . 'assets/img/automatorwp-import-file.svg';
+    }
+
     if( $item_type === 'action' && $object->type === 'automatorwp_anonymous_user' ) {
         $integration['icon'] = AUTOMATORWP_URL . 'assets/img/automatorwp-anonymous.svg';
     }
@@ -630,6 +634,16 @@ function automatorwp_automation_item_edit_html( $object, $item_type, $automation
     // All posts
     if( $automation->type === 'all-posts' ) {
         if( $object->type === 'automatorwp_all_posts' ) {
+            $classes[] = 'automatorwp-no-grab';
+            unset( $actions['move-up'] );
+            unset( $actions['move-down'] );
+            unset( $actions['delete'] );
+        }
+    }
+
+    // Import file
+    if( $automation->type === 'import-file' ) {
+        if( $object->type === 'automatorwp_import_file' ) {
             $classes[] = 'automatorwp-no-grab';
             unset( $actions['move-up'] );
             unset( $actions['move-down'] );
@@ -862,6 +876,50 @@ function automatorwp_check_automation_required_triggers( $automation, $triggers 
                 'automation_id' => $automation->id,
                 'title' => __( 'Run automation on all posts', 'automatorwp' ),
                 'type' => 'automatorwp_all_posts',
+                'status' => 'active',
+                'position' => 0,
+                'date' => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
+            );
+
+            // Insert the new trigger
+            $trigger_id = ct_insert_object( $trigger_data );
+
+            if( $trigger_id ) {
+                $trigger_data['id'] = $trigger_id;
+
+                $trigger_data = (object) $trigger_data;
+
+                // Prepend the new trigger at start of the triggers list
+                array_unshift( $triggers, $trigger_data );
+            }
+
+            ct_reset_setup_table();
+        }
+
+    }
+
+    // All users
+    if( $automation->type === 'import-file' ) {
+
+        $create = false;
+
+        // Check if the first action is the action required for anonymous automations
+        if( ! isset( $triggers[0] ) ) {
+            $create = true;
+        }
+
+        if( isset( $triggers[0] ) && $triggers[0]->type !== 'automatorwp_import_file' ) {
+            $create = true;
+        }
+
+        if( $create ) {
+            ct_setup_table( 'automatorwp_triggers' );
+
+            // Setup the trigger data
+            $trigger_data = array(
+                'automation_id' => $automation->id,
+                'title' => __( 'Run automation on file', 'automatorwp' ),
+                'type' => 'automatorwp_import_file',
                 'status' => 'active',
                 'position' => 0,
                 'date' => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
@@ -1130,7 +1188,7 @@ function automatorwp_parse_automation_item_label( $object, $item_type, $label, $
     $tags = array_keys( $replacements );
 
     $label_parsed = str_replace( $tags, $replacements, $label );
-
+    
     /**
      * Trigger/action label parsed
      *
@@ -1164,6 +1222,8 @@ function automatorwp_parse_automation_item_label( $object, $item_type, $label, $
  */
 function automatorwp_get_automation_item_option_replacement( $object, $item_type, $option, $context = 'edit' ) {
 
+    global $automatorwp_event;
+
     // Check item type
     if( ! in_array( $item_type, array( 'trigger', 'action' ) ) ) {
         return false;
@@ -1196,11 +1256,11 @@ function automatorwp_get_automation_item_option_replacement( $object, $item_type
     } else {
 
         ct_setup_table( "automatorwp_{$item_type}s" );
-
+        
         $field = $option_args['fields'][$field_id];
         $value = ct_get_object_meta( $object->id, $field_id, true );
-
-        if( empty( $value ) && isset( $field['default'] ) ) {
+        
+        if( ( $value === '' || is_null( $value ) ) && isset( $field['default'] ) ) {
             $value = $field['default'];
         }
 
@@ -1208,7 +1268,7 @@ function automatorwp_get_automation_item_option_replacement( $object, $item_type
         $field['object_id'] = $object->id;
         $field['value'] = $value;
         $field['escaped_value'] = $value;
-
+        
         // Select field
         if( in_array( $field['type'], array( 'select', 'automatorwp_select', 'automatorwp_select_filter' ) ) ) {
 
@@ -1247,7 +1307,7 @@ function automatorwp_get_automation_item_option_replacement( $object, $item_type
         }
 
         // Fallback to default option if exists
-        if( empty( $value ) && isset( $option_args['default'] ) && ! empty( $option_args['default'] ) ) {
+        if( ( $value === '' || is_null( $value ) ) && isset( $option_args['default'] ) && ! empty( $option_args['default'] ) ) {
             $value = $option_args['default'];
         }
 
@@ -1294,6 +1354,18 @@ function automatorwp_get_automation_item_option_replacement( $object, $item_type
         $option_class = apply_filters( 'automatorwp_get_automation_item_option_button_class', $option_class, $object, $item_type, $option, $context );
 
         $value = '<span class="' . esc_attr__( $option_class ) . ' automatorwp-option" data-option="' . $option . '">' . $value . '</span>';
+    } else if( $context === 'view' ) {
+
+        $automation = automatorwp_get_trigger_automation( $object->id );
+
+        if( is_object( $automation ) ) {
+
+            $user_id = ( isset( $automatorwp_event['user_id'] ) ? $automatorwp_event['user_id'] : 0 );
+
+            $value = automatorwp_parse_automation_tags( $automation->id, $user_id, $value );
+        }
+
+
     }
 
     return $value;
@@ -1419,18 +1491,15 @@ function automatorwp_automation_item_option_field_args( $object, $item_type, $op
     $field['attributes']['data-option'] = $field_id . ( $repeatable ? '[]' : '' );
 
     // Setup the fields tags selector
-    if( $item_type === 'action' ) {
 
-        // Set a specific sanitization callback for fields that support HTML and URLs
-        if( in_array( $field['type'], array( 'textarea', 'wysiwyg', 'oembed' ) ) ) {
-            $field['sanitization_cb'] = 'automatorwp_textarea_sanitization_cb';
-        }
+    // Set a specific sanitization callback for fields that support HTML and URLs
+    if( in_array( $field['type'], array( 'textarea', 'wysiwyg', 'oembed' ) ) ) {
+        $field['sanitization_cb'] = 'automatorwp_textarea_sanitization_cb';
+    }
 
-        // Check if field type is compatible with tags selector
-        if( in_array( $field['type'], array( 'text', 'textarea', 'wysiwyg' ) ) ) {
-            $field['after_field'] = automatorwp_get_tags_selector_html( $automation, $object, $item_type );
-        }
-
+    // Check if field type is compatible with tags selector
+    if( in_array( $field['type'], array( 'text', 'textarea', 'wysiwyg' ) ) ) {
+        $field['after_field'] = automatorwp_get_tags_selector_html( $automation, $object, $item_type );
     }
 
     // If field is required, update its label with the required mark
@@ -1560,25 +1629,16 @@ function automatorwp_integrations_api() {
     $request = wp_remote_get( $url, $http_args );
 
     if ( $ssl && is_wp_error( $request ) ) {
-        trigger_error(
-            sprintf(
-                __( 'An unexpected error occurred. Something may be wrong with automatorwp.com or this server&#8217;s configuration. If you continue to have problems, please try to <a href="%s">contact us</a>.', 'automatorwp' ),
-                'https://automatorwp.com/contact-us/'
-            ) . ' ' . __( '(WordPress could not establish a secure connection to automatorwp.com. Please contact your server administrator.)' ),
-            headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
-        );
-
+        // Try again without SSL
         $request = wp_remote_get( $http_url, $http_args );
     }
 
     if ( is_wp_error( $request ) ) {
-        $res = new WP_Error( 'automatorwp_integrations_api_failed',
-            sprintf(
-                __( 'An unexpected error occurred. Something may be wrong with automatorwp.com or this server&#8217;s configuration. If you continue to have problems, please try to <a href="%s">contact us</a>.', 'automatorwp' ),
-                'https://automatorwp.com/contact-us/'
-            ),
-            $request->get_error_message()
-        );
+        // No way to contact server
+        $res = array();
+
+        // Set a transient for 1 day
+        set_transient( 'automatorwp_integrations_api', $res, ( 24 * 1 ) * HOUR_IN_SECONDS );
     } else {
         $res = json_decode( $request['body'] );
 
@@ -1606,11 +1666,18 @@ function automatorwp_automation_ui_integration_pro_choice( $integration_name, $a
 
     $integrations = automatorwp_integrations_api();
 
+    if ( is_array( $integrations ) && empty( $integrations) ) {
+        return;
+    }
+    
     if( is_wp_error( $integrations ) ) {
         return;
     }
 
     foreach ( $integrations as $integration ) {
+        if( ! isset( $integration ) ) {
+            continue;
+        }
         // Break if found the integration
         if( $integration->code === $integration_name ) {
             break;
@@ -1708,11 +1775,19 @@ function automatorwp_automation_ui_integration_triggers_pro_choices( $integratio
 
     $integrations = automatorwp_integrations_api();
 
+    if ( is_array( $integrations ) && empty( $integrations) ) {
+        return;
+    }
+
     if( is_wp_error( $integrations ) ) {
         return;
     }
 
     foreach ( $integrations as $integration ) {
+        if( ! isset( $integration ) ) {
+            continue;
+        }
+
         // Break if found the integration
         if( $integration->code === $integration_name ) {
             break;
@@ -1795,11 +1870,18 @@ function automatorwp_automation_ui_integration_actions_pro_choices( $integration
 
     $integrations = automatorwp_integrations_api();
 
+    if ( is_array( $integrations ) && empty( $integrations) ) {
+        return;
+    }
+
     if( is_wp_error( $integrations ) ) {
         return;
     }
 
     foreach ( $integrations as $integration ) {
+        if( ! isset( $integration ) ) {
+            continue;
+        }
         // Break if found the integration
         if( $integration->code === $integration_name ) {
             break;

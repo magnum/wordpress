@@ -407,6 +407,16 @@ class Tracker {
 	}
 
 	/**
+	 * Get usage of performance settings.
+	 * 'Elementor->Settings->Performance'.
+	 *
+	 * @return array
+	 */
+	public static function get_settings_performance_usage() {
+		return self::get_tracking_data_from_settings( 'performance' );
+	}
+
+	/**
 	 * Get usage of experiments settings.
 	 *
 	 * 'Elementor->Settings->Experiments'.
@@ -549,6 +559,11 @@ class Tracker {
 			'is_first_time' => $is_first_time,
 			'install_time' => Plugin::instance()->get_install_time(),
 		];
+
+		$site_key = Api::get_site_key();
+		if ( ! empty( $site_key ) ) {
+			$params['site_key'] = $site_key;
+		}
 
 		/**
 		 * Tracker send tracking data params.

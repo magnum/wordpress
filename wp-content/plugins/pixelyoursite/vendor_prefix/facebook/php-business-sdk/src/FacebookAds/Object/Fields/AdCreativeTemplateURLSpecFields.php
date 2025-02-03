@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeTemplateURLSpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ANDROID = 'android';
-    const CONFIG = 'config';
-    const IOS = 'ios';
-    const IPAD = 'ipad';
-    const IPHONE = 'iphone';
-    const WEB = 'web';
-    const WINDOWS_PHONE = 'windows_phone';
-    public function getFieldTypes()
-    {
-        return array('android' => 'Object', 'config' => 'Object', 'ios' => 'Object', 'ipad' => 'Object', 'iphone' => 'Object', 'web' => 'Object', 'windows_phone' => 'Object');
-    }
+
+class AdCreativeTemplateURLSpecFields extends AbstractEnum {
+
+  const ANDROID = 'android';
+  const CONFIG = 'config';
+  const IOS = 'ios';
+  const IPAD = 'ipad';
+  const IPHONE = 'iphone';
+  const WEB = 'web';
+  const WINDOWS_PHONE = 'windows_phone';
+
+  public function getFieldTypes() {
+    return array(
+      'android' => 'Object',
+      'config' => 'Object',
+      'ios' => 'Object',
+      'ipad' => 'Object',
+      'iphone' => 'Object',
+      'web' => 'Object',
+      'windows_phone' => 'Object',
+    );
+  }
 }

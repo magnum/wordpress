@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\DACheckFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\DACheckConnectionMethodValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\DACheckConnectionMethodValues;
  * pull request for this class.
  *
  */
-class DACheck extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return DACheckFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\DACheckFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['ConnectionMethod'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\DACheckConnectionMethodValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class DACheck extends AbstractObject {
+
+  /**
+   * @return DACheckFields
+   */
+  public static function getFieldsEnum() {
+    return DACheckFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['ConnectionMethod'] = DACheckConnectionMethodValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

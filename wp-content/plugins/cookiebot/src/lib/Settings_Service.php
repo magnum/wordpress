@@ -8,6 +8,7 @@ use Generator;
 
 class Settings_Service implements Settings_Service_Interface {
 
+
 	/**
 	 * @var Dependency_Container
 	 */
@@ -38,7 +39,7 @@ class Settings_Service implements Settings_Service_Interface {
 	public function is_addon_enabled( $addon ) {
 		$option = get_option( static::OPTION_NAME );
 
-		return isset( $option[ $addon ]['enabled'] );
+		return Cookiebot_Frame::is_cb_frame_type() === true ? isset( $option[ $addon ]['enabled'] ) : false;
 	}
 
 	/**
@@ -120,7 +121,7 @@ class Settings_Service implements Settings_Service_Interface {
 	 *
 	 * @param       $option_key
 	 * @param       $widget
-	 * @param  array  $default
+	 * @param array      $default
 	 *
 	 * @return array
 	 *
@@ -201,7 +202,8 @@ class Settings_Service implements Settings_Service_Interface {
 	public function get_widget_placeholders( $option_key, $widget_key ) {
 		$option = get_option( $option_key );
 
-		if ( isset( $option[ $widget_key ]['placeholder']['languages'] ) && is_array( $option[ $widget_key ]['placeholder']['languages'] ) ) {
+		if ( isset( $option[ $widget_key ]['placeholder']['languages'] ) &&
+			is_array( $option[ $widget_key ]['placeholder']['languages'] ) ) {
 			return (array) $option[ $widget_key ]['placeholder']['languages'];
 		}
 
@@ -216,7 +218,8 @@ class Settings_Service implements Settings_Service_Interface {
 	public function get_placeholders( $option_key ) {
 		$option = get_option( static::OPTION_NAME );
 
-		if ( isset( $option[ $option_key ]['placeholder']['languages'] ) && is_array( $option[ $option_key ]['placeholder']['languages'] ) ) {
+		if ( isset( $option[ $option_key ]['placeholder']['languages'] ) &&
+			is_array( $option[ $option_key ]['placeholder']['languages'] ) ) {
 			return (array) $option[ $option_key ]['placeholder']['languages'];
 		}
 
@@ -267,7 +270,7 @@ class Settings_Service implements Settings_Service_Interface {
 	 * @param $option_key
 	 * @param $default_placeholder
 	 * @param $cookies
-	 * @param  string  $src
+	 * @param string              $src
 	 *
 	 * @return bool|mixed
 	 *
@@ -289,7 +292,7 @@ class Settings_Service implements Settings_Service_Interface {
 	 * @param $option_key
 	 * @param $widget_key
 	 * @param $default_placeholder
-	 * @param string $cookies
+	 * @param string              $cookies
 	 *
 	 * @return bool|mixed
 	 *
@@ -312,7 +315,7 @@ class Settings_Service implements Settings_Service_Interface {
 	 * @param        $option_key
 	 * @param        $default_placeholder
 	 * @param        $cookies
-	 * @param  string  $src
+	 * @param string              $src
 	 *
 	 * @return mixed
 	 *
@@ -328,7 +331,8 @@ class Settings_Service implements Settings_Service_Interface {
 		/**
 		 * Loop every language and match current language
 		 */
-		if ( isset( $option[ $option_key ]['placeholder']['languages'] ) && is_array( $option[ $option_key ]['placeholder']['languages'] ) ) {
+		if ( isset( $option[ $option_key ]['placeholder']['languages'] ) &&
+			is_array( $option[ $option_key ]['placeholder']['languages'] ) ) {
 			foreach ( $option[ $option_key ]['placeholder']['languages'] as $key => $value ) {
 
 				/**
@@ -338,8 +342,11 @@ class Settings_Service implements Settings_Service_Interface {
 					$cookies_array           = explode( ', ', $cookies );
 					$translated_cookie_names = cookiebot_translate_cookie_names( $cookies_array );
 					$translated_cookie_names = implode( ', ', $translated_cookie_names );
+					$placeholder             = cookiebot_translate_placeholder(
+						$option[ $option_key ]['placeholder']['languages'][ $key ]
+					);
 					return $this->placeholder_merge_tag(
-						$option[ $option_key ]['placeholder']['languages'][ $key ],
+						$placeholder,
 						$translated_cookie_names,
 						$src
 					);
@@ -351,8 +358,9 @@ class Settings_Service implements Settings_Service_Interface {
 		 * Returns site-default text if no match found.
 		 */
 		if ( isset( $option[ $option_key ]['placeholder']['languages']['site-default'] ) ) {
+			$placeholder = cookiebot_translate_placeholder( $option[ $option_key ]['placeholder']['languages']['site-default'] );
 			return $this->placeholder_merge_tag(
-				$option[ $option_key ]['placeholder']['languages']['site-default'],
+				$placeholder,
 				$cookies,
 				$src
 			);

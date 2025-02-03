@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static LiveVideoStatusValues getInstance()
  */
-class LiveVideoStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const LIVE_NOW = 'LIVE_NOW';
-    const SCHEDULED_CANCELED = 'SCHEDULED_CANCELED';
-    const SCHEDULED_LIVE = 'SCHEDULED_LIVE';
-    const SCHEDULED_UNPUBLISHED = 'SCHEDULED_UNPUBLISHED';
-    const UNPUBLISHED = 'UNPUBLISHED';
+class LiveVideoStatusValues extends AbstractEnum {
+
+  const LIVE_NOW = 'LIVE_NOW';
+  const SCHEDULED_CANCELED = 'SCHEDULED_CANCELED';
+  const SCHEDULED_LIVE = 'SCHEDULED_LIVE';
+  const SCHEDULED_UNPUBLISHED = 'SCHEDULED_UNPUBLISHED';
+  const UNPUBLISHED = 'UNPUBLISHED';
 }

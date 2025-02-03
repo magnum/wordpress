@@ -18,6 +18,11 @@ class Background_Actions {
 	public $action_code;
 
 	/**
+	 * @var
+	 */
+	public $last_response;
+
+	/**
 	 *
 	 */
 	const IS_USED_FOR_ACTION_TOKEN = 'is_used_for_action_token';
@@ -40,13 +45,14 @@ class Background_Actions {
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
 
 		//The priority is important here. We need to make sure we run this filter after scheduling the actions
-		add_filter( 'automator_before_action_executed', array( $this, 'maybe_send_to_background' ), 200 );
+		add_filter( 'automator_before_action_executed', array( $this, 'maybe_send_to_background' ), 200, 2 );
 
 		add_action( 'admin_init', array( $this, 'register_setting' ) );
 		add_action( 'automator_settings_advanced_tab_view', array( $this, 'settings_output' ) );
 
 		add_action( 'automator_activation_before', array( $this, 'add_option' ) );
 		add_action( 'automator_daily_healthcheck', array( $this, 'add_option' ) );
+		add_action( 'automator_daily_healthcheck', array( self::class, 'renew_license_check' ) );
 
 		add_filter( 'perfmatters_rest_api_exceptions', array( $this, 'add_rest_api_exception' ) );
 	}
@@ -65,23 +71,45 @@ class Background_Actions {
 	}
 
 	/**
+	 * Renews the license check automatically by deleting the stored transient
+	 * that tells Automator that the connected license is invalid.
+	 *
+	 * Made static so that its portable anywhere in case its needed to renew the license check.
+	 *
+	 * @since 5.2
+	 *
+	 * @return void
+	 */
+	public static function renew_license_check() {
+		// Make sure the transients are renewed.
+		delete_transient( Api_Server::TRANSIENT_LICENSE_CHECK_FAILED );
+		delete_transient( 'automator_api_license' );
+
+		try {
+			return Api_Server::get_license();
+		} catch ( \Exception $e ) {
+			automator_log( $e->getMessage(), 'renew_license_check failed', AUTOMATOR_DEBUG_MODE );
+		}
+	}
+
+	/**
 	 * add_option
 	 *
 	 * @return void
 	 */
 	public function add_option() {
 
-		$current_option  = get_option( self::OPTION_NAME, 'option_does_not_exist' );
+		$current_option  = automator_get_option( self::OPTION_NAME, 'option_does_not_exist' );
 		$bg_actions_work = $this->test_endpoint( '1' );
 
 		if ( 'option_does_not_exist' === $current_option ) {
-			add_option( self::OPTION_NAME, $bg_actions_work );
+			automator_add_option( self::OPTION_NAME, $bg_actions_work );
 
 			return;
 		}
 
 		if ( '1' === $current_option && '0' === $bg_actions_work ) {
-			update_option( self::OPTION_NAME, '0' );
+			automator_update_option( self::OPTION_NAME, '0' );
 		}
 	}
 
@@ -112,7 +140,7 @@ class Background_Actions {
 	 *
 	 * @return array
 	 */
-	public function maybe_send_to_background( $action ) {
+	public function maybe_send_to_background( $action, $args = array() ) {
 
 		$this->action      = $action;
 		$this->action_code = $this->get_action_code( $action );
@@ -223,7 +251,7 @@ class Background_Actions {
 	 * @return bool
 	 */
 	public function bg_actions_enabled() {
-		$value = get_option( self::OPTION_NAME, '1' );
+		$value = automator_get_option( self::OPTION_NAME, '1' );
 
 		return '1' === $value;
 	}
@@ -399,7 +427,34 @@ class Background_Actions {
 			unset( $action['process_further'] );
 		}
 
-		call_user_func_array( $action_execution_function, $action );
+		try {
+
+			call_user_func_array( $action_execution_function, $action );
+			do_action( 'automator_bg_action_after_run', $action );
+
+		} catch ( \Error $e ) {
+			$this->complete_with_error( $action, $e->getMessage() );
+		} catch ( \Exception $e ) {
+			$this->complete_with_error( $action, $e->getMessage() );
+		}
+	}
+
+	/**
+	 * complete_with_error
+	 *
+	 * @param mixed $action
+	 * @param mixed $error
+	 *
+	 * @return void
+	 */
+	public function complete_with_error( $action, $error = '' ) {
+
+		$recipe_id = $action['recipe_id'];
+		$user_id   = $action['user_id'];
+
+		$action['action_data']['complete_with_errors'] = true;
+
+		Automator()->complete->action( $user_id, $action['action_data'], $recipe_id, $error );
 	}
 
 	/**

@@ -125,6 +125,7 @@ class AUDIENCE_ADDAUSER {
 					array(
 						'option_code'       => 'MERGE_FIELDS',
 						'input_type'        => 'repeater',
+						'relevant_tokens'   => array(),
 						'label'             => __( 'Merge fields', 'uncanny-automator' ),
 						/* translators: 1. Button */
 						'description'       => '',
@@ -195,9 +196,9 @@ class AUDIENCE_ADDAUSER {
 				// Create array with the data we're going to send
 				let dataToBeSent = {
 					action: 'get_mailchimp_audience_fields',
-					nonce: UncannyAutomator.nonce,
+					nonce: UncannyAutomator._site.rest.nonce,
 
-					recipe_id: UncannyAutomator.recipe.id,
+					recipe_id: UncannyAutomator._recipe.recipe_id,
 					item_id: data.item.id,
 					audience: data.values.MCLIST
 				}
@@ -418,10 +419,12 @@ class AUDIENCE_ADDAUSER {
 				$status = 'pending';
 			}
 
+			$merge_fields = automator_array_filter_recursive( $key_values );
+
 			$user_data = array(
 				'email_address' => $user->user_email,
 				'status'        => $status,
-				'merge_fields'  => $key_values,
+				'merge_fields'  => $merge_fields,
 				'language'      => $lang_code,
 				'interests'     => $user_interests,
 			);

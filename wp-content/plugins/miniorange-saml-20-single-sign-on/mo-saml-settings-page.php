@@ -19,6 +19,8 @@ foreach ( glob( plugin_dir_path( __FILE__ ) . 'views' . DIRECTORY_SEPARATOR . '*
  * The function displays the tabs in the plugin and then renders the associated data.
  */
 function mo_saml_register_saml_sso() {
+
+	Mo_SAML_Utilities::mo_saml_extension_disabled_modal();
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reading tab name
 	if ( isset( $_GET['tab'] ) ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reading tab name
@@ -40,16 +42,17 @@ function mo_saml_register_saml_sso() {
 	?>
 	<div id="mo_saml_settings" >
 		<?php
+		if ( ! Mo_SAML_Utilities::mo_saml_is_sp_configured() ) {
 			mo_saml_display_welcome_page();
+		}
 
-		mo_saml_display_plugin_header( $active_tab );
+		mo_saml_display_plugin_header();
 		?>
 
 	</div>
 
 	<?php
 	mo_saml_display_plugin_tabs( $active_tab );
-
 }
 
 /**
@@ -110,31 +113,52 @@ function mo_saml_is_customer_registered_saml() {
 /**
  * This function displays test configuration error.
  *
- * @param string $error_code error code.
- *
- * @param string $error_cause error cause.
- *
- * @param string $error_message error message.
- *
- * @param string $statusmessage status message.
+ * @param string $error_code error code .
+ * @param string $display_metadata_mismatch The metadata recieved in SMAL response and stored in plugin if the error corresponds to a mismatched metadata .
+ * @param string $status_message The status sent by Identity Provider.
  */
-function mo_saml_display_test_config_error_page( $error_code, $error_cause, $error_message, $statusmessage = '' ) {
-	echo '<div style="font-family:Calibri;padding:0 3%;">';
-	echo '<div style="color: #a94442;background-color: #f2dede;padding: 15px;margin-bottom: 20px;text-align:center;border:1px solid #E6B3B2;font-size:18pt;">' . esc_attr( 'ERROR: ' . $error_code ) . '</div>
-                <div style="color: #a94442;font-size:14pt; margin-bottom:20px;text-align: justify"><p><strong>' . esc_attr( 'Error' ) . '</strong>: ' . esc_attr( $error_cause ) . ' </p>
-                
-                <p><strong>' . esc_attr_x( 'Possible Cause: ', '', 'miniorange-saml-20-single-sign-on' ) . '</strong>' . esc_attr( $error_message ) . ' </p>';
-	if ( ! empty( $statusmessage ) ) {
-		echo '<p><strong>Status Message in the SAML Response:</strong> <br/>' . esc_attr( $statusmessage ) . '</p><br>';
+function mo_saml_display_test_config_error_page( $error_code, $display_metadata_mismatch = '', $status_message = '' ) {
+	$error_fix     = $error_code['fix'];
+	$error_cause   = $error_code['cause'];
+	$error_message = empty( $status_message ) && ! empty( $error_code['testconfig_msg'] ) ? $error_code['testconfig_msg'] : $status_message;
+	if ( ob_get_level() > 0 ) {
+		ob_end_clean();
 	}
-	if ( 'WPSAMLERR010' === $error_code || 'WPSAMLERR004' === $error_code ) {
+
+	echo '<div style="font-family:Calibri;padding:0 3%;">';
+	echo '<div style="color: #a94442;background-color: #f2dede;padding: 15px;margin-bottom: 20px;text-align:center;border:1px solid #E6B3B2;font-size:18pt;"> ERROR ' . esc_html( $error_code['code'] ) . '</div>
+	<div style="color: #a94442;font-size:14pt; margin-bottom:20px;"><p><strong>Error: </strong>' . wp_kses_post( $error_cause ) . '</p>
+	<p>Please contact your administrator and report the following error:</p>
+	<p><strong>Possible Cause: </strong>' . esc_html( $error_message ) . '</p>';
+	if ( ! empty( $status_message ) ) {
+		echo '<p><strong>Status Message in the SAML Response:</strong> <br/>' . esc_html( $status_message ) . '</p><br>';
+	}
+	if ( ! empty( $display_metadata_mismatch ) ) {
+		echo wp_kses(
+			$display_metadata_mismatch,
+			array(
+				'p'      => array(
+					'strong' => array(),
+				),
+				'strong' => array(),
+			)
+		);
+	}
+	echo '<p><strong>Solution:</strong></p>
+		' . wp_kses_post( $error_fix ) . '
+	</div>
+	<div style="margin:3%;display:block;text-align:center;">';
+	if ( 'WPSAMLERR010' === $error_code['code'] || 'WPSAMLERR004' === $error_code['code'] || 'WPSAMLERR012' === $error_code['code'] ) {
 		$option_id = '';
-		switch ( $error_code ) {
+		switch ( $error_code['code'] ) {
 			case 'WPSAMLERR004':
-				$option_id = 'mo_fix_certificate';
+				$option_id = 'mo_saml_fix_certificate';
 				break;
 			case 'WPSAMLERR010':
-				$option_id = 'mo_fix_entity_id';
+				$option_id = 'mo_saml_fix_entity_id';
+				break;
+			case 'WPSAMLERR012':
+				$option_id = 'mo_saml_fix_iconv_cert';
 				break;
 		}
 		echo '<div>
@@ -147,9 +171,12 @@ function mo_saml_display_test_config_error_page( $error_code, $error_cause, $err
                 </ol>      
             </form>      
           </div>';
+	} else {
+		echo '<div style="margin:3%;display:block;text-align:center;"><input style="padding:1%;width:100px;background: #0091CD none repeat scroll 0% 0%;cursor: pointer;font-size:15px;border-width: 1px;border-style: solid;border-radius: 3px;white-space: nowrap;box-sizing: border-box;border-color: #0073AA;box-shadow: 0px 1px 0px rgba(120, 200, 230, 0.6) inset;color: #FFF;"type="button" value="Done" onClick="self.close();"></div>';
 	}
-	echo '</div>
-        </div>';
+	echo '</div>';
+	mo_saml_download_logs( $error_message, $error_cause );
+	exit;
 }
 /**
  * This function renders the error log download section.
@@ -163,7 +190,7 @@ function mo_saml_download_logs( $error_msg, $cause_msg ) {
 	echo '<div style="font-family:Calibri;padding:0 3%;">';
 	echo '<hr class="header"/>';
 	echo '          <p style="font-size: larger ;color: #a94442     ">' . wp_kses(
-		__( 'You can check out the Troubleshooting section provided in the plugin to resolve the issue.<br> If the problem persists, mail us at <a href="mailto:samlsupport@xecurify.com">samlsupport@xecurify.com</a>' ),
+		__( 'You can check out the Troubleshooting section provided in the plugin to resolve the issue.<br> If the problem persists, mail us at <a href="mailto:samlsupport@xecurify.com">samlsupport@xecurify.com</a>', 'miniorange-saml-20-single-sign-on' ),
 		array(
 			'br' => array(),
 			'a'  => array( 'href' => array() ),
@@ -173,7 +200,7 @@ function mo_saml_download_logs( $error_msg, $cause_msg ) {
                     </div>
                     <div style="margin:3%;display:block;text-align:center;">
                    
-				<input class="miniorange-button" style="margin-left:60px" type="button" value="' . esc_attr_x( 'Close', '', 'miniorange-saml-20-single-sign-on' ) . '" onclick="self.close()"></form>            
+				<input class="miniorange-button" type="button" value="' . esc_attr_x( 'Close', '', 'miniorange-saml-20-single-sign-on' ) . '" onclick="self.close()"></form>            
                 </div>    ';
 	echo '&nbsp;&nbsp;';
 
@@ -208,19 +235,17 @@ function mo_saml_download_logs( $error_msg, $cause_msg ) {
 	<?php
 
 	exit();
-
 }
 /**
  * This function adds a query argument in the passed URL.
  *
- * @param string $query_arg query argument.
- *
+ * @param array  $query_arg query argument.
  * @param string $url URL.
+ *
+ * @return string $url URL with $query_arg appended.
  */
 function mo_saml_add_query_arg( $query_arg, $url ) {
-	if ( strpos( $url, 'mo_saml_licensing' ) !== false ) {
-		$url = str_replace( 'mo_saml_licensing', 'mo_saml_settings', $url );
-	} elseif ( strpos( $url, 'mo_saml_enable_debug_logs' ) !== false ) {
+	if ( strpos( $url, 'mo_saml_enable_debug_logs' ) !== false ) {
 		$url = str_replace( 'mo_saml_enable_debug_logs', 'mo_saml_settings', $url );
 	}
 	$url = add_query_arg( $query_arg, $url );

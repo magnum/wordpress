@@ -12,13 +12,13 @@ Version History
 
 
 class Ithemes_Sync_Verb_Manage_Ithemes_Licenses extends Ithemes_Sync_Verb {
-	public static $name = 'manage-ithemes-licenses';
-	public static $description = 'Get, set, and delete license keys for iThemes products.';
-	public static $status_element_name = 'ithemes-licenses';
+	public static $name                      = 'manage-ithemes-licenses';
+	public static $description               = 'Get, set, and delete license keys for iThemes products.';
+	public static $status_element_name       = 'ithemes-licenses';
 	public static $show_in_status_by_default = false;
 	
-	private $default_arguments = array();
-	private $response = array();
+	private $default_arguments = [];
+	private $response          = [];
 	
 	
 	public function run( $arguments ) {
@@ -33,35 +33,35 @@ class Ithemes_Sync_Verb_Manage_Ithemes_Licenses extends Ithemes_Sync_Verb {
 			}
 		}
 		
-		include_once( $GLOBALS['ithemes_updater_path'] . '/keys.php' );
+		include_once $GLOBALS['ithemes_updater_path'] . '/keys.php';
 		
 		if ( ! class_exists( 'Ithemes_Updater_Keys' ) ) {
 			return new WP_Error( 'ithemes-updater-keys-class-missing', "The Ithemes_Updater_Keys class was not found. This could indicate an issue with the files of the updater located at {$GLOBALS['ithemes_updater_path']}." );
 		}
 		
 		
-		$actions = array(
-			'get'  => 'get_keys',
-			'set'  => 'set_keys',
-		);
+		$actions = [
+			'get' => 'get_keys',
+			'set' => 'set_keys',
+		];
 		
 		
 		if ( empty( $arguments ) ) {
-			$arguments = array( 'get' => true );
+			$arguments = [ 'get' => true ];
 		}
 		
 		
 		foreach ( $arguments as $action => $data ) {
-			if ( ! isset( $actions[$action] ) ) {
-				$this->response[$action] = 'This action is not recognized.';
+			if ( ! isset( $actions[ $action ] ) ) {
+				$this->response[ $action ] = 'This action is not recognized.';
 				continue;
 			}
 			if ( ! is_array( $data ) && ( 'set' == $action ) ) {
-				$this->response[$action] = new WP_Error( 'invalid-argument', 'This action requires an array.' );
+				$this->response[ $action ] = new WP_Error( 'invalid-argument', 'This action requires an array.' );
 				continue;
 			}
 			
-			$this->response[$action] = call_user_func( array( $this, $actions[$action] ), $data );
+			$this->response[ $action ] = call_user_func( [ $this, $actions[ $action ] ], $data );
 		}
 		
 		return $this->response;
@@ -72,11 +72,11 @@ class Ithemes_Sync_Verb_Manage_Ithemes_Licenses extends Ithemes_Sync_Verb {
 			return new WP_Error( 'ithemes-updater-keys-get-not-callable', 'The Ithemes_Updater_Keys::get function is not callable due to an unknown issue. Unable to process the request.' );
 		}
 		
-		@include_once( $GLOBALS['ithemes_updater_path'] . '/packages.php' );
+		@include_once $GLOBALS['ithemes_updater_path'] . '/packages.php';
 		
 		if ( ! class_exists( 'Ithemes_Updater_Packages' ) ) {
 			return new WP_Error( 'ithemes-updater-packages-class-missing', "The Ithemes_Updater_Packages class was not found. This could indicate an issue with the files of the updater located at {$GLOBALS['ithemes_updater_path']}." );
-		} else if ( ! is_callable( 'Ithemes_Updater_Packages', 'get_full_details' ) ) {
+		} elseif ( ! is_callable( 'Ithemes_Updater_Packages', 'get_full_details' ) ) {
 			return new WP_Error( 'ithemes-updater-packages-get-full-details-not-callable', 'The Ithemes_Updater_Packages::get_full_details function is not callable due to an unknown issue. Unable to process the request.' );
 		}
 		
@@ -88,11 +88,11 @@ class Ithemes_Sync_Verb_Manage_Ithemes_Licenses extends Ithemes_Sync_Verb {
 		
 		if ( '__all__' == $packages ) {
 			$package_details = Ithemes_Updater_Packages::get_full_details();
-			$all_packages = $package_details['packages'];
+			$all_packages    = $package_details['packages'];
 			
 			foreach ( $package_details['packages'] as $path => $data ) {
-				if ( ! isset( $keys[$data['package']] ) ) {
-					$keys[$data['package']] = null;
+				if ( ! isset( $keys[ $data['package'] ] ) ) {
+					$keys[ $data['package'] ] = null;
 				}
 			}
 		}

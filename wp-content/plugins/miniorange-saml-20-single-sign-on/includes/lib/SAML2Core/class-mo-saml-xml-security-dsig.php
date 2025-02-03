@@ -16,7 +16,7 @@ use DOMElement;
 use DOMNode;
 use DOMXPath;
 use Exception;
-use RobRichards\XMLSecLibs\Utils\Mo_SAML_XPath as Mo_SAML_XPath;
+use RobRichards\XMLSecLibs\Utils\Mo_SAML_XPath;
 
 /**
  * Xmlseclibs.php
@@ -422,7 +422,7 @@ class Mo_SAML_XML_Security_DSig {
 				$alg = 'ripemd160';
 				break;
 			default:
-				throw new Exception( "Cannot validate digest: Unsupported Algorithm <$digest_algorithm>" );
+				throw new Exception( 'Cannot validate digest: Unsupported Algorithm ' . esc_html( $digest_algorithm ) );
 		}
 
 		$digest = hash( $alg, $data, true );
@@ -431,7 +431,6 @@ class Mo_SAML_XML_Security_DSig {
 			$digest = base64_encode( $digest );
 		}
 		return $digest;
-
 	}
 
 	/**
@@ -449,9 +448,13 @@ class Mo_SAML_XML_Security_DSig {
 		$xpath->registerNamespace( 'secdsig', self::XMLDSIGNS );
 		$query            = 'string(./secdsig:DigestMethod/@Algorithm)';
 		$digest_algorithm = $xpath->evaluate( $query, $ref_node );
-		$dig_value        = $this->calculate_digest( $digest_algorithm, $data, false );
-		$query            = 'string(./secdsig:DigestValue)';
-		$digest_value     = $xpath->evaluate( $query, $ref_node );
+		try {
+			$dig_value = $this->calculate_digest( $digest_algorithm, $data, false );
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Algorithm' );
+		}
+		$query        = 'string(./secdsig:DigestValue)';
+		$digest_value = $xpath->evaluate( $query, $ref_node );
 		//phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- base_64 encoding is necessary as per standards of SAML.
 		return ( base64_decode( $digest_value ) === $dig_value );
 	}
@@ -790,7 +793,11 @@ class Mo_SAML_XML_Security_DSig {
 		}
 
 		$canonical_data = $this->process_transforms( $ref_node, $node );
-		$dig_value      = $this->calculate_digest( $algorithm, $canonical_data );
+		try {
+			$dig_value = $this->calculate_digest( $algorithm, $canonical_data );
+		} catch ( Exception $exception ) {
+			wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Algorithm' );
+		}
 
 		$digest_method = $this->create_new_sign_node( 'DigestMethod' );
 		$ref_node->appendChild( $digest_method );
@@ -1002,11 +1009,11 @@ class Mo_SAML_XML_Security_DSig {
 	 *
 	 * @param Mo_SAML_XML_Security_Key $obj_key instance of Mo_SAML_XML_Security_Key.
 	 *
-	 * @param null|DOMNode             $parent parent node.
+	 * @param null|DOMNode             $dom_parent parent node.
 	 * @return void
 	 */
-	public function append_key( $obj_key, $parent = null ) {
-		$obj_key->mo_saml_serialize_key( $parent );
+	public function append_key( $obj_key, $dom_parent = null ) {
+		$obj_key->mo_saml_serialize_key( $dom_parent );
 	}
 
 
@@ -1119,8 +1126,14 @@ class Mo_SAML_XML_Security_DSig {
 	 * @return void
 	 * @throws Exception Throws if parent node is not valid.
 	 */
-	public static function static_add509_cert( $parent_ref, $cert, $is_pem_format = true,
-		$is_url = false, $xpath = null, $options = null ) {
+	public static function static_add509_cert(
+		$parent_ref,
+		$cert,
+		$is_pem_format = true,
+		$is_url = false,
+		$xpath = null,
+		$options = null
+	) {
 		if ( $is_url ) {
 			//phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- file_get_contents can be used to load local files.
 			$cert = file_get_contents( $cert );
@@ -1249,7 +1262,11 @@ class Mo_SAML_XML_Security_DSig {
 	public function add509_cert( $cert, $is_pem_format = true, $is_url = false, $options = null ) {
 		$xpath = $this->get_x_path_obj();
 		if ( $xpath ) {
-			self::static_add509_cert( $this->sig_node, $cert, $is_pem_format, $is_url, $xpath, $options );
+			try {
+				self::static_add509_cert( $this->sig_node, $cert, $is_pem_format, $is_url, $xpath, $options );
+			} catch ( Exception $exception ) {
+				wp_die( 'We could not sign you in. Please contact your administrator.', 'Invalid Node' );
+			}
 		}
 	}
 

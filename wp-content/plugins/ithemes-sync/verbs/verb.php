@@ -14,17 +14,17 @@ Version History
 
 
 class Ithemes_Sync_Verb {
-	public static $name = 'example';
-	public static $description = 'This verb is not meant to be used; rather, it serves as the building block for all other verbs.';
-	public static $status_element_name = '';
+	public static $name                      = 'example';
+	public static $description               = 'This verb is not meant to be used; rather, it serves as the building block for all other verbs.';
+	public static $status_element_name       = '';
 	public static $show_in_status_by_default = false;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
-		return array();
+		return [];
 	}
 }

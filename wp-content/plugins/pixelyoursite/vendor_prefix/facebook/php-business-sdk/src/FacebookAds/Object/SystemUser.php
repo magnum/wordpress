@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,29 +21,32 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\SystemUserFields;
-class SystemUser extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     * @return string
-     */
-    protected function getEndpoint()
-    {
-        return 'system_users';
-    }
-    /**
-     * @return SystemUserFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\SystemUserFields::getInstance();
-    }
-    public function invalidateAccessTokens()
-    {
-        $this->getApi()->call('/' . $this->assureId() . '/access_tokens', \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE);
-    }
+
+class SystemUser extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   * @return string
+   */
+  protected function getEndpoint() {
+    return 'system_users';
+  }
+
+  /**
+   * @return SystemUserFields
+   */
+  public static function getFieldsEnum() {
+    return SystemUserFields::getInstance();
+  }
+
+  public function invalidateAccessTokens() {
+    $this->getApi()->call(
+      '/'.$this->assureId().'/access_tokens',
+      RequestInterface::METHOD_DELETE);
+  }
 }

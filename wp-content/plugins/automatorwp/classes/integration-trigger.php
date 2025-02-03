@@ -29,6 +29,15 @@ class AutomatorWP_Integration_Trigger {
      */
     public $trigger = '';
 
+    /**
+     * Filter result
+     *
+     * @since 1.0.0
+     *
+     * @var string $result
+     */
+    public $result = '';
+
     public function __construct() {
 
         $this->hooks();

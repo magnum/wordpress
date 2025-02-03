@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Delete_Post extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_delete_post';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_delete_post';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -34,7 +45,7 @@ class AutomatorWP_WordPress_Delete_Post extends AutomatorWP_Integration_Trigger 
             ),
             'function'          => array( $this, 'listener' ),
             'priority'          => 10,
-            'accepted_args'     => 1,
+            'accepted_args'     => 2,
             'options'           => array(
                 'times' => automatorwp_utilities_times_option(),
             ),
@@ -52,13 +63,30 @@ class AutomatorWP_WordPress_Delete_Post extends AutomatorWP_Integration_Trigger 
      * @since 1.0.0
      *
      * @param int $post_id The post ID
+     * @param object|string $post_data
      */
-    public function listener( $post_id ) {
+    public function listener( $post_id = 0, $post_data = null ) {
 
         $post = get_post( $post_id );
 
+        if ( ! $post ) {
+            return;
+        }
+
+        if ( $post_data === null ) {
+            return;
+        }
+       
         // Bail if not is a post
         if( $post->post_type !== 'post' ) {
+            return;
+        }
+        
+        // trashed_post hook returns string with previous status
+        // before_delete_post hook returns WP_post with eliminated post data
+        $post_status = ( is_object( $post_data ) ) ? $post_data->post_status : $post_data;
+
+        if( ! in_array( $post_status, array( 'publish', 'private' ) ) ) {
             return;
         }
 
@@ -72,4 +100,5 @@ class AutomatorWP_WordPress_Delete_Post extends AutomatorWP_Integration_Trigger 
 
 }
 
-new AutomatorWP_WordPress_Delete_Post();
+new AutomatorWP_WordPress_Delete_Post( 'wordpress' );
+new AutomatorWP_WordPress_Delete_Post( 'posts' );

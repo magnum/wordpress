@@ -8,11 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once dirname( __FILE__ ) . '/includes/lib/class-mo-saml-options-enum.php';
+require_once __DIR__ . '/includes/lib/class-mo-saml-options-enum.php';
 require_once 'class-mo-saml-utilities.php';
 
 /**
- * This class Mo_SAML_Customer contains functions to handle all the customer related functionalities like sending support query, demo request, feedback.
+ * This class Mo_SAML_Customer contains functions to handle all the customer related functionalities like sending support query, feedback.
  */
 class Mo_SAML_Customer {
 
@@ -91,7 +91,6 @@ class Mo_SAML_Customer {
 		);
 		$response = Mo_SAML_Utilities::mo_saml_wp_remote_post( $url, $args );
 		return $response;
-
 	}
 
 	/**
@@ -128,13 +127,12 @@ class Mo_SAML_Customer {
 		);
 		$response = Mo_SAML_Utilities::mo_saml_wp_remote_post( $url, $args );
 		return $response;
-
 	}
 
 	/**
 	 * This function is used for checking if customer exists by making a call to the /rest/customer/check-if-exists endpoint.
 	 *
-	 * @return array $response Response of the API call for customer validity.
+	 * @return string $response Response of the API call for customer validity.
 	 */
 	public function mo_saml_check_customer() {
 		$url = Mo_Saml_Options_Plugin_Constants::HOSTNAME . '/moas/rest/customer/check-if-exists';
@@ -179,9 +177,9 @@ class Mo_SAML_Customer {
 		$current_user = wp_get_current_user();
 
 		if ( $call_setup ) {
-			$query = '[Call Request - WP SAML SP SSO Plugin] ' . $query;
+			$query = '[Call Request - WP SAML SP SSO Plugin v' . Mo_Saml_Options_Plugin_Constants::VERSION . '] ' . $query;
 		} else {
-			$query = '[WP SAML 2.0 SP SSO Plugin] ' . $query;
+			$query = '[WP SAML 2.0 SP SSO Plugin v' . Mo_Saml_Options_Plugin_Constants::VERSION . '] ' . $query;
 		}
 
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {
@@ -218,7 +216,6 @@ class Mo_SAML_Customer {
 		);
 		$response = Mo_SAML_Utilities::mo_saml_wp_remote_post( $url, $args );
 		return $response;
-
 	}
 
 	/**
@@ -227,11 +224,10 @@ class Mo_SAML_Customer {
 	 * @param string $email        Customer's Email.
 	 * @param string $phone        Customer's Phone.
 	 * @param string $message      Customer's Message.
-	 * @param bool   $demo_request Customer's Request for demo.
 	 *
-	 * @return array $response     Response of the API call for demo request and feedback.
+	 * @return string $response     Response of the API call for demo request and feedback.
 	 */
-	public function mo_saml_send_email_alert( $email, $phone, $message, $demo_request = false ) {
+	public function mo_saml_send_email_alert( $email, $phone, $message ) {
 
 		$url = Mo_Saml_Options_Plugin_Constants::HOSTNAME . '/moas/api/notify/send';
 
@@ -244,10 +240,7 @@ class Mo_SAML_Customer {
 		$hash_value             = hash( 'sha512', $string_to_hash );
 		$from_email             = 'no-reply@xecurify.com';
 		$subject                = 'Feedback: WordPress SAML 2.0 SSO Plugin';
-		if ( $demo_request ) {
-			$subject = 'DEMO REQUEST: WordPress SAML 2.0 SSO';
-		}
-		$site_url = site_url();
+		$site_url               = site_url();
 
 		global $user;
 		$user = wp_get_current_user();
@@ -295,7 +288,6 @@ class Mo_SAML_Customer {
 		);
 		$response = Mo_SAML_Utilities::mo_saml_wp_remote_post( $url, $args );
 		return $response;
-
 	}
 
 	/**
@@ -346,7 +338,6 @@ class Mo_SAML_Customer {
 		);
 		$response     = Mo_SAML_Utilities::mo_saml_wp_remote_post( $url, $args );
 		return $response;
-
 	}
 
 	/**

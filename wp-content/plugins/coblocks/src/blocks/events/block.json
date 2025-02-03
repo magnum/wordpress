@@ -30,6 +30,8 @@
 	},
 	"title": "Events",
 	"textdomain": "coblocks",
-	"editorScript": "blocks-2",
-	"description": "Add a list of events or display events from a public calendar."
+	"description": "Add a list of events or display events from a public calendar.",
+	"editorScript": ["coblocks-2"],
+	"viewScript": ["coblocks-tiny-swiper","coblocks-events"],
+	"render": "index.php"
 }

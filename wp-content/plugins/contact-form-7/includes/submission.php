@@ -28,10 +28,10 @@ class WPCF7_Submission {
 	/**
 	 * Returns the singleton instance of this class.
 	 */
-	public static function get_instance( $contact_form = null, $args = '' ) {
+	public static function get_instance( $contact_form = null, $options = '' ) {
 		if ( $contact_form instanceof WPCF7_ContactForm ) {
 			if ( empty( self::$instance ) ) {
-				self::$instance = new self( $contact_form, $args );
+				self::$instance = new self( $contact_form, $options );
 				self::$instance->proceed();
 				return self::$instance;
 			} else {
@@ -51,20 +51,28 @@ class WPCF7_Submission {
 	 * Returns true if this submission is created via WP REST API.
 	 */
 	public static function is_restful() {
-		return defined( 'REST_REQUEST' ) && REST_REQUEST;
+		return wp_is_serving_rest_request();
 	}
 
 
 	/**
 	 * Constructor.
 	 */
-	private function __construct( WPCF7_ContactForm $contact_form, $args = '' ) {
-		$args = wp_parse_args( $args, array(
+	private function __construct( WPCF7_ContactForm $contact_form, $options = '' ) {
+		$options = wp_parse_args( $options, array(
 			'skip_mail' => false,
 		) );
 
 		$this->contact_form = $contact_form;
-		$this->skip_mail = (bool) $args['skip_mail'];
+		$this->skip_mail = (bool) $options['skip_mail'];
+	}
+
+
+	/**
+	 * Destructor.
+	 */
+	public function __destruct() {
+		$this->remove_uploaded_files();
 	}
 
 
@@ -124,8 +132,6 @@ class WPCF7_Submission {
 					do_action( 'wpcf7_mail_failed', $contact_form );
 				}
 			}
-
-			$this->remove_uploaded_files();
 		};
 
 		wpcf7_switch_locale( $this->contact_form->locale(), $callback );
@@ -202,15 +208,15 @@ class WPCF7_Submission {
 	/**
 	 * Adds items to the array of submission result properties.
 	 *
-	 * @param string|array|object $args Value to add to result properties.
+	 * @param string|array|object $data Value to add to result properties.
 	 * @return array Added result properties.
 	 */
-	public function add_result_props( $args = '' ) {
-		$args = wp_parse_args( $args, array() );
+	public function add_result_props( $data = '' ) {
+		$data = wp_parse_args( $data, array() );
 
-		$this->result_props = array_merge( $this->result_props, $args );
+		$this->result_props = array_merge( $this->result_props, $data );
 
-		return $args;
+		return $data;
 	}
 
 
@@ -253,11 +259,7 @@ class WPCF7_Submission {
 	 *                    or false when no invalid field.
 	 */
 	public function get_invalid_field( $name ) {
-		if ( isset( $this->invalid_fields[$name] ) ) {
-			return $this->invalid_fields[$name];
-		} else {
-			return false;
-		}
+		return $this->invalid_fields[$name] ?? false;
 	}
 
 
@@ -279,9 +281,7 @@ class WPCF7_Submission {
 	 *                     null otherwise.
 	 */
 	public function get_meta( $name ) {
-		if ( isset( $this->meta[$name] ) ) {
-			return $this->meta[$name];
-		}
+		return $this->meta[$name] ?? null;
 	}
 
 
@@ -289,38 +289,16 @@ class WPCF7_Submission {
 	 * Collects meta information about this submission.
 	 */
 	private function setup_meta_data() {
-		$timestamp = time();
-
-		$remote_ip = $this->get_remote_ip_addr();
-
-		$remote_port = isset( $_SERVER['REMOTE_PORT'] )
-			? (int) $_SERVER['REMOTE_PORT'] : '';
-
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
-			? substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 ) : '';
-
-		$url = $this->get_request_url();
-
-		$unit_tag = isset( $_POST['_wpcf7_unit_tag'] )
-			? wpcf7_sanitize_unit_tag( $_POST['_wpcf7_unit_tag'] ) : '';
-
-		$container_post_id = isset( $_POST['_wpcf7_container_post'] )
-			? (int) $_POST['_wpcf7_container_post'] : 0;
-
-		$current_user_id = get_current_user_id();
-
-		$do_not_store = $this->contact_form->is_true( 'do_not_store' );
-
 		$this->meta = array(
-			'timestamp' => $timestamp,
-			'remote_ip' => $remote_ip,
-			'remote_port' => $remote_port,
-			'user_agent' => $user_agent,
-			'url' => $url,
-			'unit_tag' => $unit_tag,
-			'container_post_id' => $container_post_id,
-			'current_user_id' => $current_user_id,
-			'do_not_store' => $do_not_store,
+			'timestamp' => time(),
+			'remote_ip' => $this->get_remote_ip_addr(),
+			'remote_port' => $_SERVER['REMOTE_PORT'] ?? '',
+			'user_agent' => substr( $_SERVER['HTTP_USER_AGENT'] ?? '', 0, 254 ),
+			'url' => $this->get_request_url(),
+			'unit_tag' => wpcf7_sanitize_unit_tag( $_POST['_wpcf7_unit_tag'] ?? '' ),
+			'container_post_id' => absint( $_POST['_wpcf7_container_post'] ?? 0 ),
+			'current_user_id' => get_current_user_id(),
+			'do_not_store' => $this->contact_form->is_true( 'do_not_store' ),
 		);
 
 		return $this->meta;
@@ -336,11 +314,7 @@ class WPCF7_Submission {
 	 */
 	public function get_posted_data( $name = '' ) {
 		if ( ! empty( $name ) ) {
-			if ( isset( $this->posted_data[$name] ) ) {
-				return $this->posted_data[$name];
-			} else {
-				return null;
-			}
+			return $this->posted_data[$name] ?? null;
 		}
 
 		return $this->posted_data;
@@ -371,91 +345,56 @@ class WPCF7_Submission {
 	 * Constructs posted data property based on user input values.
 	 */
 	private function setup_posted_data() {
-		$posted_data = array_filter( (array) $_POST, function( $key ) {
-			return '_' !== substr( $key, 0, 1 );
-		}, ARRAY_FILTER_USE_KEY );
+		$posted_data = array_filter(
+			(array) $_POST,
+			static function ( $key ) {
+				return ! str_starts_with( $key, '_' );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
 
 		$posted_data = wp_unslash( $posted_data );
 		$posted_data = $this->sanitize_posted_data( $posted_data );
 
-		$tags = $this->contact_form->scan_form_tags();
+		$tags = $this->contact_form->scan_form_tags( array(
+			'feature' => array(
+				'name-attr',
+				'! not-for-mail',
+			),
+		) );
 
-		foreach ( (array) $tags as $tag ) {
-			if ( empty( $tag->name ) ) {
-				continue;
+		$tags = array_reduce( $tags, static function ( $carry, $tag ) {
+			if ( $tag->name and ! isset( $carry[$tag->name] ) ) {
+				$carry[$tag->name] = $tag;
 			}
 
-			$type = $tag->type;
-			$name = $tag->name;
-			$pipes = $tag->pipes;
+			return $carry;
+		}, array() );
 
-			if ( wpcf7_form_tag_supports( $type, 'do-not-store' ) ) {
-				unset( $posted_data[$name] );
-				continue;
-			}
+		foreach ( $tags as $tag ) {
+			$value_orig = $value = $posted_data[$tag->name] ?? '';
 
-			$value_orig = $value = '';
+			if ( wpcf7_form_tag_supports( $tag->type, 'selectable-values' ) ) {
+				$value = ( '' === $value ) ? array() : (array) $value;
 
-			if ( isset( $posted_data[$name] ) ) {
-				$value_orig = $value = $posted_data[$name];
-			}
+				if ( WPCF7_USE_PIPE ) {
+					$pipes = $this->contact_form->get_pipes( $tag->name );
 
-			if ( WPCF7_USE_PIPE
-			and $pipes instanceof WPCF7_Pipes
-			and ! $pipes->zero() ) {
-				if ( is_array( $value_orig ) ) {
-					$value = array();
-
-					foreach ( $value_orig as $v ) {
-						$value[] = $pipes->do_pipe( $v );
-					}
-				} else {
-					$value = $pipes->do_pipe( $value_orig );
+					$value = array_map( static function ( $value ) use ( $pipes ) {
+						return $pipes->do_pipe( $value );
+					}, $value );
 				}
 			}
 
-			if ( wpcf7_form_tag_supports( $type, 'selectable-values' ) ) {
-				$value = (array) $value;
-
-				if ( $tag->has_option( 'free_text' )
-				and isset( $posted_data[$name . '_free_text'] ) ) {
-					$last_val = array_pop( $value );
-
-					list( $tied_item ) = array_slice(
-						WPCF7_USE_PIPE ? $tag->pipes->collect_afters() : $tag->values,
-						-1, 1
-					);
-
-					list( $last_val, $tied_item ) = array_map(
-						function ( $item ) {
-							return wpcf7_canonicalize( $item, array(
-								'strto' => 'as-is',
-							) );
-						},
-						array( $last_val, $tied_item )
-					);
-
-					if ( $last_val === $tied_item ) {
-						$value[] = sprintf( '%s %s',
-							$last_val,
-							$posted_data[$name . '_free_text']
-						);
-					} else {
-						$value[] = $last_val;
-					}
-
-					unset( $posted_data[$name . '_free_text'] );
-				}
-			}
-
-			$value = apply_filters( "wpcf7_posted_data_{$type}", $value,
-				$value_orig, $tag
+			$value = apply_filters( "wpcf7_posted_data_{$tag->type}",
+				$value,
+				$value_orig,
+				$tag
 			);
 
-			$posted_data[$name] = $value;
+			$posted_data[$tag->name] = $value;
 
-			if ( $tag->has_option( 'consent_for:storage' )
-			and empty( $posted_data[$name] ) ) {
+			if ( $tag->has_option( 'consent_for:storage' ) and empty( $value ) ) {
 				$this->meta['do_not_store'] = true;
 			}
 		}
@@ -477,6 +416,7 @@ class WPCF7_Submission {
 		} elseif ( is_string( $value ) ) {
 			$value = wp_check_invalid_utf8( $value );
 			$value = wp_kses_no_null( $value );
+			$value = wpcf7_strip_whitespaces( $value );
 		}
 
 		return $value;
@@ -594,11 +534,9 @@ class WPCF7_Submission {
 		$home_url = untrailingslashit( home_url() );
 
 		if ( self::is_restful() ) {
-			$referer = isset( $_SERVER['HTTP_REFERER'] )
-				? trim( $_SERVER['HTTP_REFERER'] ) : '';
+			$referer = trim( $_SERVER['HTTP_REFERER'] ?? '' );
 
-			if ( $referer
-			and 0 === strpos( $referer, $home_url ) ) {
+			if ( $referer and str_starts_with( $referer, $home_url ) ) {
 				return sanitize_url( $referer );
 			}
 		}
@@ -729,13 +667,13 @@ class WPCF7_Submission {
 	 *
 	 * @link https://contactform7.com/2019/05/31/why-is-this-message-marked-spam/
 	 */
-	public function add_spam_log( $args = '' ) {
-		$args = wp_parse_args( $args, array(
+	public function add_spam_log( $data = '' ) {
+		$data = wp_parse_args( $data, array(
 			'agent' => '',
 			'reason' => '',
 		) );
 
-		$this->spam_log[] = $args;
+		$this->spam_log[] = $data;
 	}
 
 
@@ -757,7 +695,7 @@ class WPCF7_Submission {
 			return true;
 		}
 
-		$nonce = isset( $_POST['_wpnonce'] ) ? $_POST['_wpnonce'] : '';
+		$nonce = $_POST['_wpnonce'] ?? '';
 
 		return wpcf7_verify_nonce( $nonce );
 	}
@@ -896,7 +834,7 @@ class WPCF7_Submission {
 
 			$file = $_FILES[$tag->name];
 
-			$args = array(
+			$options = array(
 				'tag' => $tag,
 				'name' => $tag->name,
 				'required' => $tag->is_required(),
@@ -905,7 +843,7 @@ class WPCF7_Submission {
 				'schema' => $this->contact_form->get_schema(),
 			);
 
-			$new_files = wpcf7_unship_uploaded_file( $file, $args );
+			$new_files = wpcf7_unship_uploaded_file( $file, $options );
 
 			if ( is_wp_error( $new_files ) ) {
 				$result->invalidate( $tag, $new_files );

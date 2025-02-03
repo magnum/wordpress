@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,16 +21,18 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static ClickTrackingTagFields getInstance()
  */
-class ClickTrackingTagFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ID = 'id';
-    const ADD_TEMPLATE_PARAM = 'add_template_param';
-    const URL = 'url';
-    const ADGROUP_ID = 'adgroup_id';
+class ClickTrackingTagFields extends AbstractEnum {
+
+  const ID = 'id';
+  const ADD_TEMPLATE_PARAM = 'add_template_param';
+  const URL = 'url';
+  const ADGROUP_ID = 'adgroup_id';
 }

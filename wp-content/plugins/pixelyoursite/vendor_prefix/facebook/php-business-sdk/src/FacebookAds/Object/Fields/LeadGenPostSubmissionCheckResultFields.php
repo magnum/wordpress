@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LeadGenPostSubmissionCheckResultFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const API_CALL_RESULT = 'api_call_result';
-    const API_ERROR_MESSAGE = 'api_error_message';
-    const SHOWN_THANK_YOU_PAGE = 'shown_thank_you_page';
-    public function getFieldTypes()
-    {
-        return array('api_call_result' => 'string', 'api_error_message' => 'string', 'shown_thank_you_page' => 'string');
-    }
+
+class LeadGenPostSubmissionCheckResultFields extends AbstractEnum {
+
+  const API_CALL_RESULT = 'api_call_result';
+  const API_ERROR_MESSAGE = 'api_error_message';
+  const SHOWN_THANK_YOU_PAGE = 'shown_thank_you_page';
+
+  public function getFieldTypes() {
+    return array(
+      'api_call_result' => 'string',
+      'api_error_message' => 'string',
+      'shown_thank_you_page' => 'string',
+    );
+  }
 }

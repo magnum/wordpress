@@ -14,12 +14,12 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Sync_Settings extends Ithemes_Sync_Verb {
-	public static $name = 'get-sync-settings';
-	public static $description = 'Retrieve the Sync plugin\'s settings.';
-	public static $status_element_name = 'settings';
+	public static $name                      = 'get-sync-settings';
+	public static $description               = 'Retrieve the Sync plugin\'s settings.';
+	public static $status_element_name       = 'settings';
 	public static $show_in_status_by_default = true;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCampaignDeliveryEstimateFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DAILY_OUTCOMES_CURVE = 'daily_outcomes_curve';
-    const ESTIMATE_DAU = 'estimate_dau';
-    const ESTIMATE_MAU_LOWER_BOUND = 'estimate_mau_lower_bound';
-    const ESTIMATE_MAU_UPPER_BOUND = 'estimate_mau_upper_bound';
-    const ESTIMATE_READY = 'estimate_ready';
-    const TARGETING_OPTIMIZATION_TYPES = 'targeting_optimization_types';
-    public function getFieldTypes()
-    {
-        return array('daily_outcomes_curve' => 'list<OutcomePredictionPoint>', 'estimate_dau' => 'int', 'estimate_mau_lower_bound' => 'int', 'estimate_mau_upper_bound' => 'int', 'estimate_ready' => 'bool', 'targeting_optimization_types' => 'map<string, int>');
-    }
+
+class AdCampaignDeliveryEstimateFields extends AbstractEnum {
+
+  const DAILY_OUTCOMES_CURVE = 'daily_outcomes_curve';
+  const ESTIMATE_DAU = 'estimate_dau';
+  const ESTIMATE_MAU_LOWER_BOUND = 'estimate_mau_lower_bound';
+  const ESTIMATE_MAU_UPPER_BOUND = 'estimate_mau_upper_bound';
+  const ESTIMATE_READY = 'estimate_ready';
+  const TARGETING_OPTIMIZATION_TYPES = 'targeting_optimization_types';
+
+  public function getFieldTypes() {
+    return array(
+      'daily_outcomes_curve' => 'list<OutcomePredictionPoint>',
+      'estimate_dau' => 'int',
+      'estimate_mau_lower_bound' => 'int',
+      'estimate_mau_upper_bound' => 'int',
+      'estimate_ready' => 'bool',
+      'targeting_optimization_types' => 'map<string, int>',
+    );
+  }
 }

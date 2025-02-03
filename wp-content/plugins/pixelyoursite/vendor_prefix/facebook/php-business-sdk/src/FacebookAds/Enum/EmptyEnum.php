@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,36 +21,36 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Enum;
 
-class EmptyEnum extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    /**
-     * @return array
-     */
-    public function getArrayCopy()
-    {
-        return array();
-    }
-    /**
-     * @return array
-     */
-    public function getNames()
-    {
-        return array();
-    }
-    /**
-     * @return array
-     */
-    public function getValues()
-    {
-        return array();
-    }
-    /**
-     * @return array
-     */
-    public function getValuesMap()
-    {
-        return array();
-    }
+class EmptyEnum extends AbstractEnum {
+
+  /**
+   * @return array
+   */
+  public function getArrayCopy() {
+    return array();
+  }
+
+  /**
+   * @return array
+   */
+  public function getNames() {
+    return array();
+  }
+
+  /**
+   * @return array
+   */
+  public function getValues() {
+    return array();
+  }
+
+  /**
+   * @return array
+   */
+  public function getValuesMap() {
+    return array();
+  }
 }

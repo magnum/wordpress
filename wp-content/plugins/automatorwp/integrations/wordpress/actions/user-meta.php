@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_user_meta';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_user_meta';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -23,8 +34,8 @@ class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
 
         automatorwp_register_action( $this->action, array(
             'integration'       => $this->integration,
-            'label'             => __( 'Set, insert, increment or decrement user meta', 'automatorwp' ),
-            'select_option'     => __( 'Set, insert, increment or decrement <strong>user meta</strong>', 'automatorwp' ),
+            'label'             => __( 'Update user meta', 'automatorwp' ),
+            'select_option'     => __( 'Update <strong>user meta</strong>', 'automatorwp' ),
             /* translators: %1$s: Operation (Set, insert, increment or decrement). %2$s: Meta value. %3$s: Meta key. */
             'edit_label'        => sprintf( __( '%1$s user meta value %2$s for meta key %3$s', 'automatorwp' ), '{operation}', '{meta_value}', '{meta_key}' ),
             /* translators: %1$s: Operation (Set, insert, increment or decrement). %2$s: Meta value. %3$s: Meta key. */
@@ -80,6 +91,9 @@ class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
                     )
                 )
             ),
+            'tags' => array_merge(
+                automatorwp_utilities_user_tags()
+            )
         ) );
 
     }
@@ -94,6 +108,9 @@ class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
         // Dynamic edit and log labels
         add_filter( 'automatorwp_parse_automation_item_edit_label', array( $this, 'dynamic_label' ), 10, 5 );
         add_filter( 'automatorwp_parse_automation_item_log_label', array( $this, 'dynamic_label' ), 10, 5 );
+
+        // Log meta data
+        add_filter( 'automatorwp_user_completed_action_log_meta', array( $this, 'log_meta' ), 10, 5 );
 
         parent::hooks();
 
@@ -150,6 +167,7 @@ class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
         $operation = $action_options['operation'];
         $meta_key = sanitize_title( $action_options['meta_key'] );
         $meta_value = sanitize_text_field( $action_options['meta_value'] );
+        $this->user_data = array();
 
         // Bail if empty meta key
         if( empty( $meta_key ) ) {
@@ -201,8 +219,74 @@ class AutomatorWP_WordPress_User_Meta extends AutomatorWP_Integration_Action {
         // Update the user meta value
         update_user_meta( $user_id, $meta_key, $value );
 
+        $this->user_meta[$meta_key] = $value;
+
+        $user = get_user_by( 'id', $user_id );
+
+        // The user fields
+        $user_fields = array(
+            'user_login',
+            'user_email',
+            'first_name',
+            'last_name',
+            'user_url',
+            'user_pass',
+            'role',
+            'display_name',
+        );
+
+        foreach( $user_fields as $user_field ) {
+                $this->user_data[$user_field] = $user->$user_field;
+        }
+
+    }
+
+    /**
+     * Action custom log meta
+     *
+     * @since 1.0.0
+     *
+     * @param array     $log_meta           Log meta data
+     * @param stdClass  $action             The action object
+     * @param int       $user_id            The user ID
+     * @param array     $action_options     The action's stored options (with tags already passed)
+     * @param stdClass  $automation         The action's automation object
+     *
+     * @return array
+     */
+    public function log_meta( $log_meta, $action, $user_id, $action_options, $automation ) {
+
+        // Bail if action type don't match this action
+        if( $action->type !== $this->action ) {
+            return $log_meta;
+        }
+
+        // Store user fields
+        $user_fields = array(
+            'user_login',
+            'user_email',
+            'first_name',
+            'last_name',
+            'user_url',
+            'user_pass',
+            'role',
+            'display_name',
+        );
+
+        foreach( $user_fields as $user_field ) {
+            $log_meta[$user_field] = $this->user_data[$user_field];
+        }
+
+        // Store user ID
+        $log_meta['user_id'] = $user_id;
+
+        // Store user meta
+        $log_meta['user_meta'] = $this->user_meta;
+
+        return $log_meta;
     }
 
 }
 
-new AutomatorWP_WordPress_User_Meta();
+new AutomatorWP_WordPress_User_Meta( 'wordpress' );
+new AutomatorWP_WordPress_User_Meta( 'users' );

@@ -99,17 +99,17 @@ class Add_Instagram_Integration {
 	 */
 	public function get_total_ig_accounts_connected() {
 
-		$options_facebook_pages = get_option( '_uncannyowl_facebook_pages_settings', array() );
+		$options_facebook_pages = automator_get_option( '_uncannyowl_facebook_pages_settings', array() );
 
 		$total = 0;
 
-		foreach ( $options_facebook_pages as $page ) {
+		foreach ( (array) $options_facebook_pages as $page ) {
 
-			$ig_account = isset( $page['ig_account'] ) ? $page['ig_account'] : '';
+			$page_array = (array) $page;
 
-			//$has_ig_connection = isset( $page['ig_connection']['is_connected'] ) ? $page['ig_connection']['is_connected'] : 'COMPAT_ALLOW_NULL';
+			$ig_account = isset( $page_array['ig_account'] ) ? $page_array['ig_account'] : '';
 
-			$has_connection_key = array_key_exists( 'ig_connection', $page );
+			$has_connection_key = array_key_exists( 'ig_connection', $page_array );
 
 			// Handle backwards compatibility.
 			if ( ! empty( $ig_account ) ) {
@@ -124,7 +124,7 @@ class Add_Instagram_Integration {
 				}
 
 				// Otherwise newer version should have connection key and [is_connected] must be true.
-				if ( $has_connection_key && true === $page['ig_connection']['is_connected'] ) {
+				if ( $has_connection_key && true === $page_array['ig_connection']['is_connected'] ) {
 
 					$total ++;
 

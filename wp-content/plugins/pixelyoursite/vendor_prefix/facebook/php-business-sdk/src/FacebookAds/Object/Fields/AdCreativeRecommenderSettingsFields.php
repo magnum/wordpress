@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativeRecommenderSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const PREFERRED_EVENTS = 'preferred_events';
-    const PRODUCT_SALES_CHANNEL = 'product_sales_channel';
-    public function getFieldTypes()
-    {
-        return array('preferred_events' => 'list<string>', 'product_sales_channel' => 'string');
-    }
+
+class AdCreativeRecommenderSettingsFields extends AbstractEnum {
+
+  const PREFERRED_EVENTS = 'preferred_events';
+  const PRODUCT_SALES_CHANNEL = 'product_sales_channel';
+
+  public function getFieldTypes() {
+    return array(
+      'preferred_events' => 'list<string>',
+      'product_sales_channel' => 'string',
+    );
+  }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -29,8 +29,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Cursor;
 use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InstagramInsightsResultFields;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultBreakdownValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultMetricTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultMetricValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultPeriodValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultTimeframeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +43,25 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultPeriodValues
  * pull request for this class.
  *
  */
-class InstagramInsightsResult extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return InstagramInsightsResultFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\InstagramInsightsResultFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Metric'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultMetricValues::getInstance()->getValues();
-        $ref_enums['Period'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\InstagramInsightsResultPeriodValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class InstagramInsightsResult extends AbstractCrudObject {
+
+  /**
+   * @return InstagramInsightsResultFields
+   */
+  public static function getFieldsEnum() {
+    return InstagramInsightsResultFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Breakdown'] = InstagramInsightsResultBreakdownValues::getInstance()->getValues();
+    $ref_enums['Metric'] = InstagramInsightsResultMetricValues::getInstance()->getValues();
+    $ref_enums['Period'] = InstagramInsightsResultPeriodValues::getInstance()->getValues();
+    $ref_enums['MetricType'] = InstagramInsightsResultMetricTypeValues::getInstance()->getValues();
+    $ref_enums['Timeframe'] = InstagramInsightsResultTimeframeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

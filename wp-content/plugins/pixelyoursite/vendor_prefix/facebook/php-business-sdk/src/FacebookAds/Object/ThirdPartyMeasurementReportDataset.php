@@ -22,13 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object;
 
-use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
-use PYS_PRO_GLOBAL\FacebookAds\Cursor;
-use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
-use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
-use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ThirdPartyMeasurementReportDatasetFields;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Cursor;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ThirdPartyMeasurementReportDatasetFields;
 /**
  * This class is auto-generated.
  *
@@ -37,14 +37,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ThirdPartyMeasurementReportDatasetF
  * pull request for this class.
  *
  */
-class ThirdPartyMeasurementReportDataset extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
+class ThirdPartyMeasurementReportDataset extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
 {
     /**
      * @return ThirdPartyMeasurementReportDatasetFields
      */
     public static function getFieldsEnum()
     {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ThirdPartyMeasurementReportDatasetFields::getInstance();
+        return \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ThirdPartyMeasurementReportDatasetFields::getInstance();
     }
     protected static function getReferencedEnums()
     {
@@ -56,7 +56,7 @@ class ThirdPartyMeasurementReportDataset extends \PYS_PRO_GLOBAL\FacebookAds\Obj
         $this->assureId();
         $param_types = array();
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset(), 'NODE', \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();
@@ -66,7 +66,7 @@ class ThirdPartyMeasurementReportDataset extends \PYS_PRO_GLOBAL\FacebookAds\Obj
         $this->assureId();
         $param_types = array('data' => 'list<map>');
         $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
+        $request = new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset(), 'NODE', \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\ThirdPartyMeasurementReportDataset::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
         $request->addParams($params);
         $request->addFields($fields);
         return $pending ? $request : $request->execute();

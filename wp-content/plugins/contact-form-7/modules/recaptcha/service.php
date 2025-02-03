@@ -133,6 +133,10 @@ class WPCF7_RECAPTCHA extends WPCF7_Service {
 
 		$endpoint = 'https://www.google.com/recaptcha/api/siteverify';
 
+		if ( apply_filters( 'wpcf7_use_recaptcha_net', false ) ) {
+			$endpoint = 'https://www.recaptcha.net/recaptcha/api/siteverify';
+		}
+
 		$sitekey = $this->get_sitekey();
 		$secret = $this->get_secret( $sitekey );
 
@@ -221,8 +225,8 @@ class WPCF7_RECAPTCHA extends WPCF7_Service {
 				$this->reset_data();
 				$redirect_to = $this->menu_page_url( 'action=setup' );
 			} else {
-				$sitekey = isset( $_POST['sitekey'] ) ? trim( $_POST['sitekey'] ) : '';
-				$secret = isset( $_POST['secret'] ) ? trim( $_POST['secret'] ) : '';
+				$sitekey = trim( $_POST['sitekey'] ?? '' );
+				$secret = trim( $_POST['secret'] ?? '' );
 
 				if ( $sitekey and $secret ) {
 					$this->sitekeys = array( $sitekey => $secret );
@@ -250,16 +254,22 @@ class WPCF7_RECAPTCHA extends WPCF7_Service {
 
 
 	public function admin_notice( $message = '' ) {
-		if ( 'invalid' == $message ) {
-			echo sprintf(
-				'<div class="notice notice-error"><p><strong>%1$s</strong>: %2$s</p></div>',
-				esc_html( __( "Error", 'contact-form-7' ) ),
-				esc_html( __( "Invalid key values.", 'contact-form-7' ) ) );
+		if ( 'invalid' === $message ) {
+			wp_admin_notice(
+				sprintf(
+					'<strong>%1$s</strong>: %2$s',
+					esc_html( __( "Error", 'contact-form-7' ) ),
+					esc_html( __( "Invalid key values.", 'contact-form-7' ) )
+				),
+				'type=error'
+			);
 		}
 
-		if ( 'success' == $message ) {
-			echo sprintf( '<div class="notice notice-success"><p>%s</p></div>',
-				esc_html( __( 'Settings saved.', 'contact-form-7' ) ) );
+		if ( 'success' === $message ) {
+			wp_admin_notice(
+				esc_html( __( "Settings saved.", 'contact-form-7' ) ),
+				'type=success'
+			);
 		}
 	}
 

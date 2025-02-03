@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LiveVideoTargetingFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AGE_MAX = 'age_max';
-    const AGE_MIN = 'age_min';
-    const EXCLUDED_COUNTRIES = 'excluded_countries';
-    const GEO_LOCATIONS = 'geo_locations';
-    public function getFieldTypes()
-    {
-        return array('age_max' => 'unsigned int', 'age_min' => 'unsigned int', 'excluded_countries' => 'list<string>', 'geo_locations' => 'TargetingGeoLocation');
-    }
+
+class LiveVideoTargetingFields extends AbstractEnum {
+
+  const AGE_MAX = 'age_max';
+  const AGE_MIN = 'age_min';
+  const EXCLUDED_COUNTRIES = 'excluded_countries';
+  const GEO_LOCATIONS = 'geo_locations';
+
+  public function getFieldTypes() {
+    return array(
+      'age_max' => 'unsigned int',
+      'age_min' => 'unsigned int',
+      'excluded_countries' => 'list<string>',
+      'geo_locations' => 'TargetingGeoLocation',
+    );
+  }
 }

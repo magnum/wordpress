@@ -13,7 +13,7 @@
 
 
 class Ithemes_Sync_Verb_Get_Admin_Menu extends Ithemes_Sync_Verb {
-	public static $name = 'get-admin-menu';
+	public static $name        = 'get-admin-menu';
 	public static $description = 'Retrieve admin menu items.';
 
 	public function run( $arguments ) {

@@ -18,7 +18,45 @@ class Recipe_Post_Type {
 		// Default title of the New Recipe.
 		add_filter( 'default_title', array( $this, 'default_recipe_title' ), 20, 2 );
 
-		add_action( 'admin_head', array( $this, 'all_recipes_colours' ) );
+		add_action( 'admin_head', array( $this, 'all_recipes_css' ) );
+
+		add_action( 'admin_init', array( $this, 'uo_recipe_check_conditions_for_notice' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function uo_recipe_check_conditions_for_notice() {
+		// Check if we're on the uo-recipe edit screen and if permalink structure is "Plain"
+		if ( Automator()->helpers->recipe->is_edit_page() && empty( get_option( 'permalink_structure' ) ) ) {
+			add_action(
+				'automator_show_internal_admin_notice',
+				array(
+					$this,
+					'uo_recipe_plain_permalink_notice',
+				)
+			);
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function uo_recipe_plain_permalink_notice() {
+		?>
+		<div class="uap notice notice-error" style="padding:0">
+			<uo-alert type="error" no-radius>
+				<strong>
+					<?php
+					echo sprintf(
+						esc_html__( "Your site's Permalinks structure is set to Plain. Please change the setting from \"Plain\" to something else by clicking %s.", 'uncanny-automator' ),
+						'<a target="_blank" href="' . admin_url( 'options-permalink.php' ) . '">' . _x( 'here', 'Admin notice when Permalinks are not set', 'uncanny-automator' ) . '</a>'
+					)
+					?>
+				</strong>
+			</uo-alert>
+		</div>
+		<?php
 	}
 
 	/**
@@ -42,7 +80,7 @@ class Recipe_Post_Type {
 				/* translators: Non-personal infinitive verb */
 				'add_new_item'          => esc_attr__( 'Add new recipe', 'uncanny-automator' ),
 				/* translators: Non-personal infinitive verb */
-				'add_new'               => esc_attr_x( 'Add new', 'Recipe', 'uncanny-automator' ),
+				'add_new'               => esc_attr_x( 'Add New', 'Recipe', 'uncanny-automator' ),
 				'new_item'              => esc_attr__( 'New recipe', 'uncanny-automator' ),
 				/* translators: Non-personal infinitive verb */
 				'edit_item'             => esc_attr__( 'Edit recipe', 'uncanny-automator' ),
@@ -120,7 +158,7 @@ class Recipe_Post_Type {
 	/**
 	 * @return void
 	 */
-	public function all_recipes_colours() {
+	public function all_recipes_css() {
 		$current_screen = get_current_screen();
 		if ( ! $current_screen instanceof \WP_Screen ) {
 			return;
@@ -138,6 +176,31 @@ class Recipe_Post_Type {
 
 			.post-type-uo-recipe .wp-list-table .recipe-ui-dash.dashicons-yes-alt {
 				color: #008800;
+			}
+			
+			.recipe-ui-list-notes__wrapper {
+				position: relative;
+			}
+			
+			.recipe-ui-list-notes__full {
+				visibility: hidden;
+				position: absolute;
+				top: 0;
+				left:0;
+				right:0;
+				width:100%;
+				z-index: 1;
+				background: white;
+				padding: 10px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				opacity: 0;
+				transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+			}
+			
+			.recipe-ui-list-notes__wrapper:hover .recipe-ui-list-notes__full {
+				visibility: visible;
+				opacity: 1;
 			}
 
 		</style>

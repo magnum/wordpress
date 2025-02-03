@@ -22,7 +22,7 @@ class Collection implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 *
 	 * @param array $items
 	 */
-	public function __construct( array $items ) {
+	public function __construct( array $items = [] ) {
 		$this->items = $items;
 	}
 
@@ -31,7 +31,7 @@ class Collection implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 *
 	 * @return static
 	 */
-	public static function make( array $items ) {
+	public static function make( array $items = [] ) {
 		return new static( $items );
 	}
 
@@ -131,7 +131,7 @@ class Collection implements \ArrayAccess, \Countable, \IteratorAggregate {
 	 * Run a callback over each of the items.
 	 *
 	 * @param callable $callback
-	 * @return void
+	 * @return $this
 	 */
 	public function each( callable $callback ) {
 		foreach ( $this->items as $key => $value ) {
@@ -311,6 +311,42 @@ class Collection implements \ArrayAccess, \Countable, \IteratorAggregate {
 	}
 
 	/**
+	 * @param callable|string|int $value
+	 *
+	 * @return bool
+	 */
+	public function contains( $value ) {
+		$callback = $value instanceof \Closure
+			? $value
+			: function ( $item ) use ( $value ) {
+				return $item === $value;
+			};
+
+		foreach ( $this->all() as $key => $item ) {
+			if ( $callback( $item, $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Run array_diff between the collection and other array or collection.
+	 *
+	 * @param $filter
+	 *
+	 * @return $this
+	 */
+	public function diff( $filter ) {
+		if ( $filter instanceof self ) {
+			$filter = $filter->all();
+		}
+
+		return new static( array_diff( $this->all(), $filter ) );
+	}
+
+	/**
 	 * Make sure all the values inside the array are uniques.
 	 *
 	 * @param null|string|string[] $keys
@@ -419,6 +455,22 @@ class Collection implements \ArrayAccess, \Countable, \IteratorAggregate {
 		}
 
 		return $this;
+	}
+
+	public function prepend( ...$values ) {
+		$this->items = array_merge( $values, $this->items );
+
+		return $this;
+	}
+
+	public function some( callable $callback ) {
+		foreach ( $this->items as $key => $item ) {
+			if ( $callback( $item, $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

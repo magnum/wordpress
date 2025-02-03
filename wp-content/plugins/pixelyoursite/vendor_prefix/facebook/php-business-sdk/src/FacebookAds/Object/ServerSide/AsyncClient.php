@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,22 +21,33 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Api;
-use PYS_PRO_GLOBAL\GuzzleHttp\Client;
-use PYS_PRO_GLOBAL\GuzzleHttp\HandlerStack;
-use PYS_PRO_GLOBAL\GuzzleHttp\Handler\CurlHandler;
-class AsyncClient extends \PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide\Singleton
-{
-    protected $client = null;
-    public function __construct()
-    {
-        $handler_stack = \PYS_PRO_GLOBAL\GuzzleHttp\HandlerStack::create(new \PYS_PRO_GLOBAL\GuzzleHttp\Handler\CurlHandler(['options' => [\CURLOPT_CONNECTTIMEOUT => 10, \CURLOPT_TIMEOUT => 60, \CURLOPT_RETURNTRANSFER => \true, \CURLOPT_HEADER => \true, \CURLOPT_CAINFO => \PYS_PRO_GLOBAL\FacebookAds\Api::instance()->getHttpClient()->getCaBundlePath()]]));
-        $this->client = new \PYS_PRO_GLOBAL\GuzzleHttp\Client(['handler' => $handler_stack]);
-    }
-    public function getClient()
-    {
-        return $this->client;
-    }
+
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\CurlHandler;
+
+class AsyncClient extends Singleton {
+  protected $client = null;
+
+  public function __construct() {
+    $handler_stack = HandlerStack::create(new CurlHandler([
+      'options' => [
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 60,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_CAINFO => Api::instance()->getHttpClient()->getCaBundlePath(),
+      ]
+    ]));
+
+    $this->client = new Client(['handler' => $handler_stack]);
+  }
+
+  public function getClient() {
+    return $this->client;
+  }
 }

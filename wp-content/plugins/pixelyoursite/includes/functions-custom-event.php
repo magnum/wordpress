@@ -54,7 +54,7 @@ function renderTextInput( &$event, $key, $placeholder = '' ) {
  * @param string      $key
  * @param array       $options
  */
-function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
+function renderGroupSelectInput( &$event, $key, $groups, $full_width = false,$classes = '' ) {
 
     $attr_name  = "pys[event][$key]";
     $attr_id    = 'pys_event_' . $key;
@@ -64,7 +64,7 @@ function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
 
     ?>
 
-    <select class="form-control-sm" id="<?php esc_attr_e( $attr_id ); ?>"
+    <select class="form-control-sm <?=$classes?>" id="<?php esc_attr_e( $attr_id ); ?>"
             name="<?php esc_attr_e( $attr_name ); ?>" autocomplete="off" style="<?php esc_attr_e( $attr_width ); ?>">
 
         <?php foreach ($groups as $group => $options) :?>
@@ -80,7 +80,29 @@ function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
 
     <?php
 }
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ */
+function renderGoogleAnalyticsMergedActionInput( &$event, $key ) {
+    renderGroupSelectInput( $event, $key, $event->GAEvents, false,'action_merged_g4' );
+}
+function renderMergedGAParamInput( $key, $val ) {
 
+    $attr_name = "pys[event][ga_ads_params][$key]";
+    $attr_id = 'pys_event_ga_ads_' . $key;
+    $attr_value = $val;
+
+    ?>
+
+    <input type="text" name="<?php esc_attr_e( $attr_name ); ?>"
+           id="<?php esc_attr_e( $attr_id ); ?>"
+           value="<?php esc_attr_e( $attr_value ); ?>"
+           class="form-control">
+
+    <?php
+
+}
 /**
  * @param CustomEvent $event
  * @param string      $key
@@ -102,7 +124,41 @@ function renderGAParamInput( $key, $val ) {
     <?php
 
 }
+/**
+ * Output checkbox input
+ *
+ * @param      $key
+ * @param      $label
+ * @param bool $disabled
+ */
+function render_checkbox_input( &$event, $key, $label, $disabled = false ) {
 
+    $attr_name  = "pys[event][$key]";
+    $attr_value = $event->$key;
+
+    $classes = array( 'custom-control', 'custom-checkbox' );
+
+    if ( $disabled ) {
+        $attr_value = false;
+        $classes[] = 'disabled';
+    }
+
+    $classes = implode( ' ', $classes );
+
+    ?>
+
+    <label class="<?php esc_attr_e( $classes ); ?>">
+        <input type="hidden" name="<?php esc_attr_e( $attr_name ); ?>" value="0">
+        <input type="checkbox" name="<?php esc_attr_e( $attr_name ); ?>" value="1"
+               class="custom-control-input" <?php disabled( $disabled, true ); ?> <?php checked( $attr_value,
+            true ); ?> >
+        <span class="custom-control-indicator"></span>
+        <span class="custom-control-description"><?php echo wp_kses_post( $label ); ?></span>
+    </label>
+
+    <?php
+
+}
 /**
  * @param CustomEvent $event
  * @param string      $key
@@ -125,7 +181,29 @@ function renderNumberInput( &$event, $key, $placeholder = null ) {
 	<?php
 
 }
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ * @param string      $placeholder
+ */
+function renderTriggerNumberInput( $trigger, $key, $placeholder = null, $default = null ) {
 
+    $i = $trigger->getTriggerIndex();
+    $attr_name = "pys[event][triggers][$i][$key]";
+    $attr_id    = 'pys_event_' . $i . '_' . $key;
+    $attr_value = $trigger->getParam( $key );
+
+    ?>
+
+    <input type="number" name="<?php esc_attr_e( $attr_name ); ?>"
+           id="<?php esc_attr_e( $attr_id ); ?>"
+           value="<?php !empty($attr_value) ? esc_attr_e( $attr_value ) : esc_attr_e($default); ?>"
+           placeholder="<?php esc_attr_e( $placeholder ); ?>"
+           min="0" class="form-control">
+
+    <?php
+
+}
 /**
  * @param CustomEvent $event
  * @param string $key
@@ -206,22 +284,65 @@ function renderSelectInput( &$event, $key, $options, $full_width = false ) {
 	<?php
 }
 
+
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ * @param array       $options
+ */
+function renderTriggerSelectInput( $trigger, $key, $options, $full_width = false , $classes = '') {
+    $i = $trigger->getTriggerIndex();
+    $attr_name  = "pys[event][triggers][$i][$key]";
+    $attr_id    = 'pys_event_' . $i . '_' . $key;
+    $attr_value = $trigger->getParam($key);
+
+    $attr_width = $full_width ? 'width: 100%;' : '';
+
+    ?>
+
+    <select class="form-control-sm <?=$classes?>" id="<?php esc_attr_e( $attr_id ); ?>"
+            name="<?php esc_attr_e( $attr_name ); ?>" autocomplete="off" style="<?php esc_attr_e( $attr_width ); ?>">
+        <?php foreach ( $options as $option_key => $option_value ) : ?>
+            <option value="<?php echo esc_attr( $option_key ); ?>" <?php selected( $option_key,
+                esc_attr( $attr_value ) ); ?> <?php disabled( $option_key,
+                'disabled' ); ?>><?php echo esc_attr( $option_value ); ?></option>
+        <?php endforeach; ?>
+    </select>
+
+    <?php
+}
 /**
  * @param CustomEvent $event
  * @param string      $key
  */
-function renderTriggerTypeInput( &$event, $key ) {
+function renderTriggerTypeInput( $trigger, $key ) {
 
 	$options = array(
-        'page_visit'    => 'Page visit',
-        'url_click'     => 'Click on HTML link - PRO',
-        'css_click'     => 'Click on CSS selector - PRO',
-        'css_mouseover' => 'Mouse over CSS selector - PRO',
-        'scroll_pos'    => 'Page Scroll - PRO',
-        'post_type'    => 'Post type - PRO',
+		'page_visit'        => 'Page visit',
+        'home_page'         => 'Home page',
 	);
+    $pro_options = array(
+        'add_to_cart'       => 'WooCommerce add to cart - PRO',
+        'purchase'          => 'WooCommerce purchase - PRO',
+        'number_page_visit' => 'Number of Page Visits - PRO',
+        'url_click'         => 'Click on HTML link - PRO',
+        'css_click'         => 'Click on CSS selector - PRO',
+        'css_mouseover'     => 'Mouse over CSS selector - PRO',
+        'scroll_pos'        => 'Page Scroll - PRO',
+        'post_type'         => 'Post type - PRO',
+        'video_view'        => 'Embedded Video View - PRO',
+        'email_link'        => 'Email Link - PRO',
+    );
+    $eventsFormFactory = apply_filters("pys_form_event_factory",[]);
+    foreach ($eventsFormFactory as $activeFormPlugin) :
+        $options[$activeFormPlugin->getSlug()] = $activeFormPlugin->getName().' - PRO';
+    endforeach;
 
-	renderSelectInput( $event, $key, $options );
+	asort( $pro_options );
+
+    $options = array_merge($options,$pro_options);
+
+    renderTriggerSelectInput( $trigger, $key, $options, false, 'pys_event_trigger_type' );
 
 }
 /**
@@ -229,7 +350,7 @@ function renderTriggerTypeInput( &$event, $key ) {
  * @param string      $key
  */
 
-function renderPostTypeSelect(&$event, $key) {
+function renderPostTypeSelect($trigger,  $key) {
     $types = get_post_types(null,"objects ");
 
     $options = array();
@@ -237,7 +358,7 @@ function renderPostTypeSelect(&$event, $key) {
         $options[$type->name]=$type->label;
     }
 
-    renderSelectInput( $event, $key, $options );
+    renderTriggerSelectInput( $trigger, $key, $options );
 }
 /**
  * @param CustomEvent $event
@@ -404,4 +525,55 @@ function renderPinterestEventTypeInput( &$event, $key ) {
 	
 	renderSelectInput( $event, $key, $options );
 	
+}
+
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ */
+function renderGTMEventId( &$event, $key) {
+    $options = array();
+    $mainPixels = PixelYourSite\GTM()->getPixelIDs();
+    foreach ($mainPixels as $mainPixel) {
+        if (strpos($mainPixel, 'GTM-') === 0 && strpos($mainPixel, 'GTM-') !== false) {
+            $options[$mainPixel] = $mainPixel.' (global)';
+        }
+        else{
+            $options[$mainPixel] = $mainPixel.' (not supported)';
+        }
+
+    }
+
+    render_multi_select_input( $event, $key, $options );
+
+}
+
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ * @param string      $placeholder
+ */
+function renderGTMParamInput( $key, $val ) {
+
+    $attr_name = "pys[event][gtm_params][$key]";
+    $attr_id = 'pys_event_gtm_' . $key;
+    $attr_value = $val;
+
+    ?>
+
+    <input type="text" name="<?php esc_attr_e( $attr_name ); ?>"
+           id="<?php esc_attr_e( $attr_id ); ?>"
+           value="<?php esc_attr_e( $attr_value ); ?>"
+           class="form-control">
+
+    <?php
+
+}
+
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ */
+function renderGTMActionInput( &$event, $key ) {
+    renderGroupSelectInput( $event, $key, $event->GAEvents, false,'action_gtm' );
 }

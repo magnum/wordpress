@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductItemARDataFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemARDataSurfacesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemARDataSurfacesValues;
  * pull request for this class.
  *
  */
-class ProductItemARData extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return ProductItemARDataFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductItemARDataFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Surfaces'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductItemARDataSurfacesValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class ProductItemARData extends AbstractObject {
+
+  /**
+   * @return ProductItemARDataFields
+   */
+  public static function getFieldsEnum() {
+    return ProductItemARDataFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Surfaces'] = ProductItemARDataSurfacesValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

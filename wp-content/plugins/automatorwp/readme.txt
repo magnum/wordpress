@@ -1,17 +1,17 @@
-=== AutomatorWP - The most flexible and powerful no-code automation plugin for WordPress ===
-Contributors: automatorwp, rubengc, eneribs, pacogon, dioni00, flabernardez
-Tags: automator, automation, zapier, webhook, marketing
+=== AutomatorWP - Automator plugin for no-code automations, webhooks & custom integrations in WordPress ===
+Contributors: automatorwp, rubengc, eneribs, dioni00, tinocalvo, pacogon, flabernardez
+Tags: automator, automation, zapier, webhooks, marketing
 Requires at least: 4.4
-Tested up to: 6.1
-Stable tag: 2.5.9.1
+Tested up to: 6.7
+Stable tag: 5.1.3
 License: GNU AGPL v3.0
 License URI: http://www.gnu.org/licenses/agpl-3.0.html
 
-Automate and connect your WordPress plugins, sites and apps together to create automated workflows with no-code automations!
+Connect your WordPress plugins, sites & apps together to create automated workflows with the most powerful no-code automator plugin!
 
 == Description ==
 
-[AutomatorWP](https://automatorwp.com "AutomatorWP") is a flexible and open-source automator plugin that lets you connect your WordPress plugins together and create automated workflows.
+[AutomatorWP](https://automatorwp.com "AutomatorWP") is a flexible and open-source automator plugin that lets you connect your WordPress plugins, sites and apps together and create automations between them.
 
 You can create "automations" linked to your WordPress activities and when any of them happen, you can make other things happen accordingly.
 
@@ -92,7 +92,7 @@ Tags to pass dynamic information from triggers to actions (with support to user 
 **Developer-friendly:**
 AutomatorWP is extremely flexible with plenty of hooks to add custom features and functionalities.
 
-= Integrated with your favorites WordPress plugins =
+= Integrated with +200 WordPress plugins =
 
 AutomatorWP works with different WordPress plugins, including:
 
@@ -102,33 +102,45 @@ AutomatorWP works with different WordPress plugins, including:
 * [AffiliateWP](https://automatorwp.com/add-ons/affiliatewp/)
 * [Amelia](https://automatorwp.com/add-ons/ameliabooking/)
 * [AnsPress](https://automatorwp.com/add-ons/anspress/)
+* [ARForms](https://automatorwp.com/add-ons/arforms/)
+* [ARMember](https://automatorwp.com/add-ons/armember/)
 * [Autonami](https://automatorwp.com/add-ons/autonami/)
 * [Awesome Support](https://automatorwp.com/add-ons/awesome-support/)
 * [bbPress](https://automatorwp.com/add-ons/bbpress/)
+* [Better Messages](https://automatorwp.com/add-ons/better-messages/)
 * [Blockli](https://automatorwp.com/add-ons/blockli/)
 * [BuddyBoss](https://automatorwp.com/add-ons/buddyboss/)
 * [BuddyPress](https://automatorwp.com/add-ons/buddypress/)
 * [Caldera Forms](https://automatorwp.com/add-ons/caldera-forms/)
+* [Code Snippets](https://automatorwp.com/add-ons/code-snippets/)
 * [Contact Form 7](https://automatorwp.com/add-ons/contact-form-7/)
+* [Charitable](https://automatorwp.com/add-ons/charitable/)
 * [DigiMember](https://automatorwp.com/add-ons/digimember/)
 * [Divi](https://automatorwp.com/add-ons/divi/)
 * [Download Manager](https://automatorwp.com/add-ons/download-manager/)
+* [Easy Affiliate](https://automatorwp.com/add-ons/easy-affiliate/)
 * [Easy Digital Downloads](https://automatorwp.com/add-ons/easy-digital-downloads/)
 * [Elementor](https://automatorwp.com/add-ons/elementor-forms/)
+* [Everest Forms](https://automatorwp.com/add-ons/everest-forms/)
 * [Favorites](https://automatorwp.com/add-ons/favorites/)
 * [FluentCRM](https://automatorwp.com/add-ons/fluentcrm/)
 * [Fluent Support](https://automatorwp.com/add-ons/fluent-support/)
 * [Formidable Forms](https://automatorwp.com/add-ons/formidable-forms/)
 * [Forminator](https://automatorwp.com/add-ons/forminator/)
 * [GamiPress](https://automatorwp.com/add-ons/gamipress/)
+* [GeoDirectory](https://automatorwp.com/add-ons/geodirectory/)
 * [Gravity Forms](https://automatorwp.com/add-ons/gravity-forms/)
+* [Gravity Kit](https://automatorwp.com/add-ons/gravity-kit/)
 * [Groundhogg](https://automatorwp.com/add-ons/groundhogg/)
 * [H5P](https://automatorwp.com/add-ons/h5p/)
 * [HappyForms](https://automatorwp.com/add-ons/happyforms/)
 * [iMember360](https://automatorwp.com/add-ons/imember360/)
 * [Invite Anyone](https://automatorwp.com/add-ons/invite-anyone/)
 * [Jetpack CRM](https://automatorwp.com/add-ons/jetpack-crm/)
+* [JetEngine](https://automatorwp.com/add-ons/jetengine/)
 * [JetFormBuilder](https://automatorwp.com/add-ons/jetformbuilder/)
+* [Kadence Blocks](https://automatorwp.com/add-ons/kadence-blocks/)
+* [Kali Forms](https://automatorwp.com/add-ons/kali-forms/)
 * [LearnDash](https://automatorwp.com/add-ons/learndash/)
 * [LearnPress](https://automatorwp.com/add-ons/learnpress/)
 * [LifterLMS](https://automatorwp.com/add-ons/lifterlms/)
@@ -143,18 +155,28 @@ AutomatorWP works with different WordPress plugins, including:
 * [PeepSo](https://automatorwp.com/add-ons/peepso/)
 * [Popup Maker](https://automatorwp.com/add-ons/popup-maker/)
 * [Presto Player](https://automatorwp.com/add-ons/presto-player/)
+* [PrettyLinks](https://automatorwp.com/add-ons/pretty-link/)
+* [Quiz and Survey Master](https://automatorwp.com/add-ons/qsm/)
 * [Restrict Content Pro](https://automatorwp.com/add-ons/restrict-content-pro/)
 * [Sensei LMS](https://automatorwp.com/add-ons/sensei-lms/)
 * [SliceWP](https://automatorwp.com/add-ons/slicewp/)
 * [Studiocart](https://automatorwp.com/add-ons/studiocart/)
+* [SureCart](https://automatorwp.com/add-ons/surecart/)
 * [The Events Calendar](https://automatorwp.com/add-ons/the-events-calendar/)
 * [Thrive Apprentice](https://automatorwp.com/add-ons/thrive-apprentice/)
+* [Thrive Cart](https://automatorwp.com/add-ons/thrive-cart/)
+* [Thrive Leads](https://automatorwp.com/add-ons/thrive-leads/)
+* [Thrive Ovation](https://automatorwp.com/add-ons/thrive-ovation/)
 * [Thrive Quiz Builder](https://automatorwp.com/add-ons/thrive-quiz-builder/)
 * [Tutor LMS](https://automatorwp.com/add-ons/tutor/)
 * [Ultimate Member](https://automatorwp.com/add-ons/ultimate-member/)
 * [Upsell Plugin](https://automatorwp.com/add-ons/upsell-plugin/)
 * [WhishList Member](https://automatorwp.com/add-ons/wishlist-member/)
+* [weForms](https://automatorwp.com/add-ons/weforms/)
 * [WooCommerce](https://automatorwp.com/add-ons/woocommerce/)
+* [WooCommerce Shipstation](https://automatorwp.com/add-ons/woocommerce-shipstation/)
+* [WP All Import](https://automatorwp.com/add-ons/wp-all-import/)
+* [WP Booking Calendar](https://automatorwp.com/add-ons/wp-booking-calendar/)
 * [WP Fluent Forms](https://automatorwp.com/add-ons/fluentform/)
 * [WP Fusion](https://automatorwp.com/add-ons/wp-fusion/)
 * [WP Job Manager](https://automatorwp.com/add-ons/wp-job-manager/)
@@ -164,6 +186,7 @@ AutomatorWP works with different WordPress plugins, including:
 * [WP Ulike](https://automatorwp.com/add-ons/wp-ulike/)
 * [WP User Manager](https://automatorwp.com/add-ons/wp-user-manager/)
 * [WPAdverts](https://automatorwp.com/add-ons/wpadverts/)
+* [WPCode](https://automatorwp.com/add-ons/wpcode/)
 * [wpDiscuz](https://automatorwp.com/add-ons/wpdiscuz/)
 * [WPForms](https://automatorwp.com/add-ons/wpforms/)
 * [WPLMS](https://automatorwp.com/add-ons/wplms/)
@@ -175,6 +198,8 @@ AutomatorWP can also work with external platforms, furthermore WordPress plugins
 
 * [ActiveCampaign](https://automatorwp.com/add-ons/activecampaign/)
 * [Airtable](https://automatorwp.com/add-ons/airtable/)
+* [ClickUp](https://automatorwp.com/add-ons/clickup/)
+* [ConvertKit](https://automatorwp.com/add-ons/covertkit/)
 * [Facebook](https://automatorwp.com/add-ons/facebook/)
 * [HubSpot](https://automatorwp.com/add-ons/hubspot/)
 * [Google Calendar](https://automatorwp.com/add-ons/google-calendar/)
@@ -184,10 +209,12 @@ AutomatorWP can also work with external platforms, furthermore WordPress plugins
 * [Integromat](https://automatorwp.com/add-ons/integromat/)
 * [KonnectzIT](https://automatorwp.com/add-ons/konnectzit/)
 * [Mailchimp](https://automatorwp.com/add-ons/mailchimp/)
+* [MailerLite](https://automatorwp.com/add-ons/mailerlite/)
 * [Make](https://automatorwp.com/add-ons/make/)
 * [Notion](https://automatorwp.com/add-ons/notion/)
 * [Twilio](https://automatorwp.com/add-ons/twilio/)
 * [Twitter](https://automatorwp.com/add-ons/twitter/)
+* [Typeform](https://automatorwp.com/add-ons/typeform/)
 * [Zapier](https://automatorwp.com/add-ons/zapier/)
 * [Zoom](https://automatorwp.com/add-ons/zoom/)
 
@@ -197,6 +224,10 @@ If you’re looking for something endorsed and maintained by the developers who 
 
 * [Webhooks](https://automatorwp.com/add-ons/webhooks/): Send and receive data from webhooks to connect all your plugins with web services like Zapier or Integromat or even to connect different WordPress sites.
 * [Schedule Actions](https://automatorwp.com/add-ons/schedule-actions/): Schedule any action to run after a time delay of your choice.
+* [Calculator](https://automatorwp.com/add-ons/calculator/): can perform mathematical calculations on tags like sums, subtractions, multiplications, divisions and even apply functions such as abs, sin, cos among others.
+* [Formatter](https://automatorwp.com/add-ons/formatter/): is able to apply different formats to tags like convert, replace or extract anything from strings, numbers or dates even remove the HTML from a content.
+* [Generator](https://automatorwp.com/add-ons/generator/): lets you generate content like random strings, random numbers, emails even hashes and WordPress nonces.
+* [QR Code](https://automatorwp.com/add-ons/qr-code/): will create QR codes from links or texts with different styles, formats and colors.
 * [Multimedia Content](https://automatorwp.com/add-ons/multimedia-content/): New triggers based on multimedia content creation and interaction.
 * [Block Users](https://automatorwp.com/add-ons/block-users/): Block users and roles for being able to complete any automation of your choice.
 * [Button](https://automatorwp.com/add-ons/button/) & [Link](https://automatorwp.com/add-ons/link/): Launch any automation through buttons and links clicks.
@@ -205,7 +236,13 @@ If you’re looking for something endorsed and maintained by the developers who 
 
 = Included triggers, actions and filters =
 
-AutomatorWP includes +200 triggers, actions and filters for free, all of them listed [here](https://automatorwp.com/all-triggers-and-actions/).
+AutomatorWP includes +600 triggers, actions and filters from +200 plugins & platforms for free, all of them listed [here](https://automatorwp.com/all-triggers-and-actions/).
+
+= More plugins from the AutomatorWP team =
+
+If you like AutomatorWP, you will love [GamiPress](https://wordpress.org/plugins/gamipress/)! The most flexible gamification plugin to reward points, achievements, badges & ranks in WordPress based on your users activity from +200 plugins.
+
+[More about GamiPress](https://wordpress.org/plugins/gamipress/)
 
 == Installation ==
 
@@ -290,67 +327,100 @@ No, We're unable to provide custom development services, as our focus is develop
 
 == Changelog ==
 
-= 2.5.9.1 =
+= 5.1.3 =
 
 * **Improvements**
-* Improved escaping of SQL queries.
+* Improved role selection in triggers and actions.
+* Improved scheduled automations to avoid duplicate executions.
 
-= 2.5.9 =
+= 5.1.2 =
 
-* **Improvements**
-* Added more nonce checks to prevent CSRF attacks.
-* Added more sanitization checks to database queries.
+* **Developer note**
+* Updated minifid JS files.
 
-= 2.5.8 =
-
-* **Improvements**
-* AffiliateWP: Updated "User becomes an affiliate" trigger to adapt to AffiliateWP new version.
-
-= 2.5.7 =
+= 5.1.1 =
 
 * **Improvements**
-* WordPress: New field to update Display Name on action "Update User".
+* Prevent to block automations UI if can not connect with automatorwp.com.
 
-= 2.5.6 =
+= 5.1.0 =
 
-* **Bug Fixes**
-* Fixed logs clean up recurring schedule when Action Scheduler is active.
+* **Bug fixes**
+* Fixed vulnerability related to importing automations.
 
-= 2.5.5 =
+= 5.0.9 =
+
+* **Bug fixes**
+* LearnPress: Fixed bug related Enroll user in course action.
+
+= 5.0.8 =
+
+* **New Features**
+* New integration: Geodirectory.
+* Geodirectory: New trigger: User reviews a place.
+* Geodirectory: New trigger: User adds a new place.
+* Geodirectory: New trigger: Guest reviews a place.
+* New integration: Quiz and Survey Master.
+* Quiz and Survey Master: New trigger: User submits a Quiz.
+* Quiz and Survey Master: New trigger: Guest submits a Quiz.
+* New integration: Booking Calendar.
+* WP Booking Calendar: New trigger: A booking is approved.
+* WP Booking Calendar: New trigger: A booking is cancelled.
+
+= 5.0.7 =
+
+* **Bug fixes**
+* GamiPress: Fixed bug related to Earn points action.
+
+= 5.0.6 =
 
 * **Improvements**
-* Performance improvements while loading integrations.
-* Added an extra check to prevent issues if an old integration is active.
-* Removed backward compatibility for free integrations since they have been removed 1 year ago.
+* Generator: Check to avoid false positives in security plugins.
 
-= 2.5.4 =
+= 5.0.5 =
 
+* **Improvements**
+* Generator: Check to avoid false positives in security plugins.
+
+= 5.0.4 =
+
+* **Improvements**
+* MailerLite: Added support to MailerLite Classic.
 * **Developer Notes**
-* Added new hooks to extend the automation clone functionality.
+* Fixed typo.
+
+= 5.0.3 =
+
 * **Bug Fixes**
-* ActiveCampaign: Fixed a PHP warning related to webhooks.
+* Fixed tag replacement in trigger filters.
 
-= 2.5.3 =
-
-* **Improvements**
-* Improved the auto logs cleanup to work even with large amounts of logs entries.
-
-= 2.5.2 =
+= 5.0.2 =
 
 * **Improvements**
-* BuddyBoss: Added check for updated activities to avoid send notifications.
+* Formatter: Nested tags support.
+* Generator: Nested tags support.
 
-= 2.5.1 =
+= 5.0.1 =
 
+* **New Features**
+* New integration: Everest Forms.
+* Everest Forms: New trigger: User submits a form.
+* Everest Forms: New trigger: Guest submits a form.
 * **Improvements**
-* Added more nonce checks to prevent CSRF attacks.
+* Added check in Custom Tables library.
+* Added CSS improvement.
 
-= 2.5.0 =
+= 5.0.0 =
 
+* **New Features**
+* Tags now supported in triggers (even all users and all posts setup).
+* Generator: Added {generate_hash( VALUE : ALGORITHM )} tag.
+* Generator: Added {generate_nonce( ACTION )} tag.
+* Formatter: Added {floor( VALUE )} tag.
+* Formatter: Added {ceil( VALUE )} tag.
+* Formatter: Added {lowercase( VALUE )} tag.
+* Formatter: Added {uppercase( VALUE )} tag.
 * **Improvements**
-* Meta Box: Added support for custom types.
-* **Bug Fixes**
-* FluentCRM: Fixed function to get the WordPress user ID.
-* WP Fusion: Fixed triggers to handle "Any" tag.
+* Generator: Improved hash selector.
 * **Developer Notes**
 * Moved old changelog to changelog.txt.

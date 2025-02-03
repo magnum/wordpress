@@ -73,6 +73,13 @@
   },
   "title": "Post Carousel (CoBlocks)",
   "textdomain": "coblocks",
-  "editorScript": "blocks-11",
-  "description": "Display posts or an external blog feed as a carousel."
+  "description": "Display posts or an external blog feed as a carousel.",
+  "editorScript": [
+    "coblocks-11"
+  ],
+  "viewScript": [
+    "coblocks-tiny-swiper",
+    "coblocks-post-carousel"
+  ],
+  "render": "index.php"
 }

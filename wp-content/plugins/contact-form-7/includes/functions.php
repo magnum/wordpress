@@ -134,7 +134,7 @@ function wpcf7_array_flatten( $input ) {
  */
 function wpcf7_exclude_blank( $input ) {
 	$output = array_filter( $input,
-		function ( $i ) {
+		static function ( $i ) {
 			return isset( $i ) && '' !== $i;
 		}
 	);
@@ -147,11 +147,11 @@ function wpcf7_exclude_blank( $input ) {
  * Creates a comma-separated list from a multi-dimensional array.
  *
  * @param mixed $input Array or item of array.
- * @param string|array $args Optional. Output options.
+ * @param string|array $options Optional. Output options.
  * @return string Comma-separated list.
  */
-function wpcf7_flat_join( $input, $args = '' ) {
-	$args = wp_parse_args( $args, array(
+function wpcf7_flat_join( $input, $options = '' ) {
+	$options = wp_parse_args( $options, array(
 		'separator' => ', ',
 	) );
 
@@ -164,7 +164,7 @@ function wpcf7_flat_join( $input, $args = '' ) {
 		}
 	}
 
-	return implode( $args['separator'], $output );
+	return implode( $options['separator'], $output );
 }
 
 
@@ -210,10 +210,14 @@ function wpcf7_validate_configuration() {
 
 
 /**
- * Returns true if wpcf7_autop() is applied to form content.
+ * Returns true if wpcf7_autop() is applied.
  */
-function wpcf7_autop_or_not() {
-	return (bool) apply_filters( 'wpcf7_autop_or_not', WPCF7_AUTOP );
+function wpcf7_autop_or_not( $options = '' ) {
+	$options = wp_parse_args( $options, array(
+		'for' => 'form',
+	) );
+
+	return (bool) apply_filters( 'wpcf7_autop_or_not', WPCF7_AUTOP, $options );
 }
 
 
@@ -238,16 +242,16 @@ function wpcf7_load_css() {
  *
  * @param string $url Link URL.
  * @param string $anchor_text Anchor label text.
- * @param string|array $args Optional. Link options.
+ * @param string|array $atts Optional. HTML attributes.
  * @return string Formatted anchor element.
  */
-function wpcf7_link( $url, $anchor_text, $args = '' ) {
-	$args = wp_parse_args( $args, array(
+function wpcf7_link( $url, $anchor_text, $atts = '' ) {
+	$atts = wp_parse_args( $atts, array(
 		'id' => null,
 		'class' => null,
 	) );
 
-	$atts = array_merge( $args, array(
+	$atts = array_merge( $atts, array(
 		'href' => esc_url( $url ),
 	) );
 
@@ -267,6 +271,7 @@ function wpcf7_get_request_uri() {
 
 	if ( empty( $request_uri ) ) {
 		$request_uri = add_query_arg( array() );
+		$request_uri = '/' . ltrim( $request_uri, '/' );
 	}
 
 	return sanitize_url( $request_uri );
@@ -289,22 +294,20 @@ function wpcf7_register_post_types() {
 /**
  * Returns the version string of this plugin.
  *
- * @param string|array $args Optional. Output options.
+ * @param string|array $options Optional. Output options.
  * @return string Version string.
  */
-function wpcf7_version( $args = '' ) {
-	$defaults = array(
+function wpcf7_version( $options = '' ) {
+	$options = wp_parse_args( $options, array(
 		'limit' => -1,
 		'only_major' => false,
-	);
+	) );
 
-	$args = wp_parse_args( $args, $defaults );
-
-	if ( $args['only_major'] ) {
-		$args['limit'] = 2;
+	if ( $options['only_major'] ) {
+		$options['limit'] = 2;
 	}
 
-	$args['limit'] = (int) $args['limit'];
+	$options['limit'] = (int) $options['limit'];
 
 	$ver = WPCF7_VERSION;
 	$ver = strtr( $ver, '_-+', '...' );
@@ -313,8 +316,8 @@ function wpcf7_version( $args = '' ) {
 	$ver = trim( $ver, '.' );
 	$ver = explode( '.', $ver );
 
-	if ( -1 < $args['limit'] ) {
-		$ver = array_slice( $ver, 0, $args['limit'] );
+	if ( -1 < $options['limit'] ) {
+		$ver = array_slice( $ver, 0, $options['limit'] );
 	}
 
 	$ver = implode( '.', $ver );
@@ -428,15 +431,15 @@ function wpcf7_rmdir_p( $dir ) {
  *
  * @link https://developer.wordpress.org/reference/functions/_http_build_query/
  *
- * @param array $args URL query parameters.
+ * @param array $data URL query parameters.
  * @param string $key Optional. If specified, used to prefix key name.
  * @return string Query string.
  */
-function wpcf7_build_query( $args, $key = '' ) {
+function wpcf7_build_query( $data, $key = '' ) {
 	$sep = '&';
 	$ret = array();
 
-	foreach ( (array) $args as $k => $v ) {
+	foreach ( (array) $data as $k => $v ) {
 		$k = urlencode( $k );
 
 		if ( ! empty( $key ) ) {
@@ -515,26 +518,21 @@ function wpcf7_is_localhost() {
  * @param string $replacement The function that should have been called.
  */
 function wpcf7_deprecated_function( $function_name, $version, $replacement ) {
-	if ( WP_DEBUG ) {
-		if ( function_exists( '__' ) ) {
-			trigger_error(
-				sprintf(
-					/* translators: 1: PHP function name, 2: version number, 3: alternative function name */
-					__( 'Function %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s! Use %3$s instead.', 'contact-form-7' ),
-					$function_name, $version, $replacement
-				),
-				E_USER_DEPRECATED
-			);
-		} else {
-			trigger_error(
-				sprintf(
-					'Function %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s! Use %3$s instead.',
-					$function_name, $version, $replacement
-				),
-				E_USER_DEPRECATED
-			);
-		}
+
+	if ( ! WP_DEBUG ) {
+		return;
 	}
+
+	if ( function_exists( '__' ) ) {
+		/* translators: 1: PHP function name, 2: version number, 3: alternative function name */
+		$message = __( 'Function %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s! Use %3$s instead.', 'contact-form-7' );
+	} else {
+		$message = 'Function %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s! Use %3$s instead.';
+	}
+
+	$message = sprintf( $message, $function_name, $version, $replacement );
+
+	wp_trigger_error( '', $message, E_USER_DEPRECATED );
 }
 
 
@@ -555,7 +553,8 @@ function wpcf7_apply_filters_deprecated( $hook_name, $args, $version, $replaceme
 
 	if ( WP_DEBUG and apply_filters( 'deprecated_hook_trigger_error', true ) ) {
 		if ( $replacement ) {
-			trigger_error(
+			wp_trigger_error(
+				'',
 				sprintf(
 					/* translators: 1: WordPress hook name, 2: version number, 3: alternative hook name */
 					__( 'Hook %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s! Use %3$s instead.', 'contact-form-7' ),
@@ -566,7 +565,8 @@ function wpcf7_apply_filters_deprecated( $hook_name, $args, $version, $replaceme
 				E_USER_DEPRECATED
 			);
 		} else {
-			trigger_error(
+			wp_trigger_error(
+				'',
 				sprintf(
 					/* translators: 1: WordPress hook name, 2: version number */
 					__( 'Hook %1$s is <strong>deprecated</strong> since Contact Form 7 version %2$s with no alternative available.', 'contact-form-7' ),
@@ -591,44 +591,49 @@ function wpcf7_apply_filters_deprecated( $hook_name, $args, $version, $replaceme
  *                        was added.
  */
 function wpcf7_doing_it_wrong( $function_name, $message, $version ) {
-	if ( WP_DEBUG ) {
-		if ( function_exists( '__' ) ) {
-			if ( $version ) {
-				$version = sprintf(
-					/* translators: %s: Contact Form 7 version number. */
-					__( '(This message was added in Contact Form 7 version %s.)', 'contact-form-7' ),
-					$version
-				);
-			}
 
-			trigger_error(
-				sprintf(
-					/* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: Contact Form 7 version number. */
-					__( 'Function %1$s was called incorrectly. %2$s %3$s', 'contact-form-7' ),
-					$function_name,
-					$message,
-					$version
-				),
-				E_USER_NOTICE
-			);
-		} else {
-			if ( $version ) {
-				$version = sprintf(
-					'(This message was added in Contact Form 7 version %s.)',
-					$version
-				);
-			}
+	if ( ! WP_DEBUG ) {
+		return;
+	}
 
-			trigger_error(
-				sprintf(
-					'Function %1$s was called incorrectly. %2$s %3$s',
-					$function_name,
-					$message,
-					$version
-				),
-				E_USER_NOTICE
+	if ( function_exists( '__' ) ) {
+		if ( $version ) {
+			$version = sprintf(
+				/* translators: %s: Contact Form 7 version number. */
+				__( '(This message was added in Contact Form 7 version %s.)', 'contact-form-7' ),
+				$version
 			);
 		}
+
+		wp_trigger_error(
+			'',
+			sprintf(
+				/* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: Contact Form 7 version number. */
+				__( 'Function %1$s was called incorrectly. %2$s %3$s', 'contact-form-7' ),
+				$function_name,
+				$message,
+				$version
+			),
+			E_USER_NOTICE
+		);
+	} else {
+		if ( $version ) {
+			$version = sprintf(
+				'(This message was added in Contact Form 7 version %s.)',
+				$version
+			);
+		}
+
+		wp_trigger_error(
+			'',
+			sprintf(
+				'Function %1$s was called incorrectly. %2$s %3$s',
+				$function_name,
+				$message,
+				$version
+			),
+			E_USER_NOTICE
+		);
 	}
 }
 
@@ -641,6 +646,11 @@ function wpcf7_doing_it_wrong( $function_name, $message, $version ) {
  * @param array|WP_Error $response The response or WP_Error on failure.
  */
 function wpcf7_log_remote_request( $url, $request, $response ) {
+
+	if ( ! WP_DEBUG ) {
+		return;
+	}
+
 	$log = sprintf(
 		/* translators: 1: response code, 2: message, 3: body, 4: URL */
 		__( 'HTTP Response: %1$s %2$s %3$s from %4$s', 'contact-form-7' ),
@@ -655,7 +665,7 @@ function wpcf7_log_remote_request( $url, $request, $response ) {
 	);
 
 	if ( $log ) {
-		trigger_error( $log );
+		wp_trigger_error( '', $log, E_USER_NOTICE );
 	}
 }
 

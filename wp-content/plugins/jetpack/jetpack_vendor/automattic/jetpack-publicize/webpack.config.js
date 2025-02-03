@@ -4,11 +4,11 @@ const jetpackWebpackConfig = require( '@automattic/jetpack-webpack-config/webpac
 module.exports = [
 	{
 		entry: {
-			[ 'classic-editor-share-limits' ]: './src/js/classic-editor-share-limits.js',
-			[ 'classic-editor-connections' ]: './src/js/classic-editor-connections.js',
+			'classic-editor-share-limits': './src/js/classic-editor-share-limits.js',
+			'classic-editor-connections': './src/js/classic-editor-connections.js',
 		},
 		mode: jetpackWebpackConfig.mode,
-		devtool: jetpackWebpackConfig.isProduction ? false : 'source-map',
+		devtool: jetpackWebpackConfig.devtool,
 		output: {
 			...jetpackWebpackConfig.output,
 			path: path.resolve( './build' ),

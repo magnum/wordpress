@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemConditionValues getInstance()
  */
-class ProductItemConditionValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CPO = 'cpo';
-    const VALUE_NEW = 'new';
-    const OPEN_BOX_NEW = 'open_box_new';
-    const REFURBISHED = 'refurbished';
-    const USED = 'used';
-    const USED_FAIR = 'used_fair';
-    const USED_GOOD = 'used_good';
-    const USED_LIKE_NEW = 'used_like_new';
+class ProductItemConditionValues extends AbstractEnum {
+
+  const CPO = 'cpo';
+  const VALUE_NEW = 'new';
+  const OPEN_BOX_NEW = 'open_box_new';
+  const REFURBISHED = 'refurbished';
+  const USED = 'used';
+  const USED_FAIR = 'used_fair';
+  const USED_GOOD = 'used_good';
+  const USED_LIKE_NEW = 'used_like_new';
 }

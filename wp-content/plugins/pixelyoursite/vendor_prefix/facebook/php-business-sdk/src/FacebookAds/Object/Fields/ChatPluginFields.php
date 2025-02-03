@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,22 +34,36 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ChatPluginFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ALIGNMENT = 'alignment';
-    const DESKTOP_BOTTOM_SPACING = 'desktop_bottom_spacing';
-    const DESKTOP_SIDE_SPACING = 'desktop_side_spacing';
-    const ENTRY_POINT_ICON = 'entry_point_icon';
-    const ENTRY_POINT_LABEL = 'entry_point_label';
-    const GREETING_DIALOG_DISPLAY = 'greeting_dialog_display';
-    const GUEST_CHAT_MODE = 'guest_chat_mode';
-    const MOBILE_BOTTOM_SPACING = 'mobile_bottom_spacing';
-    const MOBILE_CHAT_DISPLAY = 'mobile_chat_display';
-    const MOBILE_SIDE_SPACING = 'mobile_side_spacing';
-    const THEME_COLOR = 'theme_color';
-    const WELCOME_SCREEN_GREETING = 'welcome_screen_greeting';
-    public function getFieldTypes()
-    {
-        return array('alignment' => 'string', 'desktop_bottom_spacing' => 'string', 'desktop_side_spacing' => 'string', 'entry_point_icon' => 'string', 'entry_point_label' => 'string', 'greeting_dialog_display' => 'string', 'guest_chat_mode' => 'string', 'mobile_bottom_spacing' => 'string', 'mobile_chat_display' => 'string', 'mobile_side_spacing' => 'string', 'theme_color' => 'string', 'welcome_screen_greeting' => 'string');
-    }
+
+class ChatPluginFields extends AbstractEnum {
+
+  const ALIGNMENT = 'alignment';
+  const DESKTOP_BOTTOM_SPACING = 'desktop_bottom_spacing';
+  const DESKTOP_SIDE_SPACING = 'desktop_side_spacing';
+  const ENTRY_POINT_ICON = 'entry_point_icon';
+  const ENTRY_POINT_LABEL = 'entry_point_label';
+  const GREETING_DIALOG_DISPLAY = 'greeting_dialog_display';
+  const GUEST_CHAT_MODE = 'guest_chat_mode';
+  const MOBILE_BOTTOM_SPACING = 'mobile_bottom_spacing';
+  const MOBILE_CHAT_DISPLAY = 'mobile_chat_display';
+  const MOBILE_SIDE_SPACING = 'mobile_side_spacing';
+  const THEME_COLOR = 'theme_color';
+  const WELCOME_SCREEN_GREETING = 'welcome_screen_greeting';
+
+  public function getFieldTypes() {
+    return array(
+      'alignment' => 'string',
+      'desktop_bottom_spacing' => 'string',
+      'desktop_side_spacing' => 'string',
+      'entry_point_icon' => 'string',
+      'entry_point_label' => 'string',
+      'greeting_dialog_display' => 'string',
+      'guest_chat_mode' => 'string',
+      'mobile_bottom_spacing' => 'string',
+      'mobile_chat_display' => 'string',
+      'mobile_side_spacing' => 'string',
+      'theme_color' => 'string',
+      'welcome_screen_greeting' => 'string',
+    );
+  }
 }

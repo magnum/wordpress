@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,12 +35,12 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemImageFetchStatusValues getInstance()
  */
-class ProductItemImageFetchStatusValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DIRECT_UPLOAD = 'DIRECT_UPLOAD';
-    const FETCHED = 'FETCHED';
-    const FETCH_FAILED = 'FETCH_FAILED';
-    const NO_STATUS = 'NO_STATUS';
-    const OUTDATED = 'OUTDATED';
-    const PARTIAL_FETCH = 'PARTIAL_FETCH';
+class ProductItemImageFetchStatusValues extends AbstractEnum {
+
+  const DIRECT_UPLOAD = 'DIRECT_UPLOAD';
+  const FETCHED = 'FETCHED';
+  const FETCH_FAILED = 'FETCH_FAILED';
+  const NO_STATUS = 'NO_STATUS';
+  const OUTDATED = 'OUTDATED';
+  const PARTIAL_FETCH = 'PARTIAL_FETCH';
 }

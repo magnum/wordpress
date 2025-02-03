@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class TargetingGeoLocationPlaceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNTRY = 'country';
-    const DISTANCE_UNIT = 'distance_unit';
-    const KEY = 'key';
-    const LATITUDE = 'latitude';
-    const LONGITUDE = 'longitude';
-    const NAME = 'name';
-    const PRIMARY_CITY_ID = 'primary_city_id';
-    const RADIUS = 'radius';
-    const REGION_ID = 'region_id';
-    public function getFieldTypes()
-    {
-        return array('country' => 'string', 'distance_unit' => 'string', 'key' => 'string', 'latitude' => 'float', 'longitude' => 'float', 'name' => 'string', 'primary_city_id' => 'int', 'radius' => 'float', 'region_id' => 'int');
-    }
+
+class TargetingGeoLocationPlaceFields extends AbstractEnum {
+
+  const COUNTRY = 'country';
+  const DISTANCE_UNIT = 'distance_unit';
+  const KEY = 'key';
+  const LATITUDE = 'latitude';
+  const LONGITUDE = 'longitude';
+  const NAME = 'name';
+  const PRIMARY_CITY_ID = 'primary_city_id';
+  const RADIUS = 'radius';
+  const REGION_ID = 'region_id';
+
+  public function getFieldTypes() {
+    return array(
+      'country' => 'string',
+      'distance_unit' => 'string',
+      'key' => 'string',
+      'latitude' => 'float',
+      'longitude' => 'float',
+      'name' => 'string',
+      'primary_city_id' => 'int',
+      'radius' => 'float',
+      'region_id' => 'int',
+    );
+  }
 }

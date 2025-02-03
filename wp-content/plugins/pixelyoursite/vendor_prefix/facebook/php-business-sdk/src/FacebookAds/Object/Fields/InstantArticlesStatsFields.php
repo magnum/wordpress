@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class InstantArticlesStatsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ERROR = 'error';
-    const METADATA = 'metadata';
-    const METRIC = 'metric';
-    const TOTALS = 'totals';
-    const X_AXIS_BREAKDOWN = 'x_axis_breakdown';
-    public function getFieldTypes()
-    {
-        return array('error' => 'string', 'metadata' => 'map<string, Object>', 'metric' => 'Object', 'totals' => 'map<string, Object>', 'x_axis_breakdown' => 'list<map<string, Object>>');
-    }
+
+class InstantArticlesStatsFields extends AbstractEnum {
+
+  const ERROR = 'error';
+  const METADATA = 'metadata';
+  const METRIC = 'metric';
+  const TOTALS = 'totals';
+  const X_AXIS_BREAKDOWN = 'x_axis_breakdown';
+
+  public function getFieldTypes() {
+    return array(
+      'error' => 'string',
+      'metadata' => 'map<string, Object>',
+      'metric' => 'Object',
+      'totals' => 'map<string, Object>',
+      'x_axis_breakdown' => 'list<map<string, Object>>',
+    );
+  }
 }

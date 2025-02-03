@@ -4,10 +4,11 @@
  * Description: CoBlocks is a suite of professional <strong>page building content blocks</strong> for the WordPress Gutenberg block editor. Our blocks are hyper-focused on empowering makers to build beautifully rich pages in WordPress.
  * Author: GoDaddy
  * Author URI: https://www.godaddy.com
- * Version: 2.25.5
+ * Version: 3.1.14
  * Text Domain: coblocks
  * Domain Path: /languages
- * Tested up to: 6.1
+ * Tested up to: 6.7
+ * Requires at least: 6.3
  *
  * CoBlocks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'COBLOCKS_VERSION', '2.25.5' );
+define( 'COBLOCKS_VERSION', '3.1.14' );
 define( 'COBLOCKS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COBLOCKS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'COBLOCKS_PLUGIN_FILE', __FILE__ );
@@ -110,7 +111,6 @@ if ( ! class_exists( 'CoBlocks' ) ) :
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-register-blocks.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-generated-styles.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-body-classes.php';
-			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-form.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-font-loader.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-post-meta.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'includes/class-coblocks-google-map-block.php';
@@ -126,6 +126,9 @@ if ( ! class_exists( 'CoBlocks' ) ) :
 			// Require CoBlocks custom filters.
 			require_once COBLOCKS_PLUGIN_DIR . 'src/components/gutter-control/gutter-wrapper.php';
 			require_once COBLOCKS_PLUGIN_DIR . 'src/components/form-label-colors/label-color-wrapper.php';
+
+			// Forced Block Migration Processor.
+			require_once COBLOCKS_PLUGIN_DIR . 'includes/block-migrate/loader.php';
 
 			if ( is_admin() ) {
 				require_once COBLOCKS_PLUGIN_DIR . 'src/extensions/layout-selector/index.php';

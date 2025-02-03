@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class TargetingGeoLocationMarketFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNTRY = 'country';
-    const KEY = 'key';
-    const MARKET_TYPE = 'market_type';
-    const NAME = 'name';
-    public function getFieldTypes()
-    {
-        return array('country' => 'string', 'key' => 'string', 'market_type' => 'string', 'name' => 'string');
-    }
+
+class TargetingGeoLocationMarketFields extends AbstractEnum {
+
+  const COUNTRY = 'country';
+  const KEY = 'key';
+  const MARKET_TYPE = 'market_type';
+  const NAME = 'name';
+
+  public function getFieldTypes() {
+    return array(
+      'country' => 'string',
+      'key' => 'string',
+      'market_type' => 'string',
+      'name' => 'string',
+    );
+  }
 }

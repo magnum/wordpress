@@ -4,13 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'PYS_FREE_VERSION', '9.3.2' );
-define( 'PYS_FREE_PINTEREST_MIN_VERSION', '3.2.5' );
-define( 'PYS_FREE_BING_MIN_VERSION', '2.2.2' );
+define( 'PYS_FREE_VERSION', '10.0.4' );
+define( 'PYS_FREE_PINTEREST_MIN_VERSION', '5.4.0' );
+define( 'PYS_FREE_BING_MIN_VERSION', '3.4.0' );
 define( 'PYS_FREE_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PYS_FREE_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-
-
+define( 'PYS_FREE_PLUGIN_FILE', __FILE__ );
+define( 'PYS_FREE_PLUGIN_BASENAME', plugin_basename( PYS_FREE_PLUGIN_FILE ) );
+define( 'PYS_FREE_GTM_CONTAINERS_PATH', untrailingslashit( plugin_dir_url( __FILE__ ) ) .'/containers_gtm/' );
 
 
 
@@ -32,6 +33,7 @@ require_once PYS_FREE_PATH.'/includes/events/class-events-edd.php';
 require_once PYS_FREE_PATH.'/includes/events/class-events-fdp.php';
 require_once PYS_FREE_PATH.'/includes/events/class-events-custom.php';
 
+require_once PYS_FREE_PATH .'/containers_gtm/container.php';
 require_once PYS_FREE_PATH.'/includes/functions-custom-event.php';
 require_once PYS_FREE_PATH.'/includes/functions-woo.php';
 require_once PYS_FREE_PATH.'/includes/functions-edd.php';
@@ -51,11 +53,24 @@ require_once PYS_FREE_PATH.'/includes/class-pys.php';
 require_once PYS_FREE_PATH.'/includes/class-events-manager.php';
 require_once PYS_FREE_PATH.'/includes/class-custom-event.php';
 require_once PYS_FREE_PATH.'/includes/class-custom-event-factory.php';
+require_once PYS_FREE_PATH.'/includes/class-trigger-event.php';
 require_once PYS_FREE_PATH.'/modules/facebook/facebook.php';
 require_once PYS_FREE_PATH.'/modules/facebook/facebook-server.php';
 require_once PYS_FREE_PATH.'/modules/google_analytics/ga.php';
+require_once PYS_FREE_PATH.'/modules/google_tags/gatags.php';
+require_once PYS_FREE_PATH.'/modules/google_gtm/gtm.php';
 require_once PYS_FREE_PATH.'/modules/head_footer/head_footer.php';
 require_once PYS_FREE_PATH.'/includes/enrich/class_enrich_order.php';
 
+
+require_once PYS_FREE_PATH.'/includes/formEvents/interface-formEvents.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/CF7/class-formEvent-CF7.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/forminator/class-formEvent-Forminator.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/WPForms/class-formEvent-WPForms.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/Formidable/class-formEvent-Formidable.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/NinjaForm/class-formEvent-NinjaForm.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/FluentForm/class-formEvent-FluentForm.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/WSForm/class-formEvent-WSForm.php';
+require_once PYS_FREE_PATH.'/includes/formEvents/ElementorForm/ElementorForm.php';
 // here we go...
 PixelYourSite\PYS();

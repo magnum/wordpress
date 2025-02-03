@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdActivityDataSourceValues getInstance()
  */
-class AdActivityDataSourceValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CALYPSO = 'CALYPSO';
-    const TAO = 'TAO';
-    const TAO_AD_ACCOUNT = 'TAO_AD_ACCOUNT';
-    const TAO_AD_STATUS = 'TAO_AD_STATUS';
+class AdActivityDataSourceValues extends AbstractEnum {
+
+  const CALYPSO = 'CALYPSO';
+  const TAO = 'TAO';
+  const TAO_AD_ACCOUNT = 'TAO_AD_ACCOUNT';
+  const TAO_AD_STATUS = 'TAO_AD_STATUS';
 }

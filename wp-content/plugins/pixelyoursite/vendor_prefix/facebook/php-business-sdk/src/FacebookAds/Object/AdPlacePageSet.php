@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPlacePageSetFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,37 +40,52 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValue
  * pull request for this class.
  *
  */
-class AdPlacePageSet extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'ad_place_page_sets';
-    }
-    /**
-     * @return AdPlacePageSetFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdPlacePageSetFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['LocationTypes'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetLocationTypesValues::getInstance()->getValues();
-        $ref_enums['TargetedAreaType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\AdPlacePageSet::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class AdPlacePageSet extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'ad_place_page_sets';
+  }
+
+  /**
+   * @return AdPlacePageSetFields
+   */
+  public static function getFieldsEnum() {
+    return AdPlacePageSetFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['LocationTypes'] = AdPlacePageSetLocationTypesValues::getInstance()->getValues();
+    $ref_enums['TargetedAreaType'] = AdPlacePageSetTargetedAreaTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new AdPlacePageSet(),
+      'NODE',
+      AdPlacePageSet::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

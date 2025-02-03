@@ -14,6 +14,7 @@ use Elementor\Includes\TemplateLibrary\Sources\AdminMenuItems\Templates_Categori
 use Elementor\Modules\Library\Documents\Library_Document;
 use Elementor\Plugin;
 use Elementor\Utils;
+use Elementor\User;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -46,7 +47,8 @@ class Source_Local extends Source_Base {
 
 	/**
 	 * Elementor template-library meta key.
-	 * @deprecated 2.3.0 Use \Elementor\Core\Base\Document::TYPE_META_KEY instead
+	 *
+	 * @deprecated 2.3.0 Use `Elementor\Core\Base\Document::TYPE_META_KEY` const instead.
 	 */
 	const TYPE_META_KEY = '_elementor_template_type';
 
@@ -221,27 +223,19 @@ class Source_Local extends Source_Base {
 	 * @access public
 	 */
 	public function register_data() {
-		$admin_menu_rearrangement_active = Plugin::$instance->experiments->is_feature_active( 'admin_menu_rearrangement' );
-
-		if ( $admin_menu_rearrangement_active ) {
-			$name = esc_html_x( 'Templates', 'Template Library', 'elementor' );
-		} else {
-			$name = esc_html_x( 'My Templates', 'Template Library', 'elementor' );
-		}
-
 		$labels = [
-			'name' => $name,
+			'name' => esc_html_x( 'My Templates', 'Template Library', 'elementor' ),
 			'singular_name' => esc_html_x( 'Template', 'Template Library', 'elementor' ),
-			'add_new' => esc_html_x( 'Add New', 'Template Library', 'elementor' ),
-			'add_new_item' => esc_html_x( 'Add New Template', 'Template Library', 'elementor' ),
-			'edit_item' => esc_html_x( 'Edit Template', 'Template Library', 'elementor' ),
-			'new_item' => esc_html_x( 'New Template', 'Template Library', 'elementor' ),
-			'all_items' => esc_html_x( 'All Templates', 'Template Library', 'elementor' ),
-			'view_item' => esc_html_x( 'View Template', 'Template Library', 'elementor' ),
-			'search_items' => esc_html_x( 'Search Template', 'Template Library', 'elementor' ),
-			'not_found' => esc_html_x( 'No Templates found', 'Template Library', 'elementor' ),
-			'not_found_in_trash' => esc_html_x( 'No Templates found in Trash', 'Template Library', 'elementor' ),
-			'parent_item_colon' => '',
+			'add_new' => esc_html__( 'Add New Template', 'elementor' ),
+			'add_new_item' => esc_html__( 'Add New Template', 'elementor' ),
+			'edit_item' => esc_html__( 'Edit Template', 'elementor' ),
+			'new_item' => esc_html__( 'New Template', 'elementor' ),
+			'all_items' => esc_html__( 'All Templates', 'elementor' ),
+			'view_item' => esc_html__( 'View Template', 'elementor' ),
+			'search_items' => esc_html__( 'Search Template', 'elementor' ),
+			'not_found' => esc_html__( 'No Templates found', 'elementor' ),
+			'not_found_in_trash' => esc_html__( 'No Templates found in Trash', 'elementor' ),
+			'parent_item_colon' => esc_html__( 'Parent Template:', 'elementor' ),
 			'menu_name' => esc_html_x( 'Templates', 'Template Library', 'elementor' ),
 		];
 
@@ -251,13 +245,16 @@ class Source_Local extends Source_Base {
 			'rewrite' => false,
 			'menu_icon' => 'dashicons-admin-page',
 			'show_ui' => true,
-			'show_in_menu' => ! $admin_menu_rearrangement_active,
+			'show_in_menu' => true,
 			'show_in_nav_menus' => false,
 			'exclude_from_search' => true,
 			'capability_type' => 'post',
 			'hierarchical' => false,
-			'supports' => [ 'title', 'thumbnail', 'author', 'elementor' ],
+			'supports' => [ 'title', 'thumbnail', 'author', 'elementor', 'custom-fields' ],
+			'show_in_rest' => true,
 		];
+
+		$this->avoid_rest_access_for_non_admins();
 
 		/**
 		 * Register template library post type args.
@@ -502,10 +499,21 @@ class Source_Local extends Source_Base {
 		$defaults = [
 			'title' => esc_html__( '(no title)', 'elementor' ),
 			'page_settings' => [],
-			'status' => current_user_can( 'publish_posts' ) ? 'publish' : 'pending',
 		];
 
 		$template_data = wp_parse_args( $template_data, $defaults );
+		$template_data['status'] = current_user_can( 'publish_posts' ) ? 'publish' : 'pending';
+
+		// BC: Allow importing any template type when using CLI
+		// to support users that rely on this mechanism.
+		$should_check_template_type = ! $this->is_wp_cli();
+
+		if (
+				$should_check_template_type &&
+				! $this->is_valid_template_type( $template_data['type'] )
+		) {
+			return new \WP_Error( 'invalid_template_type', esc_html__( 'Invalid template type.', 'elementor' ) );
+		}
 
 		$document = Plugin::$instance->documents->create(
 			$template_data['type'],
@@ -558,6 +566,33 @@ class Source_Local extends Source_Base {
 		do_action( 'elementor/template-library/after_update_template', $template_id, $template_data );
 
 		return $template_id;
+	}
+
+	protected function is_valid_template_type( $type ) {
+		$document_class = Plugin::$instance->documents->get_document_type( $type, false );
+
+		if ( ! $document_class ) {
+			return false;
+		}
+
+		$cpt = $document_class::get_property( 'cpt' );
+
+		if ( ! $cpt || ! is_array( $cpt ) || 1 !== count( $cpt ) ) {
+			return false;
+		}
+
+		$is_valid_template_type = in_array( static::CPT, $cpt, true );
+
+		return apply_filters(
+			'elementor/template_library/sources/local/is_valid_template_type',
+			$is_valid_template_type,
+			$cpt,
+		);
+	}
+
+	// For testing purposes only, in order to be able to mock the `WP_CLI` constant.
+	protected function is_wp_cli() {
+		return Utils::is_wp_cli();
 	}
 
 	/**
@@ -933,7 +968,7 @@ class Source_Local extends Source_Base {
 	 * @access public
 	 */
 	public function admin_import_template_form() {
-		if ( ! self::is_base_templates_screen() ) {
+		if ( ! self::is_base_templates_screen() || ! User::is_current_user_can_upload_json() ) {
 			return;
 		}
 
@@ -1338,7 +1373,7 @@ class Source_Local extends Source_Base {
 					?>
 				</h3>
 				<p><?php echo wp_kses_post( $description ); ?></p>
-				<a id="elementor-template-library-add-new" class="elementor-button elementor-button-success" href="<?php echo esc_url( $href ); ?>">
+				<a id="elementor-template-library-add-new" class="elementor-button e-primary" href="<?php echo esc_url( $href ); ?>">
 					<?php
 					/* translators: %s: Template type label. */
 					printf( esc_html__( 'Add New %s', 'elementor' ), esc_html( $current_type_label ) );
@@ -1348,13 +1383,22 @@ class Source_Local extends Source_Base {
 		<?php
 	}
 
+	/**
+	 * Add filter by category.
+	 *
+	 * In the templates library, add a filter by Elementor library category.
+	 *
+	 * @access public
+	 *
+	 * @param string $post_type The post type slug.
+	 */
 	public function add_filter_by_category( $post_type ) {
 		if ( self::CPT !== $post_type ) {
 			return;
 		}
 
 		$all_items = get_taxonomy( self::TAXONOMY_CATEGORY_SLUG )->labels->all_items;
-		$dropdown_options = array(
+		$dropdown_options = [
 			'show_option_all' => $all_items,
 			'show_option_none' => $all_items,
 			'hide_empty' => 0,
@@ -1366,8 +1410,13 @@ class Source_Local extends Source_Base {
 			'name' => self::TAXONOMY_CATEGORY_SLUG,
 			//phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not required to retrieve the value.
 			'selected' => Utils::get_super_global_value( $_GET, self::TAXONOMY_CATEGORY_SLUG ) ?? '',
+		];
+
+		printf(
+			'<label class="screen-reader-text" for="%1$s">%2$s</label>',
+			esc_attr( self::TAXONOMY_CATEGORY_SLUG ),
+			esc_html_x( 'Filter by category', 'Template Library', 'elementor' )
 		);
-		echo '<label class="screen-reader-text" for="cat">' . esc_html_x( 'Filter by category', 'Template Library', 'elementor' ) . '</label>';
 		wp_dropdown_categories( $dropdown_options );
 	}
 
@@ -1420,9 +1469,6 @@ class Source_Local extends Source_Base {
 			'type' => $data['type'],
 			'page_settings' => $page_settings,
 		] );
-
-		// Remove the temporary file, now that we're done with it.
-		Plugin::$instance->uploads_manager->remove_file_or_dir( $file_path );
 
 		if ( is_wp_error( $template_id ) ) {
 			return $template_id;
@@ -1701,6 +1747,18 @@ class Source_Local extends Source_Base {
 		unset( $post_types[ self::CPT ] );
 
 		return $post_types;
+	}
+
+	private function avoid_rest_access_for_non_admins(): void {
+		add_filter( 'rest_pre_dispatch', function ( $value, \WP_REST_Server $server, \WP_REST_Request $request ) {
+			if ( strpos( $request->get_route(), self::CPT ) !== false ) {
+				if ( ! current_user_can( 'manage_options' ) ) {
+					return new \WP_Error( 'rest_forbidden', esc_html__( 'Sorry, you are not allowed to do that.', 'elementor' ), [ 'status' => rest_authorization_required_code() ] );
+				}
+			}
+
+			return $value;
+		}, 10, 3 );
 	}
 
 	/**

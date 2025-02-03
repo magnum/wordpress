@@ -5,6 +5,177 @@
 This file contains older changelog entries, so we can keep the size of the standard WordPress readme.txt file reasonable.
 For the latest changes, please refer to the "Changelog" section in the [readme.txt file](https://plugins.svn.wordpress.org/miniorange-saml-20-single-sign-on/trunk/readme.txt).
 
+= 5.0.9 =
+* Fix for iconv() warning in linux environment
+* Fix for upgrade to premium versions
+* Minor UI improvements
+
+= 5.0.8 =
+* WP 6.4 Compatibility
+* Compatibility fix with Themify Plugin
+* UI fixes
+
+= 5.0.7 =
+* WP 6.3 Compatibility
+* Added proper error message when wp-config.php is not writable for enabling debug logs
+* Fix for warning in the list of IDP logos 
+
+= 5.0.6 =
+* Fix for NetIQ SAML IDP Logo
+* Fix for x509 certificate in SAML SSO Configurations
+
+= 5.0.5 =
+* Vulnerability fix for Broken Access Control in SSO Settings
+
+= 5.0.4 =
+* Added additional exception handling checks to enhance the validation of SAML Response
+* Added Steps to download the paid plugin
+* Minor Bug Fixes
+
+= 5.0.3 =
+* Added new IDPs like Siteminder, VMWare, OpenAthens
+* Minor Bug Fixes
+
+= 5.0.2 =
+* Added new IDPs like Sharepoint, Dynamic CRM, LastPass, Drupal
+
+= 5.0.1 =
+* Compatibility with WordPress 6.2
+* Added iconv encoding issue flow 
+* Fixed plugin update using FTP replace
+* Fixed SSO widget title issue
+* Fixed plugin deactivation issue
+* Fixes in debug log functionality 
+
+= 5.0.0 =
+* Added PHPCS fixes
+
+= 4.9.32 =
+* Security fix for Open Redirect Vulnerability
+
+= 4.9.31 =
+* Fixes in logger functionality
+
+= 4.9.30 =
+* Added an option to disable assertion validity
+* Added custom Bootstrap CSS and JS
+* Updated images to webp format
+* Added Azure AD Integrations
+* Cross browser UI fixes
+
+= 4.9.29 =
+* Compatibility with WordPress 6.1
+* Fixes for PHP 8.1
+
+= 4.9.28 =
+* Fixed console warning
+
+= 4.9.27 =
+* Plugin delete fix
+
+= 4.9.26 =
+* Modified code flow for form save
+* Made Utilities class static
+* Improvements in logger flow
+
+= 4.9.25 =
+* Updated intel-tel library
+* Updated modenizr, Font Awesome, Time Picker libraries
+* Improved design of success and error messages
+* Added support for dynamic folder name for plugin
+
+= 4.9.24 =
+* Updated Bootstrap version
+* Sanitization fixes for global variables
+
+= 4.9.23 =
+* Removed role mapping for existing users
+
+= 4.9.22 =
+* Fixed a bug with post login redirection
+* Fixed RelayState URL
+
+= 4.9.21 =
+* Sanitization and Escaping fixes
+* Role Mapping fix
+
+= 4.9.20 =
+* Introduced Error Codes
+* Removed some obsolete functions
+
+= 4.9.19 =
+* Fixed UI compatibility with all themes
+
+= 4.9.18 =
+* Minor UI fixes
+
+= 4.9.17 =
+* Fixed Login button positioning
+
+= 4.9.16 =
+* Revamped plugin's UI
+* NameID Format fix for ADFS
+
+= 4.9.15 =
+* Compatibility with WordPress 5.9
+* Added Support for NameID Policy in SAML Request
+
+= 4.9.14 =
+* Removed end of year sale
+* Readme updates
+
+= 4.9.13 =
+* License Banner fixes
+
+= 4.9.12 =
+* Added discounted pricing for WordPress SSO plans
+
+= 4.9.11 =
+* Updated licensing plans for SAML SSO
+* Fixed bugs for Debug Framework
+* Other UI fixes
+
+= 4.9.10 =
+* Fixed an issue with broken plugin links
+
+= 4.9.09 =
+* Added Debug Logs Framework
+* Added new IDP's support for SSO
+* WordPress 5.8 Compatibility
+
+= 4.9.08 =
+* Demo request improvements
+
+= 4.9.07 =
+* Licensing Update for WordPress SSO plans
+
+= 4.9.06 =
+* UI changes and fixes
+* Readme changes
+
+= 4.9.05 =
+* UI improvements and fixes
+* WordPress 5.7 Compatibility
+
+= 4.9.04 =
+* Licensing Update for WordPress SSO plans
+
+= 4.9.03 =
+* Added video plugin guides for WordPress SSO
+
+= 4.9.02 =
+* Welcome page fixes
+
+= 4.9.01 =
+* Added support of Localization
+* WordPress 5.6 Loop back issue fix
+* PHP 8 Compatibility
+* Fixed SAML Login URL query parameters bug
+* Removed end of year sale
+
+= 4.9.00 =
+* Rolled out end of year sale
+
 = 4.8.99 =
 * Added new Add-on description
 

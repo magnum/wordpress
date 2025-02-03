@@ -54,9 +54,7 @@ class Add_Zoom_Webinar_Integration {
 
 		// If the helper file exists in pro it means, the pro version still contains the old helper file.
 		if ( file_exists( $pro_integration_helpers_path ) && is_automator_pro_active() ) {
-
 			$is_enabled = false;
-
 		}
 
 		return $is_enabled;
@@ -82,8 +80,8 @@ class Add_Zoom_Webinar_Integration {
 	 */
 	public function add_integration_func() {
 
-		$client = get_option( '_uncannyowl_zoom_webinar_settings', array() );
-		$user   = get_option( 'uap_zoom_webinar_api_connected_user', '' );
+		$client = automator_get_option( '_uncannyowl_zoom_webinar_settings', array() );
+		$user   = automator_get_option( 'uap_zoom_webinar_api_connected_user', '' );
 
 		if ( isset( $client['access_token'] ) && ! empty( $client['access_token'] ) && ! empty( $user ) ) {
 			$this->connected = true;

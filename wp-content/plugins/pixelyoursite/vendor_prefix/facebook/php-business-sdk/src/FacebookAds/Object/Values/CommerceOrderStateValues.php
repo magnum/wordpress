@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CommerceOrderStateValues getInstance()
  */
-class CommerceOrderStateValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COMPLETED = 'COMPLETED';
-    const CREATED = 'CREATED';
-    const FB_PROCESSING = 'FB_PROCESSING';
-    const IN_PROGRESS = 'IN_PROGRESS';
+class CommerceOrderStateValues extends AbstractEnum {
+
+  const COMPLETED = 'COMPLETED';
+  const CREATED = 'CREATED';
+  const FB_PROCESSING = 'FB_PROCESSING';
+  const IN_PROGRESS = 'IN_PROGRESS';
 }

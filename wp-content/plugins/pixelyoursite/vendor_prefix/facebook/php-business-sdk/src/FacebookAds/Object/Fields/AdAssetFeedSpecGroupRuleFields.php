@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAssetFeedSpecGroupRuleFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BODY_LABEL = 'body_label';
-    const CAPTION_LABEL = 'caption_label';
-    const DESCRIPTION_LABEL = 'description_label';
-    const IMAGE_LABEL = 'image_label';
-    const LINK_URL_LABEL = 'link_url_label';
-    const TITLE_LABEL = 'title_label';
-    const VIDEO_LABEL = 'video_label';
-    public function getFieldTypes()
-    {
-        return array('body_label' => 'AdAssetFeedSpecAssetLabel', 'caption_label' => 'AdAssetFeedSpecAssetLabel', 'description_label' => 'AdAssetFeedSpecAssetLabel', 'image_label' => 'AdAssetFeedSpecAssetLabel', 'link_url_label' => 'AdAssetFeedSpecAssetLabel', 'title_label' => 'AdAssetFeedSpecAssetLabel', 'video_label' => 'AdAssetFeedSpecAssetLabel');
-    }
+
+class AdAssetFeedSpecGroupRuleFields extends AbstractEnum {
+
+  const BODY_LABEL = 'body_label';
+  const CAPTION_LABEL = 'caption_label';
+  const DESCRIPTION_LABEL = 'description_label';
+  const IMAGE_LABEL = 'image_label';
+  const LINK_URL_LABEL = 'link_url_label';
+  const TITLE_LABEL = 'title_label';
+  const VIDEO_LABEL = 'video_label';
+
+  public function getFieldTypes() {
+    return array(
+      'body_label' => 'AdAssetFeedSpecAssetLabel',
+      'caption_label' => 'AdAssetFeedSpecAssetLabel',
+      'description_label' => 'AdAssetFeedSpecAssetLabel',
+      'image_label' => 'AdAssetFeedSpecAssetLabel',
+      'link_url_label' => 'AdAssetFeedSpecAssetLabel',
+      'title_label' => 'AdAssetFeedSpecAssetLabel',
+      'video_label' => 'AdAssetFeedSpecAssetLabel',
+    );
+  }
 }

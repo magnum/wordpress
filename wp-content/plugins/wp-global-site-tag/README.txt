@@ -1,9 +1,9 @@
-=== Plugin Name ===
+=== WP Global Site Tag ===
 Contributors: digitalapps
-Donate link: https://digitalapps.com
-Tags: global site tag, analytics, google analytics, google, gtm, google tag manager, global site tag, gtag
+Donate link: https://www.buymeacoffee.com/wpplugins
+Tags: global site tag, google analytics, gtm, google tag manager, global site tag
 Requires at least: 3.0.1
-Tested up to: 5.5
+Tested up to: 6.5.3
 Stable tag: 5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,6 +23,12 @@ To use gtag.js to track your site, install the plugin and activate.
     <li>Built using WordPress best practices and standards</li>
     <li>Great for marketing agencies and individuals</li>
 </ul>
+
+== Supercharge Your GTM Setup with gtag
+
+Wondering if you can make the most of gtag and set up Google Tag Manager (GTM) simultaneously? Heck yeah, you can! 
+
+Setting up GTM with gtag is a breeze. Just swap out that initial GA_TRACKING_ID with your GTM container ID, and you're good to go. You can still keep the universal analytics tag running smoothly within GTM, all while having gtag in the mix.
 
 == How to use Global Site Tag ==
 
@@ -75,3 +81,5 @@ Follow these steps to install the plugin on your site.
 * Updated label
 = 1.0.6 =
 * Added mime type
+= 1.0.7 =
+* remove warning message

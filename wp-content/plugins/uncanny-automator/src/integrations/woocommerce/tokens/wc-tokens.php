@@ -13,12 +13,6 @@ use WC_Order_Item_Product;
 class Wc_Tokens {
 
 	/**
-	 * Integration code
-	 *
-	 * @var string
-	 */
-	public static $integration = 'WC';
-	/**
 	 * @var array
 	 */
 	public $possible_order_fields = array();
@@ -35,10 +29,12 @@ class Wc_Tokens {
 			'billing_last_name'     => esc_attr__( 'Billing last name', 'uncanny-automator' ),
 			'billing_company'       => esc_attr__( 'Billing company', 'uncanny-automator' ),
 			'billing_country'       => esc_attr__( 'Billing country', 'uncanny-automator' ),
+			'billing_country_name'  => esc_attr__( 'Billing country (full name)', 'uncanny-automator' ),
 			'billing_address_1'     => esc_attr__( 'Billing address line 1', 'uncanny-automator' ),
 			'billing_address_2'     => esc_attr__( 'Billing address line 2', 'uncanny-automator' ),
 			'billing_city'          => esc_attr__( 'Billing city', 'uncanny-automator' ),
 			'billing_state'         => esc_attr__( 'Billing state', 'uncanny-automator' ),
+			'billing_state_name'    => esc_attr__( 'Billing state (full name)', 'uncanny-automator' ),
 			'billing_postcode'      => esc_attr__( 'Billing postcode', 'uncanny-automator' ),
 			'billing_phone'         => esc_attr__( 'Billing phone', 'uncanny-automator' ),
 			'billing_email'         => esc_attr__( 'Billing email', 'uncanny-automator' ),
@@ -46,12 +42,16 @@ class Wc_Tokens {
 			'shipping_last_name'    => esc_attr__( 'Shipping last name', 'uncanny-automator' ),
 			'shipping_company'      => esc_attr__( 'Shipping company', 'uncanny-automator' ),
 			'shipping_country'      => esc_attr__( 'Shipping country', 'uncanny-automator' ),
+			'shipping_country_name' => esc_attr__( 'Shipping country (full name)', 'uncanny-automator' ),
 			'shipping_address_1'    => esc_attr__( 'Shipping address line 1', 'uncanny-automator' ),
 			'shipping_address_2'    => esc_attr__( 'Shipping address line 2', 'uncanny-automator' ),
 			'shipping_city'         => esc_attr__( 'Shipping city', 'uncanny-automator' ),
 			'shipping_state'        => esc_attr__( 'Shipping state', 'uncanny-automator' ),
+			'shipping_state_name'   => esc_attr__( 'Shipping state (full name)', 'uncanny-automator' ),
 			'shipping_postcode'     => esc_attr__( 'Shipping postcode', 'uncanny-automator' ),
 			'order_date'            => esc_attr__( 'Order date', 'uncanny-automator' ),
+			'order_time'            => esc_attr__( 'Order time', 'uncanny-automator' ),
+			'order_date_time'       => esc_attr__( 'Order date and time', 'uncanny-automator' ),
 			'order_id'              => esc_attr__( 'Order ID', 'uncanny-automator' ),
 			'order_comments'        => esc_attr__( 'Order comments', 'uncanny-automator' ),
 			'order_total'           => esc_attr__( 'Order total', 'uncanny-automator' ),
@@ -69,11 +69,24 @@ class Wc_Tokens {
 			'order_qty'             => esc_attr__( 'Order quantity', 'uncanny-automator' ),
 			'order_products_links'  => esc_attr__( 'Order products links', 'uncanny-automator' ),
 			'order_summary'         => esc_attr__( 'Order summary', 'uncanny-automator' ),
-			'order_fees'            => esc_attr__( 'Order fees', 'uncanny-automator' ),
-			'order_shipping'        => esc_attr__( 'Order shipping', 'uncanny-automator' ),
+			'order_fees'            => esc_attr__( 'Order fee', 'uncanny-automator' ),
+			'order_fees_raw'        => esc_attr__( 'Order fee (unformatted)', 'uncanny-automator' ),
+			'order_shipping'        => esc_attr__( 'Shipping fee', 'uncanny-automator' ),
+			'order_shipping_raw'    => esc_attr__( 'Shipping fee (unformatted)', 'uncanny-automator' ),
 			'payment_method'        => esc_attr__( 'Payment method', 'uncanny-automator' ),
 			'shipping_method'       => esc_attr__( 'Shipping method', 'uncanny-automator' ),
+			'payment_url'           => esc_attr__( 'Payment URL', 'uncanny-automator' ),
+			'payment_url_checkout'  => esc_attr__( 'Direct checkout URL', 'uncanny-automator' ),
+			'user_total_spend'      => esc_attr__( "User's total spend", 'uncanny-automator' ),
+			'user_total_spend_raw'  => esc_attr__( "User's total spend (unformatted)", 'uncanny-automator' ),
 		);
+
+		if ( function_exists( 'stripe_wc' ) || class_exists( '\WC_Stripe_Helper' ) || function_exists( 'woocommerce_gateway_stripe' ) ) {
+			$this->possible_order_fields['stripe_fee']        = esc_attr__( 'Stripe fee', 'uncanny-automator' );
+			$this->possible_order_fields['stripe_fee_raw']    = esc_attr__( 'Stripe fee (unformatted)', 'uncanny-automator' );
+			$this->possible_order_fields['stripe_payout']     = esc_attr__( 'Stripe payout', 'uncanny-automator' );
+			$this->possible_order_fields['stripe_payout_raw'] = esc_attr__( 'Stripe payout (unformatted)', 'uncanny-automator' );
+		}
 
 		add_action(
 			'uap_wc_trigger_save_meta',
@@ -123,7 +136,7 @@ class Wc_Tokens {
 				$this,
 				'wc_ordertotal_tokens',
 			),
-			20,
+			2000,
 			6
 		);
 
@@ -163,12 +176,6 @@ class Wc_Tokens {
 
 				if ( true === $trigger_result['result'] && $trigger_result['args']['trigger_id'] && $trigger_result['args']['get_trigger_id'] ) {
 
-					$run_number = Automator()->get->trigger_run_number(
-						$trigger_result['args']['trigger_id'],
-						$trigger_result['args']['get_trigger_id'],
-						$trigger_result['args']['user_id']
-					);
-
 					$trigger_id     = (int) $trigger_result['args']['trigger_id'];
 					$user_id        = (int) $trigger_result['args']['user_id'];
 					$trigger_log_id = (int) $trigger_result['args']['get_trigger_id'];
@@ -205,8 +212,8 @@ class Wc_Tokens {
 	}
 
 	/**
-	 * @param array $tokens
-	 * @param array $args
+	 * @param array  $tokens
+	 * @param array  $args
 	 * @param string $type
 	 *
 	 * @return array
@@ -261,28 +268,6 @@ class Wc_Tokens {
 	}
 
 	/**
-	 * Only load this integration and its triggers and actions if the related
-	 * plugin is active
-	 *
-	 * @param $status
-	 * @param $plugin
-	 *
-	 * @return bool
-	 */
-	public function plugin_active( $status, $plugin ) {
-
-		if ( self::$integration === $plugin ) {
-			if ( class_exists( 'WooCommerce' ) ) {
-				$status = true;
-			} else {
-				$status = false;
-			}
-		}
-
-		return $status;
-	}
-
-	/**
 	 * @param $value
 	 * @param $pieces
 	 * @param $recipe_id
@@ -312,7 +297,6 @@ class Wc_Tokens {
 		if ( empty( $pieces ) ) {
 			return $value;
 		}
-
 		if ( array_intersect( $to_match, $pieces ) ) {
 			$value = $this->replace_values( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args );
 		}
@@ -356,11 +340,15 @@ class Wc_Tokens {
 	 * @return array|string|null
 	 */
 	public function replace_values( $value, $pieces, $recipe_id, $trigger_data, $user_id, $replace_args ) {
+
 		if ( empty( $trigger_data ) || empty( $replace_args ) ) {
 			return $value;
 		}
-		$parse                = $pieces[2];
+
+		$parse = $pieces[2];
+
 		$multi_line_separator = apply_filters( 'automator_woo_multi_item_separator', ' | ', $pieces );
+
 		foreach ( $trigger_data as $trigger ) {
 			if ( ! is_array( $trigger ) || empty( $trigger ) ) {
 				continue;
@@ -368,10 +356,18 @@ class Wc_Tokens {
 			$trigger_id     = $trigger['ID'];
 			$trigger_log_id = $replace_args['trigger_log_id'];
 			$order          = null;
-			$order_id       = Automator()->db->token->get( 'order_id', $replace_args );
+
+			// Use the Trigger's user id if its available.
+			if ( isset( $replace_args['recipe_triggers'][ $trigger['ID'] ]['user_id'] ) ) {
+				$replace_args['user_id'] = $replace_args['recipe_triggers'][ $trigger['ID'] ]['user_id'];
+			}
+
+			$order_id = Automator()->db->token->get( 'order_id', $replace_args );
+
 			if ( ! empty( $order_id ) ) {
 				$order = wc_get_order( $order_id );
 			}
+
 			if ( $order instanceof WC_Order ) {
 				switch ( $parse ) {
 					case 'order_id':
@@ -381,43 +377,43 @@ class Wc_Tokens {
 						$value = $order->get_status();
 						break;
 					case 'WOOPRODUCT':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
-						$value          = $this->get_woo_product_names_from_items( $order, $value_to_match );
+						//$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value = $this->get_woo_product_names_from_items( $order, '-1' );
 						break;
 					case 'WOOPRODUCT_ID':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_ids_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_PRODUCT_PRICE':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_price_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_PRODUCT_PRICE_UNFORMATTED':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_price_from_items( $order, $value_to_match, true );
 						break;
 					case 'WOOPRODUCT_PRODUCT_SALE_PRICE':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_price_from_items( $order, $value_to_match, false, true );
 						break;
 					case 'WOOPRODUCT_PRODUCT_SALE_PRICE_UNFORMATTED':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_price_from_items( $order, $value_to_match, true, true );
 						break;
 					case 'WOOPRODUCT_URL':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_urls_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_THUMB_ID':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_image_ids_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_THUMB_URL':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_image_urls_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_ORDER_QTY':
-						$product_id   = isset( $trigger['meta']['WOOPRODUCT'] ) ? intval( $trigger['meta']['WOOPRODUCT'] ) : - 1;
+						$product_id   = isset( $trigger['meta']['WOOPRODUCT'] ) ? intval( $trigger['meta']['WOOPRODUCT'] ) : '-1';
 						$items        = $order->get_items();
 						$product_qtys = array();
 						if ( $items ) {
@@ -480,6 +476,9 @@ class Wc_Tokens {
 					case 'billing_country':
 						$value = $order->get_billing_country();
 						break;
+					case 'billing_country_name':
+						$value = $this->get_country_name_from_code( $order->get_billing_country() );
+						break;
 					case 'billing_address_1':
 						$value = $order->get_billing_address_1();
 						break;
@@ -491,6 +490,9 @@ class Wc_Tokens {
 						break;
 					case 'billing_state':
 						$value = $order->get_billing_state();
+						break;
+					case 'billing_state_name':
+						$value = $this->get_state_name_from_codes( $order->get_billing_state(), $order->get_billing_country() );
 						break;
 					case 'billing_postcode':
 						$value = $order->get_billing_postcode();
@@ -504,6 +506,12 @@ class Wc_Tokens {
 					case 'order_date':
 						$value = $order->get_date_created()->format( get_option( 'date_format', 'F j, Y' ) );
 						break;
+					case 'order_time':
+						$value = $order->get_date_created()->format( get_option( 'time_format', 'H:i:s' ) );
+						break;
+					case 'order_date_time':
+						$value = $order->get_date_created()->format( sprintf( '%s %s', get_option( 'date_format', 'F j, Y' ), get_option( 'time_format', 'H:i:s' ) ) );
+						break;
 					case 'shipping_first_name':
 						$value = $order->get_shipping_first_name();
 						break;
@@ -516,6 +524,9 @@ class Wc_Tokens {
 					case 'shipping_country':
 						$value = $order->get_shipping_country();
 						break;
+					case 'shipping_country_name':
+						$value = $this->get_country_name_from_code( $order->get_shipping_country() );
+						break;
 					case 'shipping_address_1':
 						$value = $order->get_shipping_address_1();
 						break;
@@ -527,6 +538,9 @@ class Wc_Tokens {
 						break;
 					case 'shipping_state':
 						$value = $order->get_shipping_state();
+						break;
+					case 'shipping_state_name':
+						$value = $this->get_state_name_from_codes( $order->get_shipping_state(), $order->get_shipping_country() );
 						break;
 					case 'shipping_postcode':
 						$value = $order->get_shipping_postcode();
@@ -545,34 +559,48 @@ class Wc_Tokens {
 						$value = $order->get_status();
 						break;
 					case 'order_total':
-						$value = strip_tags( wc_price( $order->get_total() ) );
+						$value = wp_strip_all_tags( wc_price( $order->get_total() ) );
 						break;
 					case 'order_total_raw':
 						$value = $order->get_total();
 						break;
 					case 'order_subtotal':
-						$value = strip_tags( wc_price( $order->get_subtotal() ) );
+						$value = wp_strip_all_tags( wc_price( $order->get_subtotal() ) );
 						break;
 					case 'order_subtotal_raw':
 						$value = $order->get_subtotal();
 						break;
 					case 'order_tax':
-						$value = strip_tags( wc_price( $order->get_total_tax() ) );
+						$value = wp_strip_all_tags( wc_price( $order->get_total_tax() ) );
 						break;
 					case 'order_fees':
 						$value = wc_price( $order->get_total_fees() );
 						break;
+					case 'order_fees_raw':
+						$value = $order->get_total_fees();
+						break;
 					case 'order_shipping':
 						$value = wc_price( $order->get_shipping_total() );
+						break;
+					case 'order_shipping_raw':
+						$value = $order->get_shipping_total();
 						break;
 					case 'order_tax_raw':
 						$value = $order->get_total_tax();
 						break;
 					case 'order_discounts':
-						$value = strip_tags( wc_price( $order->get_discount_total() * - 1 ) );
+						$value = wp_strip_all_tags( wc_price( $order->get_discount_total() * - 1 ) );
 						break;
 					case 'order_discounts_raw':
 						$value = ( $order->get_discount_total() * - 1 );
+						break;
+					case 'user_total_spend_raw':
+						$customer_id = $order->get_user_id();
+						$value       = wc_get_customer_total_spent( $customer_id );
+						break;
+					case 'user_total_spend':
+						$customer_id = $order->get_user_id();
+						$value       = wc_price( wc_get_customer_total_spent( $customer_id ) );
 						break;
 					case 'order_coupons':
 						$coupons = $order->get_coupon_codes();
@@ -629,6 +657,63 @@ class Wc_Tokens {
 					case 'payment_method':
 						$value = $order->get_payment_method_title();
 						break;
+
+					case 'payment_url':
+						$value = $order->get_checkout_payment_url();
+						break;
+
+					case 'payment_url_checkout':
+						$value = $order->get_checkout_payment_url( true );
+						break;
+
+					case 'stripe_fee':
+						$value = 0;
+						if ( function_exists( 'stripe_wc' ) ) {
+							$value = \WC_Stripe_Utils::display_fee( $order );
+						}
+						if ( ( function_exists( 'woocommerce_gateway_stripe' ) || class_exists( '\WC_Stripe_Helper' ) ) && 0 === $value ) {
+							$value = \WC_Stripe_Helper::get_stripe_fee( $order );
+						}
+
+						break;
+
+					case 'stripe_fee_raw':
+						$value = 0;
+						if ( function_exists( 'stripe_wc' ) ) {
+							$value = \WC_Stripe_Utils::display_fee( $order );
+						}
+						if ( ( function_exists( 'woocommerce_gateway_stripe' ) || class_exists( '\WC_Stripe_Helper' ) ) && 0 === $value ) {
+							$value = \WC_Stripe_Helper::get_stripe_fee( $order );
+						}
+
+						if ( ! empty( $value ) ) {
+							$value = $this->clean_wc_price( $value );
+						}
+						break;
+
+					case 'stripe_payout':
+						$value = 0;
+						if ( function_exists( 'stripe_wc' ) ) {
+							$value = \WC_Stripe_Utils::display_net( $order );
+						}
+						if ( class_exists( '\WC_Stripe_Helper' ) && 0 === $value ) {
+							$value = \WC_Stripe_Helper::get_stripe_net( $order );
+						}
+						break;
+
+					case 'stripe_payout_raw':
+						$value = 0;
+						if ( function_exists( 'stripe_wc' ) ) {
+							$value = \WC_Stripe_Utils::display_net( $order );
+						}
+						if ( class_exists( '\WC_Stripe_Helper' ) && 0 === $value ) {
+							$value = \WC_Stripe_Helper::get_stripe_net( $order );
+						}
+						if ( ! empty( $value ) ) {
+							$value = $this->clean_wc_price( $value );
+						}
+						break;
+
 					case 'shipping_method':
 						$value = $order->get_shipping_method();
 						break;
@@ -636,11 +721,11 @@ class Wc_Tokens {
 						$value = $this->get_products_skus( $order );
 						break;
 					case 'WOOPRODUCT_CATEGORIES':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_categories_from_items( $order, $value_to_match );
 						break;
 					case 'WOOPRODUCT_TAGS':
-						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : - 1;
+						$value_to_match = isset( $trigger['meta'][ $parse ] ) ? $trigger['meta'][ $parse ] : '-1';
 						$value          = $this->get_woo_product_tags_from_items( $order, $value_to_match );
 						break;
 					case 'CARRIER':
@@ -701,6 +786,24 @@ class Wc_Tokens {
 	}
 
 	/**
+	 * @param $price
+	 *
+	 * @return float|mixed
+	 */
+	public function clean_wc_price( $price ) {
+		// Regular expression to match the numeric/float value after the currency symbol
+		$pattern = '/<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">.*?<\/span>([0-9,]+(?:\.[0-9]+)?)<\/bdi><\/span>/';
+
+		// Extract the value
+		if ( preg_match( $pattern, $price, $matches ) ) {
+			// Convert the captured value to a float
+			return floatval( str_replace( ',', '', $matches[1] ) );
+		}
+
+		return $price;
+	}
+
+	/**
 	 * @param WC_Order $order
 	 * @param          $value_to_match
 	 *
@@ -712,7 +815,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product_titles[] = $item->get_product()->get_name();
 				}
 			}
@@ -733,7 +836,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product_ids[] = $item->get_product_id();
 				}
 			}
@@ -744,9 +847,9 @@ class Wc_Tokens {
 
 	/**
 	 * @param \WC_Order $order
-	 * @param $value_to_match
-	 * @param bool $unformatted
-	 * @param bool $sale
+	 * @param           $value_to_match
+	 * @param bool      $unformatted
+	 * @param bool      $sale
 	 *
 	 * @return string
 	 */
@@ -756,7 +859,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product = $item->get_product();
 					if ( $unformatted ) {
 						$product_prices[] = ! $sale ? $product->get_price() : $product->get_sale_price();
@@ -782,7 +885,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product_ids[] = get_permalink( $item->get_product_id() );
 				}
 			}
@@ -803,7 +906,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product_image_ids[] = get_post_thumbnail_id( $item->get_product_id() );
 				}
 			}
@@ -824,7 +927,7 @@ class Wc_Tokens {
 		if ( $items ) {
 			/** @var WC_Order_Item_Product $item */
 			foreach ( $items as $item ) {
-				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || absint( '-1' ) === absint( $value_to_match ) ) {
+				if ( absint( $value_to_match ) === absint( $item->get_product_id() ) || intval( '-1' ) === intval( $value_to_match ) ) {
 					$product_image_urls[] = get_the_post_thumbnail_url( $item->get_product_id(), 'full' );
 				}
 			}
@@ -873,7 +976,7 @@ class Wc_Tokens {
 	 *
 	 * @return string
 	 */
-	private function build_summary_style_html( $order ) {
+	public function build_summary_style_html( $order ) {
 		$font_colour      = apply_filters( 'automator_woocommerce_order_summary_text_color', '#000', $order );
 		$font_family      = apply_filters( 'automator_woocommerce_order_summary_font_family', "'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif", $order );
 		$table_styles     = apply_filters( 'automator_woocommerce_order_summary_table_style', '', $order );
@@ -1020,7 +1123,7 @@ class Wc_Tokens {
 
 	/**
 	 * @param WC_Order $order
-	 * @param $value_to_match
+	 * @param          $value_to_match
 	 *
 	 * @return string
 	 */
@@ -1053,7 +1156,7 @@ class Wc_Tokens {
 
 	/**
 	 * @param WC_Order $order
-	 * @param $value_to_match
+	 * @param          $value_to_match
 	 *
 	 * @return string
 	 */
@@ -1168,5 +1271,46 @@ class Wc_Tokens {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Helper function to return country name from provided code.
+	 *
+	 * @param string $country_code
+	 *
+	 * @return string $country_name if found, otherwise $country_code
+	 */
+	public function get_country_name_from_code( $country_code ) {
+		$countries = WC()->countries->get_countries();
+		if ( ! empty( $countries ) ) {
+			foreach ( $countries as $country_key => $country_name ) {
+				if ( $country_key === $country_code ) {
+					return $country_name;
+				}
+			}
+		}
+
+		return $country_code;
+	}
+
+	/**
+	 * Helper function to return state name from provided codes.
+	 *
+	 * @param string $state_code
+	 * @param string $country_code
+	 *
+	 * @return string $state_name if found, otherwise $state_code
+	 */
+	public function get_state_name_from_codes( $state_code, $country_code ) {
+		$states = WC()->countries->get_states( $country_code );
+		if ( ! empty( $states ) ) {
+			foreach ( $states as $state_key => $state_name ) {
+				if ( $state_key === $state_code ) {
+					return $state_name;
+				}
+			}
+		}
+
+		return $state_code;
 	}
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CommercePayoutFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AMOUNT = 'amount';
-    const PAYOUT_DATE = 'payout_date';
-    const PAYOUT_REFERENCE_ID = 'payout_reference_id';
-    const STATUS = 'status';
-    const TRANSFER_ID = 'transfer_id';
-    public function getFieldTypes()
-    {
-        return array('amount' => 'Object', 'payout_date' => 'string', 'payout_reference_id' => 'string', 'status' => 'string', 'transfer_id' => 'string');
-    }
+
+class CommercePayoutFields extends AbstractEnum {
+
+  const AMOUNT = 'amount';
+  const PAYOUT_DATE = 'payout_date';
+  const PAYOUT_REFERENCE_ID = 'payout_reference_id';
+  const STATUS = 'status';
+  const TRANSFER_ID = 'transfer_id';
+
+  public function getFieldTypes() {
+    return array(
+      'amount' => 'Object',
+      'payout_date' => 'string',
+      'payout_reference_id' => 'string',
+      'status' => 'string',
+      'transfer_id' => 'string',
+    );
+  }
 }

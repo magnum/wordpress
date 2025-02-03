@@ -7,9 +7,11 @@ use Generator;
 
 /**
  * Interface Settings_Service_Interface
+ *
  * @package cybot\cookiebot\lib
  */
 interface Settings_Service_Interface {
+
 
 	/**
 	 * Settings_Service constructor.
@@ -81,7 +83,7 @@ interface Settings_Service_Interface {
 	 * @param $option_key
 	 * @param $default_placeholder
 	 * @param $cookies
-	 * @param string $src
+	 * @param string              $src
 	 *
 	 * @return mixed
 	 */

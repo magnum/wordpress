@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CustomAudienceCustomerFileSourceValues getInstance()
  */
-class CustomAudienceCustomerFileSourceValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BOTH_USER_AND_PARTNER_PROVIDED = 'BOTH_USER_AND_PARTNER_PROVIDED';
-    const PARTNER_PROVIDED_ONLY = 'PARTNER_PROVIDED_ONLY';
-    const USER_PROVIDED_ONLY = 'USER_PROVIDED_ONLY';
+class CustomAudienceCustomerFileSourceValues extends AbstractEnum {
+
+  const BOTH_USER_AND_PARTNER_PROVIDED = 'BOTH_USER_AND_PARTNER_PROVIDED';
+  const PARTNER_PROVIDED_ONLY = 'PARTNER_PROVIDED_ONLY';
+  const USER_PROVIDED_ONLY = 'USER_PROVIDED_ONLY';
 }

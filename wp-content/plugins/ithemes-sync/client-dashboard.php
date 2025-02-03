@@ -5,12 +5,12 @@ class Ithemes_Sync_Client_Dashboard {
 	/**
 	 * @var array List of item IDs to ignore from our list and never send to Sync
 	 */
-	private $_admin_bar_ignored_items = array(
-		'menu-toggle', //This is for admin responsiveness
-	);
+	private $_admin_bar_ignored_items = [
+		'menu-toggle', // This is for admin responsiveness
+	];
 
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', [ $this, 'init' ] );
 	}
 
 	public function init() {
@@ -22,31 +22,31 @@ class Ithemes_Sync_Client_Dashboard {
 
 			if ( ! get_user_meta( $user_id, 'ithemes-sync-client-dashboard-no-css', true ) ) {
 				// Enqueue our admin scripts and styles
-				//add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_scripts' ) );
+				// add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_scripts' ) );
 			}
 
 			if ( get_user_meta( $user_id, 'ithemes-sync-suppress-admin-notices', true ) ) {
-				add_action( 'network_admin_notices', array( $this, 'admin_notices_start' ), 1 );
-				add_action( 'user_admin_notices',    array( $this, 'admin_notices_start' ), 1 );
-				add_action( 'admin_notices',         array( $this, 'admin_notices_start' ), 1 );
-				add_action( 'all_admin_notices',     array( $this, 'admin_notices_start' ), 1 );
-				add_action( 'network_admin_notices', array( $this, 'admin_notices_end' ),   999 );
-				add_action( 'user_admin_notices',    array( $this, 'admin_notices_end' ),   999 );
-				add_action( 'admin_notices',         array( $this, 'admin_notices_end' ),   999 );
-				add_action( 'all_admin_notices',     array( $this, 'admin_notices_end' ),   999 );
+				add_action( 'network_admin_notices', [ $this, 'admin_notices_start' ], 1 );
+				add_action( 'user_admin_notices', [ $this, 'admin_notices_start' ], 1 );
+				add_action( 'admin_notices', [ $this, 'admin_notices_start' ], 1 );
+				add_action( 'all_admin_notices', [ $this, 'admin_notices_start' ], 1 );
+				add_action( 'network_admin_notices', [ $this, 'admin_notices_end' ], 999 );
+				add_action( 'user_admin_notices', [ $this, 'admin_notices_end' ], 999 );
+				add_action( 'admin_notices', [ $this, 'admin_notices_end' ], 999 );
+				add_action( 'all_admin_notices', [ $this, 'admin_notices_end' ], 999 );
 			}
 
 			// Filter menu items
-			add_action( 'admin_menu', array( $this, 'filter_admin_menu' ), 999999 ); //We want to be last!
+			add_action( 'admin_menu', [ $this, 'filter_admin_menu' ], 999999 ); // We want to be last!
 
 			// Filter admin bar items
-			add_action( 'wp_before_admin_bar_render', array( $this, 'filter_admin_bar_menu' ), 1002 );
+			add_action( 'wp_before_admin_bar_render', [ $this, 'filter_admin_bar_menu' ], 1002 );
 
 			// Filter dashboard widgets - screen_layout_columns fires late but before dashboard widgets are run or referenced in screen options
-			add_action( 'screen_layout_columns', array( $this, 'filter_dashboard_widgets' ) );
+			add_action( 'screen_layout_columns', [ $this, 'filter_dashboard_widgets' ] );
 
 			// Filter welcome panel
-			add_filter( 'show_welcome_panel', array( $this, 'show_welcome_panel' ) );
+			add_filter( 'show_welcome_panel', [ $this, 'show_welcome_panel' ] );
 		} else {
 			// If this is a call from the Edit User screen in sync, clear the cache.
 			if ( ! empty( $refresh_cd ) ) {
@@ -55,27 +55,27 @@ class Ithemes_Sync_Client_Dashboard {
 			}
 		}
 
-		add_action( 'admin_menu', array( $this, 'admin_menu' ), 999999 ); //We want to be last!
-		add_action( 'wp_before_admin_bar_render', array( $this, 'admin_bar_menu' ), 999 );
+		add_action( 'admin_menu', [ $this, 'admin_menu' ], 999999 ); // We want to be last!
+		add_action( 'wp_before_admin_bar_render', [ $this, 'admin_bar_menu' ], 999 );
 
-		add_action( 'switch_theme', array( $this, 'clear_cache' ) );
-		add_action( 'activate_plugin', array( $this, 'clear_cache' ) );
-		add_action( 'deactivate_plugin', array( $this, 'clear_cache' ) );
-		add_action( 'update_option_active_plugins', array( $this, 'clear_cache' ) );
-		add_action( 'add_option_active_plugins', array( $this, 'clear_cache' ) );
+		add_action( 'switch_theme', [ $this, 'clear_cache' ] );
+		add_action( 'activate_plugin', [ $this, 'clear_cache' ] );
+		add_action( 'deactivate_plugin', [ $this, 'clear_cache' ] );
+		add_action( 'update_option_active_plugins', [ $this, 'clear_cache' ] );
+		add_action( 'add_option_active_plugins', [ $this, 'clear_cache' ] );
 
-		add_action( 'update_site_option_active_sitewide_plugins', array( $this, 'clear_cache_network' ) );
-		add_action( 'add_site_option_active_sitewide_plugins', array( $this, 'clear_cache_network' ) );
+		add_action( 'update_site_option_active_sitewide_plugins', [ $this, 'clear_cache_network' ] );
+		add_action( 'add_site_option_active_sitewide_plugins', [ $this, 'clear_cache_network' ] );
 
 		/**
 		 * Handle Dashboard Widgets
 		 */
-		add_action( 'admin_footer-index.php', array( $this, 'dashboard_admin_footer' ) );
+		add_action( 'admin_footer-index.php', [ $this, 'dashboard_admin_footer' ] );
 	}
 
 	public function enqueue_dashboard_scripts() {
 		// Enqueue an additional CSS file on the admin dashboard
-		wp_enqueue_style( 'ithemes-sync-client-dashboard', plugins_url( 'css/client-dashboard.css', __FILE__ ), array( 'wp-admin' ), '20140801' );
+		wp_enqueue_style( 'ithemes-sync-client-dashboard', plugins_url( 'css/client-dashboard.css', __FILE__ ), [ 'wp-admin' ], '3.0.0' );
 	}
 
 	/**
@@ -92,12 +92,12 @@ class Ithemes_Sync_Client_Dashboard {
 
 		// If the user's admin_menu whitelist doesn't exist, set it.
 		if ( ! is_array( $menu_whitelist ) ) {
-			$menu_whitelist = array(
-				'index.php' => array(),
-				'edit.php' => true,
+			$menu_whitelist = [
+				'index.php'               => [],
+				'edit.php'                => true,
 				'edit.php?post_type=page' => true,
-				'edit-comments.php' => array(),
-			);
+				'edit-comments.php'       => [],
+			];
 			update_user_meta( $user_id, 'ithemes-sync-admin_menu-whitelist', $menu_whitelist );
 		}
 
@@ -172,15 +172,15 @@ class Ithemes_Sync_Client_Dashboard {
 			 */
 			global $submenu;
 
-			$admin_menu = array();
+			$admin_menu = [];
 			foreach ( $menu as $menu_item ) {
-				$admin_menu[$menu_item[2]] = array();
-				$admin_menu[$menu_item[2]]['label'] = $menu_item[0];
+				$admin_menu[ $menu_item[2] ]          = [];
+				$admin_menu[ $menu_item[2] ]['label'] = $menu_item[0];
 
-				if ( ! empty( $submenu[$menu_item[2]] ) ) {
-					$admin_menu[$menu_item[2]]['children'] = array();
-					foreach ( $submenu[$menu_item[2]] as $submenu_item ) {
-						$admin_menu[$menu_item[2]]['children'][$submenu_item[2]] = array( 'label' => $submenu_item[0] );
+				if ( ! empty( $submenu[ $menu_item[2] ] ) ) {
+					$admin_menu[ $menu_item[2] ]['children'] = [];
+					foreach ( $submenu[ $menu_item[2] ] as $submenu_item ) {
+						$admin_menu[ $menu_item[2] ]['children'][ $submenu_item[2] ] = [ 'label' => $submenu_item[0] ];
 					}
 				}
 			}
@@ -203,27 +203,27 @@ class Ithemes_Sync_Client_Dashboard {
 
 		// If the user's admin_menu whitelist doesn't exist, set it.
 		if ( ! is_array( $whitelist ) ) {
-			$whitelist = array(
+			$whitelist = [
 				'wp-logo',
-					'about',
-					'wp-logo-external',
-						'wporg',
-						'documentation',
-						'support-forums',
-						'feedback',
+				'about',
+				'wp-logo-external',
+				'wporg',
+				'documentation',
+				'support-forums',
+				'feedback',
 				'site-name',
 				'comments',
 				'new-content',
-					'new-post',
-					'new-page',
+				'new-post',
+				'new-page',
 				'edit',
 				'top-secondary',
-					'my-account',
-						'user-actions',
-							'user-info',
-							'edit-profile',
-							'logout',
-			);
+				'my-account',
+				'user-actions',
+				'user-info',
+				'edit-profile',
+				'logout',
+			];
 			update_user_meta( $user_id, 'ithemes-sync-admin-bar-item-whitelist-' . get_current_blog_id(), $whitelist );
 		}
 
@@ -251,7 +251,7 @@ class Ithemes_Sync_Client_Dashboard {
 			return true;
 		}
 
-		$admin_bar = array();
+		$admin_bar       = [];
 		$admin_bar_nodes = $wp_admin_bar->get_nodes();
 
 		$last_count = null;
@@ -272,8 +272,14 @@ class Ithemes_Sync_Client_Dashboard {
 				}
 			}
 
-			if ( ! $edit_found  && ( current_user_can( 'edit_published_pages' ) || current_user_can( 'edit_published_posts' ) ) ) {
-				$admin_bar['edit'] = (object) array( 'id' => 'edit', 'title' => '<span class="ab-icon"></span><span class="ab-label">Edit Post/ Page</span>', 'parent' => false, 'type' => 'item', 'children' => false );
+			if ( ! $edit_found && ( current_user_can( 'edit_published_pages' ) || current_user_can( 'edit_published_posts' ) ) ) {
+				$admin_bar['edit'] = (object) [
+					'id'       => 'edit',
+					'title'    => '<span class="ab-icon"></span><span class="ab-label">Edit Post/ Page</span>',
+					'parent'   => false,
+					'type'     => 'item',
+					'children' => false,
+				];
 			}
 
 			/**
@@ -304,12 +310,12 @@ class Ithemes_Sync_Client_Dashboard {
 	}
 
 	private function _create_admin_bar_node( $node_info ) {
-		$node = new stdClass();
-		$node->id = $node_info->id;
-		$node->title = $node_info->title;
-		$node->parent = $node_info->parent;
-		$node->type = $node_info->group? 'group':'item';
-		$node->children = array();
+		$node           = new stdClass();
+		$node->id       = $node_info->id;
+		$node->title    = $node_info->title;
+		$node->parent   = $node_info->parent;
+		$node->type     = $node_info->group ? 'group' : 'item';
+		$node->children = [];
 		return $node;
 	}
 
@@ -320,7 +326,12 @@ class Ithemes_Sync_Client_Dashboard {
 		delete_option( 'ithemes-sync-admin_menu' );
 		delete_option( 'ithemes-sync-dashboard-metaboxes' );
 
-		$users = get_users( array( 'blog_id' => get_current_blog_id(), 'fields' => array( 'ID' ) ) );
+		$users    = get_users(
+			[
+				'blog_id' => get_current_blog_id(),
+				'fields'  => [ 'ID' ],
+			] 
+		);
 		$meta_key = 'ithemes-sync-admin-bar-items-' . get_current_blog_id();
 		foreach ( $users as $user ) {
 			delete_user_meta( $user->ID, $meta_key );
@@ -337,8 +348,13 @@ class Ithemes_Sync_Client_Dashboard {
 		if ( $site && isset( $site->id ) ) {
 			global $wpdb;
 			$query = $wpdb->prepare( "SELECT `blog_id` FROM $wpdb->blogs WHERE `site_id`=%d", absint( $site->id ) );
-			$users = get_users( array( 'blog_id' => 0, 'fields' => array( 'ID' ) ) );
-			foreach( $wpdb->get_col( $query ) as $blog_id ) {
+			$users = get_users(
+				[
+					'blog_id' => 0,
+					'fields'  => [ 'ID' ],
+				] 
+			);
+			foreach ( $wpdb->get_col( $query ) as $blog_id ) {
 				delete_blog_option( $blog_id, 'ithemes-sync-admin_menu' );
 				delete_blog_option( $blog_id, 'ithemes-sync-dashboard-metaboxes' );
 
@@ -354,9 +370,9 @@ class Ithemes_Sync_Client_Dashboard {
 		$meta_box_list = get_option( 'ithemes-sync-dashboard-metaboxes' );
 		if ( false === $meta_box_list ) {
 			global $wp_meta_boxes;
-			$screen = get_current_screen();
-			$meta_box_list = array();
-			foreach ( $wp_meta_boxes[$screen->id] as $box_position ) {
+			$screen        = get_current_screen();
+			$meta_box_list = [];
+			foreach ( $wp_meta_boxes[ $screen->id ] as $box_position ) {
 				foreach ( $box_position as $box_set ) {
 					foreach ( $box_set as $box ) {
 						$meta_box_list[ $box['id'] ] = $box['title'];
@@ -382,11 +398,11 @@ class Ithemes_Sync_Client_Dashboard {
 
 		// If the user's admin_menu whitelist doesn't exist, set it.
 		if ( ! is_array( $whitelist ) ) {
-			$whitelist = array(
+			$whitelist = [
 				'dashboard_right_now',
 				'dashboard_quick_press',
 				'show_welcome_panel',
-			);
+			];
 			update_user_meta( $user_id, 'ithemes-sync-dashboard-widget-whitelist', $whitelist );
 		}
 
@@ -399,11 +415,11 @@ class Ithemes_Sync_Client_Dashboard {
 			global $wp_meta_boxes;
 			$whitelist = $this->get_allowed_dashboard_widgets();
 
-			foreach ( $wp_meta_boxes[$screen->id] as $box_position => $box_position_boxes ) {
+			foreach ( $wp_meta_boxes[ $screen->id ] as $box_position => $box_position_boxes ) {
 				foreach ( $box_position_boxes as $priority => $box_set ) {
 					foreach ( $box_set as $index => $box ) {
 						if ( ! in_array( $box['id'], $whitelist ) ) {
-							unset( $wp_meta_boxes[$screen->id][$box_position][$priority][$index] );
+							unset( $wp_meta_boxes[ $screen->id ][ $box_position ][ $priority ][ $index ] );
 						}
 					}
 				}

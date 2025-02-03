@@ -2,6 +2,7 @@
 namespace Elementor;
 
 use Elementor\Core\Base\App;
+use Elementor\Core\Settings\Manager as SettingsManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -16,6 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Preview extends App {
+
+	/**
+	 * The priority of the preview enqueued styles.
+	 */
+	const ENQUEUED_STYLES_PRIORITY = 20;
 
 	/**
 	 * Is Preview.
@@ -102,7 +108,7 @@ class Preview extends App {
 		add_action( 'wp_enqueue_scripts', function() {
 			$this->enqueue_styles();
 			$this->enqueue_scripts();
-		} );
+		}, self::ENQUEUED_STYLES_PRIORITY );
 
 		add_filter( 'the_content', [ $this, 'builder_wrapper' ], 999999 );
 
@@ -229,6 +235,8 @@ class Preview extends App {
 
 		Plugin::$instance->frontend->enqueue_styles();
 
+		Plugin::$instance->elements_manager->enqueue_elements_styles();
+
 		Plugin::$instance->widgets_manager->enqueue_widgets_styles();
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
@@ -251,18 +259,14 @@ class Preview extends App {
 			ELEMENTOR_VERSION
 		);
 
+		wp_enqueue_style(
+			'e-theme-ui-light',
+			$this->get_css_assets_url( 'theme-light' ),
+			[],
+			ELEMENTOR_VERSION
+		);
+
 		wp_enqueue_style( 'editor-preview' );
-
-		if ( ! Plugin::$instance->experiments->is_feature_active( 'e_dom_optimization' ) ) {
-			wp_register_style(
-				'editor-preview-legacy',
-				ELEMENTOR_ASSETS_URL . 'css/editor-preview-legacy' . $direction_suffix . $suffix . '.css',
-				[],
-				ELEMENTOR_VERSION
-			);
-
-			wp_enqueue_style( 'editor-preview-legacy' );
-		}
 
 		// Handle the 'wp audio' in editor preview.
 		wp_enqueue_style( 'wp-mediaelement' );

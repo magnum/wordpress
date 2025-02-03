@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,29 +34,50 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class GroupFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ARCHIVED = 'archived';
-    const COVER = 'cover';
-    const CREATED_TIME = 'created_time';
-    const DESCRIPTION = 'description';
-    const EMAIL = 'email';
-    const ICON = 'icon';
-    const ID = 'id';
-    const INSTALL = 'install';
-    const LINK = 'link';
-    const MEMBER_COUNT = 'member_count';
-    const MEMBER_REQUEST_COUNT = 'member_request_count';
-    const NAME = 'name';
-    const PARENT = 'parent';
-    const PERMISSIONS = 'permissions';
-    const PRIVACY = 'privacy';
-    const PURPOSE = 'purpose';
-    const SUBDOMAIN = 'subdomain';
-    const UPDATED_TIME = 'updated_time';
-    const VENUE = 'venue';
-    public function getFieldTypes()
-    {
-        return array('archived' => 'bool', 'cover' => 'CoverPhoto', 'created_time' => 'datetime', 'description' => 'string', 'email' => 'string', 'icon' => 'string', 'id' => 'string', 'install' => 'Object', 'link' => 'string', 'member_count' => 'unsigned int', 'member_request_count' => 'unsigned int', 'name' => 'string', 'parent' => 'Object', 'permissions' => 'list<string>', 'privacy' => 'string', 'purpose' => 'string', 'subdomain' => 'string', 'updated_time' => 'datetime', 'venue' => 'Location');
-    }
+
+class GroupFields extends AbstractEnum {
+
+  const ARCHIVED = 'archived';
+  const COVER = 'cover';
+  const CREATED_TIME = 'created_time';
+  const DESCRIPTION = 'description';
+  const EMAIL = 'email';
+  const ICON = 'icon';
+  const ID = 'id';
+  const INSTALL = 'install';
+  const LINK = 'link';
+  const MEMBER_COUNT = 'member_count';
+  const MEMBER_REQUEST_COUNT = 'member_request_count';
+  const NAME = 'name';
+  const PARENT = 'parent';
+  const PERMISSIONS = 'permissions';
+  const PRIVACY = 'privacy';
+  const PURPOSE = 'purpose';
+  const SUBDOMAIN = 'subdomain';
+  const UPDATED_TIME = 'updated_time';
+  const VENUE = 'venue';
+
+  public function getFieldTypes() {
+    return array(
+      'archived' => 'bool',
+      'cover' => 'CoverPhoto',
+      'created_time' => 'datetime',
+      'description' => 'string',
+      'email' => 'string',
+      'icon' => 'string',
+      'id' => 'string',
+      'install' => 'Object',
+      'link' => 'string',
+      'member_count' => 'unsigned int',
+      'member_request_count' => 'unsigned int',
+      'name' => 'string',
+      'parent' => 'Object',
+      'permissions' => 'list<string>',
+      'privacy' => 'string',
+      'purpose' => 'string',
+      'subdomain' => 'string',
+      'updated_time' => 'datetime',
+      'venue' => 'Location',
+    );
+  }
 }

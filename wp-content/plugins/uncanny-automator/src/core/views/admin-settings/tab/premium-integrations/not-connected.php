@@ -3,9 +3,9 @@
 namespace Uncanny_Automator;
 
 /**
- * Premium integrations
- * Settings > Premium integrations > Not connected
- * 
+ * App integrations
+ * Settings > App integrations > Not connected
+ *
  * Tab panel displayed when the user doesn't have an
  * automatorplugin.com account connected
  *
@@ -30,7 +30,7 @@ namespace Uncanny_Automator;
 			<uo-icon id="sync"></uo-icon>
 
 			<div class="uap-settings-panel-title">
-				<?php esc_html_e( 'Premium integrations use credits', 'uncanny-automator' ); ?>
+				<?php esc_html_e( 'App integrations use credits', 'uncanny-automator' ); ?>
 			</div>
 
 			<div class="uap-settings-panel-content">
@@ -41,18 +41,18 @@ namespace Uncanny_Automator;
 
 						printf(
 							/* translators: 1. Highlighted text */
-							esc_html__( 'Connect your site and start using third-party integrations! The free version of Uncanny Automator includes %1$s to use with our third-party integrations.', 'uncanny-automator' ),
+							esc_html__( 'Connect your site and start using app integrations! The free version of Uncanny Automator includes %1$s to use with our app integrations.', 'uncanny-automator' ),
 							/* translators: 1. Integer. Number of credits */
-							'<strong>' . sprintf( esc_html__( '%1$s free credits', 'uncanny-automator' ), '1,000' ) . '</strong>'
+							'<strong>' . sprintf( esc_html__( '%1$s free app credits', 'uncanny-automator' ), '250' ) . '</strong>'
 						);
 
-					?>
+						?>
 
-					<a 
+					<a
 						href="<?php echo esc_url( $upgrade_to_pro_url ); ?>"
 						target="_blank"
 					>
-						<?php esc_html_e( 'Buy Pro to get unlimited credits!', 'uncanny-automator' ); ?> <uo-icon id="external-link"></uo-icon>
+						<?php esc_html_e( 'Buy Pro to get unlimited app credits!', 'uncanny-automator' ); ?> <uo-icon id="external-link"></uo-icon>
 					</a>
 
 				</div>
@@ -65,7 +65,7 @@ namespace Uncanny_Automator;
 						<?php esc_html_e( 'Connect your site', 'uncanny-automator' ); ?>
 					</uo-button>
 
-					<uo-button 
+					<uo-button
 						href="<?php echo esc_url( $credits_article_url ); ?>"
 						target="_blank"
 						color="secondary"

@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_View_Post_Category extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_view_post_category';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_view_post_category';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -124,4 +135,5 @@ class AutomatorWP_WordPress_View_Post_Category extends AutomatorWP_Integration_T
 
 }
 
-new AutomatorWP_WordPress_View_Post_Category();
+new AutomatorWP_WordPress_View_Post_Category( 'wordpress' );
+new AutomatorWP_WordPress_View_Post_Category( 'posts' );

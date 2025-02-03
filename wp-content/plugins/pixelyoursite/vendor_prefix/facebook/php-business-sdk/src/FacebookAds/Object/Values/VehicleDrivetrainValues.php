@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,13 +35,13 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static VehicleDrivetrainValues getInstance()
  */
-class VehicleDrivetrainValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AWD = 'AWD';
-    const FOUR_WD = 'FOUR_WD';
-    const FWD = 'FWD';
-    const NONE = 'NONE';
-    const OTHER = 'OTHER';
-    const RWD = 'RWD';
-    const TWO_WD = 'TWO_WD';
+class VehicleDrivetrainValues extends AbstractEnum {
+
+  const AWD = 'AWD';
+  const FOUR_WD = 'FOUR_WD';
+  const FWD = 'FWD';
+  const NONE = 'NONE';
+  const OTHER = 'OTHER';
+  const RWD = 'RWD';
+  const TWO_WD = 'TWO_WD';
 }

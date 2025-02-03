@@ -1,4 +1,5 @@
 <?php
+
 namespace Uncanny_Automator;
 
 /**
@@ -8,60 +9,107 @@ namespace Uncanny_Automator;
  */
 class Automator_Status {
 
-	const NOT_COMPLETED         = 0;
-	const COMPLETED             = 1;
+	/**
+	 * @var int
+	 */
+	const NOT_COMPLETED = 0;
+
+	/**
+	 * @var int
+	 */
+	const COMPLETED = 1;
+
+	/**
+	 * @var int
+	 */
 	const COMPLETED_WITH_ERRORS = 2;
-	const IN_PROGRESS           = 5;
-	const CANCELLED             = 7;
-	const SKIPPED               = 8;
-	const DID_NOTHING           = 9;
-	const COMPLETED_AWAITING    = 10;
+
+	/**
+	 * @var int
+	 */
+	const IN_PROGRESS = 5;
+
+	/**
+	 * @var int
+	 */
+	const CANCELLED = 7;
+
+	/**
+	 * @var int
+	 */
+	const SKIPPED = 8;
+
+	/**
+	 * @var int
+	 */
+	const DID_NOTHING = 9;
+
+	/**
+	 * @var int
+	 */
+	const COMPLETED_AWAITING = 10;
+
+	/**
+	 * @var int
+	 */
 	const COMPLETED_WITH_NOTICE = 11;
+
+	/**
+	 * @var int
+	 */
+	const QUEUED = 12;
+
+	/**
+	 *
+	 */
+	const IN_PROGRESS_WITH_ERROR = 13;
+
+	/**
+	 * The status for recipes that are stuck in progress.
+	 *
+	 * @var int
+	 */
+	const FAILED = 14;
 
 	/**
 	 * Action status name
 	 *
-	 * @param  int $status
+	 * @param int $status
+	 *
 	 * @return string
 	 */
 	public static function name( $status ) {
-		$output = $status;
-		switch ( $status ) {
-			case self::NOT_COMPLETED:
-				$output = esc_attr__( 'Not completed', 'uncanny-automator' );
-				break;
-			case self::COMPLETED:
-				$output = esc_attr__( 'Completed', 'uncanny-automator' );
-				break;
-			case self::COMPLETED_WITH_ERRORS:
-				$output = esc_attr__( 'Completed with errors', 'uncanny-automator' );
-				break;
-			case self::IN_PROGRESS:
-				$output = esc_attr__( 'In progress', 'uncanny-automator' );
-				break;
-			case self::CANCELLED:
-				$output = esc_attr__( 'Cancelled', 'uncanny-automator' );
-				break;
-			case self::SKIPPED:
-				$output = esc_attr__( 'Skipped', 'uncanny-automator' );
-				break;
-			case self::DID_NOTHING:
-				$output = esc_attr__( 'Completed, did nothing', 'uncanny-automator' );
-				break;
-			case self::COMPLETED_AWAITING:
-				$output = esc_attr__( 'Completed, awaiting', 'uncanny-automator' );
-				break;
-			case self::COMPLETED_WITH_NOTICE:
-				$output = esc_attr__( 'Completed with notice', 'uncanny-automator' );
-				break;
-			default:
-				$output = $status;
-				break;
-		}
+
+		$status_names = self::get_all_statuses();
+
+		$output = isset( $status_names[ $status ] ) ? $status_names[ $status ] : $status;
 
 		return apply_filters( 'automator_status', $output, $status );
 	}
 
+	/**
+	 * @return array
+	 */
+	public static function get_all_statuses() {
+		return array(
+			self::NOT_COMPLETED          => esc_attr_x( 'Not completed', 'Recipe log status', 'uncanny-automator' ),
+			self::COMPLETED              => esc_attr_x( 'Completed', 'Recipe log status', 'uncanny-automator' ),
+			self::COMPLETED_WITH_ERRORS  => esc_attr_x( 'Completed with errors', 'Recipe log status', 'uncanny-automator' ),
+			self::IN_PROGRESS            => esc_attr_x( 'In progress', 'Recipe log status', 'uncanny-automator' ),
+			self::CANCELLED              => esc_attr_x( 'Cancelled', 'Recipe log status', 'uncanny-automator' ),
+			self::QUEUED                 => esc_attr_x( 'Queued', 'Recipe log status', 'uncanny-automator' ),
+			self::SKIPPED                => esc_attr_x( 'Skipped', 'Recipe log status', 'uncanny-automator' ),
+			self::DID_NOTHING            => esc_attr_x( 'Completed, did nothing', 'Recipe log status', 'uncanny-automator' ),
+			self::COMPLETED_AWAITING     => esc_attr_x( 'Completed, awaiting', 'Recipe log status', 'uncanny-automator' ),
+			self::COMPLETED_WITH_NOTICE  => esc_attr_x( 'Completed with notice', 'Recipe log status', 'uncanny-automator' ),
+			self::FAILED                 => esc_attr_x( 'Failed', 'Recipe log status', 'uncanny-automator' ),
+			self::IN_PROGRESS_WITH_ERROR => esc_attr_x( 'In progress with errors', 'Recipe log status', 'uncanny-automator' ),
+		);
+	}
+
+	/**
+	 * @return int[]
+	 */
 	public static function get_finished_statuses() {
 
 		$finished_statuses = array(
@@ -71,24 +119,52 @@ class Automator_Status {
 			self::SKIPPED,
 			self::DID_NOTHING,
 			self::COMPLETED_WITH_NOTICE,
+			self::FAILED,
 		);
 
 		return apply_filters( 'automator_status_finished', $finished_statuses );
 	}
 
+	/**
+	 * @return int[]
+	 */
+	public static function get_removable_statuses() {
+
+		$removable_statuses = array(
+			self::COMPLETED,
+			self::CANCELLED,
+			self::SKIPPED,
+			self::DID_NOTHING,
+			self::COMPLETED_WITH_NOTICE,
+			self::FAILED,
+		);
+
+		return apply_filters( 'automator_status_removable', $removable_statuses );
+
+	}
+
+	/**
+	 * @param $status
+	 *
+	 * @return mixed
+	 */
 	public static function get_class_name( $status ) {
 
 		$label = apply_filters(
 			'automator_status_get_class_name',
 			array(
-				self::NOT_COMPLETED         => 'not-completed',
-				self::COMPLETED             => 'completed',
-				self::COMPLETED_WITH_ERRORS => 'completed-with-errors',
-				self::IN_PROGRESS           => 'in-progress',
-				self::SKIPPED               => 'skipped',
-				self::DID_NOTHING           => 'completed-do-nothing',
-				self::COMPLETED_AWAITING    => 'completed-awaiting',
-				self::COMPLETED_WITH_NOTICE => 'completed-with-notice',
+				self::NOT_COMPLETED          => 'not-completed',
+				self::COMPLETED              => 'completed',
+				self::COMPLETED_WITH_ERRORS  => 'completed-with-errors',
+				self::IN_PROGRESS            => 'in-progress',
+				self::SKIPPED                => 'skipped',
+				self::DID_NOTHING            => 'completed-do-nothing',
+				self::COMPLETED_AWAITING     => 'completed-awaiting',
+				self::COMPLETED_WITH_NOTICE  => 'completed-with-notice',
+				self::CANCELLED              => 'cancelled',
+				self::QUEUED                 => 'queued',
+				self::FAILED                 => 'failed',
+				self::IN_PROGRESS_WITH_ERROR => 'in-progress-with-errors',
 			),
 			$status
 		);
@@ -97,8 +173,12 @@ class Automator_Status {
 
 	}
 
+	/**
+	 * @param $status
+	 *
+	 * @return bool
+	 */
 	public static function finished( $status ) {
 		return in_array( $status, self::get_finished_statuses(), true );
 	}
-
 }

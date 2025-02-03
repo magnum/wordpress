@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ExtendedCreditAllocationConfigField
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigLiabilityTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigPartitionTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigSendBillToValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,51 +41,93 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigSendB
  * pull request for this class.
  *
  */
-class ExtendedCreditAllocationConfig extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return ExtendedCreditAllocationConfigFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ExtendedCreditAllocationConfigFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['LiabilityType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigLiabilityTypeValues::getInstance()->getValues();
-        $ref_enums['PartitionType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigPartitionTypeValues::getInstance()->getValues();
-        $ref_enums['SendBillTo'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ExtendedCreditAllocationConfigSendBillToValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function deleteSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_DELETE, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject(), 'NODE', array(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ExtendedCreditAllocationConfig(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ExtendedCreditAllocationConfig::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function updateSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('amount' => 'Object');
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\ExtendedCreditAllocationConfig(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\ExtendedCreditAllocationConfig::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class ExtendedCreditAllocationConfig extends AbstractCrudObject {
+
+  /**
+   * @return ExtendedCreditAllocationConfigFields
+   */
+  public static function getFieldsEnum() {
+    return ExtendedCreditAllocationConfigFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['LiabilityType'] = ExtendedCreditAllocationConfigLiabilityTypeValues::getInstance()->getValues();
+    $ref_enums['PartitionType'] = ExtendedCreditAllocationConfigPartitionTypeValues::getInstance()->getValues();
+    $ref_enums['SendBillTo'] = ExtendedCreditAllocationConfigSendBillToValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function deleteSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_DELETE,
+      '/',
+      new AbstractCrudObject(),
+      'NODE',
+      array(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new ExtendedCreditAllocationConfig(),
+      'NODE',
+      ExtendedCreditAllocationConfig::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function updateSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'amount' => 'Object',
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/',
+      new ExtendedCreditAllocationConfig(),
+      'NODE',
+      ExtendedCreditAllocationConfig::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

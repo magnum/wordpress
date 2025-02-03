@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -37,6 +37,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeveri
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeverityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypesValues;
+
 /**
  * This class is auto-generated.
  *
@@ -45,26 +46,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypesV
  * pull request for this class.
  *
  */
-class ProductCatalogDiagnosticGroup extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return ProductCatalogDiagnosticGroupFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductCatalogDiagnosticGroupFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['AffectedChannels'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedChannelsValues::getInstance()->getValues();
-        $ref_enums['AffectedEntity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntityValues::getInstance()->getValues();
-        $ref_enums['AffectedFeatures'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedFeaturesValues::getInstance()->getValues();
-        $ref_enums['Severity'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeverityValues::getInstance()->getValues();
-        $ref_enums['Type'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypeValues::getInstance()->getValues();
-        $ref_enums['AffectedEntities'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupAffectedEntitiesValues::getInstance()->getValues();
-        $ref_enums['Severities'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupSeveritiesValues::getInstance()->getValues();
-        $ref_enums['Types'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductCatalogDiagnosticGroupTypesValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class ProductCatalogDiagnosticGroup extends AbstractObject {
+
+  /**
+   * @return ProductCatalogDiagnosticGroupFields
+   */
+  public static function getFieldsEnum() {
+    return ProductCatalogDiagnosticGroupFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['AffectedChannels'] = ProductCatalogDiagnosticGroupAffectedChannelsValues::getInstance()->getValues();
+    $ref_enums['AffectedEntity'] = ProductCatalogDiagnosticGroupAffectedEntityValues::getInstance()->getValues();
+    $ref_enums['AffectedFeatures'] = ProductCatalogDiagnosticGroupAffectedFeaturesValues::getInstance()->getValues();
+    $ref_enums['Severity'] = ProductCatalogDiagnosticGroupSeverityValues::getInstance()->getValues();
+    $ref_enums['Type'] = ProductCatalogDiagnosticGroupTypeValues::getInstance()->getValues();
+    $ref_enums['AffectedEntities'] = ProductCatalogDiagnosticGroupAffectedEntitiesValues::getInstance()->getValues();
+    $ref_enums['Severities'] = ProductCatalogDiagnosticGroupSeveritiesValues::getInstance()->getValues();
+    $ref_enums['Types'] = ProductCatalogDiagnosticGroupTypesValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductItemImporterAddressFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CITY = 'city';
-    const COUNTRY = 'country';
-    const POSTAL_CODE = 'postal_code';
-    const REGION = 'region';
-    const STREET1 = 'street1';
-    const STREET2 = 'street2';
-    public function getFieldTypes()
-    {
-        return array('city' => 'string', 'country' => 'string', 'postal_code' => 'string', 'region' => 'string', 'street1' => 'string', 'street2' => 'string');
-    }
+
+class ProductItemImporterAddressFields extends AbstractEnum {
+
+  const CITY = 'city';
+  const COUNTRY = 'country';
+  const POSTAL_CODE = 'postal_code';
+  const REGION = 'region';
+  const STREET1 = 'street1';
+  const STREET2 = 'street2';
+
+  public function getFieldTypes() {
+    return array(
+      'city' => 'string',
+      'country' => 'string',
+      'postal_code' => 'string',
+      'region' => 'string',
+      'street1' => 'string',
+      'street2' => 'string',
+    );
+  }
 }

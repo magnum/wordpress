@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CustomConversionStatsResultAggregationValues getInstance()
  */
-class CustomConversionStatsResultAggregationValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNT = 'count';
-    const DEVICE_TYPE = 'device_type';
-    const HOST = 'host';
-    const PIXEL_FIRE = 'pixel_fire';
-    const UNMATCHED_COUNT = 'unmatched_count';
-    const UNMATCHED_USD_AMOUNT = 'unmatched_usd_amount';
-    const URL = 'url';
-    const USD_AMOUNT = 'usd_amount';
+class CustomConversionStatsResultAggregationValues extends AbstractEnum {
+
+  const COUNT = 'count';
+  const DEVICE_TYPE = 'device_type';
+  const HOST = 'host';
+  const PIXEL_FIRE = 'pixel_fire';
+  const UNMATCHED_COUNT = 'unmatched_count';
+  const UNMATCHED_USD_AMOUNT = 'unmatched_usd_amount';
+  const URL = 'url';
+  const USD_AMOUNT = 'usd_amount';
 }

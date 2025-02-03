@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,17 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdStudyObjectiveTypeValues getInstance()
  */
-class AdStudyObjectiveTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BRAND = 'BRAND';
-    const BRANDLIFT = 'BRANDLIFT';
-    const CONVERSIONS = 'CONVERSIONS';
-    const FTL = 'FTL';
-    const MAE = 'MAE';
-    const MAI = 'MAI';
-    const MPC_CONVERSION = 'MPC_CONVERSION';
-    const NONSALES = 'NONSALES';
-    const PARTNER = 'PARTNER';
-    const SALES = 'SALES';
-    const TELCO = 'TELCO';
+class AdStudyObjectiveTypeValues extends AbstractEnum {
+
+  const BRAND = 'BRAND';
+  const BRANDLIFT = 'BRANDLIFT';
+  const CONVERSIONS = 'CONVERSIONS';
+  const FTL = 'FTL';
+  const MAE = 'MAE';
+  const MAI = 'MAI';
+  const MPC_CONVERSION = 'MPC_CONVERSION';
+  const NONSALES = 'NONSALES';
+  const PARTNER = 'PARTNER';
+  const SALES = 'SALES';
+  const TELCO = 'TELCO';
 }

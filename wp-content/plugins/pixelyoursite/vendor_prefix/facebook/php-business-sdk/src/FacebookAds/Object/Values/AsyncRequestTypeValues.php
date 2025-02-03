@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,9 +35,9 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AsyncRequestTypeValues getInstance()
  */
-class AsyncRequestTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ASYNC_ADGROUP_CREATION = 'ASYNC_ADGROUP_CREATION';
-    const BATCH_API = 'BATCH_API';
-    const DRAFTS = 'DRAFTS';
+class AsyncRequestTypeValues extends AbstractEnum {
+
+  const ASYNC_ADGROUP_CREATION = 'ASYNC_ADGROUP_CREATION';
+  const BATCH_API = 'BATCH_API';
+  const DRAFTS = 'DRAFTS';
 }

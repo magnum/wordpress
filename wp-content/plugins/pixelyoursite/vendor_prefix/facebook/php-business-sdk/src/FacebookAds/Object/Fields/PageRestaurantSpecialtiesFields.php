@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PageRestaurantSpecialtiesFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BREAKFAST = 'breakfast';
-    const COFFEE = 'coffee';
-    const DINNER = 'dinner';
-    const DRINKS = 'drinks';
-    const LUNCH = 'lunch';
-    public function getFieldTypes()
-    {
-        return array('breakfast' => 'unsigned int', 'coffee' => 'unsigned int', 'dinner' => 'unsigned int', 'drinks' => 'unsigned int', 'lunch' => 'unsigned int');
-    }
+
+class PageRestaurantSpecialtiesFields extends AbstractEnum {
+
+  const BREAKFAST = 'breakfast';
+  const COFFEE = 'coffee';
+  const DINNER = 'dinner';
+  const DRINKS = 'drinks';
+  const LUNCH = 'lunch';
+
+  public function getFieldTypes() {
+    return array(
+      'breakfast' => 'unsigned int',
+      'coffee' => 'unsigned int',
+      'dinner' => 'unsigned int',
+      'drinks' => 'unsigned int',
+      'lunch' => 'unsigned int',
+    );
+  }
 }

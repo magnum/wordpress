@@ -113,7 +113,7 @@ function automatorwp_ajax_add_automation_item() {
 
         $tags_html = '';
 
-        // Setup the tags html
+        // Set up the trigger tags html
         if( $item_type === 'trigger' ) {
 
             // Get the trigger tags
@@ -123,6 +123,16 @@ function automatorwp_ajax_add_automation_item() {
                 $tags_html = automatorwp_get_tags_selector_group_html( $id, $tags[$id] );
             }
 
+        }
+
+        // Set up the action tags html
+        if( $item_type === 'action' ) {
+            // Get the action tags
+            $tags = automatorwp_get_action_tags( (object) $object );
+
+            if( ! empty( $tags ) && isset( $tags[$id] ) ) {
+                $tags_html = automatorwp_get_tags_selector_group_html( $id, $tags[$id] );
+            }
         }
 
         // Send back a successful response
@@ -302,10 +312,10 @@ function automatorwp_ajax_update_item_option() {
 
     // Get option sanitized values
     $sanitized_values = $cmb2->get_sanitized_values( $_POST );
-
+    
     // Fields not in sanitized values need to recover its default value
     foreach ( $type_args['options'][$option]['fields'] as $field_id => $field ) {
-
+        
         // Skip fields in sanitized values
         if( isset( $sanitized_values[$field_id] ) ) {
             continue;
@@ -317,7 +327,7 @@ function automatorwp_ajax_update_item_option() {
         }
 
     }
-
+    
     // Field groups requires a custom way to handle their values saving
     foreach ( $type_args['options'][$option]['fields'] as $field_id => $field ) {
 
@@ -348,7 +358,7 @@ function automatorwp_ajax_update_item_option() {
                 if( ! isset( $field['fields'][$field_group_id] ) ) {
                     continue;
                 }
-
+                
                 if( ! empty( $value ) ) {
                     // Add the value from $_POST
                     $values[$field_group_id] = sanitize_text_field( $value );
@@ -366,11 +376,11 @@ function automatorwp_ajax_update_item_option() {
 
     // Setup the table here to ensure to store meta data on the correct table
     ct_setup_table( "automatorwp_{$item_type}s" );
-
+    
     foreach( $sanitized_values as $field_id => $value ) {
         ct_update_object_meta( $object->id, $field_id, $value );
     }
-
+    
     // Flush cache to ensure that option replacement gets the newest value
     wp_cache_flush();
 
@@ -388,6 +398,21 @@ function automatorwp_ajax_update_item_option() {
     if( $item_type === 'trigger' ) {
         // Get the trigger tags
         $tags = automatorwp_get_trigger_tags( (object) $object );
+
+        if( ! empty( $tags ) && isset( $tags[$id] ) ) {
+            $tags_html = automatorwp_get_tags_selector_group_html( $id, $tags[$id] );
+        }
+    }
+
+    $response = array(
+        'edit_html' => automatorwp_parse_automation_item_edit_label( (object) $object, $item_type ),
+        'tags_html' => $tags_html
+    );
+
+    // Setup the tags html
+    if( $item_type === 'action' ) {
+        // Get the action tags
+        $tags = automatorwp_get_action_tags( (object) $object );
 
         if( ! empty( $tags ) && isset( $tags[$id] ) ) {
             $tags_html = automatorwp_get_tags_selector_group_html( $id, $tags[$id] );
@@ -432,7 +457,7 @@ function automatorwp_ajax_run_automation() {
     // Sanitize parameters
     $automation_id = absint( $_POST['automation_id'] );
     $items_per_loop = ( isset( $_POST['items_per_loop'] ) ? absint( $_POST['items_per_loop'] ) : 0 );
-
+    
     $automation = automatorwp_get_automation_object( $automation_id );
 
     // Bail if automation not found
@@ -470,6 +495,18 @@ function automatorwp_ajax_run_automation() {
 
             if( $items_per_loop !== $original_posts_per_loop ) {
                 automatorwp_update_automation_meta( $automation->id, 'posts_per_loop', $items_per_loop );
+            }
+        } else if( $automation->type === 'import-file' ) {
+            // Import file
+            if( $items_per_loop <= 0 ) {
+                wp_send_json_error( __( 'Lines per loop need to be higher than 0.', 'automatorwp' ) );
+            }
+
+            // Update the lines per loop
+            $original_lines_per_loop = absint( automatorwp_get_automation_meta( $automation->id, 'lines_per_loop', true ) );
+
+            if( $items_per_loop !== $original_lines_per_loop ) {
+                automatorwp_update_automation_meta( $automation->id, 'lines_per_loop', $items_per_loop );
             }
         }
 

@@ -52,7 +52,7 @@ function adminGetCurrentPromoNotice() {
          * Determine which promo notices set is currently in use.
          * If meta is not present yet, it can be clean install or update from pre 7.x.
          */
-        $meta = get_user_meta( $user_id, 'pys_free_current_promo_notices_set', true );
+        $meta = get_option( 'pys_free_current_promo_notices_set' ) ?? get_user_meta( $user_id, 'pys_free_current_promo_notices_set', true );
         
         if ( ! $meta ) {
         
@@ -121,7 +121,7 @@ function adminGetCurrentPromoNotice() {
 
             $path = PYS_FREE_PATH . '/notices/' . $next . '.php';
             if (file_exists($path)) {
-                update_user_meta( $user_id, 'pys_free_current_promo_notices_set', $next );
+                update_option( 'pys_free_current_promo_notices_set', $next );
             }
 
             return false;
@@ -130,11 +130,11 @@ function adminGetCurrentPromoNotice() {
         /**
          * Get current notice.
          */
-        $current_notice_key = (int) get_user_meta( $user_id, 'pys_free_current_promo_notice_key', true );
+        $current_notice_key = (int) (get_option( 'pys_free_current_promo_notice_key' ) ?? get_user_meta( $user_id, 'pys_free_current_promo_notice_key', true ));
     
         if ( ! $current_notice_key ) {
             $current_notice_key = 0;
-            update_user_meta( $user_id, 'pys_free_current_promo_notice_key', $current_notice_key );
+            update_option( 'pys_free_current_promo_notice_key', $current_notice_key );
         }
         
         return adminGetSinglePromoNoticeContent( $notices, $current_notice_key, $days_passed, $user_id );
@@ -170,11 +170,11 @@ function adminGetSinglePromoNoticeContent($notices, $current_key, $days_passed, 
     
     // notice time is passed already, use next one
     if ( $days_passed > $to ) {
-        delete_user_meta( $user_id, 'pys_free_promo_notice_dismissed_at' );
+        delete_option( 'pys_free_promo_notice_dismissed_at' );
         return adminGetSinglePromoNoticeContent( $notices, $current_key + 1, $days_passed, $user_id );
     }
    
-    $dismissed = get_user_meta( $user_id, 'pys_free_promo_notice_dismissed_at', true );
+    $dismissed = get_opton( 'pys_free_promo_notice_dismissed_at' ) ?? get_user_meta( $user_id, 'pys_free_promo_notice_dismissed_at', true );
     
     if ( $dismissed ) {
         return false;

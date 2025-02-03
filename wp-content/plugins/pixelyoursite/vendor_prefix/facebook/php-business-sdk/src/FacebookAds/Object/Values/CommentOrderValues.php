@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static CommentOrderValues getInstance()
  */
-class CommentOrderValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CHRONOLOGICAL = 'chronological';
-    const REVERSE_CHRONOLOGICAL = 'reverse_chronological';
+class CommentOrderValues extends AbstractEnum {
+
+  const CHRONOLOGICAL = 'chronological';
+  const REVERSE_CHRONOLOGICAL = 'reverse_chronological';
 }

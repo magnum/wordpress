@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
-use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 /**
  * This class is auto-generated.
  *
@@ -34,7 +34,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ContentDeliveryReportPlatformValues getInstance()
  */
-class ContentDeliveryReportPlatformValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
+class ContentDeliveryReportPlatformValues extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const AUDIENCE_NETWORK = 'AUDIENCE_NETWORK';
     const FACEBOOK = 'FACEBOOK';

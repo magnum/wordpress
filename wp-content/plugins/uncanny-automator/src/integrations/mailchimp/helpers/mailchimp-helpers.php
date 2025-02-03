@@ -1,6 +1,7 @@
 <?php
 namespace Uncanny_Automator;
 
+use Exception;
 use Uncanny_Automator_Pro\Mailchimp_Pro_Helpers;
 
 use Uncanny_Automator\Api_Server;
@@ -39,7 +40,7 @@ class Mailchimp_Helpers {
 	 *
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Mailchimp Endpoint.
@@ -62,9 +63,14 @@ class Mailchimp_Helpers {
 	 */
 	public static $hash_string = 'Uncanny Automator Pro Mailchimp Sheet Integration';
 
-	public function __construct() {
+	/**
+	 * The mailchimp public API.
+	 *
+	 * @var string $settings_tab
+	 */
+	public $settings_tab = 'mailchimp_api';
 
-		$this->settings_tab = 'mailchimp_api';
+	public function __construct() {
 
 		add_action( 'init', array( $this, 'validate_oauth_tokens' ), 100, 3 );
 
@@ -745,7 +751,7 @@ class Mailchimp_Helpers {
 	 */
 	public function get_mailchimp_client() {
 
-		$client = get_option( '_uncannyowl_mailchimp_settings', array() );
+		$client = automator_get_option( '_uncannyowl_mailchimp_settings', array() );
 
 		if ( empty( $client ) || ! isset( $client['access_token'] ) ) {
 			throw new \Exception( __( 'Mailchimp account not found.', 'uncanny-automator' ) );
@@ -785,11 +791,11 @@ class Mailchimp_Helpers {
 					}
 
 					// Update user info settings.
-					update_option( '_uncannyowl_mailchimp_settings_user_info', $user_info );
+					automator_update_option( '_uncannyowl_mailchimp_settings_user_info', $user_info );
 
 					// On success.
-					update_option( '_uncannyowl_mailchimp_settings', $tokens );
-					delete_option( '_uncannyowl_mailchimp_settings_expired' );
+					automator_update_option( '_uncannyowl_mailchimp_settings', $tokens );
+					automator_delete_option( '_uncannyowl_mailchimp_settings_expired' );
 
 					// Set the transient.
 					set_transient( '_uncannyowl_mailchimp_settings', $tokens['access_token'] . '|' . $tokens['dc'], 60 * 50 );
@@ -826,9 +832,9 @@ class Mailchimp_Helpers {
 	public function uo_mailchimp_disconnect() {
 
 		if ( wp_verify_nonce( filter_input( INPUT_GET, 'nonce', FILTER_UNSAFE_RAW ), 'uo-mailchimp-disconnect' ) ) {
-			delete_option( '_uncannyowl_mailchimp_settings' );
-			delete_option( '_uncannyowl_mailchimp_settings_expired' );
-			delete_option( '_uncannyowl_mailchimp_settings_user_info' );
+			automator_delete_option( '_uncannyowl_mailchimp_settings' );
+			automator_delete_option( '_uncannyowl_mailchimp_settings_expired' );
+			automator_delete_option( '_uncannyowl_mailchimp_settings_user_info' );
 			delete_transient( 'automator_api_mailchimp_authorize_nonce' );
 			delete_transient( '_uncannyowl_mailchimp_settings' );
 		}
@@ -1070,7 +1076,7 @@ class Mailchimp_Helpers {
 	 */
 	public function is_webhook_enabled() {
 
-		$webhook_enabled_option = get_option( 'uap_mailchimp_enable_webhook', false );
+		$webhook_enabled_option = automator_get_option( 'uap_mailchimp_enable_webhook', false );
 
 		// The get_option can return string or boolean sometimes.
 		if ( 'on' === $webhook_enabled_option || 1 == $webhook_enabled_option ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
@@ -1239,7 +1245,7 @@ class Mailchimp_Helpers {
 	 */
 	public function get_webhook_key() {
 
-		$webhook_key = get_option( 'uap_mailchimp_webhook_key', false );
+		$webhook_key = automator_get_option( 'uap_mailchimp_webhook_key', false );
 
 		if ( false === $webhook_key ) {
 
@@ -1260,7 +1266,7 @@ class Mailchimp_Helpers {
 
 		$new_key = md5( uniqid( wp_rand(), true ) );
 
-		update_option( 'uap_mailchimp_webhook_key', $new_key );
+		automator_update_option( 'uap_mailchimp_webhook_key', $new_key );
 
 		return $new_key;
 
@@ -1329,6 +1335,51 @@ class Mailchimp_Helpers {
 			'input_type'  => 'email',
 			'required'    => true,
 		);
+
+	}
+
+	/**
+	 * Dynamically sanitizes and validates Mailchimp merge fields.
+	 *
+	 * @param  array $fields The Mailchimp merge fields to validate.
+	 *
+	 * @return array The sanitized fields.
+	 * @throws \Exception If required sub-array fields are empty.
+	 */
+	public static function handle_mailchimp_merge_fields( $fields ) {
+
+		$sanitized_fields = array();
+
+		foreach ( $fields as $key => $value ) {
+			// Handle nested arrays.
+			if ( is_array( $value ) ) {
+				$nested_sanitized = self::handle_mailchimp_merge_fields( $value );
+
+				// Ensure no empty values exist in nested arrays.
+				foreach ( $nested_sanitized as $sub_key => $sub_value ) {
+					if ( empty( $sub_value ) && $sub_value !== '0' ) {
+						throw new Exception(
+							sprintf(
+								/* translators: %1$s is the sub-field key, %2$s is the parent field key. */
+								__( "The field '%1\$s' in '%2\$s' is required but is empty.", 'text-domain' ),
+								$sub_key,
+								$key
+							)
+						);
+					}
+				}
+
+				$sanitized_fields[ $key ] = $nested_sanitized;
+				continue;
+			}
+
+			// Sanitize scalar fields.
+			$sanitized_value = sanitize_text_field( $value );
+
+			$sanitized_fields[ $key ] = $sanitized_value;
+		}
+
+		return $sanitized_fields;
 
 	}
 

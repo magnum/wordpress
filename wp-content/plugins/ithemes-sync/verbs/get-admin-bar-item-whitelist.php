@@ -13,7 +13,7 @@
 
 
 class Ithemes_Sync_Verb_Get_Admin_Bar_Item_Whitelist extends Ithemes_Sync_Verb {
-	public static $name = 'get-admin-bar-item-whitelist';
+	public static $name        = 'get-admin-bar-item-whitelist';
 	public static $description = 'Get the admin bar items a user can see.';
 
 	public function run( $arguments ) {

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCreativePlaceDataFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADDRESS_STRING = 'address_string';
-    const LABEL = 'label';
-    const LATITUDE = 'latitude';
-    const LOCATION_SOURCE_ID = 'location_source_id';
-    const LONGITUDE = 'longitude';
-    const TYPE = 'type';
-    public function getFieldTypes()
-    {
-        return array('address_string' => 'string', 'label' => 'string', 'latitude' => 'float', 'location_source_id' => 'string', 'longitude' => 'float', 'type' => 'string');
-    }
+
+class AdCreativePlaceDataFields extends AbstractEnum {
+
+  const ADDRESS_STRING = 'address_string';
+  const LABEL = 'label';
+  const LATITUDE = 'latitude';
+  const LOCATION_SOURCE_ID = 'location_source_id';
+  const LONGITUDE = 'longitude';
+  const TYPE = 'type';
+
+  public function getFieldTypes() {
+    return array(
+      'address_string' => 'string',
+      'label' => 'string',
+      'latitude' => 'float',
+      'location_source_id' => 'string',
+      'longitude' => 'float',
+      'type' => 'string',
+    );
+  }
 }

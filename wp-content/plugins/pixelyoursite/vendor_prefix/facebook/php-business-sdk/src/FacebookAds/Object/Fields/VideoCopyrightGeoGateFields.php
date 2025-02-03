@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VideoCopyrightGeoGateFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const EXCLUDED_COUNTRIES = 'excluded_countries';
-    const INCLUDED_COUNTRIES = 'included_countries';
-    public function getFieldTypes()
-    {
-        return array('excluded_countries' => 'list<string>', 'included_countries' => 'list<string>');
-    }
+
+class VideoCopyrightGeoGateFields extends AbstractEnum {
+
+  const EXCLUDED_COUNTRIES = 'excluded_countries';
+  const INCLUDED_COUNTRIES = 'included_countries';
+
+  public function getFieldTypes() {
+    return array(
+      'excluded_countries' => 'list<string>',
+      'included_countries' => 'list<string>',
+    );
+  }
 }

@@ -21,6 +21,15 @@ class AutomatorWP_Integration_Action {
     public $integration = '';
 
     /**
+     * Filter result
+     *
+     * @since 1.0.0
+     *
+     * @var string $result
+     */
+    public $result = '';
+
+    /**
      * Trigger
      *
      * @since 1.0.0

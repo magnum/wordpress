@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CatalogItemAppLinksFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ANDROID = 'android';
-    const IOS = 'ios';
-    const IPAD = 'ipad';
-    const IPHONE = 'iphone';
-    const WEB = 'web';
-    const WINDOWS = 'windows';
-    const WINDOWS_PHONE = 'windows_phone';
-    const WINDOWS_UNIVERSAL = 'windows_universal';
-    public function getFieldTypes()
-    {
-        return array('android' => 'list<AndroidAppLink>', 'ios' => 'list<IosAppLink>', 'ipad' => 'list<IosAppLink>', 'iphone' => 'list<IosAppLink>', 'web' => 'WebAppLink', 'windows' => 'list<WindowsAppLink>', 'windows_phone' => 'list<WindowsPhoneAppLink>', 'windows_universal' => 'list<WindowsAppLink>');
-    }
+
+class CatalogItemAppLinksFields extends AbstractEnum {
+
+  const ANDROID = 'android';
+  const IOS = 'ios';
+  const IPAD = 'ipad';
+  const IPHONE = 'iphone';
+  const WEB = 'web';
+  const WINDOWS = 'windows';
+  const WINDOWS_PHONE = 'windows_phone';
+  const WINDOWS_UNIVERSAL = 'windows_universal';
+
+  public function getFieldTypes() {
+    return array(
+      'android' => 'list<AndroidAppLink>',
+      'ios' => 'list<IosAppLink>',
+      'ipad' => 'list<IosAppLink>',
+      'iphone' => 'list<IosAppLink>',
+      'web' => 'WebAppLink',
+      'windows' => 'list<WindowsAppLink>',
+      'windows_phone' => 'list<WindowsPhoneAppLink>',
+      'windows_universal' => 'list<WindowsAppLink>',
+    );
+  }
 }

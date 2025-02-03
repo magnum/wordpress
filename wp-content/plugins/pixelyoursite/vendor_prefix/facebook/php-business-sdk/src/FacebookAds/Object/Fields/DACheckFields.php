@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class DACheckFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACTION_URI = 'action_uri';
-    const DESCRIPTION = 'description';
-    const KEY = 'key';
-    const RESULT = 'result';
-    const TITLE = 'title';
-    const USER_MESSAGE = 'user_message';
-    public function getFieldTypes()
-    {
-        return array('action_uri' => 'string', 'description' => 'string', 'key' => 'string', 'result' => 'string', 'title' => 'string', 'user_message' => 'string');
-    }
+
+class DACheckFields extends AbstractEnum {
+
+  const ACTION_URI = 'action_uri';
+  const DESCRIPTION = 'description';
+  const KEY = 'key';
+  const RESULT = 'result';
+  const TITLE = 'title';
+  const USER_MESSAGE = 'user_message';
+
+  public function getFieldTypes() {
+    return array(
+      'action_uri' => 'string',
+      'description' => 'string',
+      'key' => 'string',
+      'result' => 'string',
+      'title' => 'string',
+      'user_message' => 'string',
+    );
+  }
 }

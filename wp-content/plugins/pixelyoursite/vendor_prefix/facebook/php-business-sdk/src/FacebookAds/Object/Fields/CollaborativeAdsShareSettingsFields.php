@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,16 +34,24 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CollaborativeAdsShareSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AGENCY_BUSINESS = 'agency_business';
-    const ID = 'id';
-    const PRODUCT_CATALOG_PROXY_ID = 'product_catalog_proxy_id';
-    const UTM_CAMPAIGN = 'utm_campaign';
-    const UTM_MEDIUM = 'utm_medium';
-    const UTM_SOURCE = 'utm_source';
-    public function getFieldTypes()
-    {
-        return array('agency_business' => 'Business', 'id' => 'string', 'product_catalog_proxy_id' => 'string', 'utm_campaign' => 'string', 'utm_medium' => 'string', 'utm_source' => 'string');
-    }
+
+class CollaborativeAdsShareSettingsFields extends AbstractEnum {
+
+  const AGENCY_BUSINESS = 'agency_business';
+  const ID = 'id';
+  const PRODUCT_CATALOG_PROXY_ID = 'product_catalog_proxy_id';
+  const UTM_CAMPAIGN = 'utm_campaign';
+  const UTM_MEDIUM = 'utm_medium';
+  const UTM_SOURCE = 'utm_source';
+
+  public function getFieldTypes() {
+    return array(
+      'agency_business' => 'Business',
+      'id' => 'string',
+      'product_catalog_proxy_id' => 'string',
+      'utm_campaign' => 'string',
+      'utm_medium' => 'string',
+      'utm_source' => 'string',
+    );
+  }
 }

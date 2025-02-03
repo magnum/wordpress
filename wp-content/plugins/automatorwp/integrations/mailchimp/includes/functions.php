@@ -416,7 +416,7 @@ function automatorwp_mailchimp_get_template_name( $template_id ) {
         return;
     }
     
-    $template = $mailchimp->templates->get( $template_id );
+    $template = $mailchimp->templates->getTemplate( $template_id );
 
     return $template->name;
 

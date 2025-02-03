@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class InsightsResultFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const DESCRIPTION_FROM_API_DOC = 'description_from_api_doc';
-    const ID = 'id';
-    const NAME = 'name';
-    const PERIOD = 'period';
-    const TITLE = 'title';
-    const VALUES = 'values';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'description_from_api_doc' => 'string', 'id' => 'string', 'name' => 'string', 'period' => 'string', 'title' => 'string', 'values' => 'list<Object>');
-    }
+
+class InsightsResultFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const DESCRIPTION_FROM_API_DOC = 'description_from_api_doc';
+  const ID = 'id';
+  const NAME = 'name';
+  const PERIOD = 'period';
+  const TITLE = 'title';
+  const VALUES = 'values';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'description_from_api_doc' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'period' => 'string',
+      'title' => 'string',
+      'values' => 'list<Object>',
+    );
+  }
 }

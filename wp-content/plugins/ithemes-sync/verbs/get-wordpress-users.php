@@ -14,18 +14,16 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Wordpress_Users extends Ithemes_Sync_Verb {
-	public static $name = 'get-wordpress-users';
-	public static $description = 'Provides a list of WordPress users and their IDs';
+	public static $name                = 'get-wordpress-users';
+	public static $description         = 'Provides a list of WordPress users and their IDs';
 	public static $status_element_name = 'users';
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
-		$users = Ithemes_Sync_Functions::get_users( $arguments );
-		
-		return $users;
+		return Ithemes_Sync_Functions::get_users( $arguments );
 	}
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,16 +35,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static LiveVideoLiveCommentModerationSettingValues getInstance()
  */
-class LiveVideoLiveCommentModerationSettingValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const VALUE_DEFAULT = 'DEFAULT';
-    const DISCUSSION = 'DISCUSSION';
-    const FOLLOWED = 'FOLLOWED';
-    const FOLLOWER = 'FOLLOWER';
-    const NO_HYPERLINK = 'NO_HYPERLINK';
-    const PROTECTED_MODE = 'PROTECTED_MODE';
-    const RESTRICTED = 'RESTRICTED';
-    const SLOW = 'SLOW';
-    const SUPPORTER = 'SUPPORTER';
-    const TAGGED = 'TAGGED';
+class LiveVideoLiveCommentModerationSettingValues extends AbstractEnum {
+
+  const VALUE_DEFAULT = 'DEFAULT';
+  const DISCUSSION = 'DISCUSSION';
+  const FOLLOWED = 'FOLLOWED';
+  const FOLLOWER = 'FOLLOWER';
+  const NO_HYPERLINK = 'NO_HYPERLINK';
+  const PROTECTED_MODE = 'PROTECTED_MODE';
+  const RESTRICTED = 'RESTRICTED';
+  const SLOW = 'SLOW';
+  const SUPPORTER = 'SUPPORTER';
+  const TAGGED = 'TAGGED';
 }

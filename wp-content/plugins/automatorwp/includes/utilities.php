@@ -25,12 +25,36 @@ function automatorwp_utilities_times_option() {
                 'type' => 'text',
                 'attributes' => array(
                     'type' => 'number',
-                    'min' => '1',
                 ),
+                'sanitization_cb' => 'automatorwp_times_option_sanitization_cb',
                 'default' => 1
             )
         )
     );
+}
+
+/**
+ * Handles sanitization for the times option field. Ensures a field's value is greater than 0.
+ * 
+ * @since 1.0.0
+ *
+ * @param  mixed      $value        The unsanitized value from the form.
+ * @param  array      $field_args   Array of field arguments.
+ * @param  CMB2_Field $field        The field object
+ *
+ * @return int                      Sanitized value to be stored.
+ */
+function automatorwp_times_option_sanitization_cb( $value, $field_args, $field ) {
+
+    // Prevent incorrect values or numbers less than 1
+    if ( ! is_numeric( $value ) || $value < 1 ) {
+        $sanitized_value = 1;
+    } else {
+        $sanitized_value = absint( $value );
+    }
+
+    return $sanitized_value;
+
 }
 
 /**
@@ -670,6 +694,30 @@ function automatorwp_utilities_post_tags( $post_label = '' ) {
             'type'      => 'text',
             'preview'   => 'publish',
         ),
+        'post_date'  => array(
+            /* translators: %s: Post label (by default: Post). */
+            'label'     => sprintf( __( '%s Date', 'automatorwp' ), $post_label ),
+            'type'      => 'text',
+            'preview'   => date( 'Y-m-d H:i:s' ),
+        ),
+        'post_date_gmt'  => array(
+            /* translators: %s: Post label (by default: Post). */
+            'label'     => sprintf( __( '%s Date GMT', 'automatorwp' ), $post_label ),
+            'type'      => 'text',
+            'preview'   => date( 'Y-m-d H:i:s' ),
+        ),
+        'post_modified'  => array(
+            /* translators: %s: Post label (by default: Post). */
+            'label'     => sprintf( __( '%s Modified Date', 'automatorwp' ), $post_label ),
+            'type'      => 'text',
+            'preview'   => date( 'Y-m-d H:i:s' ),
+        ),
+        'post_modified_gmt'  => array(
+            /* translators: %s: Post label (by default: Post). */
+            'label'     => sprintf( __( '%s Modified Date GMT', 'automatorwp' ), $post_label ),
+            'type'      => 'text',
+            'preview'   => date( 'Y-m-d H:i:s' ),
+        ),
         'post_parent' => array(
             /* translators: %s: Post label (by default: Post). */
             'label'     => sprintf( __( '%s Parent ID', 'automatorwp' ), $post_label ),
@@ -681,6 +729,12 @@ function automatorwp_utilities_post_tags( $post_label = '' ) {
             'label'     => sprintf( __( '%s Menu Order', 'automatorwp' ), $post_label ),
             'type'      => 'integer',
             'preview'   => '1',
+        ),
+        'post_terms:TAXONOMY' => array(
+            /* translators: %s: Post label (by default: Post). */
+            'label'     => sprintf( __( '%s Terms', 'automatorwp' ), $post_label ),
+            'type'      => 'text',
+            'preview'   => sprintf( __( 'Terms assigned to the %s, replace "TAXONOMY" by the terms taxonomy (eg: category, post_tag, etc)', 'automatorwp' ), $post_label, strtolower( $post_label ) ),
         ),
         'post_meta:META_KEY' => array(
             /* translators: %s: Post label (by default: Post). */
@@ -774,6 +828,105 @@ function automatorwp_utilities_comment_tags( $comment_label = '' ) {
             'label'     => sprintf( __( '%s Type', 'automatorwp' ), $comment_label ),
             'type'      => 'text',
             'preview'   => 'comment',
+        ),
+    ) );
+
+}
+
+/**
+ * Utility function to get the user tags
+ *
+ * @since 1.0.0
+ *
+ * @return array
+ */
+function automatorwp_utilities_user_tags( $user_label = '' ) {
+
+    if( empty( $user_label ) ) {
+        $user_label = __( 'User', 'automatorwp' );
+    }
+
+    /**
+     * Filter to setup custom post tags
+     *
+     * @since 1.0.0
+     *
+     * @param array $post_tags
+     *
+     * @return array
+     */
+    return apply_filters( 'automatorwp_utilities_user_tags', array(
+        'user_id' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s ID', 'automatorwp' ), $user_label ),
+            'type'      => 'integer',
+            'preview'   => '123',
+        ),
+        'user_login' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Username', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => __( 'automatorwp', 'automatorwp' ),
+        ),
+        'user_email' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Email', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => 'contact@automatorwp.com',
+        ),
+        'display_name' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Display name', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => 'AutomatorWP Plugin',
+        ),
+        'first_name' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s First name', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => 'AutomatorWP',
+        ),
+        'last_name' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Last name', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => 'Plugin',
+        ),
+        'user_url' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Website URL', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => 'https://automatorwp.com',
+        ),
+        'avatar' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Avatar', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => '<img src="' . get_option( 'home' ) . '/wp-content/uploads/avatar.jpg'  . '"/>',
+        ),
+        'avatar_url' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Avatar URL', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => get_option( 'home' ) . '/wp-content/uploads/avatar.jpg',
+        ),
+        'reset_password_url' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Reset password URL', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => get_option( 'home' ) . '/wp-login.php?action=rp',
+        ),
+        'reset_password_link' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Reset password link', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => '<a href="' . get_option( 'home' ) . '/wp-login.php?action=rp' . '">' . __( 'Click here to reset your password', 'automatorwp' ) . '</a>',
+        ),
+        'user_meta:META_KEY' => array(
+            /* translators: %s: User label (by default: User). */
+            'label'     => sprintf( __( '%s Meta', 'automatorwp' ), $user_label ),
+            'type'      => 'text',
+            'preview'   => sprintf( __( '%s meta value, replace "META_KEY" by the %s meta key', 'automatorwp' ), $user_label, strtolower( $user_label ) ),
         ),
     ) );
 
@@ -1601,5 +1754,27 @@ function automatorwp_implode_array( $glue = '', $glue_for_last_item = '', $array
     $both  = array_filter( array_merge( array( $first ), $last ), 'strlen' );
 
     return join( $glue_for_last_item, $both );
+
+}
+
+
+/**
+ * Utility function to get the operator field
+ *
+ * @since 1.0.0
+ *
+ * @return array
+ */
+function automatorwp_utilities_operator_field() {
+
+    return array(
+        'name' => __( 'Operator:', 'automatorwp' ),
+        'type' => 'select',
+        'options'  => array(
+            'AND' => __( 'AND', 'automatorwp' ),
+            'OR' => __( 'OR', 'automatorwp' ),
+        ),
+        'default' => 'AND'
+    );
 
 }

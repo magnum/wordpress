@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,14 +35,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static LocalServiceBusinessConditionValues getInstance()
  */
-class LocalServiceBusinessConditionValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const PC_CPO = 'PC_CPO';
-    const PC_NEW = 'PC_NEW';
-    const PC_OPEN_BOX_NEW = 'PC_OPEN_BOX_NEW';
-    const PC_REFURBISHED = 'PC_REFURBISHED';
-    const PC_USED = 'PC_USED';
-    const PC_USED_FAIR = 'PC_USED_FAIR';
-    const PC_USED_GOOD = 'PC_USED_GOOD';
-    const PC_USED_LIKE_NEW = 'PC_USED_LIKE_NEW';
+class LocalServiceBusinessConditionValues extends AbstractEnum {
+
+  const PC_CPO = 'PC_CPO';
+  const PC_NEW = 'PC_NEW';
+  const PC_OPEN_BOX_NEW = 'PC_OPEN_BOX_NEW';
+  const PC_REFURBISHED = 'PC_REFURBISHED';
+  const PC_USED = 'PC_USED';
+  const PC_USED_FAIR = 'PC_USED_FAIR';
+  const PC_USED_GOOD = 'PC_USED_GOOD';
+  const PC_USED_LIKE_NEW = 'PC_USED_LIKE_NEW';
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,26 +34,46 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class SavedAudienceFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT = 'account';
-    const APPROXIMATE_COUNT_LOWER_BOUND = 'approximate_count_lower_bound';
-    const APPROXIMATE_COUNT_UPPER_BOUND = 'approximate_count_upper_bound';
-    const DELETE_TIME = 'delete_time';
-    const DESCRIPTION = 'description';
-    const EXTRA_INFO = 'extra_info';
-    const ID = 'id';
-    const NAME = 'name';
-    const OPERATION_STATUS = 'operation_status';
-    const PAGE_DELETION_MARKED_DELETE_TIME = 'page_deletion_marked_delete_time';
-    const PERMISSION_FOR_ACTIONS = 'permission_for_actions';
-    const RUN_STATUS = 'run_status';
-    const SENTENCE_LINES = 'sentence_lines';
-    const TARGETING = 'targeting';
-    const TIME_CREATED = 'time_created';
-    const TIME_UPDATED = 'time_updated';
-    public function getFieldTypes()
-    {
-        return array('account' => 'AdAccount', 'approximate_count_lower_bound' => 'int', 'approximate_count_upper_bound' => 'int', 'delete_time' => 'int', 'description' => 'string', 'extra_info' => 'string', 'id' => 'string', 'name' => 'string', 'operation_status' => 'CustomAudienceStatus', 'page_deletion_marked_delete_time' => 'int', 'permission_for_actions' => 'AudiencePermissionForActions', 'run_status' => 'string', 'sentence_lines' => 'list', 'targeting' => 'Targeting', 'time_created' => 'datetime', 'time_updated' => 'datetime');
-    }
+
+class SavedAudienceFields extends AbstractEnum {
+
+  const ACCOUNT = 'account';
+  const APPROXIMATE_COUNT_LOWER_BOUND = 'approximate_count_lower_bound';
+  const APPROXIMATE_COUNT_UPPER_BOUND = 'approximate_count_upper_bound';
+  const DELETE_TIME = 'delete_time';
+  const DESCRIPTION = 'description';
+  const EXTRA_INFO = 'extra_info';
+  const ID = 'id';
+  const NAME = 'name';
+  const OPERATION_STATUS = 'operation_status';
+  const OWNER_BUSINESS = 'owner_business';
+  const PAGE_DELETION_MARKED_DELETE_TIME = 'page_deletion_marked_delete_time';
+  const PERMISSION_FOR_ACTIONS = 'permission_for_actions';
+  const RUN_STATUS = 'run_status';
+  const SENTENCE_LINES = 'sentence_lines';
+  const TARGETING = 'targeting';
+  const TIME_CREATED = 'time_created';
+  const TIME_UPDATED = 'time_updated';
+
+  public function getFieldTypes() {
+    return array(
+      'account' => 'AdAccount',
+      'approximate_count_lower_bound' => 'int',
+      'approximate_count_upper_bound' => 'int',
+      'delete_time' => 'int',
+      'description' => 'string',
+      'extra_info' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'operation_status' => 'CustomAudienceStatus',
+      'owner_business' => 'Business',
+      'page_deletion_marked_delete_time' => 'int',
+      'permission_for_actions' => 'AudiencePermissionForActions',
+      'run_status' => 'string',
+      'sentence_lines' => 'list',
+      'targeting' => 'Targeting',
+      'time_created' => 'datetime',
+      'time_updated' => 'datetime',
+    );
+  }
 }

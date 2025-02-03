@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Register extends AutomatorWP_Integration_Trigger {
 
-    public $integration = 'wordpress';
-    public $trigger = 'wordpress_register';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->trigger = $integration . '_register';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -59,4 +70,5 @@ class AutomatorWP_WordPress_Register extends AutomatorWP_Integration_Trigger {
 
 }
 
-new AutomatorWP_WordPress_Register();
+new AutomatorWP_WordPress_Register( 'wordpress' );
+new AutomatorWP_WordPress_Register( 'users' );

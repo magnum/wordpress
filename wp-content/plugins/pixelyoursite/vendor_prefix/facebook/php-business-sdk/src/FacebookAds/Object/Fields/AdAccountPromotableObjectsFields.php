@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdAccountPromotableObjectsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const PROMOTABLE_APP_IDS = 'promotable_app_ids';
-    const PROMOTABLE_PAGE_IDS = 'promotable_page_ids';
-    const PROMOTABLE_URLS = 'promotable_urls';
-    public function getFieldTypes()
-    {
-        return array('promotable_app_ids' => 'list<string>', 'promotable_page_ids' => 'list<string>', 'promotable_urls' => 'list<string>');
-    }
+
+class AdAccountPromotableObjectsFields extends AbstractEnum {
+
+  const PROMOTABLE_APP_IDS = 'promotable_app_ids';
+  const PROMOTABLE_PAGE_IDS = 'promotable_page_ids';
+  const PROMOTABLE_URLS = 'promotable_urls';
+
+  public function getFieldTypes() {
+    return array(
+      'promotable_app_ids' => 'list<string>',
+      'promotable_page_ids' => 'list<string>',
+      'promotable_urls' => 'list<string>',
+    );
+  }
 }

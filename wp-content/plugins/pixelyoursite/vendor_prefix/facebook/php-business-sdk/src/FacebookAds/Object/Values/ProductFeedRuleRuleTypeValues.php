@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductFeedRuleRuleTypeValues getInstance()
  */
-class ProductFeedRuleRuleTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FALLBACK_RULE = 'fallback_rule';
-    const LETTER_CASE_RULE = 'letter_case_rule';
-    const MAPPING_RULE = 'mapping_rule';
-    const REGEX_REPLACE_RULE = 'regex_replace_rule';
-    const VALUE_MAPPING_RULE = 'value_mapping_rule';
+class ProductFeedRuleRuleTypeValues extends AbstractEnum {
+
+  const FALLBACK_RULE = 'fallback_rule';
+  const LETTER_CASE_RULE = 'letter_case_rule';
+  const MAPPING_RULE = 'mapping_rule';
+  const REGEX_REPLACE_RULE = 'regex_replace_rule';
+  const VALUE_MAPPING_RULE = 'value_mapping_rule';
 }

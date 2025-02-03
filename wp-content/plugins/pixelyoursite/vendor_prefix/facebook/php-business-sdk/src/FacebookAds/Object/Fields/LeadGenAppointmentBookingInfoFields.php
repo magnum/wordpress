@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LeadGenAppointmentBookingInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADVERTISER_TIMEZONE_OFFSET = 'advertiser_timezone_offset';
-    const APPOINTMENT_DURATIONS = 'appointment_durations';
-    const APPOINTMENT_SLOTS_BY_DAY = 'appointment_slots_by_day';
-    public function getFieldTypes()
-    {
-        return array('advertiser_timezone_offset' => 'string', 'appointment_durations' => 'list<string>', 'appointment_slots_by_day' => 'list<Object>');
-    }
+
+class LeadGenAppointmentBookingInfoFields extends AbstractEnum {
+
+  const ADVERTISER_TIMEZONE_OFFSET = 'advertiser_timezone_offset';
+  const APPOINTMENT_DURATIONS = 'appointment_durations';
+  const APPOINTMENT_SLOTS_BY_DAY = 'appointment_slots_by_day';
+
+  public function getFieldTypes() {
+    return array(
+      'advertiser_timezone_offset' => 'string',
+      'appointment_durations' => 'list<string>',
+      'appointment_slots_by_day' => 'list<Object>',
+    );
+  }
 }

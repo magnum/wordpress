@@ -16,12 +16,12 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Supported_Verbs extends Ithemes_Sync_Verb {
-	public static $name = 'get-supported-verbs';
-	public static $description = 'Retrieve a listing of the supported verbs.';
-	public static $status_element_name = 'supported-verbs';
+	public static $name                      = 'get-supported-verbs';
+	public static $description               = 'Retrieve a listing of the supported verbs.';
+	public static $status_element_name       = 'supported-verbs';
 	public static $show_in_status_by_default = true;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {

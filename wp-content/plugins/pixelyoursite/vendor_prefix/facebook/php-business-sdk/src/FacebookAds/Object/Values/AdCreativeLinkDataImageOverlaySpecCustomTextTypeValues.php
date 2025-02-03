@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues getInstance()
  */
-class AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const FREE_SHIPPING = 'free_shipping';
-    const POPULAR = 'popular';
+class AdCreativeLinkDataImageOverlaySpecCustomTextTypeValues extends AbstractEnum {
+
+  const FREE_SHIPPING = 'free_shipping';
+  const POPULAR = 'popular';
 }

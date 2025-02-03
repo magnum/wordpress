@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,12 +34,16 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PermissionFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const PERMISSION = 'permission';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('permission' => 'string', 'status' => 'string');
-    }
+
+class PermissionFields extends AbstractEnum {
+
+  const PERMISSION = 'permission';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'permission' => 'string',
+      'status' => 'string',
+    );
+  }
 }

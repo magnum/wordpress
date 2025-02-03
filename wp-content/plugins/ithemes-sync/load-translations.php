@@ -15,7 +15,7 @@ Version History
 
 
 $ithemes_sync_plugin_dir = basename( $GLOBALS['ithemes_sync_path'] );
-$ithemes_sync_locale = apply_filters( 'plugin_locale', get_locale(), 'it-l10n-ithemes-sync' );
+$ithemes_sync_locale     = apply_filters( 'plugin_locale', get_locale(), 'it-l10n-ithemes-sync' );
 
 load_textdomain( 'it-l10n-ithemes-sync', WP_LANG_DIR . "/plugins/ithemes-sync/it-l10n-ithemes-sync-$ithemes_sync_locale.mo" );
 load_plugin_textdomain( 'it-l10n-ithemes-sync', false, "$ithemes_sync_plugin_dir/lang/" );

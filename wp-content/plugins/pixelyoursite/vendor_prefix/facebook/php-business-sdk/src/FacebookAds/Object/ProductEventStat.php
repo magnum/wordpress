@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductEventStatFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatBreakdownsValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatDeviceTypeValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatEventValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,21 +41,23 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatEventValues;
  * pull request for this class.
  *
  */
-class ProductEventStat extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return ProductEventStatFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\ProductEventStatFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['DeviceType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatDeviceTypeValues::getInstance()->getValues();
-        $ref_enums['Event'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatEventValues::getInstance()->getValues();
-        $ref_enums['Breakdowns'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\ProductEventStatBreakdownsValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class ProductEventStat extends AbstractObject {
+
+  /**
+   * @return ProductEventStatFields
+   */
+  public static function getFieldsEnum() {
+    return ProductEventStatFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['DeviceType'] = ProductEventStatDeviceTypeValues::getInstance()->getValues();
+    $ref_enums['Event'] = ProductEventStatEventValues::getInstance()->getValues();
+    $ref_enums['Breakdowns'] = ProductEventStatBreakdownsValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

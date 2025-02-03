@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,24 +34,40 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessRoleRequestFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CREATED_BY = 'created_by';
-    const CREATED_TIME = 'created_time';
-    const EMAIL = 'email';
-    const EXPIRATION_TIME = 'expiration_time';
-    const EXPIRY_TIME = 'expiry_time';
-    const FINANCE_ROLE = 'finance_role';
-    const ID = 'id';
-    const INVITE_LINK = 'invite_link';
-    const IP_ROLE = 'ip_role';
-    const OWNER = 'owner';
-    const ROLE = 'role';
-    const STATUS = 'status';
-    const UPDATED_BY = 'updated_by';
-    const UPDATED_TIME = 'updated_time';
-    public function getFieldTypes()
-    {
-        return array('created_by' => 'Object', 'created_time' => 'datetime', 'email' => 'string', 'expiration_time' => 'datetime', 'expiry_time' => 'datetime', 'finance_role' => 'string', 'id' => 'string', 'invite_link' => 'string', 'ip_role' => 'string', 'owner' => 'Business', 'role' => 'string', 'status' => 'string', 'updated_by' => 'Object', 'updated_time' => 'datetime');
-    }
+
+class BusinessRoleRequestFields extends AbstractEnum {
+
+  const CREATED_BY = 'created_by';
+  const CREATED_TIME = 'created_time';
+  const EMAIL = 'email';
+  const EXPIRATION_TIME = 'expiration_time';
+  const EXPIRY_TIME = 'expiry_time';
+  const FINANCE_ROLE = 'finance_role';
+  const ID = 'id';
+  const INVITE_LINK = 'invite_link';
+  const IP_ROLE = 'ip_role';
+  const OWNER = 'owner';
+  const ROLE = 'role';
+  const STATUS = 'status';
+  const UPDATED_BY = 'updated_by';
+  const UPDATED_TIME = 'updated_time';
+
+  public function getFieldTypes() {
+    return array(
+      'created_by' => 'Object',
+      'created_time' => 'datetime',
+      'email' => 'string',
+      'expiration_time' => 'datetime',
+      'expiry_time' => 'datetime',
+      'finance_role' => 'string',
+      'id' => 'string',
+      'invite_link' => 'string',
+      'ip_role' => 'string',
+      'owner' => 'Business',
+      'role' => 'string',
+      'status' => 'string',
+      'updated_by' => 'Object',
+      'updated_time' => 'datetime',
+    );
+  }
 }

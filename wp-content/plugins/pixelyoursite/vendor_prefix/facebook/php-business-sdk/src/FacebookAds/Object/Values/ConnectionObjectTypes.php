@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,17 +21,19 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * @method static ConnectionObjectTypes getInstance()
  */
-class ConnectionObjectTypes extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const PAGE = 1;
-    const APPLICATION = 2;
-    const EVENT = 3;
-    const PLACE = 6;
-    const DOMAIN = 7;
+class ConnectionObjectTypes extends AbstractEnum {
+
+  const PAGE = 1;
+  const APPLICATION = 2;
+  const EVENT = 3;
+  const PLACE = 6;
+  const DOMAIN = 7;
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,12 +21,13 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
-interface CanRedownloadInterface
-{
-    /**
-     * @string
-     */
-    const PARAM_REDOWNLOAD = 'redownload';
+interface CanRedownloadInterface {
+
+  /**
+   * @string
+   */
+  const PARAM_REDOWNLOAD = 'redownload';
 }

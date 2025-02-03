@@ -3,7 +3,7 @@
  * Plugin Name: miniOrange SSO using SAML 2.0
  * Plugin URI: https://miniorange.com/
  * Description: miniOrange SAML plugin allows sso/login using Azure, Azure B2C, Okta, ADFS, Keycloak, Onelogin, Salesforce, Google Apps (Gsuite), Salesforce, Shibboleth, Centrify, Ping, Auth0 and other Identity Providers. It acts as a SAML Service Provider which can be configured to establish a trust between the plugin and IDP to securely authenticate and login the user to WordPress site.
- * Version: 5.0.0
+ * Version: 5.2.4
  * Author: miniOrange
  * Author URI: https://miniorange.com/
  * License: MIT/Expat
@@ -17,51 +17,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+define( 'MO_SAML_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 require_once 'handlers/class-mo-saml-base-handler.php';
+require_once 'handlers/class-mo-saml-test-config-error-handler.php';
 require_once 'class-mo-saml-idp-metadata-reader.php';
 require_once 'class-mo-saml-login-widget.php';
+require_once 'class-mo-saml-login-validate.php';
 require_once 'class-mo-saml-customer.php';
 require_once 'class-mo-saml-logger.php';
 require_once 'mo-saml-settings-page.php';
 require_once 'class-mo-saml-utilities.php';
 require_once 'class-mo-saml-wp-config-editor.php';
+require_once 'notices/class-mo-saml-end-year-sale-notice.php';
 
 /**
  * The Main class of the miniOrange SAML SSO Plugin.
  */
 class Saml_Mo_Login {
 
-
 	/**
 	 * The Constructor for the main class. This takes care of initializing all the hooks used by the plugin.
 	 */
 	public function __construct() {
-		add_action( 'activated_plugin', array( $this, 'mo_saml_redirect_after_activation' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'plugin_settings_script' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'plugin_settings_style' ) );
+		register_activation_hook( __FILE__, array( $this, 'mo_saml_sso_activate' ) );
+		add_action( 'admin_init', array( Mo_Saml_Test_Config_Error_Handler::class, 'mo_saml_get_settings_handler' ) );
 		add_action( 'admin_init', array( Mo_SAML_Base_Handler::class, 'mo_saml_save_settings_handler' ) );
 		add_action( 'admin_init', array( 'Mo_SAML_Logger', 'mo_saml_admin_notices' ) );
+		add_action( 'admin_init', array( $this, 'mo_saml_do_plugin_extension_checks' ) );
 		add_action( 'admin_footer', array( $this, 'feedback_request' ) );
 		add_action( 'admin_menu', array( $this, 'miniorange_sso_menu' ) );
 		add_action( 'admin_notices', array( $this, 'mo_saml_idp_notice' ) );
 		add_action( 'login_form', array( $this, 'mo_saml_modify_login_form' ) );
 		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'mo_saml_plugin_action_links' ) );
 		add_action( 'plugins_loaded', array( $this, 'mo_saml_load_translations' ) );
-		add_action( 'wp_ajax_skip_entire_plugin_tour', array( $this, 'close_welcome_modal' ) );
 		add_action( 'wp_authenticate', array( $this, 'mo_saml_authenticate' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'mo_saml_deactivate' ) );
 		register_shutdown_function( array( $this, 'log_errors' ) );
 		remove_action( 'admin_notices', array( Mo_SAML_Utilities::class, 'mo_saml_error_message' ) );
 		remove_action( 'admin_notices', array( Mo_SAML_Utilities::class, 'mo_saml_success_message' ) );
-	}
-
-	/**
-	 * This function takes care of setting a flag required for showing the welcome page only once.
-	 *
-	 * @return void
-	 */
-	public function close_welcome_modal() {
-		update_option( Mo_Saml_Options_Enum::NEW_USER, 1 );
 	}
 
 	/**
@@ -76,6 +71,15 @@ class Saml_Mo_Login {
 		if ( ! isset( $_GET['activate-multi'] ) && 'miniorange-saml-20-single-sign-on/login.php' === $plugin && ! $network_wide ) {
 			wp_safe_redirect( self_admin_url() . 'admin.php?page=mo_saml_settings' );
 			exit;
+		}
+	}
+
+	/**
+	 * This function enabled the keep setting intact toggle if it is disabled when activating the plugin.
+	 */
+	public function mo_saml_sso_activate() {
+		if ( ! get_option( Mo_Saml_Options_Enum_Sso_Login::MO_SAML_KEEP_SETTINGS_DELETION ) ) {
+			add_option( Mo_Saml_Options_Enum_Sso_Login::MO_SAML_KEEP_SETTINGS_DELETION, 'true' );
 		}
 	}
 
@@ -97,6 +101,38 @@ class Saml_Mo_Login {
 		load_plugin_textdomain( 'miniorange-saml-20-single-sign-on', false, dirname( plugin_basename( __FILE__ ) ) . '/resources/lang/' );
 	}
 
+	/**
+	 * Function to display the notice on the specific pages.
+	 */
+	public function mo_saml_do_plugin_extension_checks() {
+		$valid_pages = 'mo_saml_settings';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reading page parameter.
+		if ( ! ( ! empty( $_GET['page'] ) && ( $_GET['page'] === $valid_pages ) ) && current_user_can( 'manage_options' ) ) {
+			add_action( 'admin_notices', array( $this, 'mo_saml_show_disabled_extension_notice' ) );
+		}
+	}
+
+	/**
+	 * Function shows a notice incase any required extensions are not enabled.
+	 */
+	public function mo_saml_show_disabled_extension_notice() {
+		$disable_extension = Mo_SAML_Utilities::mo_saml_get_disabled_extensions();
+
+		if ( ! empty( $disable_extension ) ) {
+			$extension_display_line = implode( ', ', $disable_extension );
+			echo '
+			<div class="wrap">
+            <div class="notice notice-warning mo-saml-trial-notice-banner">
+                <div class="mo-saml-notice-content">
+                    <img src="' . esc_attr( plugin_dir_url( __FILE__ ) ) . 'images/miniorange_logo.webp" class="mo-saml-logo">
+                    <span class="mo-saml-warning-text">
+                        <span class="mo-saml-warning-title">Warning:</span> Following PHP extensions (<i class="mo-saml-extension-list">' . esc_attr( $extension_display_line ) . '</i>) are disabled which are important for SSO configuration. Please enable these extensions to continue using SSO on your site.
+                    </span>
+                </div>
+				</div>
+            </div>';
+		}
+	}
 
 	/**
 	 * Displays the feedback form upon plugin deactivation.
@@ -133,7 +169,7 @@ class Saml_Mo_Login {
 		$wp_config_path   = $site_home_path . 'wp-config.php';
 		$wp_config_editor = new Mo_SAML_WP_Config_Editor( $wp_config_path );
 
-		if ( is_writeable( $wp_config_path ) ) {
+		if ( wp_is_writable( $wp_config_path ) ) {
 			$wp_config_editor->mo_saml_wp_config_update( 'MO_SAML_LOGGING', 'false' );
 		}
 		wp_safe_redirect( 'plugins.php' );
@@ -147,7 +183,8 @@ class Saml_Mo_Login {
 	 */
 	public function plugin_settings_style( $page ) {
 		wp_enqueue_style( 'mo_saml_notice_style', plugins_url( 'includes/css/notice.min.css', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, 'all' );
-		if ( 'toplevel_page_mo_saml_settings' !== $page && 'miniorange-saml-2-0-sso_page_mo_saml_licensing' !== $page && 'miniorange-saml-2-0-sso_page_mo_saml_enable_debug_logs' !== $page ) {
+		wp_enqueue_style( 'mo_saml_end_year_sale_style', plugins_url( 'includes/css/end-year-sale-banner.min.css', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, 'all' );
+		if ( 'toplevel_page_mo_saml_settings' !== $page && 'miniorange-saml-2-0-sso_page_mo_saml_enable_debug_logs' !== $page ) {
 			return;
 		} else {
 			wp_enqueue_style( 'mo_saml_bootstrap_css', plugins_url( 'includes/css/bootstrap/mo-saml-bootstrap.min.css', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, 'all' );
@@ -166,17 +203,7 @@ class Saml_Mo_Login {
 	 * @return void
 	 */
 	public function plugin_settings_script( $page ) {
-		//phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter from the URL for checking the tab name, doesn't require nonce verification.
-		if ( ( isset( $_GET['tab'] ) && 'licensing' === $_GET['tab'] ) || 'miniorange-saml-2-0-sso_page_mo_saml_licensing' === $page ) {
-			wp_enqueue_script( 'mo_saml_modernizr_script', plugins_url( 'includes/js/modernizr.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
-			wp_enqueue_script( 'mo_saml_popover_script', plugins_url( 'includes/js/bootstrap/popper.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
-			wp_enqueue_script( 'mo_saml_bootstrap_script', plugins_url( 'includes/js/bootstrap/mo-saml-bootstrap.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
-			wp_enqueue_script( 'mo_saml_fontawesome_script', plugins_url( 'includes/js/fontawesome.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
-			wp_enqueue_script( 'mo_saml_admin_settings_script', plugins_url( 'includes/js/settings.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
-			wp_enqueue_script( 'jquery' );
-		}
 		if ( 'toplevel_page_mo_saml_settings' === $page || 'miniorange-saml-2-0-sso_page_mo_saml_enable_debug_logs' === $page ) {
-			wp_localize_script( 'rml-script', 'readmelater_ajax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 			wp_enqueue_script( 'jquery-ui-core' );
 			wp_enqueue_script( 'jquery-ui-autocomplete' );
 			wp_enqueue_script( 'jquery-ui-datepicker' );
@@ -186,6 +213,7 @@ class Saml_Mo_Login {
 			wp_enqueue_script( 'mo_saml_admin_settings_phone_script', plugins_url( 'includes/js/phone.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
 		}
 		wp_enqueue_script( 'mo_saml_notice_script', plugins_url( 'includes/js/notice.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
+		wp_enqueue_script( 'mo_saml_end_year_sale_banner_script', plugins_url( 'includes/js/end-year-sale-banner.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
 	}
 
 	/**
@@ -195,7 +223,7 @@ class Saml_Mo_Login {
 	 */
 	public function mo_saml_modify_login_form() {
 		$sso_button = get_option( Mo_Saml_Options_Enum_Sso_Login::SSO_BUTTON );
-		if ( ( ! $sso_button && Mo_SAML_Utilities::mo_saml_is_sp_configured() ) || 'true' === $sso_button ) {
+		if ( 'false' !== $sso_button && Mo_SAML_Utilities::mo_saml_is_sp_configured() ) {
 			$this->mo_saml_add_sso_button();
 		}
 	}
@@ -208,23 +236,12 @@ class Saml_Mo_Login {
 	public function mo_saml_add_sso_button() {
 		if ( ! is_user_logged_in() ) {
 			$saml_idp_name      = get_option( Mo_Saml_Options_Enum_Service_Provider::IDENTITY_NAME );
-			$custom_button_text = $saml_idp_name ? 'Login with ' . $saml_idp_name : 'Login with SSO';
+			$custom_button_text = isset( $saml_idp_name ) ? 'Login with ' . $saml_idp_name : 'Login with SSO';
+			wp_enqueue_script( 'mo_saml_login_button_script', plugins_url( 'includes/js/sso_button.min.js', __FILE__ ), array(), Mo_Saml_Options_Plugin_Constants::VERSION, false );
 			echo '
-                <script>
-                window.onload = function() {
-	                var target_btn = document.getElementById("mo_saml_button");
-	                var before_element = document.querySelector("#loginform p");
-	                before_element.before(target_btn);
-                };                  
-                    function loginWithSSOButton(id) {
-                        if( id === "mo_saml_login_sso_button")
-                            document.getElementById("saml_user_login_input").value = "saml_user_login";
-                        document.getElementById("loginform").submit();
-                    }
-				</script>
                 <input id="saml_user_login_input" type="hidden" name="option" value="">
                 <div id="mo_saml_button" style="height:88px;">
-                	<div id="mo_saml_login_sso_button" onclick="loginWithSSOButton(this.id)" style="width:100%;display:flex;justify-content:center;align-items:center;font-size:14px;margin-bottom:1.3rem" class="button button-primary">
+                	<div id="mo_saml_login_sso_button" style="width:100%;display:flex;justify-content:center;align-items:center;font-size:14px;margin-bottom:1.3rem" class="button button-primary">
                     <img style="width:20px;height:15px;padding-right:1px" src="' . esc_url( Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() ) . 'images/lock-icon.webp">' . esc_html( $custom_button_text ) . '
                 	</div>
                 	<div style="padding:5px;font-size:14px;height:20px;text-align:center"><b>OR</b></div>
@@ -240,7 +257,7 @@ class Saml_Mo_Login {
 	public function mo_saml_idp_notice() {
 		$mo_date_current_notice = gmdate( 'Y-m-d' );
 
-		if ( isset( $_POST['mo_idp_close_notice'] ) && check_admin_referer( 'mo_idp_close_notice' ) ) {
+		if ( isset( $_POST['mo_idp_close_notice_nonce'] ) && check_admin_referer( 'mo_idp_close_notice', 'mo_idp_close_notice_nonce' ) ) {
 			$mo_date_expire_notice = gmdate( 'Y-m-d', strtotime( $mo_date_current_notice . '+7 day' ) );
 			update_option( Mo_Saml_Sso_Constants::MO_SAML_EXPIRE_NOTICE, $mo_date_expire_notice );
 			update_option( Mo_Saml_Sso_Constants::MO_SAML_CLOSE_NOTICE, 1 );
@@ -254,11 +271,13 @@ class Saml_Mo_Login {
 		if ( ! empty( Mo_Saml_Options_Plugin_Idp::$idp_list[ $mo_saml_identity_provider_identifier_name ] ) && ( ! isset( $_GET['tab'] ) || 'addons' !== $_GET['tab'] ) ) {
 			$display = 'block';
 		}
+
 		if ( $mo_date_current_notice < get_option( Mo_Saml_Sso_Constants::MO_SAML_EXPIRE_NOTICE ) && ! empty( get_option( Mo_Saml_Sso_Constants::MO_SAML_CLOSE_NOTICE ) ) && get_option( Mo_Saml_Sso_Constants::MO_SAML_CLOSE_NOTICE ) ) {
 			$display = 'none';
 		}
+
 		if ( current_user_can( 'manage_options' ) ) {
-			mo_saml_display_notice( $display );
+			mo_saml_display_plugin_notice( $display );
 		}
 	}
 
@@ -272,7 +291,7 @@ class Saml_Mo_Login {
 		add_menu_page(
 			'MO SAML Settings ' . __( 'Configure SAML Identity Provider for SSO', 'miniorange-saml-20-single-sign-on' ),
 			'miniOrange SAML 2.0 SSO',
-			'administrator',
+			'manage_options',
 			$slug,
 			array(
 				$this,
@@ -291,9 +310,9 @@ class Saml_Mo_Login {
 		add_submenu_page(
 			$slug,
 			'miniOrange SAML 2.0 SSO',
-			'<div style="color:orange"><img src="' . Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/premium_plans_icon.webp" style="height:10px;width:12px"> ' . __( 'Premium Plans', 'miniorange-saml-20-single-sign-on' ) . '</div>',
+			'<div style="color:orange" id="mo_saml_pricing_menu"><img src="' . Mo_SAML_Utilities::mo_saml_get_plugin_dir_url() . 'images/premium_plans_icon.webp" style="height:10px;width:12px"> ' . __( 'Premium Plans', 'miniorange-saml-20-single-sign-on' ) . '</div>',
 			'manage_options',
-			'mo_saml_licensing',
+			'mo_saml_settings',
 			array( $this, 'mo_login_widget_saml_options' )
 		);
 		add_submenu_page(
@@ -359,17 +378,10 @@ class Saml_Mo_Login {
 	 * @param array $links The default links provided by WordPress for Settings and Deactivate.
 	 * @return array
 	 */
-	public function mo_saml_plugin_action_links( $links ) : array {
-		$url = esc_url(
-			add_query_arg(
-				'page',
-				'mo_saml_settings',
-				get_admin_url() . 'admin.php?page=mo_saml_settings&tab=licensing'
-			)
-		);
+	public function mo_saml_plugin_action_links( $links ) {
 
 		$settings_link = array( '<a href="' . esc_url( admin_url( 'admin.php?page=mo_saml_settings' ) ) . '">' . __( 'Settings', 'miniorange-saml-20-single-sign-on' ) . '</a>' );
-		$license_link  = "<a href='$url'>" . esc_html__( 'Premium Plans', 'miniorange-saml-20-single-sign-on' ) . '</a>';
+		$license_link  = '<a href="' . Mo_Saml_External_Links::PRICING_PAGE . '" target="_blank">' . esc_html__( 'Premium Plans', 'miniorange-saml-20-single-sign-on' ) . '</a>';
 
 		$links = array_merge( $settings_link, $links );
 

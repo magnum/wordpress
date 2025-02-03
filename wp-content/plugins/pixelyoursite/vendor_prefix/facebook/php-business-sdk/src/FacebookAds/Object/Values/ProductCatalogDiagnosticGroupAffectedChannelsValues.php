@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,11 +35,11 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductCatalogDiagnosticGroupAffectedChannelsValues getInstance()
  */
-class ProductCatalogDiagnosticGroupAffectedChannelsValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS_INBOX_IN_MESSENGER = 'business_inbox_in_messenger';
-    const SHOPS = 'shops';
-    const TEST_CAPABILITY = 'test_capability';
-    const UNIVERSAL_CHECKOUT = 'universal_checkout';
-    const US_MARKETPLACE = 'us_marketplace';
+class ProductCatalogDiagnosticGroupAffectedChannelsValues extends AbstractEnum {
+
+  const BUSINESS_INBOX_IN_MESSENGER = 'business_inbox_in_messenger';
+  const SHOPS = 'shops';
+  const TEST_CAPABILITY = 'test_capability';
+  const UNIVERSAL_CHECKOUT = 'universal_checkout';
+  const US_MARKETPLACE = 'us_marketplace';
 }

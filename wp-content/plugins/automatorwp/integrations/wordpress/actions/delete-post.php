@@ -11,8 +11,19 @@ if( !defined( 'ABSPATH' ) ) exit;
 
 class AutomatorWP_WordPress_Delete_Post_Action extends AutomatorWP_Integration_Action {
 
-    public $integration = 'wordpress';
-    public $action = 'wordpress_delete_post_action';
+    /**
+     * Initialize the trigger
+     *
+     * @since 1.0.0
+     */
+    public function __construct( $integration ) {
+
+        $this->integration = $integration;
+        $this->action = $integration . '_delete_post_action';
+
+        parent::__construct();
+
+    }
 
     /**
      * Register the trigger
@@ -66,4 +77,5 @@ class AutomatorWP_WordPress_Delete_Post_Action extends AutomatorWP_Integration_A
 
 }
 
-new AutomatorWP_WordPress_Delete_Post_Action();
+new AutomatorWP_WordPress_Delete_Post_Action( 'wordpress' );
+new AutomatorWP_WordPress_Delete_Post_Action( 'posts' );

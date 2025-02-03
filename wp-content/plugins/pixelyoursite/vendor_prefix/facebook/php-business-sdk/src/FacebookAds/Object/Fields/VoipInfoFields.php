@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class VoipInfoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const HAS_MOBILE_APP = 'has_mobile_app';
-    const HAS_PERMISSION = 'has_permission';
-    const IS_CALLABLE = 'is_callable';
-    const IS_CALLABLE_WEBRTC = 'is_callable_webrtc';
-    const IS_PUSHABLE = 'is_pushable';
-    const REASON_CODE = 'reason_code';
-    const REASON_DESCRIPTION = 'reason_description';
-    public function getFieldTypes()
-    {
-        return array('has_mobile_app' => 'bool', 'has_permission' => 'bool', 'is_callable' => 'bool', 'is_callable_webrtc' => 'bool', 'is_pushable' => 'bool', 'reason_code' => 'unsigned int', 'reason_description' => 'string');
-    }
+
+class VoipInfoFields extends AbstractEnum {
+
+  const HAS_MOBILE_APP = 'has_mobile_app';
+  const HAS_PERMISSION = 'has_permission';
+  const IS_CALLABLE = 'is_callable';
+  const IS_CALLABLE_WEBRTC = 'is_callable_webrtc';
+  const IS_PUSHABLE = 'is_pushable';
+  const REASON_CODE = 'reason_code';
+  const REASON_DESCRIPTION = 'reason_description';
+
+  public function getFieldTypes() {
+    return array(
+      'has_mobile_app' => 'bool',
+      'has_permission' => 'bool',
+      'is_callable' => 'bool',
+      'is_callable_webrtc' => 'bool',
+      'is_pushable' => 'bool',
+      'reason_code' => 'unsigned int',
+      'reason_description' => 'string',
+    );
+  }
 }

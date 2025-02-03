@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -31,6 +31,7 @@ use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountAdRulesHistoryFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdRulesHistoryActionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdRulesHistoryEvaluationTypeValues;
+
 /**
  * This class is auto-generated.
  *
@@ -39,20 +40,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdRulesHistoryEvaluationTy
  * pull request for this class.
  *
  */
-class AdAccountAdRulesHistory extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAccountAdRulesHistoryFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountAdRulesHistoryFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Action'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdRulesHistoryActionValues::getInstance()->getValues();
-        $ref_enums['EvaluationType'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountAdRulesHistoryEvaluationTypeValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountAdRulesHistory extends AbstractObject {
+
+  /**
+   * @return AdAccountAdRulesHistoryFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountAdRulesHistoryFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Action'] = AdAccountAdRulesHistoryActionValues::getInstance()->getValues();
+    $ref_enums['EvaluationType'] = AdAccountAdRulesHistoryEvaluationTypeValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

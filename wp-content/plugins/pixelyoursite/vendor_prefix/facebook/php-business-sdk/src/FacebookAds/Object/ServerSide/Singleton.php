@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,23 +21,24 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
-abstract class Singleton
-{
-    /**
-     * @var array
-     */
-    protected static $instances = array();
-    private function __construct()
-    {
+abstract class Singleton {
+  /**
+   * @var array
+   */
+  protected static $instances = array();
+
+
+  private function __construct() {}
+
+  public static function getInstance() {
+    $fqn = get_called_class();
+    if (!array_key_exists($fqn, static::$instances)) {
+      static::$instances[$fqn] = new static();
     }
-    public static function getInstance()
-    {
-        $fqn = \get_called_class();
-        if (!\array_key_exists($fqn, static::$instances)) {
-            static::$instances[$fqn] = new static();
-        }
-        return static::$instances[$fqn];
-    }
+
+    return static::$instances[$fqn];
+  }
 }

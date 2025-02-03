@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,15 +21,15 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds;
 
-class AnonymousSession implements \PYS_PRO_GLOBAL\FacebookAds\SessionInterface
-{
-    /**
-     * @return array
-     */
-    public function getRequestParameters()
-    {
-        return array();
-    }
+class AnonymousSession implements SessionInterface {
+
+  /**
+   * @return array
+   */
+  public function getRequestParameters() {
+    return array();
+  }
 }

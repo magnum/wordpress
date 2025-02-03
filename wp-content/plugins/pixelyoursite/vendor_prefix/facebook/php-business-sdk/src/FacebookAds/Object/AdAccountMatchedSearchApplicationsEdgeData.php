@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountMatchedSearchApplicationsEdgeDataFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountMatchedSearchApplicationsEdgeDataAppStoreValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountMatchedSearchApplicationsE
  * pull request for this class.
  *
  */
-class AdAccountMatchedSearchApplicationsEdgeData extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAccountMatchedSearchApplicationsEdgeDataFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountMatchedSearchApplicationsEdgeDataFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['AppStore'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountMatchedSearchApplicationsEdgeDataAppStoreValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountMatchedSearchApplicationsEdgeData extends AbstractObject {
+
+  /**
+   * @return AdAccountMatchedSearchApplicationsEdgeDataFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountMatchedSearchApplicationsEdgeDataFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['AppStore'] = AdAccountMatchedSearchApplicationsEdgeDataAppStoreValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

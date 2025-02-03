@@ -63,8 +63,6 @@ class Themes extends Module {
 	 *
 	 * @access public
 	 *
-	 * @todo Implement nonce verification
-	 *
 	 * @param array      $instance      The current widget instance's settings.
 	 * @param array      $new_instance  Array of new widget settings.
 	 * @param array      $old_instance  Array of old widget settings.
@@ -77,7 +75,7 @@ class Themes extends Module {
 		}
 
 		// Don't trigger sync action if this is an ajax request, because Customizer makes them during preview before saving changes.
-		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Not doing anything with or in response to the $_POST data. We're only using $_POST['customized'] to early return if this is an ajax request from Customizer.
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_POST['customized'] ) ) {
 			return $instance;
 		}
@@ -112,9 +110,10 @@ class Themes extends Module {
 	 */
 	public function sync_network_allowed_themes_change( $option, $value, $old_value, $network_id ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$all_enabled_theme_slugs = array_keys( $value );
+		$old_value_count         = is_countable( $old_value ) ? count( $old_value ) : 0;
+		$value_count             = is_countable( $value ) ? count( $value ) : 0;
 
-		if ( count( $old_value ) > count( $value ) ) {
-
+		if ( $old_value_count > $value_count ) {
 			// Suppress jetpack_network_disabled_themes sync action when theme is deleted.
 			$delete_theme_call = $this->get_delete_theme_call();
 			if ( ! empty( $delete_theme_call ) ) {
@@ -191,7 +190,7 @@ class Themes extends Module {
 		$query_params = array();
 		wp_parse_str( $url['query'], $query_params );
 		if (
-			! isset( $_POST['newcontent'] ) ||
+			! isset( $_POST['newcontent'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Missing -- 'wp_redirect' gets fired for a lot of things. We're only using $_POST['newcontent'] to limit action to redirects from theme edits, we're not doing anything with or in response to the post itself.
 			! isset( $query_params['file'] ) ||
 			! isset( $query_params['theme'] ) ||
 			! isset( $query_params['updated'] )
@@ -225,29 +224,28 @@ class Themes extends Module {
 	 * @todo Refactor to use WP_Filesystem instead of fopen()/fclose().
 	 */
 	public function theme_edit_ajax() {
-		$args = wp_unslash( $_POST );
-
-		if ( empty( $args['theme'] ) ) {
+		// This validation is based on wp_edit_theme_plugin_file().
+		if ( empty( $_POST['theme'] ) ) {
 			return;
 		}
 
-		if ( empty( $args['file'] ) ) {
+		if ( empty( $_POST['file'] ) ) {
 			return;
 		}
-		$file = $args['file'];
+		$file = wp_unslash( $_POST['file'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated manually just after.
 		if ( 0 !== validate_file( $file ) ) {
 			return;
 		}
 
-		if ( ! isset( $args['newcontent'] ) ) {
+		if ( ! isset( $_POST['newcontent'] ) ) {
 			return;
 		}
 
-		if ( ! isset( $args['nonce'] ) ) {
+		if ( ! isset( $_POST['nonce'] ) ) {
 			return;
 		}
 
-		$stylesheet = $args['theme'];
+		$stylesheet = wp_unslash( $_POST['theme'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated manually just after.
 		if ( 0 !== validate_file( $stylesheet ) ) {
 			return;
 		}
@@ -261,7 +259,7 @@ class Themes extends Module {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $args['nonce'], 'edit-theme_' . $stylesheet . '_' . $file ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'edit-theme_' . $stylesheet . '_' . $file ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- WP core doesn't pre-sanitize nonces either.
 			return;
 		}
 
@@ -307,8 +305,8 @@ class Themes extends Module {
 			}
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writeable
-		if ( ! is_writeable( $real_file ) ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+		if ( ! is_writable( $real_file ) ) {
 			return;
 		}
 
@@ -382,6 +380,7 @@ class Themes extends Module {
 		}
 
 		if ( 'install' === $details['action'] ) {
+			// @phan-suppress-next-line PhanUndeclaredMethod -- Checked above. See also https://github.com/phan/phan/issues/1204.
 			$theme = $upgrader->theme_info();
 			if ( ! $theme instanceof \WP_Theme ) {
 				return;
@@ -872,5 +871,4 @@ class Themes extends Module {
 
 		return array( $this->get_theme_info() );
 	}
-
 }

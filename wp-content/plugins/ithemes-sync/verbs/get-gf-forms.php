@@ -13,11 +13,11 @@
 
 
 class Ithemes_Sync_Verb_Get_GF_Forms extends Ithemes_Sync_Verb {
-	public static $name = 'get-gf-forms';
+	public static $name        = 'get-gf-forms';
 	public static $description = 'Retrieve Gravity Forms forms.';
 
 	public function run( $arguments ) {
-		if ( class_exists( 'RGFormsModel' ) && is_callable( array( 'RGFormsModel', 'get_forms' ) ) ) {
+		if ( class_exists( 'RGFormsModel' ) && is_callable( [ 'RGFormsModel', 'get_forms' ] ) ) {
 			return RGFormsModel::get_forms();
 		}
 		return false;

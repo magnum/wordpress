@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -32,6 +32,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\LocalServiceBusinessFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessAvailabilityValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessConditionValues;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessImageFetchStatusValues;
+use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessVisibilityValues;
+
 /**
  * This class is auto-generated.
  *
@@ -40,41 +42,70 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessImageFetchStatu
  * pull request for this class.
  *
  */
-class LocalServiceBusiness extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return LocalServiceBusinessFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\LocalServiceBusinessFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Availability'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessAvailabilityValues::getInstance()->getValues();
-        $ref_enums['Condition'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessConditionValues::getInstance()->getValues();
-        $ref_enums['ImageFetchStatus'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\LocalServiceBusinessImageFetchStatusValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getChannelsToIntegrityStatus(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/channels_to_integrity_status', new \PYS_PRO_GLOBAL\FacebookAds\Object\CatalogItemChannelsToIntegrityStatus(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\CatalogItemChannelsToIntegrityStatus::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\LocalServiceBusiness(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\LocalServiceBusiness::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class LocalServiceBusiness extends AbstractCrudObject {
+
+  /**
+   * @return LocalServiceBusinessFields
+   */
+  public static function getFieldsEnum() {
+    return LocalServiceBusinessFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Availability'] = LocalServiceBusinessAvailabilityValues::getInstance()->getValues();
+    $ref_enums['Condition'] = LocalServiceBusinessConditionValues::getInstance()->getValues();
+    $ref_enums['ImageFetchStatus'] = LocalServiceBusinessImageFetchStatusValues::getInstance()->getValues();
+    $ref_enums['Visibility'] = LocalServiceBusinessVisibilityValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getChannelsToIntegrityStatus(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/channels_to_integrity_status',
+      new CatalogItemChannelsToIntegrityStatus(),
+      'EDGE',
+      CatalogItemChannelsToIntegrityStatus::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new LocalServiceBusiness(),
+      'NODE',
+      LocalServiceBusiness::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

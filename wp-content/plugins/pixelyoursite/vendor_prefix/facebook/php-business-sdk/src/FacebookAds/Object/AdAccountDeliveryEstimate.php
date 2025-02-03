@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountDeliveryEstimateFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDeliveryEstimateOptimizationGoalValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,19 +39,21 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDeliveryEstimateOptimizati
  * pull request for this class.
  *
  */
-class AdAccountDeliveryEstimate extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractObject
-{
-    /**
-     * @return AdAccountDeliveryEstimateFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\AdAccountDeliveryEstimateFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['OptimizationGoal'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\AdAccountDeliveryEstimateOptimizationGoalValues::getInstance()->getValues();
-        return $ref_enums;
-    }
+
+class AdAccountDeliveryEstimate extends AbstractObject {
+
+  /**
+   * @return AdAccountDeliveryEstimateFields
+   */
+  public static function getFieldsEnum() {
+    return AdAccountDeliveryEstimateFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['OptimizationGoal'] = AdAccountDeliveryEstimateOptimizationGoalValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
 }

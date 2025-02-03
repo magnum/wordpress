@@ -55,13 +55,9 @@ function wpcf7_stripe_enqueue_scripts() {
 		null
 	);
 
-	$assets = array();
-
-	$asset_file = wpcf7_plugin_path( 'modules/stripe/index.asset.php' );
-
-	if ( file_exists( $asset_file ) ) {
-		$assets = include( $asset_file );
-	}
+	$assets = include(
+		wpcf7_plugin_path( 'modules/stripe/index.asset.php' )
+	);
 
 	$assets = wp_parse_args( $assets, array(
 		'dependencies' => array(),
@@ -80,15 +76,21 @@ function wpcf7_stripe_enqueue_scripts() {
 			)
 		),
 		$assets['version'],
-		true
+		array( 'in_footer' => true )
 	);
 
 	$api_keys = $service->get_api_keys();
 
 	if ( $api_keys['publishable'] ) {
-		wp_localize_script( 'wpcf7-stripe', 'wpcf7_stripe', array(
-			'publishable_key' => $api_keys['publishable'],
-		) );
+		wp_add_inline_script( 'wpcf7-stripe',
+			sprintf(
+				'var wpcf7_stripe = %s;',
+				wp_json_encode( array(
+					'publishable_key' => $api_keys['publishable'],
+				), JSON_PRETTY_PRINT )
+			),
+			'before'
+		);
 	}
 }
 

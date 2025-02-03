@@ -35,7 +35,14 @@ class Twilio_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
+
+	/**
+	 * The tab's URL.
+	 *
+	 * @var string $tab_url
+	 */
+	public $tab_url = '';
 
 	/**
 	 * Twilio_Helpers constructor.
@@ -96,7 +103,7 @@ class Twilio_Helpers {
 	 */
 	public function send_sms( $to, $body, $user_id, $action = null ) {
 
-		$from = trim( get_option( 'uap_automator_twilio_api_phone_number', '' ) );
+		$from = trim( automator_get_option( 'uap_automator_twilio_api_phone_number', '' ) );
 
 		if ( empty( $from ) ) {
 			return array(
@@ -164,8 +171,8 @@ class Twilio_Helpers {
 	 */
 	public function get_client() {
 
-		$sid   = get_option( 'uap_automator_twilio_api_account_sid' );
-		$token = get_option( 'uap_automator_twilio_api_auth_token' );
+		$sid   = automator_get_option( 'uap_automator_twilio_api_account_sid' );
+		$token = automator_get_option( 'uap_automator_twilio_api_auth_token' );
 
 		if ( empty( $sid ) || empty( $token ) ) {
 			throw new \Exception( 'Twilio is not connected' );
@@ -190,7 +197,7 @@ class Twilio_Helpers {
 
 		$twilio_account = $this->api_call( $body );
 
-		update_option( 'uap_twilio_connected_user', $twilio_account );
+		automator_update_option( 'uap_twilio_connected_user', $twilio_account );
 
 		return $twilio_account;
 
@@ -217,7 +224,7 @@ class Twilio_Helpers {
 			);
 
 			foreach ( $option_keys as $option_key ) {
-				delete_option( $option_key );
+				automator_delete_option( $option_key );
 			}
 
 			// Remove transients.
@@ -291,7 +298,7 @@ class Twilio_Helpers {
 		try {
 			$this->get_twilio_accounts_connected();
 		} catch ( \Exception $e ) {
-			update_option( 'uap_twilio_connected_user', array() );
+			automator_update_option( 'uap_twilio_connected_user', array() );
 			$result = $e->getMessage();
 		}
 
@@ -307,7 +314,7 @@ class Twilio_Helpers {
 	 * @return void
 	 */
 	public function get_user() {
-		$users_option_exist = get_option( 'uap_twilio_connected_user', 'no' );
+		$users_option_exist = automator_get_option( 'uap_twilio_connected_user', 'no' );
 
 		if ( 'no' !== $users_option_exist ) {
 			return $users_option_exist;
@@ -323,7 +330,7 @@ class Twilio_Helpers {
 		try {
 
 			$client = $this->get_client();
-			$user   = get_option( 'uap_twilio_connected_user', array() );
+			$user   = automator_get_option( 'uap_twilio_connected_user', array() );
 
 			if ( empty( $user['sid'] ) ) {
 				throw new \Exception( __( 'User account error', 'uncanny-automator' ) );

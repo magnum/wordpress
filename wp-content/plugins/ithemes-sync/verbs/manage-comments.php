@@ -13,56 +13,56 @@ Version History
 */
 
 class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
-	public static $name = 'manage-comments';
+	public static $name        = 'manage-comments';
 	public static $description = 'Approve, edit, and delete comments.';
 	
-	private $default_arguments = array();
-	private $response = array();
-	private $comments_cache = array();
+	private $default_arguments = [];
+	private $response          = [];
+	private $comments_cache    = [];
 	
 	public function run( $arguments ) {
 		$arguments = Ithemes_Sync_Functions::merge_defaults( $arguments, $this->default_arguments );
 		
-		include_once( ABSPATH . WPINC . '/comment.php' );
+		include_once ABSPATH . WPINC . '/comment.php';
 		
-		$actions = array(
+		$actions = [
 			'add'        => '',
 			'edit'       => '',
-			'approve'    => array( $this, 'approve_comment' ),
-			'unapprove'  => array( $this, 'unapprove_comment' ),
-			'spam'       => array( $this, 'spam_comment' ),
-			'unspam'     => array( $this, 'unspam_comment' ),
-			'trash'      => array( $this, 'trash_comment' ),
-			'restore'    => array( $this, 'restore_comment' ),
-			'untrash'    => array( $this, 'restore_comment' ),
-			'delete'     => array( $this, 'delete_comment' ),
-			'emptyspam'  => array( $this, 'empty_spam' ),
-			'emptytrash' => array( $this, 'empty_trash' ),
-		);
+			'approve'    => [ $this, 'approve_comment' ],
+			'unapprove'  => [ $this, 'unapprove_comment' ],
+			'spam'       => [ $this, 'spam_comment' ],
+			'unspam'     => [ $this, 'unspam_comment' ],
+			'trash'      => [ $this, 'trash_comment' ],
+			'restore'    => [ $this, 'restore_comment' ],
+			'untrash'    => [ $this, 'restore_comment' ],
+			'delete'     => [ $this, 'delete_comment' ],
+			'emptyspam'  => [ $this, 'empty_spam' ],
+			'emptytrash' => [ $this, 'empty_trash' ],
+		];
 		
 		foreach ( $arguments as $action => $data ) {
 			if ( 'get-actions' == $action ) {
-				$this->response[$action] = array_keys( $actions );
+				$this->response[ $action ] = array_keys( $actions );
 				continue;
 			}
 			
-			if ( ! isset( $actions[$action] ) ) {
-				$this->response[$action] = 'This action is not recognized.';
+			if ( ! isset( $actions[ $action ] ) ) {
+				$this->response[ $action ] = 'This action is not recognized.';
 				continue;
 			}
 						
 			if ( 'add' == $action ) {
-				$this->response[$action] = $this->add_comment( $data );
-			} else if ( 'edit' == $action ) {
-				$this->response[$action] = $this->edit_comments( $data );
-			} else if ( 'emptyspam' == $action ) {
-				$function = $actions[$action];
-				if ( ! is_callable( $actions[$action] ) ) {
+				$this->response[ $action ] = $this->add_comment( $data );
+			} elseif ( 'edit' == $action ) {
+				$this->response[ $action ] = $this->edit_comments( $data );
+			} elseif ( 'emptyspam' == $action ) {
+				$function = $actions[ $action ];
+				if ( ! is_callable( $actions[ $action ] ) ) {
 					return new WP_Error( "missing-function-$function", "Due to an unknown issue, the $function function is not available." );
 				}
-				$this->response[$action] = call_user_func( $function );
+				$this->response[ $action ] = call_user_func( $function );
 			} else {
-				$this->response[$action] = $this->run_function_on_ids( $actions[$action], $data );
+				$this->response[ $action ] = $this->run_function_on_ids( $actions[ $action ], $data );
 			}
 		}
 		
@@ -70,8 +70,8 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 	}
 	
 	private function is_valid_comment_id( $id ) {
-		if ( isset( $this->comments_cache[$id] ) ) {
-			return $this->comments_cache[$id];
+		if ( isset( $this->comments_cache[ $id ] ) ) {
+			return $this->comments_cache[ $id ];
 		}
 		
 		$comment = get_comment( $id );
@@ -82,7 +82,7 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 			$comment = true;
 		}
 		
-		$this->comments_cache[$id] = $comment;
+		$this->comments_cache[ $id ] = $comment;
 		
 		return $comment;
 	}
@@ -102,13 +102,13 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 			return new WP_Error( "missing-function-$check_function", "Due to an unknown issue, the $check_function function is not available." );
 		}
 		
-		$response = array();
+		$response = [];
 		
 		foreach ( $ids as $id ) {
 			if ( ! $this->is_valid_comment_id( $id ) ) {
-				$response[$id] = new WP_Error( 'invalid-comment-id', 'The requested comment could not be found.' );
+				$response[ $id ] = new WP_Error( 'invalid-comment-id', 'The requested comment could not be found.' );
 			} else {
-				$response[$id] = call_user_func( $function, $id );
+				$response[ $id ] = call_user_func( $function, $id );
 			}
 		}
 		
@@ -149,29 +149,29 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 		}
 		
 		if ( ! is_callable( 'wp_update_comment' ) ) {
-			include_once( ABSPATH . WPINC . '/wp-includes/comment.php' );
+			include_once ABSPATH . WPINC . '/wp-includes/comment.php';
 		}
 		if ( ! is_callable( 'wp_update_comment' ) ) {
 			return new WP_Error( 'missing-function-wp_update_comment', 'Due to an unknown issue, the wp_update_comment function is not available.' );
 		}
 		
 		
-		$response = array();
+		$response = [];
 		
 		foreach ( $edits as $id => $data ) {
 			if ( (int) $id != $id ) {
-				$response[$id] = new WP_Error( 'invalid-index', 'Array keys for the edit argument must be integers, each representing a comment ID.' );
-			} else if ( ! $this->is_valid_comment_id( $id ) ) {
-				$response[$id] = new WP_Error( 'invalid-comment-id', 'The requested comment could not be found.' );
+				$response[ $id ] = new WP_Error( 'invalid-index', 'Array keys for the edit argument must be integers, each representing a comment ID.' );
+			} elseif ( ! $this->is_valid_comment_id( $id ) ) {
+				$response[ $id ] = new WP_Error( 'invalid-comment-id', 'The requested comment could not be found.' );
 			} else {
 				$data['comment_ID'] = $id;
-				$result = wp_update_comment( $data );
+				$result             = wp_update_comment( $data );
 				
 				if ( is_int( $result ) ) {
 					$result = (bool) $result;
 				}
 				
-				$response[$id] = $result;
+				$response[ $id ] = $result;
 			}
 		}
 		
@@ -184,14 +184,14 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 		}
 		
 		if ( ! isset( $comment['comment_post_ID'] ) ) {
-			$response = array();
+			$response    = [];
 			$error_count = 0;
 			
 			foreach ( $comment as $id => $data ) {
-				$response[$id] = $this->add_comment( $data );
+				$response[ $id ] = $this->add_comment( $data );
 				
-				if ( is_wp_error( $response[$id] ) ) {
-					$error_count++;
+				if ( is_wp_error( $response[ $id ] ) ) {
+					++$error_count;
 				}
 			}
 			
@@ -202,22 +202,22 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 			return $response;
 		}
 		
-		$required_indexes = array(
+		$required_indexes = [
 			'comment_author_IP',
 			'comment_content',
 			'comment_agent',
-		);
+		];
 		
-		$comment_defaults = array(
-			'comment_approved' => 1,
-			'comment_karma'    => 0,
-			'comment_parent'   => 0,
-			'comment_type'     => '',
-			'filtered'         => false,
+		$comment_defaults = [
+			'comment_approved'                   => 1,
+			'comment_karma'                      => 0,
+			'comment_parent'                     => 0,
+			'comment_type'                       => '',
+			'filtered'                           => false,
 			
 			'sync_run_preprocess_comment_filter' => true, // Change to false to skip the preprocess_comment filter.
 			'sync_send_comment_notifications'    => true, // Change to false to disable comment notification emails.
-		);
+		];
 		
 		// Starting here, much of the following code mirrors similar code from wp-comments-post.php and wp-includes/comment.php from WP version 3.9.1.
 		// Mirroring this code was the only way to reliably provide full comment functionality and flexibility while staying compatible with the WP API.
@@ -239,13 +239,13 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 			
 			kses_remove_filters();
 			kses_init_filters();
-		} else if ( isset( $comment['comment_author'] ) && isset( $comment['comment_author_email'] ) && isset( $comment['comment_author_url'] ) ) {
+		} elseif ( isset( $comment['comment_author'] ) && isset( $comment['comment_author_email'] ) && isset( $comment['comment_author_url'] ) ) {
 			$comment['user_id'] = 0;
 		} else {
 			return new WP_Error( 'missing-required-commenter-data', 'Either user_id or comment_author, comment_author_email, and comment_author_url must be supplied.' );
 		}
 		
-		$comment = array_merge( $comment_defaults, $comment );		
+		$comment = array_merge( $comment_defaults, $comment );      
 		
 		$run_preprocess_comment_filter = $comment['sync_run_preprocess_comment_filter'];
 		unset( $comment['sync_run_preprocess_comment_filter'] );
@@ -254,10 +254,10 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 		unset( $comment['sync_send_comment_notifications'] );
 		
 		
-		$missing_indexes = array();
+		$missing_indexes = [];
 		
 		foreach ( $required_indexes as $index ) {
-			if ( empty( $comment[$index] ) ) {
+			if ( empty( $comment[ $index ] ) ) {
 				$missing_indexes[] = $index;
 			}
 		}
@@ -315,30 +315,30 @@ class Ithemes_Sync_Verb_Manage_Comments extends Ithemes_Sync_Verb {
 	function empty_spam() {
 		global $wpdb;
 		
-        $comment_status = 'spam';
-        $delete_time = current_time( 'mysql', 1 );
-        $comment_ids = $wpdb->get_col( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_approved = %s AND %s > comment_date_gmt", $comment_status, $delete_time ) );
+		$comment_status = 'spam';
+		$delete_time    = current_time( 'mysql', 1 );
+		$comment_ids    = $wpdb->get_col( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_approved = %s AND %s > comment_date_gmt", $comment_status, $delete_time ) );
 
-	    $deleted = 0;
-	    foreach ( $comment_ids as $comment_id ) { // Check the permissions on each
-            wp_delete_comment( $comment_id, true );
-            $deleted++;
-	    }
-	    return $deleted;
+		$deleted = 0;
+		foreach ( $comment_ids as $comment_id ) { // Check the permissions on each
+			wp_delete_comment( $comment_id, true );
+			++$deleted;
+		}
+		return $deleted;
 	}
 	
 	function empty_trash() {
 		global $wpdb;
 		
-        $comment_status = 'trash';
-        $delete_time = current_time( 'mysql', 1 );
-        $comment_ids = $wpdb->get_col( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_approved = %s AND %s > comment_date_gmt", $comment_status, $delete_time ) );
+		$comment_status = 'trash';
+		$delete_time    = current_time( 'mysql', 1 );
+		$comment_ids    = $wpdb->get_col( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_approved = %s AND %s > comment_date_gmt", $comment_status, $delete_time ) );
 
-	    $deleted = 0;
-	    foreach ( $comment_ids as $comment_id ) { // Check the permissions on each
-            wp_delete_comment( $comment_id, true );
-            $deleted++;
-	    }
-	    return $deleted;
+		$deleted = 0;
+		foreach ( $comment_ids as $comment_id ) { // Check the permissions on each
+			wp_delete_comment( $comment_id, true );
+			++$deleted;
+		}
+		return $deleted;
 	}
 }

@@ -12,12 +12,12 @@ Version History
 
 
 class Ithemes_Sync_Verb_Get_Status_Elements extends Ithemes_Sync_Verb {
-	public static $name = 'get-status-elements';
-	public static $description = 'Retrieve a listing of the status elements.';
-	public static $status_element_name = 'status-elements';
+	public static $name                      = 'get-status-elements';
+	public static $description               = 'Retrieve a listing of the status elements.';
+	public static $status_element_name       = 'status-elements';
 	public static $show_in_status_by_default = true;
 	
-	private $default_arguments = array();
+	private $default_arguments = [];
 	
 	
 	public function run( $arguments ) {

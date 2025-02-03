@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class LiveVideoRecommendedEncoderSettingsFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AUDIO_CODEC_SETTINGS = 'audio_codec_settings';
-    const STREAMING_PROTOCOL = 'streaming_protocol';
-    const VIDEO_CODEC_SETTINGS = 'video_codec_settings';
-    public function getFieldTypes()
-    {
-        return array('audio_codec_settings' => 'Object', 'streaming_protocol' => 'string', 'video_codec_settings' => 'Object');
-    }
+
+class LiveVideoRecommendedEncoderSettingsFields extends AbstractEnum {
+
+  const AUDIO_CODEC_SETTINGS = 'audio_codec_settings';
+  const STREAMING_PROTOCOL = 'streaming_protocol';
+  const VIDEO_CODEC_SETTINGS = 'video_codec_settings';
+
+  public function getFieldTypes() {
+    return array(
+      'audio_codec_settings' => 'Object',
+      'streaming_protocol' => 'string',
+      'video_codec_settings' => 'Object',
+    );
+  }
 }

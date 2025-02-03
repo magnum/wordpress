@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,13 +34,18 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdCampaignOptimizationEventFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CUSTOM_CONVERSION_ID = 'custom_conversion_id';
-    const EVENT_SEQUENCE = 'event_sequence';
-    const EVENT_TYPE = 'event_type';
-    public function getFieldTypes()
-    {
-        return array('custom_conversion_id' => 'string', 'event_sequence' => 'unsigned int', 'event_type' => 'string');
-    }
+
+class AdCampaignOptimizationEventFields extends AbstractEnum {
+
+  const CUSTOM_CONVERSION_ID = 'custom_conversion_id';
+  const EVENT_SEQUENCE = 'event_sequence';
+  const EVENT_TYPE = 'event_type';
+
+  public function getFieldTypes() {
+    return array(
+      'custom_conversion_id' => 'string',
+      'event_sequence' => 'unsigned int',
+      'event_type' => 'string',
+    );
+  }
 }

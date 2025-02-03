@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,19 +35,19 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeObjectTypeValues getInstance()
  */
-class AdCreativeObjectTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const APPLICATION = 'APPLICATION';
-    const DOMAIN = 'DOMAIN';
-    const EVENT = 'EVENT';
-    const INVALID = 'INVALID';
-    const OFFER = 'OFFER';
-    const PAGE = 'PAGE';
-    const PHOTO = 'PHOTO';
-    const POST_DELETED = 'POST_DELETED';
-    const PRIVACY_CHECK_FAIL = 'PRIVACY_CHECK_FAIL';
-    const SHARE = 'SHARE';
-    const STATUS = 'STATUS';
-    const STORE_ITEM = 'STORE_ITEM';
-    const VIDEO = 'VIDEO';
+class AdCreativeObjectTypeValues extends AbstractEnum {
+
+  const APPLICATION = 'APPLICATION';
+  const DOMAIN = 'DOMAIN';
+  const EVENT = 'EVENT';
+  const INVALID = 'INVALID';
+  const OFFER = 'OFFER';
+  const PAGE = 'PAGE';
+  const PHOTO = 'PHOTO';
+  const POST_DELETED = 'POST_DELETED';
+  const PRIVACY_CHECK_FAIL = 'PRIVACY_CHECK_FAIL';
+  const SHARE = 'SHARE';
+  const STATUS = 'STATUS';
+  const STORE_ITEM = 'STORE_ITEM';
+  const VIDEO = 'VIDEO';
 }

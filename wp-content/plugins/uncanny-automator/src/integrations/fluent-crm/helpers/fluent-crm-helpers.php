@@ -32,14 +32,12 @@ class Fluent_Crm_Helpers {
 	/**
 	 * @var bool
 	 */
-	public $load_options;
+	public $load_options = true;
 
 	/**
 	 * Wp_Fluent_Forms_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->load_options = true;
 
 		$fluent_crm_targetted_actions = array(
 			'fluentcrm_subscriber_status_to_subscribed',
@@ -431,7 +429,7 @@ class Fluent_Crm_Helpers {
 	 *
 	 * @return array The list of subscribers statuses.
 	 */
-	public function get_subscriber_statuses( $any = true ) {
+	public function get_subscriber_statuses( $any = true, $disable_default = false ) {
 
 		if ( ! function_exists( 'fluentcrm_subscriber_statuses' ) ) {
 			return array();
@@ -451,6 +449,10 @@ class Fluent_Crm_Helpers {
 
 		if ( true === $any ) {
 			$formatted_statues['-1'] = esc_html__( 'Any status', 'uncanny-automator' );
+		}
+
+		if ( true === $disable_default ) {
+			$formatted_statues[''] = esc_html__( 'Select status', 'uncanny-automator' );
 		}
 
 		foreach ( $statuses as $status ) {
@@ -523,6 +525,11 @@ class Fluent_Crm_Helpers {
 
 		$fields = array();
 		foreach ( $custom_fields as $k => $custom_field ) {
+
+			if ( apply_filters( "automator_fluentcrm_omit_custom_field-{$custom_field['slug']}", false, $custom_field ) ) {
+				continue;
+			}
+
 			$options                  = null;
 			$supports_multiple_values = false;
 			if ( 'select-multi' === $custom_field['type'] ) {

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductSetMetadataFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COVER_IMAGE_URL = 'cover_image_url';
-    const DESCRIPTION = 'description';
-    const EXTERNAL_URL = 'external_url';
-    const INTEGRITY_REVIEW_STATUS = 'integrity_review_status';
-    public function getFieldTypes()
-    {
-        return array('cover_image_url' => 'string', 'description' => 'string', 'external_url' => 'string', 'integrity_review_status' => 'string');
-    }
+
+class ProductSetMetadataFields extends AbstractEnum {
+
+  const COVER_IMAGE_URL = 'cover_image_url';
+  const DESCRIPTION = 'description';
+  const EXTERNAL_URL = 'external_url';
+  const INTEGRITY_REVIEW_STATUS = 'integrity_review_status';
+
+  public function getFieldTypes() {
+    return array(
+      'cover_image_url' => 'string',
+      'description' => 'string',
+      'external_url' => 'string',
+      'integrity_review_status' => 'string',
+    );
+  }
 }

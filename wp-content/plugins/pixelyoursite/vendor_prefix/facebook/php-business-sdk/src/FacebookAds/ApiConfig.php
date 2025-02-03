@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -23,10 +22,8 @@
  *
  */
 namespace PYS_PRO_GLOBAL\FacebookAds;
-
-class ApiConfig
-{
-    const APIVersion = '14.0';
-    const SDKVersion = '14.0.0';
-    const TYPE_CHECKER_STRICT_MODE = \false;
+class ApiConfig {
+  const APIVersion = '16.0';
+  const SDKVersion = '16.0.2';
+  const TYPE_CHECKER_STRICT_MODE = false;
 }

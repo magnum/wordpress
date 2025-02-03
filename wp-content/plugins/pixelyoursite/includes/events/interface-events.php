@@ -31,16 +31,25 @@ abstract class EventsFactory {
         $eventsList = array();
         foreach ($this->getEvents() as $eventName) {
             if($this->isReadyForFire($eventName)) {
-
-                foreach ( PYS()->getRegisteredPixels() as $pixel ) {
-                    $events = $this->getEvent($eventName);
-                    if(!is_array($events))  $events = array($events); // some type of events can return array
-
-                    foreach ($events as $event) {
-                        $singleEvents = $pixel->generateEvents( $event );
-                        foreach ($singleEvents as $singleEvent) {
-                            if(!apply_filters("pys_validate_pixel_event",true,$singleEvent,$pixel)) continue;
-                            $eventsList[$pixel->getSlug()][] = $singleEvent;
+                $events = $this->getEvent($eventName);
+                if($events == null) continue;
+                if(!is_array($events))  $events = array($events); // some
+                foreach ($events as $event) {
+                    foreach ( PYS()->getRegisteredPixels() as $pixel ) {
+                        if(method_exists($pixel,'generateEvents')) {
+                            $pixelEvents =  $pixel->generateEvents( $event );
+                            foreach ($pixelEvents as $pixelEvent) {
+                                if(apply_filters("pys_validate_pixel_event",true,$pixelEvent,$pixel)) {
+                                    $eventsList[$pixel->getSlug()][] = $pixelEvent;
+                                }
+                            }
+                        }
+                        else {
+                            // deprecate
+                            $pixel_event = clone $event;
+                            $isSuccess = $pixel->addParamsToEvent( $pixel_event );
+                            if(!$isSuccess || !apply_filters("pys_validate_pixel_event",true,$pixel_event,$pixel)) continue;
+                            $eventsList[$pixel->getSlug()][] = $pixel_event;
                         }
                     }
                 }

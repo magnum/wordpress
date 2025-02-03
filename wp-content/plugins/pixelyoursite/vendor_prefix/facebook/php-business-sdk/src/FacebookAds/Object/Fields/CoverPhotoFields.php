@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CoverPhotoFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COVER_ID = 'cover_id';
-    const ID = 'id';
-    const OFFSET_X = 'offset_x';
-    const OFFSET_Y = 'offset_y';
-    const SOURCE = 'source';
-    public function getFieldTypes()
-    {
-        return array('cover_id' => 'string', 'id' => 'string', 'offset_x' => 'float', 'offset_y' => 'float', 'source' => 'string');
-    }
+
+class CoverPhotoFields extends AbstractEnum {
+
+  const COVER_ID = 'cover_id';
+  const ID = 'id';
+  const OFFSET_X = 'offset_x';
+  const OFFSET_Y = 'offset_y';
+  const SOURCE = 'source';
+
+  public function getFieldTypes() {
+    return array(
+      'cover_id' => 'string',
+      'id' => 'string',
+      'offset_x' => 'float',
+      'offset_y' => 'float',
+      'source' => 'string',
+    );
+  }
 }

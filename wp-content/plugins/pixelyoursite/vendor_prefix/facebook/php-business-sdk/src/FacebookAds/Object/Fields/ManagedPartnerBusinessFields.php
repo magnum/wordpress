@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,17 +34,26 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ManagedPartnerBusinessFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const AD_ACCOUNT = 'ad_account';
-    const CATALOG_SEGMENT = 'catalog_segment';
-    const EXTENDED_CREDIT = 'extended_credit';
-    const PAGE = 'page';
-    const SELLER_BUSINESS_INFO = 'seller_business_info';
-    const SELLER_BUSINESS_STATUS = 'seller_business_status';
-    const TEMPLATE = 'template';
-    public function getFieldTypes()
-    {
-        return array('ad_account' => 'AdAccount', 'catalog_segment' => 'ProductCatalog', 'extended_credit' => 'ExtendedCredit', 'page' => 'Page', 'seller_business_info' => 'Object', 'seller_business_status' => 'string', 'template' => 'list<Object>');
-    }
+
+class ManagedPartnerBusinessFields extends AbstractEnum {
+
+  const AD_ACCOUNT = 'ad_account';
+  const CATALOG_SEGMENT = 'catalog_segment';
+  const EXTENDED_CREDIT = 'extended_credit';
+  const PAGE = 'page';
+  const SELLER_BUSINESS_INFO = 'seller_business_info';
+  const SELLER_BUSINESS_STATUS = 'seller_business_status';
+  const TEMPLATE = 'template';
+
+  public function getFieldTypes() {
+    return array(
+      'ad_account' => 'AdAccount',
+      'catalog_segment' => 'ProductCatalog',
+      'extended_credit' => 'ExtendedCredit',
+      'page' => 'Page',
+      'seller_business_info' => 'Object',
+      'seller_business_status' => 'string',
+      'template' => 'list<Object>',
+    );
+  }
 }

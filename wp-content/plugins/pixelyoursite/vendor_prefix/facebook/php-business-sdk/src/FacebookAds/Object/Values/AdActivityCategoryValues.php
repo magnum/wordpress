@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,17 +35,17 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdActivityCategoryValues getInstance()
  */
-class AdActivityCategoryValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ACCOUNT = 'ACCOUNT';
-    const AD = 'AD';
-    const AD_KEYWORDS = 'AD_KEYWORDS';
-    const AD_SET = 'AD_SET';
-    const AUDIENCE = 'AUDIENCE';
-    const BID = 'BID';
-    const BUDGET = 'BUDGET';
-    const CAMPAIGN = 'CAMPAIGN';
-    const DATE = 'DATE';
-    const STATUS = 'STATUS';
-    const TARGETING = 'TARGETING';
+class AdActivityCategoryValues extends AbstractEnum {
+
+  const ACCOUNT = 'ACCOUNT';
+  const AD = 'AD';
+  const AD_KEYWORDS = 'AD_KEYWORDS';
+  const AD_SET = 'AD_SET';
+  const AUDIENCE = 'AUDIENCE';
+  const BID = 'BID';
+  const BUDGET = 'BUDGET';
+  const CAMPAIGN = 'CAMPAIGN';
+  const DATE = 'DATE';
+  const STATUS = 'STATUS';
+  const TARGETING = 'TARGETING';
 }

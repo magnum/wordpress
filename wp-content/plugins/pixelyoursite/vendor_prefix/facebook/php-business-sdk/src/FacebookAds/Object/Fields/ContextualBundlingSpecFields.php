@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,11 +34,14 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ContextualBundlingSpecFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('status' => 'string');
-    }
+
+class ContextualBundlingSpecFields extends AbstractEnum {
+
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'status' => 'string',
+    );
+  }
 }

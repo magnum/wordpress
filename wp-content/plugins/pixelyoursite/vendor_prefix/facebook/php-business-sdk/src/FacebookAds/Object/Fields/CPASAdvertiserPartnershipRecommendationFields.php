@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class CPASAdvertiserPartnershipRecommendationFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const ADVERTISER_BUSINESS_ID = 'advertiser_business_id';
-    const BRAND_BUSINESS_ID = 'brand_business_id';
-    const BRANDS = 'brands';
-    const COUNTRIES = 'countries';
-    const ID = 'id';
-    const MERCHANT_BUSINESS_ID = 'merchant_business_id';
-    const MERCHANT_CATEGORIES = 'merchant_categories';
-    const STATUS = 'status';
-    const STATUS_REASON = 'status_reason';
-    public function getFieldTypes()
-    {
-        return array('advertiser_business_id' => 'string', 'brand_business_id' => 'string', 'brands' => 'list<string>', 'countries' => 'list<string>', 'id' => 'string', 'merchant_business_id' => 'string', 'merchant_categories' => 'list<string>', 'status' => 'string', 'status_reason' => 'string');
-    }
+
+class CPASAdvertiserPartnershipRecommendationFields extends AbstractEnum {
+
+  const ADVERTISER_BUSINESS_ID = 'advertiser_business_id';
+  const BRAND_BUSINESS_ID = 'brand_business_id';
+  const BRANDS = 'brands';
+  const COUNTRIES = 'countries';
+  const ID = 'id';
+  const MERCHANT_BUSINESS_ID = 'merchant_business_id';
+  const MERCHANT_CATEGORIES = 'merchant_categories';
+  const STATUS = 'status';
+  const STATUS_REASON = 'status_reason';
+
+  public function getFieldTypes() {
+    return array(
+      'advertiser_business_id' => 'string',
+      'brand_business_id' => 'string',
+      'brands' => 'list<string>',
+      'countries' => 'list<string>',
+      'id' => 'string',
+      'merchant_business_id' => 'string',
+      'merchant_categories' => 'list<string>',
+      'status' => 'string',
+      'status_reason' => 'string',
+    );
+  }
 }

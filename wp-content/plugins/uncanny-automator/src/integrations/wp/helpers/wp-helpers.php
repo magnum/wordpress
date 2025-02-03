@@ -3,8 +3,9 @@
 
 namespace Uncanny_Automator;
 
+use Uncanny_Automator\Integrations\Wp\Tokens\Trigger\Loopable\Post_Categories;
+use Uncanny_Automator\Integrations\Wp\Tokens\Trigger\Loopable\Post_Tags;
 use Uncanny_Automator_Pro\Wp_Pro_Helpers;
-use WP_Error;
 
 /**
  * Class Wp_Helpers
@@ -17,36 +18,30 @@ class Wp_Helpers {
 	 * @var Wp_Helpers
 	 */
 	public $options;
+
 	/**
 	 * @var Wp_Pro_Helpers
 	 */
 	public $pro;
 
-	public $load_options;
+	/**
+	 * @var true
+	 */
+	public $load_options = true;
 
 	/**
-	 * Wp_Helpers constructor.
+	 * @var int
+	 */
+	private static $internal_post_id = 288662867; // Automator in numbers
+
+
+	/**
+	 * __construct.
 	 */
 	public function __construct() {
 
-		$this->load_options = true;
-
-		add_action(
-			'wp_ajax_select_custom_post_by_type',
-			array(
-				$this,
-				'select_custom_post_func',
-			)
-		);
-
-		add_action(
-			'wp_ajax_select_post_type_taxonomies',
-			array(
-				$this,
-				'select_post_type_taxonomies',
-			)
-		);
-
+		add_action( 'wp_ajax_select_custom_post_by_type', array( $this, 'select_custom_post_func' ) );
+		add_action( 'wp_ajax_select_post_type_taxonomies', array( $this, 'select_post_type_taxonomies' ) );
 		add_action(
 			'wp_ajax_select_specific_post_type_taxonomies',
 			array(
@@ -54,15 +49,7 @@ class Wp_Helpers {
 				'select_specific_post_type_taxonomies',
 			)
 		);
-
-		add_action(
-			'wp_ajax_select_specific_taxonomy_terms',
-			array(
-				$this,
-				'select_specific_taxonomy_terms',
-			)
-		);
-
+		add_action( 'wp_ajax_select_specific_taxonomy_terms', array( $this, 'select_specific_taxonomy_terms' ) );
 		add_action(
 			'wp_ajax_select_terms_for_selected_taxonomy',
 			array(
@@ -70,14 +57,7 @@ class Wp_Helpers {
 				'select_terms_for_selected_taxonomy',
 			)
 		);
-
-		add_action(
-			'wp_ajax_select_all_post_from_SELECTEDPOSTTYPE',
-			array(
-				$this,
-				'select_posts_by_post_type',
-			)
-		);
+		add_action( 'wp_ajax_select_all_post_from_SELECTEDPOSTTYPE', array( $this, 'select_posts_by_post_type' ) );
 
 	}
 
@@ -110,6 +90,9 @@ class Wp_Helpers {
 		}
 
 		$post_type = automator_filter_input( 'value', INPUT_POST );
+		$field_id  = automator_filter_input( 'field_id', INPUT_POST );
+		// REVIEW maybe an array of Field IDs or filter to exclude would be better here?
+		$is_any = 'WP_OLD_POST_TYPE' !== $field_id;
 
 		$args = array(
 			//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
@@ -126,10 +109,14 @@ class Wp_Helpers {
 
 		if ( ! empty( $posts_list ) ) {
 			$post_type_label = get_post_type_object( $post_type )->labels->singular_name;
-			$fields[]        = array(
-				'value' => '-1',
-				'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
-			);
+
+			if ( $is_any ) {
+				$fields[] = array(
+					'value' => '-1',
+					'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
+				);
+			}
+
 			foreach ( $posts_list as $post_id => $title ) {
 
 				$post_title = ! empty( $title ) ? $title : sprintf(
@@ -150,10 +137,12 @@ class Wp_Helpers {
 				$post_type_label = get_post_type_object( $post_type )->labels->singular_name;
 			}
 
-			$fields[] = array(
-				'value' => '-1',
-				'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
-			);
+			if ( $is_any ) {
+				$fields[] = array(
+					'value' => '-1',
+					'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
+				);
+			}
 		}
 
 		echo wp_json_encode( $fields );
@@ -197,19 +186,21 @@ class Wp_Helpers {
 			'required'        => true,
 			'options'         => $all_posts,
 			'relevant_tokens' => array(
-				$option_code                => esc_attr__( 'Post title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Post ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Post URL', 'uncanny-automator' ),
-				$option_code . '_CONTENT'   => esc_attr__( 'Post content', 'uncanny-automator' ),
-				$option_code . '_EXCERPT'   => esc_attr__( 'Post excerpt', 'uncanny-automator' ),
-				$option_code . '_TYPE'      => esc_attr__( 'Post type', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Post featured image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Post featured image URL', 'uncanny-automator' ),
-				'POSTAUTHORFN'              => esc_attr__( 'Post author first name', 'uncanny-automator' ),
-				'POSTAUTHORLN'              => esc_attr__( 'Post author last name', 'uncanny-automator' ),
-				'POSTAUTHORDN'              => esc_attr__( 'Post author display name', 'uncanny-automator' ),
-				'POSTAUTHOREMAIL'           => esc_attr__( 'Post author email', 'uncanny-automator' ),
-				'POSTAUTHORURL'             => esc_attr__( 'Post author URL', 'uncanny-automator' ),
+				$option_code                         => esc_attr__( 'Post title', 'uncanny-automator' ),
+				$option_code . '_ID'                 => esc_attr__( 'Post ID', 'uncanny-automator' ),
+				$option_code . '_URL'                => esc_attr__( 'Post URL', 'uncanny-automator' ),
+				$option_code . '_POSTNAME'           => esc_attr__( 'Post slug', 'uncanny-automator' ),
+				$option_code . '_CONTENT'            => esc_attr__( 'Post content (raw)', 'uncanny-automator' ),
+				$option_code . '_CONTENT_BEAUTIFIED' => esc_attr__( 'Post content (formatted)', 'uncanny-automator' ),
+				$option_code . '_EXCERPT'            => esc_attr__( 'Post excerpt', 'uncanny-automator' ),
+				$option_code . '_TYPE'               => esc_attr__( 'Post type', 'uncanny-automator' ),
+				$option_code . '_THUMB_ID'           => esc_attr__( 'Post featured image ID', 'uncanny-automator' ),
+				$option_code . '_THUMB_URL'          => esc_attr__( 'Post featured image URL', 'uncanny-automator' ),
+				'POSTAUTHORFN'                       => esc_attr__( 'Post author first name', 'uncanny-automator' ),
+				'POSTAUTHORLN'                       => esc_attr__( 'Post author last name', 'uncanny-automator' ),
+				'POSTAUTHORDN'                       => esc_attr__( 'Post author display name', 'uncanny-automator' ),
+				'POSTAUTHOREMAIL'                    => esc_attr__( 'Post author email', 'uncanny-automator' ),
+				'POSTAUTHORURL'                      => esc_attr__( 'Post author URL', 'uncanny-automator' ),
 			),
 		);
 
@@ -250,18 +241,20 @@ class Wp_Helpers {
 			'required'        => true,
 			'options'         => $all_pages,
 			'relevant_tokens' => array(
-				$option_code                => esc_attr__( 'Page title', 'uncanny-automator' ),
-				$option_code . '_ID'        => esc_attr__( 'Page ID', 'uncanny-automator' ),
-				$option_code . '_URL'       => esc_attr__( 'Page URL', 'uncanny-automator' ),
-				$option_code . '_EXCERPT'   => esc_attr__( 'Page excerpt', 'uncanny-automator' ),
-				$option_code . '_CONTENT'   => esc_attr__( 'Page content', 'uncanny-automator' ),
-				$option_code . '_THUMB_ID'  => esc_attr__( 'Page featured image ID', 'uncanny-automator' ),
-				$option_code . '_THUMB_URL' => esc_attr__( 'Page featured image URL', 'uncanny-automator' ),
-				'POSTAUTHORFN'              => esc_attr__( 'Page author first name', 'uncanny-automator' ),
-				'POSTAUTHORLN'              => esc_attr__( 'Page author last name', 'uncanny-automator' ),
-				'POSTAUTHORDN'              => esc_attr__( 'Page author display name', 'uncanny-automator' ),
-				'POSTAUTHOREMAIL'           => esc_attr__( 'Page author email', 'uncanny-automator' ),
-				'POSTAUTHORURL'             => esc_attr__( 'Page author URL', 'uncanny-automator' ),
+				$option_code                         => esc_attr__( 'Page title', 'uncanny-automator' ),
+				$option_code . '_ID'                 => esc_attr__( 'Page ID', 'uncanny-automator' ),
+				$option_code . '_URL'                => esc_attr__( 'Page URL', 'uncanny-automator' ),
+				$option_code . '_POSTNAME'           => esc_attr__( 'Page slug', 'uncanny-automator' ),
+				$option_code . '_EXCERPT'            => esc_attr__( 'Page excerpt', 'uncanny-automator' ),
+				$option_code . '_CONTENT'            => esc_attr__( 'Page content (raw)', 'uncanny-automator' ),
+				$option_code . '_CONTENT_BEAUTIFIED' => esc_attr__( 'Page content (formatted)', 'uncanny-automator' ),
+				$option_code . '_THUMB_ID'           => esc_attr__( 'Page featured image ID', 'uncanny-automator' ),
+				$option_code . '_THUMB_URL'          => esc_attr__( 'Page featured image URL', 'uncanny-automator' ),
+				'POSTAUTHORFN'                       => esc_attr__( 'Page author first name', 'uncanny-automator' ),
+				'POSTAUTHORLN'                       => esc_attr__( 'Page author last name', 'uncanny-automator' ),
+				'POSTAUTHORDN'                       => esc_attr__( 'Page author display name', 'uncanny-automator' ),
+				'POSTAUTHOREMAIL'                    => esc_attr__( 'Page author email', 'uncanny-automator' ),
+				'POSTAUTHORURL'                      => esc_attr__( 'Page author URL', 'uncanny-automator' ),
 			),
 		);
 
@@ -274,7 +267,7 @@ class Wp_Helpers {
 	 *
 	 * @return mixed
 	 */
-	public function wp_user_roles( $label = null, $option_code = 'WPROLE' ) {
+	public function wp_user_roles( $label = null, $option_code = 'WPROLE', $is_any = false ) {
 
 		if ( ! $this->load_options ) {
 			return Automator()->helpers->recipe->build_default_options_array( $label, $option_code );
@@ -285,7 +278,11 @@ class Wp_Helpers {
 			$label = esc_attr__( 'Role', 'uncanny-automator' );
 		}
 
-		$roles                  = array();
+		$roles = array();
+		if ( true === $is_any ) {
+			$roles['-1'] = esc_attr_x( 'Any role', 'WordPress', 'uncanny-automator' );
+		}
+
 		$default_role           = get_option( 'default_role', 'subscriber' );
 		$roles[ $default_role ] = wp_roles()->roles[ $default_role ]['name'];
 
@@ -380,7 +377,12 @@ class Wp_Helpers {
 
 		$options = array();
 
+		$group_id   = automator_filter_input( 'group_id', INPUT_POST );
 		$taxonomies = $this->get_taxonomies( automator_filter_input( 'value', INPUT_POST ) );
+		if ( 'CREATEPOST' === $group_id ) {
+			$post_type  = sanitize_text_field( $_POST['values']['CREATEPOST'] ); //phpcs:ignore
+			$taxonomies = $this->get_taxonomies( $post_type );
+		}
 
 		if ( empty( $taxonomies ) ) {
 			wp_send_json( array() );
@@ -512,6 +514,7 @@ class Wp_Helpers {
 		}
 
 		$post_type = automator_filter_input( 'value', INPUT_POST );
+		$group_id  = automator_filter_input( 'group_id', INPUT_POST );
 
 		$args       = array(
 			//phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
@@ -525,14 +528,23 @@ class Wp_Helpers {
 		);
 		$posts_list = $uncanny_automator->helpers->recipe->options->wp_query( $args, false, __( 'Any post', 'uncanny-automator' ) );
 
+		if ( 'CREATEPOST' === $group_id ) {
+			$fields[] = array(
+				'value' => '0',
+				'text'  => _x( 'No parent', 'WordPress post parent', 'uncanny-automator' ),
+			);
+		}
+
 		if ( ! empty( $posts_list ) ) {
 
 			$post_type_label = get_post_type_object( $post_type )->labels->singular_name;
 
-			$fields[] = array(
-				'value' => '-1',
-				'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
-			);
+			if ( 'CREATEPOST' !== $group_id ) {
+				$fields[] = array(
+					'value' => '-1',
+					'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
+				);
+			}
 			foreach ( $posts_list as $post_id => $post_title ) {
 				// Check if the post title is defined
 				$post_title = ! empty( $post_title ) ? $post_title : sprintf( __( 'ID: %1$s (no title)', 'uncanny-automator' ), $post_id );
@@ -543,16 +555,18 @@ class Wp_Helpers {
 				);
 			}
 		} else {
-			$post_type_label = 'post';
+			if ( 'CREATEPOST' !== $group_id ) {
+				$post_type_label = 'post';
 
-			if ( intval( $post_type ) !== intval( '-1' ) ) {
-				$post_type_label = get_post_type_object( $post_type )->labels->singular_name;
+				if ( intval( $post_type ) !== intval( '-1' ) ) {
+					$post_type_label = get_post_type_object( $post_type )->labels->singular_name;
+				}
+
+				$fields[] = array(
+					'value' => '-1',
+					'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
+				);
 			}
-
-			$fields[] = array(
-				'value' => '-1',
-				'text'  => sprintf( _x( 'Any %s', 'WordPress post type', 'uncanny-automator' ), strtolower( $post_type_label ) ),
-			);
 		}
 
 		echo wp_json_encode( $fields );
@@ -584,7 +598,8 @@ class Wp_Helpers {
 	 * @param string $label The label of the field.
 	 * @param string $option_code The option code of the field.
 	 * @param array $args The field arguments.
-	 * @param boolean $apply_relevant_tokens Previous method `all_post_types` does not apply the relevant tokens. Set to true to apply the 'relevant_tokens' argument.
+	 * @param boolean $apply_relevant_tokens Previous method `all_post_types` does not apply the relevant tokens. Set
+	 *                                       to true to apply the 'relevant_tokens' argument.
 	 *
 	 * @return array The option.
 	 */
@@ -610,6 +625,7 @@ class Wp_Helpers {
 				$option_code                => __( 'Post title', 'uncanny-automator' ),
 				$option_code . '_ID'        => __( 'Post ID', 'uncanny-automator' ),
 				$option_code . '_URL'       => __( 'Post URL', 'uncanny-automator' ),
+				$option_code . '_POSTNAME'  => __( 'Post slug', 'uncanny-automator' ),
 				$option_code . '_THUMB_ID'  => __( 'Post featured image ID', 'uncanny-automator' ),
 				$option_code . '_THUMB_URL' => __( 'Post featured image URL', 'uncanny-automator' ),
 			);
@@ -705,7 +721,7 @@ class Wp_Helpers {
 	 *
 	 * @param string $post_type The WordPress post type.
 	 *
-	 * @return object The taxonomies of a given post type.
+	 * @return string[]|\WP_Taxonomy[] The taxonomies of a given post type.
 	 */
 	public function get_taxonomies( $post_type = 'post' ) {
 
@@ -741,5 +757,212 @@ class Wp_Helpers {
 
 		return apply_filters( 'automator_wp_get_disabled_post_types', $post_types );
 
+	}
+
+	/**
+	 * Conditional child taxonomy checkbox
+	 *
+	 * @param string $label
+	 * @param string $option_code
+	 * @param string $comparision_code
+	 *
+	 * @return array
+	 */
+	public function conditional_child_taxonomy_checkbox( $label = null, $option_code = 'WPTAXONOMIES_CHILDREN', $comparision_code = 'WPTAXONOMIES' ) {
+
+		if ( empty( $label ) ) {
+			$label = esc_attr__( 'Also include child categories', 'uncanny-automator' );
+		}
+
+		$args = array(
+			'option_code'           => $option_code,
+			'label'                 => $label,
+			'input_type'            => 'checkbox',
+			'required'              => false,
+			'exclude_default_token' => true,
+			/*
+			'dynamic_visibility' => array(
+				'default_state'    => 'hidden',
+				'visibility_rules' => array(
+					array(
+						'operator'             => 'AND',
+						'rule_conditions'      => array(
+							array(
+								'option_code' => $comparision_code,
+								'compare'     => '==',
+								'value'       => 'category',
+							),
+						),
+						'resulting_visibility' => 'show',
+					),
+				),
+			),
+			*/
+		);
+
+		return Automator()->helpers->recipe->field->text( $args );
+	}
+
+	/**
+	 * Get term child of a parent term from provided post terms.
+	 *
+	 * @param array $post_terms
+	 * @param int $parent_term_id
+	 * @param string $taxonomy
+	 * @param int $post_id
+	 *
+	 * @return mixed WP_Term|false
+	 */
+	public function get_term_child_of( $post_terms, $parent_term_id, $taxonomy, $post_id ) {
+
+		if ( empty( $post_terms ) || ! is_array( $post_terms ) ) {
+			return false;
+		}
+
+		// Check Post Type for the post
+		$allowed_post_types = apply_filters( 'automator_allowed_category_taxonomy_children_post_types', array( 'post' ) );
+		if ( ! in_array( get_post_type( $post_id ), $allowed_post_types, true ) ) {
+			return false;
+		}
+
+		$allowed_taxonomies = apply_filters( 'automator_allowed_category_taxonomy_children_taxonomies', array( 'category' ) );
+		if ( ! is_array( $allowed_taxonomies ) || ! in_array( $taxonomy, $allowed_taxonomies, true ) ) {
+			return false;
+		}
+
+		// Get all child terms of the parent term
+		$child_terms = get_term_children( $parent_term_id, $taxonomy );
+		if ( empty( $child_terms ) || is_wp_error( $child_terms ) ) {
+			return false;
+		}
+
+		foreach ( $post_terms as $post_term ) {
+			if ( in_array( $post_term->term_id, $child_terms, true ) && $post_term->taxonomy === $taxonomy ) {
+				return $post_term;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the common trigger loopable tokens.
+	 *
+	 * @return array{WP_POST_CATEGORIES: class-string<\Uncanny_Automator\Integrations\Woocommerce\Tokens\Trigger\Loopable\Post_Categories>}
+	 */
+	public static function common_trigger_loopable_tokens() {
+
+		return array(
+			'WP_POST_CATEGORIES' => Post_Categories::class,
+			'WP_POST_TAGS'       => Post_Tags::class,
+		);
+	}
+
+	/**
+	 * @param $post_id
+	 * @param $action_hook
+	 *
+	 * @return void
+	 */
+	public static function add_pending_post( $post_id, $action_hook ) {
+		// Add the post ID to the post meta table.
+		global $wpdb;
+		$wpdb->insert(
+			$wpdb->postmeta,
+			array(
+				'post_id'    => absint( self::$internal_post_id ),
+				'meta_key'   => $action_hook,
+				'meta_value' => absint( $post_id ),
+			),
+			array(
+				'%d',
+				'%s',
+				'%d',
+			)
+		);
+	}
+
+	/**
+	 * @param $action_hook
+	 *
+	 * @return array|object|\stdClass[]|null
+	 */
+	public static function get_pending_posts( $action_hook ) {
+		// Retrieve the accumulated post IDs from the postmeta table
+		global $wpdb;
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT *
+				FROM $wpdb->postmeta
+				WHERE meta_key = %s
+				AND post_id = %d",
+				$action_hook,
+				self::$internal_post_id
+			)
+		);
+	}
+
+	/**
+	 * @param $post_meta
+	 *
+	 * @return bool|int|\mysqli_result|null
+	 */
+	public static function delete_post_after_trigger( $post_meta ) {
+		global $wpdb;
+		// Delete the post meta
+		return $wpdb->delete(
+			$wpdb->postmeta,
+			array(
+				'post_id'    => absint( $post_meta->post_id ),
+				'meta_key'   => $post_meta->meta_key,
+				'meta_value' => absint( $post_meta->meta_value ),
+			),
+			array(
+				'%d',
+				'%s',
+				'%d',
+			)
+		);
+	}
+
+	/**
+	 * @param $post_id
+	 * @param $hook
+	 *
+	 * @return bool
+	 */
+	public static function maybe_post_postponed( $post_id, $hook ) {
+
+		// Retrieve the accumulated post IDs from the post meta table.
+		$post_metas = self::get_pending_posts( $hook );
+
+		if ( empty( $post_metas ) ) {
+			return false;
+		}
+
+		$post_ids = array_column( $post_metas, 'meta_value' );
+		$post_ids = array_unique( $post_ids );
+
+		// Remove duplicates and convert to integers.
+		$post_ids = array_map( 'absint', array_unique( $post_ids ) );
+
+		return in_array( absint( $post_id ), $post_ids, true );
+	}
+
+	/**
+	 * Requeue the post if it was not processed.
+	 *
+	 * @param $post_id
+	 * @param $action_hook
+	 *
+	 * @return void
+	 */
+	public static function requeue_post( $post_id, $action_hook ) {
+		// Let's try queueing the post only once to see if the terms are populated in the next run.
+		if ( empty( get_post_meta( $post_id, $action_hook, true ) ) ) {
+			self::add_pending_post( $post_id, $action_hook );
+			add_post_meta( $post_id, $action_hook, wp_date( 'c' ) );
+		}
 	}
 }

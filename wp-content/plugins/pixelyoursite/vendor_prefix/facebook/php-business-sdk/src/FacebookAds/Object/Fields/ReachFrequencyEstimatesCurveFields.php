@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ReachFrequencyEstimatesCurveFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUDGET = 'budget';
-    const CONVERSION = 'conversion';
-    const IMPRESSION = 'impression';
-    const INTERPOLATED_REACH = 'interpolated_reach';
-    const NUM_POINTS = 'num_points';
-    const RAW_IMPRESSION = 'raw_impression';
-    const RAW_REACH = 'raw_reach';
-    const REACH = 'reach';
-    public function getFieldTypes()
-    {
-        return array('budget' => 'list<int>', 'conversion' => 'list<int>', 'impression' => 'list<int>', 'interpolated_reach' => 'float', 'num_points' => 'unsigned int', 'raw_impression' => 'list<int>', 'raw_reach' => 'list<int>', 'reach' => 'list<int>');
-    }
+
+class ReachFrequencyEstimatesCurveFields extends AbstractEnum {
+
+  const BUDGET = 'budget';
+  const CONVERSION = 'conversion';
+  const IMPRESSION = 'impression';
+  const INTERPOLATED_REACH = 'interpolated_reach';
+  const NUM_POINTS = 'num_points';
+  const RAW_IMPRESSION = 'raw_impression';
+  const RAW_REACH = 'raw_reach';
+  const REACH = 'reach';
+
+  public function getFieldTypes() {
+    return array(
+      'budget' => 'list<int>',
+      'conversion' => 'list<int>',
+      'impression' => 'list<int>',
+      'interpolated_reach' => 'float',
+      'num_points' => 'unsigned int',
+      'raw_impression' => 'list<int>',
+      'raw_reach' => 'list<int>',
+      'reach' => 'list<int>',
+    );
+  }
 }

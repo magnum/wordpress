@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,15 +34,22 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class BusinessOwnedObjectOnBehalfOfRequestFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUSINESS_OWNED_OBJECT = 'business_owned_object';
-    const ID = 'id';
-    const RECEIVING_BUSINESS = 'receiving_business';
-    const REQUESTING_BUSINESS = 'requesting_business';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('business_owned_object' => 'string', 'id' => 'string', 'receiving_business' => 'Business', 'requesting_business' => 'Business', 'status' => 'string');
-    }
+
+class BusinessOwnedObjectOnBehalfOfRequestFields extends AbstractEnum {
+
+  const BUSINESS_OWNED_OBJECT = 'business_owned_object';
+  const ID = 'id';
+  const RECEIVING_BUSINESS = 'receiving_business';
+  const REQUESTING_BUSINESS = 'requesting_business';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'business_owned_object' => 'string',
+      'id' => 'string',
+      'receiving_business' => 'Business',
+      'requesting_business' => 'Business',
+      'status' => 'string',
+    );
+  }
 }

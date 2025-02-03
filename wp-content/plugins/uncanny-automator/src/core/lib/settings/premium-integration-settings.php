@@ -99,14 +99,32 @@ abstract class Premium_Integration_Settings {
 	public $alerts = array();
 
 	/**
-	 * Integration helpers
+	 * helpers
 	 *
 	 * @var mixed
 	 */
 	public $helpers;
 
-	final public function __construct( $helpers = null ) {
-		$this->helpers = $helpers;
+	/**
+	 * Integration helpers
+	 *
+	 * @var mixed
+	 */
+	public $dependencies;
+
+	/**
+	 * __construct
+	 *
+	 * @param  mixed $dependencies
+	 * @return void
+	 */
+	final public function __construct( ...$dependencies ) {
+
+		if ( ! empty( $dependencies ) ) {
+			$this->dependencies = $dependencies;
+			$this->helpers      = array_shift( $dependencies );
+		}
+
 		$this->register_hooks();
 	}
 
@@ -131,6 +149,60 @@ abstract class Premium_Integration_Settings {
 		// Allow running code if settings were updated
 		add_filter( 'admin_init', array( $this, 'maybe_settings_updated' ) );
 
+		// Hook into WordPress option update/add/delete to add/update/delete the option in uap_options table
+		add_action( 'added_option', array( $this, 'add_option_in_uap_options' ), 10, 2 );
+		add_action( 'updated_option', array( $this, 'update_option_in_uap_options' ), 10, 3 );
+		add_action( 'deleted_option', array( $this, 'delete_option_in_uap_optoions' ), 10, 1 );
+
+	}
+
+	/**
+	 * @param $option
+	 * @param $value
+	 *
+	 * @return void
+	 */
+	public function add_option_in_uap_options( $option, $value = '' ) {
+		if ( $this->maybe_automator_setting( $option ) ) {
+			automator_add_option( $option, $value );
+		}
+	}
+
+	/**
+	 * @param $option
+	 * @param $old_value
+	 * @param $value
+	 *
+	 * @return void
+	 */
+	public function update_option_in_uap_options( $option, $old_value, $value ) {
+		if ( $this->maybe_automator_setting( $option ) ) {
+			automator_update_option( $option, $value );
+		}
+	}
+
+	/**
+	 * @param $option
+	 *
+	 * @return void
+	 */
+	public function delete_option_in_uap_optoions( $option ) {
+		if ( $this->maybe_automator_setting( $option ) ) {
+			automator_delete_option( $option );
+		}
+	}
+
+	/**
+	 * @param $option
+	 *
+	 * @return false|int
+	 */
+	public function maybe_automator_setting( $option ) {
+		if ( preg_match( '/^(automator_|uncanny_automator_|uap_|ua_|_uoa_|_uncanny_|UO_|_uncannyowl_|uoa_)/', $option ) ) {
+			return array_key_exists( $option, automator_get_all_options() );
+		}
+
+		return false;
 	}
 
 	/**
@@ -139,6 +211,7 @@ abstract class Premium_Integration_Settings {
 	 * Set the settings page id, name, icon in this method.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function set_properties() {
 		$this->set_id( 'sample-tab' );
@@ -299,14 +372,134 @@ abstract class Premium_Integration_Settings {
 	}
 
 	/**
+	 * @return void
+	 */
+	final public function output_wrapper() {
+		do_action( 'automator_settings_premium_integration_before_output', $this );
+		$this->output();
+		do_action( 'automator_settings_premium_integration_after_output', $this );
+	}
+
+	/**
 	 * Outputs the content of the settings page of this integration
 	 */
 	public function output() {
 		// Return a placeholder
 		// Each Premium Integration will have its own output method
 		// Don't translate the string, it's just for internal use
-		echo $this->content; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		//echo $this->content; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		$this->output_form();
+
 	}
+
+	/**
+	 * output_form
+	 *
+	 * @return void
+	 */
+	public function output_form() {
+		?>
+
+			<form method="POST" action="options.php" warn-unsaved>
+				<?php settings_fields( $this->get_settings_id() ); ?>
+				<?php $this->output_panel(); ?>
+			</form>
+			<?php
+	}
+
+	/**
+	 * output_panel
+	 *
+	 * @return void
+	 */
+	public function output_panel() {
+		?>
+
+			<div class="uap-settings-panel">
+				<div class="uap-settings-panel-top">
+					<?php $this->output_panel_top(); ?>
+					<?php $this->display_alerts(); ?>
+					<div class="uap-settings-panel-content">
+						<?php $this->output_panel_content(); ?>
+					</div>
+				</div>
+				<div class="uap-settings-panel-bottom">
+					<?php $this->output_panel_bottom(); ?>
+				</div>
+			</div>
+		<?php
+	}
+
+	/**
+	 * output_panel_top
+	 *
+	 * @return void
+	 */
+	public function output_panel_top() {
+		?>
+
+			<div class="uap-settings-panel-title">
+				<?php $this->output_panel_title(); ?>
+			</div>
+
+		<?php
+	}
+
+	/**
+	 * output_panel_title
+	 *
+	 * @return void
+	 */
+	public function output_panel_title() {
+		?>
+
+			<uo-icon integration="<?php echo esc_attr( $this->get_icon() ); ?>"></uo-icon> <?php echo esc_attr( $this->get_name() ); ?>
+
+		<?php
+	}
+
+	/**
+	 * output_panel_content
+	 *
+	 * @return void
+	 */
+	public function output_panel_content() {
+
+	}
+
+	/**
+	 * output_panel_bottom
+	 *
+	 * @return void
+	 */
+	public function output_panel_bottom() {
+		?>
+
+		<div class="uap-settings-panel-bottom-left">
+			<?php $this->output_panel_bottom_left(); ?>
+		</div>
+		<div class="uap-settings-panel-bottom-right">
+			<?php $this->output_panel_bottom_right(); ?>
+		</div>
+
+		<?php
+	}
+
+	/**
+	 * output_panel_bottom_left
+	 *
+	 * @return void
+	 */
+	public function output_panel_bottom_left() {}
+
+	/**
+	 * output_panel_bottom_right
+	 *
+	 * @return void
+	 */
+	public function output_panel_bottom_right() {}
+
 
 	/**
 	 * Returns the URL to the Settings page of this integration
@@ -363,8 +556,8 @@ abstract class Premium_Integration_Settings {
 	 */
 	public function is_current_page_settings() {
 		return automator_filter_input( 'page' ) === 'uncanny-automator-config'
-			   && automator_filter_input( 'tab' ) === 'premium-integrations'
-			   && automator_filter_input( 'integration' ) === $this->get_id();
+		&& automator_filter_input( 'tab' ) === 'premium-integrations'
+		&& automator_filter_input( 'integration' ) === $this->get_id();
 	}
 
 	/**
@@ -384,7 +577,7 @@ abstract class Premium_Integration_Settings {
 			'icon'     => $this->get_icon(),
 			'status'   => $this->get_status(),
 			'preload'  => $this->get_preload(),
-			'function' => array( $this, 'output' ),
+			'function' => array( $this, 'output_wrapper' ),
 		);
 
 		return $tabs;
@@ -588,6 +781,16 @@ abstract class Premium_Integration_Settings {
 	}
 
 	/**
+	 * text_input
+	 *
+	 * @param  mixed $input
+	 * @return void
+	 */
+	public function text_input( $input ) {
+		$this->text_input_html( $input );
+	}
+
+	/**
 	 * text_input_html
 	 *
 	 * Output the uo-text-input HTML
@@ -630,4 +833,50 @@ abstract class Premium_Integration_Settings {
 		></uo-text-field>
 		<?php
 	}
+
+	/**
+	 * output_panel_separator
+	 *
+	 * @return void
+	 */
+	public function output_panel_separator() {
+		?>
+
+			<div class="uap-settings-panel-content-separator"></div>
+
+		<?php
+	}
+
+	/**
+	 * submit_button
+	 *
+	 * @param  mixed $label
+	 * @return void
+	 */
+	public function submit_button( $label ) {
+		?>
+
+			<uo-button type="submit">
+				<?php echo esc_attr( $label ); ?>
+			</uo-button>
+
+		<?php
+	}
+
+	/**
+	 * redirect_button
+	 *
+	 * @param  mixed $label
+	 * @param  mixed $url
+	 * @return void
+	 */
+	public function redirect_button( $label, $url, $color = 'primary' ) {
+		?>
+		<uo-button href="<?php echo esc_attr( $url ); ?>" color="<?php echo esc_attr( $color ); ?>">
+			<?php echo esc_attr( $label ); ?>
+		</uo-button>
+
+		<?php
+	}
+
 }

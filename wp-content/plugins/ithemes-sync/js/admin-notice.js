@@ -16,7 +16,7 @@ jQuery(document).ready(
 					action: 'ithemes_sync_hide_notice'
 				};
 				
-				jQuery.post( ajaxurl, post_data );
+				jQuery.post( ithemes_sync_notice.url, post_data );
 				
 				return false;
 			}

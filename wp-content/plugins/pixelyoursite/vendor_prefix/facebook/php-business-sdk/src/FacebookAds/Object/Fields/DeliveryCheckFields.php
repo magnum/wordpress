@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class DeliveryCheckFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const CHECK_NAME = 'check_name';
-    const DESCRIPTION = 'description';
-    const EXTRA_INFO = 'extra_info';
-    const SUMMARY = 'summary';
-    public function getFieldTypes()
-    {
-        return array('check_name' => 'string', 'description' => 'string', 'extra_info' => 'DeliveryCheckExtraInfo', 'summary' => 'string');
-    }
+
+class DeliveryCheckFields extends AbstractEnum {
+
+  const CHECK_NAME = 'check_name';
+  const DESCRIPTION = 'description';
+  const EXTRA_INFO = 'extra_info';
+  const SUMMARY = 'summary';
+
+  public function getFieldTypes() {
+    return array(
+      'check_name' => 'string',
+      'description' => 'string',
+      'extra_info' => 'DeliveryCheckExtraInfo',
+      'summary' => 'string',
+    );
+  }
 }

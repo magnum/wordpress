@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,10 +35,10 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ProductItemShippingWeightUnitValues getInstance()
  */
-class ProductItemShippingWeightUnitValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const VALUE_G = 'g';
-    const KG = 'kg';
-    const LB = 'lb';
-    const OZ = 'oz';
+class ProductItemShippingWeightUnitValues extends AbstractEnum {
+
+  const VALUE_G = 'g';
+  const KG = 'kg';
+  const LB = 'lb';
+  const OZ = 'oz';
 }

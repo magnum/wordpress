@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,18 +34,28 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class PlaceTopicFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const COUNT = 'count';
-    const HAS_CHILDREN = 'has_children';
-    const ICON_URL = 'icon_url';
-    const ID = 'id';
-    const NAME = 'name';
-    const PARENT_IDS = 'parent_ids';
-    const PLURAL_NAME = 'plural_name';
-    const TOP_SUBTOPIC_NAMES = 'top_subtopic_names';
-    public function getFieldTypes()
-    {
-        return array('count' => 'unsigned int', 'has_children' => 'bool', 'icon_url' => 'string', 'id' => 'string', 'name' => 'string', 'parent_ids' => 'list<string>', 'plural_name' => 'string', 'top_subtopic_names' => 'list<string>');
-    }
+
+class PlaceTopicFields extends AbstractEnum {
+
+  const COUNT = 'count';
+  const HAS_CHILDREN = 'has_children';
+  const ICON_URL = 'icon_url';
+  const ID = 'id';
+  const NAME = 'name';
+  const PARENT_IDS = 'parent_ids';
+  const PLURAL_NAME = 'plural_name';
+  const TOP_SUBTOPIC_NAMES = 'top_subtopic_names';
+
+  public function getFieldTypes() {
+    return array(
+      'count' => 'unsigned int',
+      'has_children' => 'bool',
+      'icon_url' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'parent_ids' => 'list<string>',
+      'plural_name' => 'string',
+      'top_subtopic_names' => 'list<string>',
+    );
+  }
 }

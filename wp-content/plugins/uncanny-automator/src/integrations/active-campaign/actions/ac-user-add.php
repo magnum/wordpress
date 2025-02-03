@@ -10,13 +10,11 @@ class AC_USER_ADD {
 
 	use Recipe\Actions;
 
-	public $prefix = '';
+	public $prefix = 'AC_USER_ADD';
+
+	protected $ac_endpoint_uri = AUTOMATOR_API_URL . 'v2/active-campaign';
 
 	public function __construct() {
-
-		$this->prefix = 'AC_USER_ADD';
-
-		$this->ac_endpoint_uri = AUTOMATOR_API_URL . 'v2/active-campaign';
 
 		$this->setup_action();
 
@@ -41,13 +39,23 @@ class AC_USER_ADD {
 		/* translators: Action - WordPress */
 		$this->set_readable_sentence( esc_attr__( 'Add {{the user}} to ActiveCampaign', 'uncanny-automator' ) );
 
-		$options_group = array( $this->get_action_meta() => $this->get_field() );
-
-		$this->set_options_group( $options_group );
+		$this->set_options_callback( array( $this, 'load_options' ) );
 
 		$this->set_background_processing( true );
 
 		$this->register_action();
+
+	}
+
+	public function load_options() {
+
+		$options_group = array( $this->get_action_meta() => $this->get_field() );
+
+		return Automator()->utilities->keep_order_of_options(
+			array(
+				'options_group' => $options_group,
+			)
+		);
 
 	}
 
@@ -86,7 +94,18 @@ class AC_USER_ADD {
 			'lastName'       => $lastname,
 			'phone'          => $phone,
 			'updateIfExists' => $is_update, // String.
-			'fields'         => wp_json_encode( $custom_fields ),
+			'fields'         => $custom_fields,
+		);
+
+		$body = $ac_helper->filter_add_contact_api_body(
+			$body,
+			array(
+				'user_id'     => $user_id,
+				'action_data' => $action_data,
+				'parsed'      => $parsed,
+				'args'        => $args,
+				'recipe_id'   => $recipe_id,
+			)
 		);
 
 		try {
@@ -125,6 +144,7 @@ class AC_USER_ADD {
 			'option_code' => $this->prefix . '_UPDATE_IF_CONTACT_EXISTS',
 			'label'       => esc_attr__( 'If the contact already exists, update their info.', 'uncanny-automator' ),
 			'input_type'  => 'checkbox',
+			'description' => __( 'To delete a value from a field, set its value to [delete], including the square brackets.', 'uncanny-automator' ),
 		);
 
 		return $fields;

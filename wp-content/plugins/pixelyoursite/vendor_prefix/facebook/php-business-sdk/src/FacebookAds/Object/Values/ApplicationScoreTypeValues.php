@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
+namespace PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
-use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+use PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
 /**
  * This class is auto-generated.
  *
@@ -34,7 +34,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static ApplicationScoreTypeValues getInstance()
  */
-class ApplicationScoreTypeValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
+class ApplicationScoreTypeValues extends \PYS_PRO_GLOBAL\PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
 {
     const CUSTOM = 'CUSTOM';
     const NUMERIC = 'NUMERIC';

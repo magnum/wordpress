@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Values;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -34,8 +35,8 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  *
  * @method static AdCreativeDynamicAdVoiceValues getInstance()
  */
-class AdCreativeDynamicAdVoiceValues extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DYNAMIC = 'DYNAMIC';
-    const STORY_OWNER = 'STORY_OWNER';
+class AdCreativeDynamicAdVoiceValues extends AbstractEnum {
+
+  const DYNAMIC = 'DYNAMIC';
+  const STORY_OWNER = 'STORY_OWNER';
 }

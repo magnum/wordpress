@@ -225,6 +225,8 @@ function automatorwp_dashboard_docs_box() {
         <li><a href="https://automatorwp.com/docs/getting-started/what-is-automatorwp/" target="_blank"><?php _e( 'What is AutomatorWP?', 'automatorwp' ); ?></a></li>
         <li><a href="https://automatorwp.com/docs/getting-started/automations/" target="_blank"><?php _e( 'Automations', 'automatorwp' ); ?></a></li>
         <li><a href="https://automatorwp.com/docs/getting-started/anonymous-automations/" target="_blank"><?php _e( 'Anonymous Automations', 'automatorwp' ); ?></a></li>
+        <li><a href="https://automatorwp.com/docs/getting-started/all-users-automations/" target="_blank"><?php _e( 'All Users Automations', 'automatorwp' ); ?></a></li>
+        <li><a href="https://automatorwp.com/docs/getting-started/all-pòsts-automations/" target="_blank"><?php _e( 'All Posts Automations', 'automatorwp' ); ?></a></li>
         <li><a href="https://automatorwp.com/docs/getting-started/triggers/" target="_blank"><?php _e( 'Triggers', 'automatorwp' ); ?></a></li>
         <li><a href="https://automatorwp.com/docs/getting-started/actions/" target="_blank"><?php _e( 'Actions', 'automatorwp' ); ?></a></li>
         <li><a href="https://automatorwp.com/docs/getting-started/filters/" target="_blank"><?php _e( 'Filters', 'automatorwp' ); ?></a></li>
@@ -264,6 +266,7 @@ function automatorwp_dashboard_advanced_box() {
                 <li><a href="https://automatorwp.com/docs/special-tags/user-meta-tag/" target="_blank"><?php _e( 'User meta tag', 'automatorwp' ); ?></a></li>
                 <li><a href="https://automatorwp.com/docs/special-tags/post-meta-tag/" target="_blank"><?php _e( 'Post meta tag', 'automatorwp' ); ?></a></li>
                 <li><a href="https://automatorwp.com/docs/special-tags/date-tag/" target="_blank"><?php _e( 'Date tag', 'automatorwp' ); ?></a></li>
+                <li><a href="https://automatorwp.com/docs/special-tags/function-tags/" target="_blank"><?php _e( 'Function tags', 'automatorwp' ); ?></a></li>
             </ul>
         </li>
     </ul>
@@ -291,15 +294,21 @@ function automatorwp_dashboard_team_box() {
             </a>
         </li>
         <li>
-            <a href="https://profiles.wordpress.org/pacogon/" target="_blank">
-                <img alt="" src="https://secure.gravatar.com/avatar/348f374779e7433ad6bf3930cb2a492e?s=64&amp;d=mm&amp;r=g" class="avatar avatar-32 photo" loading="lazy">
-                <span>Paco González</span>
-            </a>
-        </li>
-        <li>
             <a href="https://profiles.wordpress.org/dioni00/" target="_blank">
                 <img alt="" src="https://secure.gravatar.com/avatar/6de68ad3863fdf3c92a194ba16546571?s=64&amp;d=mm&amp;r=g" class="avatar avatar-32 photo" loading="lazy">
                 <span>Dionisio Sanchez</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://profiles.wordpress.org/tinocalvo/" target="_blank">
+                <img alt="" src="https://secure.gravatar.com/avatar/a438aa12efcfb007f3db145d6ad37def?s=64&amp;d=retro&amp;r=g" class="avatar avatar-32 photo" loading="lazy">
+                <span>Tino Calvo</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://profiles.wordpress.org/pacogon/" target="_blank">
+                <img alt="" src="https://secure.gravatar.com/avatar/348f374779e7433ad6bf3930cb2a492e?s=64&amp;d=mm&amp;r=g" class="avatar avatar-32 photo" loading="lazy">
+                <span>Paco González</span>
             </a>
         </li>
         <li>

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\PaymentEnginePaymentFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PaymentEnginePaymentReasonValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,49 +39,96 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\PaymentEnginePaymentReasonValues;
  * pull request for this class.
  *
  */
-class PaymentEnginePayment extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @return PaymentEnginePaymentFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\PaymentEnginePaymentFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['Reason'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PaymentEnginePaymentReasonValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function createDispute(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('reason' => 'reason_enum');
-        $enums = array('reason_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PaymentEnginePaymentReasonValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/dispute', new \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function createRefund(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array('amount' => 'float', 'currency' => 'string', 'reason' => 'reason_enum');
-        $enums = array('reason_enum' => \PYS_PRO_GLOBAL\FacebookAds\Object\Values\PaymentEnginePaymentReasonValues::getInstance()->getValues());
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_POST, '/refunds', new \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment(), 'EDGE', \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\PaymentEnginePayment::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class PaymentEnginePayment extends AbstractCrudObject {
+
+  /**
+   * @return PaymentEnginePaymentFields
+   */
+  public static function getFieldsEnum() {
+    return PaymentEnginePaymentFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['Reason'] = PaymentEnginePaymentReasonValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function createDispute(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'reason' => 'reason_enum',
+    );
+    $enums = array(
+      'reason_enum' => PaymentEnginePaymentReasonValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/dispute',
+      new PaymentEnginePayment(),
+      'EDGE',
+      PaymentEnginePayment::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function createRefund(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+      'amount' => 'float',
+      'currency' => 'string',
+      'reason' => 'reason_enum',
+    );
+    $enums = array(
+      'reason_enum' => PaymentEnginePaymentReasonValues::getInstance()->getValues(),
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_POST,
+      '/refunds',
+      new PaymentEnginePayment(),
+      'EDGE',
+      PaymentEnginePayment::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new PaymentEnginePayment(),
+      'NODE',
+      PaymentEnginePayment::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

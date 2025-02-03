@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object;
 
 use PYS_PRO_GLOBAL\FacebookAds\ApiRequest;
@@ -30,6 +30,7 @@ use PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface;
 use PYS_PRO_GLOBAL\FacebookAds\TypeChecker;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CPASCollaborationRequestFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CPASCollaborationRequestRequesterAgencyOrBrandValues;
+
 /**
  * This class is auto-generated.
  *
@@ -38,36 +39,51 @@ use PYS_PRO_GLOBAL\FacebookAds\Object\Values\CPASCollaborationRequestRequesterAg
  * pull request for this class.
  *
  */
-class CPASCollaborationRequest extends \PYS_PRO_GLOBAL\FacebookAds\Object\AbstractCrudObject
-{
-    /**
-     * @deprecated getEndpoint function is deprecated
-     */
-    protected function getEndpoint()
-    {
-        return 'collaborative_ads_collaboration_requests';
-    }
-    /**
-     * @return CPASCollaborationRequestFields
-     */
-    public static function getFieldsEnum()
-    {
-        return \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CPASCollaborationRequestFields::getInstance();
-    }
-    protected static function getReferencedEnums()
-    {
-        $ref_enums = array();
-        $ref_enums['RequesterAgencyOrBrand'] = \PYS_PRO_GLOBAL\FacebookAds\Object\Values\CPASCollaborationRequestRequesterAgencyOrBrandValues::getInstance()->getValues();
-        return $ref_enums;
-    }
-    public function getSelf(array $fields = array(), array $params = array(), $pending = \false)
-    {
-        $this->assureId();
-        $param_types = array();
-        $enums = array();
-        $request = new \PYS_PRO_GLOBAL\FacebookAds\ApiRequest($this->api, $this->data['id'], \PYS_PRO_GLOBAL\FacebookAds\Http\RequestInterface::METHOD_GET, '/', new \PYS_PRO_GLOBAL\FacebookAds\Object\CPASCollaborationRequest(), 'NODE', \PYS_PRO_GLOBAL\FacebookAds\Object\CPASCollaborationRequest::getFieldsEnum()->getValues(), new \PYS_PRO_GLOBAL\FacebookAds\TypeChecker($param_types, $enums));
-        $request->addParams($params);
-        $request->addFields($fields);
-        return $pending ? $request : $request->execute();
-    }
+
+class CPASCollaborationRequest extends AbstractCrudObject {
+
+  /**
+   * @deprecated getEndpoint function is deprecated
+   */
+  protected function getEndpoint() {
+    return 'collaborative_ads_collaboration_requests';
+  }
+
+  /**
+   * @return CPASCollaborationRequestFields
+   */
+  public static function getFieldsEnum() {
+    return CPASCollaborationRequestFields::getInstance();
+  }
+
+  protected static function getReferencedEnums() {
+    $ref_enums = array();
+    $ref_enums['RequesterAgencyOrBrand'] = CPASCollaborationRequestRequesterAgencyOrBrandValues::getInstance()->getValues();
+    return $ref_enums;
+  }
+
+
+  public function getSelf(array $fields = array(), array $params = array(), $pending = false) {
+    $this->assureId();
+
+    $param_types = array(
+    );
+    $enums = array(
+    );
+
+    $request = new ApiRequest(
+      $this->api,
+      $this->data['id'],
+      RequestInterface::METHOD_GET,
+      '/',
+      new CPASCollaborationRequest(),
+      'NODE',
+      CPASCollaborationRequest::getFieldsEnum()->getValues(),
+      new TypeChecker($param_types, $enums)
+    );
+    $request->addParams($params);
+    $request->addFields($fields);
+    return $pending ? $request : $request->execute();
+  }
+
 }

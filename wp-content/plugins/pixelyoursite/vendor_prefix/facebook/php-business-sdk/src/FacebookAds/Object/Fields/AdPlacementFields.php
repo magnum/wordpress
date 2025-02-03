@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,19 +34,30 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class AdPlacementFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const BUNDLE_ID = 'bundle_id';
-    const DISPLAY_FORMAT = 'display_format';
-    const EXTERNAL_PLACEMENT_ID = 'external_placement_id';
-    const GOOGLE_DISPLAY_FORMAT = 'google_display_format';
-    const ID = 'id';
-    const NAME = 'name';
-    const PLACEMENT_GROUP = 'placement_group';
-    const PLATFORM = 'platform';
-    const STATUS = 'status';
-    public function getFieldTypes()
-    {
-        return array('bundle_id' => 'string', 'display_format' => 'string', 'external_placement_id' => 'string', 'google_display_format' => 'string', 'id' => 'string', 'name' => 'string', 'placement_group' => 'Object', 'platform' => 'string', 'status' => 'string');
-    }
+
+class AdPlacementFields extends AbstractEnum {
+
+  const BUNDLE_ID = 'bundle_id';
+  const DISPLAY_FORMAT = 'display_format';
+  const EXTERNAL_PLACEMENT_ID = 'external_placement_id';
+  const GOOGLE_DISPLAY_FORMAT = 'google_display_format';
+  const ID = 'id';
+  const NAME = 'name';
+  const PLACEMENT_GROUP = 'placement_group';
+  const PLATFORM = 'platform';
+  const STATUS = 'status';
+
+  public function getFieldTypes() {
+    return array(
+      'bundle_id' => 'string',
+      'display_format' => 'string',
+      'external_placement_id' => 'string',
+      'google_display_format' => 'string',
+      'id' => 'string',
+      'name' => 'string',
+      'placement_group' => 'Object',
+      'platform' => 'string',
+      'status' => 'string',
+    );
+  }
 }

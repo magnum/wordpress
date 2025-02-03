@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,28 +21,32 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * Class DeliveryCategory
  *
  * Type of delivery for a purchase event.
  *
- * @package FacebookAds\Object\ServerSide
+ * @package PYS_PRO_GLOBAL\FacebookAds\Object\ServerSide
  */
-class DeliveryCategory extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    /**
-     * Customer needs to enter the store to get the purchased product.
-     */
-    const IN_STORE = 'in_store';
-    /**
-     * Customer picks up their order by driving to a store and waiting inside their vehicle.
-     */
-    const CURBSIDE = 'curbside';
-    /**
-     * Purchase is delivered to the customer's home.
-     */
-    const HOME_DELIVERY = 'home_delivery';
+class DeliveryCategory extends AbstractEnum {
+
+  /**
+  * Customer needs to enter the store to get the purchased product.
+  */
+  const IN_STORE = 'in_store';
+
+  /**
+  * Customer picks up their order by driving to a store and waiting inside their vehicle.
+  */
+  const CURBSIDE = 'curbside';
+
+  /**
+  * Purchase is delivered to the customer's home.
+  */
+  const HOME_DELIVERY = 'home_delivery';
 }

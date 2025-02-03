@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
  *
@@ -22,28 +21,36 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers;
 
 use PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceMultikeySchemaFields;
 use PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers\ValueNormalizerInterface;
-class DateNormalizer implements \PYS_PRO_GLOBAL\FacebookAds\Object\CustomAudienceNormalizers\ValueNormalizerInterface
-{
-    /**
-     * @param string $key
-     * @param string $key_value
-     * @return boolean
-     */
-    public function shouldNormalize($key, $key_value)
-    {
-        return \in_array($key, array(\PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceMultikeySchemaFields::BIRTH_DATE, \PYS_PRO_GLOBAL\FacebookAds\Object\Fields\CustomAudienceMultikeySchemaFields::BIRTH_MONTH));
-    }
-    /**
-     * @param string $key
-     * @param string $key_value
-     * @return string
-     */
-    public function normalize($key, $key_value)
-    {
-        return \str_pad(\preg_replace('/[^0-9]/', '', $key_value), 2, '0', \STR_PAD_LEFT);
-    }
+
+class DateNormalizer implements ValueNormalizerInterface {
+
+  /**
+   * @param string $key
+   * @param string $key_value
+   * @return boolean
+   */
+  public function shouldNormalize($key, $key_value) {
+    return in_array($key, array(
+      CustomAudienceMultikeySchemaFields::BIRTH_DATE,
+      CustomAudienceMultikeySchemaFields::BIRTH_MONTH
+    ));
+  }
+
+  /**
+   * @param string $key
+   * @param string $key_value
+   * @return string
+   */
+  public function normalize($key, $key_value) {
+    return str_pad(
+      preg_replace('/[^0-9]/', '', $key_value),
+      2,
+      '0',
+      STR_PAD_LEFT);
+  }
 }

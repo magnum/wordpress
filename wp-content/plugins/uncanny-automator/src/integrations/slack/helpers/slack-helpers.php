@@ -2,8 +2,6 @@
 
 namespace Uncanny_Automator;
 
-use Uncanny_Automator\Api_Server;
-
 /**
  * Class Slack_Helpers
  *
@@ -19,16 +17,35 @@ class Slack_Helpers {
 	const API_ENDPOINT = 'v2/slack';
 	public $options;
 	public $pro;
-	public $load_options;
+	public $load_options = true;
 	public $api_integration_url;
 	public $scope;
+
+	/**
+	 * The setting's ID.
+	 *
+	 * @var string $setting_tab
+	 */
+	public $setting_tab = 'slack_api';
+
+	/**
+	 * The settings page URL.
+	 *
+	 * @var string $settings_page_url
+	 */
+	public $settings_page_url = '';
+
+	/**
+	 * The scope.
+	 *
+	 * @var string $slack_scope
+	 */
+	public $slack_scope = '';
 
 	/**
 	 * Slack_Helpers constructor.
 	 */
 	public function __construct() {
-
-		$this->setting_tab = 'slack_api';
 
 		$this->settings_page_url = add_query_arg(
 			array(
@@ -73,7 +90,8 @@ class Slack_Helpers {
 	/**
 	 * Method setOptions
 	 *
-	 * @param  Slack_Helpers $options
+	 * @param Slack_Helpers $options
+	 *
 	 * @return void
 	 */
 	public function setOptions( Slack_Helpers $options ) { // phpcs:ignore
@@ -96,7 +114,7 @@ class Slack_Helpers {
 	 */
 	public function get_slack_client() {
 
-		$tokens = get_option( '_uncannyowl_slack_settings', array() );
+		$tokens = automator_get_option( '_uncannyowl_slack_settings', array() );
 
 		if ( empty( $tokens ) ) {
 			throw new \Exception( 'Slack is not connected' );
@@ -109,20 +127,22 @@ class Slack_Helpers {
 	 * Method maybe_customize_bot
 	 *
 	 * @param array $mesage
+	 *
 	 * @return array $mesage
 	 */
 	public function maybe_customize_bot( $message ) {
 
-		$bot_name = get_option( 'uap_automator_slack_api_bot_name' );
+		$settings_bot_name = automator_get_option( 'uap_automator_slack_api_bot_name', '' );
 
-		if ( ! empty( $bot_name ) ) {
-			$message['username'] = $bot_name;
+		if ( empty( $message['username'] ) && ! empty( $settings_bot_name ) ) {
+			$message['username'] = automator_get_option( 'uap_automator_slack_api_bot_name', '' );
 		}
 
-		$bot_icon = get_option( 'uap_automator_alck_api_bot_icon' );
+		$settings_bot_icon = automator_get_option( 'uap_automator_alck_api_bot_icon', '' );
 
-		if ( ! empty( $bot_icon ) ) {
-			$message['icon_url'] = $bot_icon;
+		if ( empty( $message['icon_url'] ) && ! empty( $settings_bot_icon ) ) {
+
+			$message['icon_url'] = automator_get_option( 'uap_automator_alck_api_bot_icon', '' );
 		}
 
 		return apply_filters( 'uap_slack_maybe_customize_bot', $message );
@@ -287,15 +307,16 @@ class Slack_Helpers {
 		}
 
 		$option = array(
-			'option_code'      => $option_code,
-			'label'            => $label,
-			'description'      => $description,
-			'placeholder'      => $placeholder,
-			'input_type'       => $type,
-			'supports_tokens'  => $tokens,
-			'required'         => $required,
-			'default_value'    => $default,
-			'supports_tinymce' => false,
+			'option_code'       => $option_code,
+			'label'             => $label,
+			'description'       => $description,
+			'placeholder'       => $placeholder,
+			'input_type'        => $type,
+			'supports_tokens'   => $tokens,
+			'required'          => $required,
+			'default_value'     => $default,
+			'supports_tinymce'  => false,
+			'supports_markdown' => true,
 		);
 
 		return apply_filters( 'uap_option_text_field', $option );
@@ -316,10 +337,6 @@ class Slack_Helpers {
 			);
 
 			$response = $this->api_call( $body );
-
-			if ( empty( $response['data']['ok'] ) || true !== $response['data']['ok'] ) {
-				throw new \Exception( 'Something went wrong when fetching the channles' );
-			}
 
 			$options[] = array(
 				'value' => '-1',
@@ -364,12 +381,8 @@ class Slack_Helpers {
 
 			$response = $this->api_call( $body );
 
-			if ( empty( $response['data']['ok'] ) || true !== $response['data']['ok'] ) {
-				throw new \Exception( 'Something went wrong when fetching the users' );
-			}
-
 			$options[] = array(
-				'value' => '-1',
+				'value' => '',
 				'text'  => __( 'Select a user', 'uncanny-automator' ),
 			);
 
@@ -487,7 +500,7 @@ class Slack_Helpers {
 
 		// Check is the parsed tokens are valid
 		if ( $tokens ) {
-			update_option( '_uncannyowl_slack_settings', $tokens );
+			automator_update_option( '_uncannyowl_slack_settings', $tokens );
 			$connect = 1;
 		}
 
@@ -517,7 +530,7 @@ class Slack_Helpers {
 
 		if ( '1' === automator_filter_input( 'disconnect' ) ) {
 			// Delete the saved data
-			delete_option( '_uncannyowl_slack_settings' );
+			automator_delete_option( '_uncannyowl_slack_settings' );
 
 			// Reload the page
 			wp_safe_redirect( $this->settings_page_url );
@@ -527,8 +540,9 @@ class Slack_Helpers {
 	/**
 	 * Method api_call
 	 *
-	 * @param  mixed $body
-	 * @param  mixed $action
+	 * @param mixed $body
+	 * @param mixed $action
+	 *
 	 * @return void
 	 */
 	public function api_call( $body, $action = null ) {
@@ -546,14 +560,17 @@ class Slack_Helpers {
 
 		$response = Api_Server::api_call( $params );
 
-		if ( 200 !== $response['statusCode'] ) {
-			throw new \Exception( $params['endpoint'] . ' failed' );
-		}
+		$this->check_for_errors( $response );
 
 		return $response;
 
 	}
 
+	/**
+	 * integration_status
+	 *
+	 * @return string
+	 */
 	public function integration_status() {
 
 		try {
@@ -565,5 +582,65 @@ class Slack_Helpers {
 		}
 
 		return $is_connected ? 'success' : '';
+	}
+
+	/**
+	 * check_for_errors
+	 *
+	 * @param mixed $response
+	 *
+	 * @return void
+	 */
+	public function check_for_errors( $response ) {
+
+		// The API class makes sure the [data] is always there.
+		$data = $response['data'];
+
+		if ( ! empty( $data['ok'] ) && true === $data['ok'] ) {
+			return;
+		}
+
+		$error = __( 'Unknown Slack API error occurred.', 'uncanny-automator' );
+
+		if ( ! empty( $data['error'] ) ) {
+			$error = __( 'Slack API returned an error: ', 'uncanny-automator' ) . $data['error'];
+		}
+
+		throw new \Exception( $error, $response['statusCode'] );
+	}
+
+	/**
+	 * bot_name_field
+	 *
+	 * @return array
+	 */
+	public function bot_name_field() {
+		return Automator()->helpers->recipe->field->text(
+			array(
+				'option_code' => 'BOT_NAME',
+				'input_type'  => 'text',
+				'required'    => false,
+				'label'       => __( 'Bot name', 'uncanny-automator' ),
+				'default'     => automator_get_option( 'uap_automator_slack_api_bot_name', '' ),
+			)
+		);
+	}
+
+	/**
+	 * bot_icon_field
+	 *
+	 * @return array
+	 */
+	public function bot_icon_field() {
+		return Automator()->helpers->recipe->field->text(
+			array(
+				'option_code' => 'BOT_ICON',
+				'input_type'  => 'url',
+				'required'    => false,
+				'label'       => __( 'Bot icon', 'uncanny-automator' ),
+				'default'     => automator_get_option( 'uap_automator_alck_api_bot_icon', '' ),
+				'description' => _x( 'Enter the URL of the image you wish to share. The image must be publicly accessible and at minimum 512x512 pixels and at maximum 1024x1024 pixels.', 'Slack', 'uncanny-automator' ),
+			)
+		);
 	}
 }

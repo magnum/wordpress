@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2015-present, Facebook, Inc. All rights reserved.
  *
@@ -22,9 +21,11 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 namespace PYS_PRO_GLOBAL\FacebookAds\Object\Fields;
 
 use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
+
 /**
  * This class is auto-generated.
  *
@@ -33,14 +34,20 @@ use PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum;
  * pull request for this class.
  *
  */
-class ProductItemErrorFields extends \PYS_PRO_GLOBAL\FacebookAds\Enum\AbstractEnum
-{
-    const DESCRIPTION = 'description';
-    const ERROR_PRIORITY = 'error_priority';
-    const ERROR_TYPE = 'error_type';
-    const TITLE = 'title';
-    public function getFieldTypes()
-    {
-        return array('description' => 'string', 'error_priority' => 'string', 'error_type' => 'string', 'title' => 'string');
-    }
+
+class ProductItemErrorFields extends AbstractEnum {
+
+  const DESCRIPTION = 'description';
+  const ERROR_PRIORITY = 'error_priority';
+  const ERROR_TYPE = 'error_type';
+  const TITLE = 'title';
+
+  public function getFieldTypes() {
+    return array(
+      'description' => 'string',
+      'error_priority' => 'string',
+      'error_type' => 'string',
+      'title' => 'string',
+    );
+  }
 }
